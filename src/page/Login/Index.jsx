@@ -1,6 +1,7 @@
 import React from 'react'
 import AuthLayout from '../../components/modules/layouts/AuthLayout'
 import NavLink from '../../components/modules/navigation/NavLink'
+import FormLogin from '../../components/modules/Form/FormLogin'
 
 const LoginPage = () => {
   return (
@@ -14,7 +15,7 @@ const LoginPage = () => {
         </p>
       }
     >
-      hai
+      <FormLogin/>
     </AuthLayout>
   )
 }
