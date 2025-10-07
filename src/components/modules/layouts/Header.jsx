@@ -4,6 +4,7 @@ import SearchBar from '../navigation/SearchBar'
 import Input from '../../common/Input'
 import Button from '../../common/Button'
 import { FaSearch } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
 
 const Header = () => {
   return (
@@ -13,7 +14,7 @@ const Header = () => {
         </div>
         <div className='w-full flex items-center gap-0 sm:gap-[5px]'>
             <div className='overflow-hidden w-full flex items-center h-[43px]'>
-                <Button className='aspect-square rounded-bl-[25px] rounded-tl-[25px] flex items-center justify-center h-[35px] md:h-[43px]'><FaSearch size={10} color='white'/></Button>
+                <Button className='aspect-square rounded-bl-[25px] rounded-tl-[25px] flex items-center justify-center h-[35px] md:h-[43px]' variant='primary'><FaSearch size={10} color='white'/></Button>
                 <div className='w-full flex items-center'>
                     <Input placeholder='Cari jasa sekarang' className='h-[35px] md:h-[43px] text-left md:indent-3 md:placeholder:text-h5 placeholder:text-h6'/>
                 </div>
@@ -22,7 +23,9 @@ const Header = () => {
         </div>
         <div className='p-1 sm:p-3 md:p-10 flex gap-[10px] md:gap-[15px] items-center h-full '>
             <NavLink link='/login' className='text-h6 md:text-h5 lg:text-h4 text-secondary font-bold' text='Masuk'/>
-            <Button className='h-[30px] w-[65px] sm:h-[35px] sm:w-[70px] md:h-[40px] md:w-[100px] lg:h-[45px] lg:w-[130px] text-white lg:text-h4 md:text-h5 text-h6 rounded-[25px] font-bold flex justify-center items-center'>Daftar</Button>
+            <Link to='/register'>
+                <Button className='h-[30px] w-[65px] sm:h-[35px] sm:w-[70px] md:h-[40px] md:w-[100px] lg:h-[45px] lg:w-[130px] text-white lg:text-h4 md:text-h5 text-h6 rounded-[25px] font-bold flex justify-center items-center' variant='primary'>Daftar</Button>
+            </Link>
         </div>
     </div>
   )
