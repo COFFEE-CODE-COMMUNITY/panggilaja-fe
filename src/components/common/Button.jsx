@@ -4,11 +4,11 @@ const combineClass = ((baseClass, customClass) => {
     return `${baseClass} ${customClass}`.trim()
 })
 
-const Button = ({className, onClick = (() => ''), children, variant = 'primary'}) => {
+const Button = ({className, onClick = (() => ''), children, variant}, link) => {
     let baseColor = ''
     if(variant === 'primary'){
         baseColor = ' bg-primary'
-    }else{
+    }else if(variant === 'secondary'){
         baseColor = ' bg-secondary'
     }
     const baseClass = 'px-4 py-2 cursor-pointer' + baseColor;
