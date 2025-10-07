@@ -6,12 +6,8 @@
   --text-h3 : 24px;
   --text-h4 : 18px;
   --text-h5 : 16px;
+  --text-h6 : 12px;
 
   --color-primary : #3A573F;
   --color-secondary : #3A573F;
-}
-
-*{
-  padding: 0px;
-  margin: 0px;
 }
