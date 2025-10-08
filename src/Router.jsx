@@ -7,6 +7,7 @@ import RegisterPage from './page/Register/Index'
 import NotFound from './page/NotFound'
 import AuthLayout from './components/modules/layouts/AuthLayout'
 import AppLayout from './components/modules/layouts/AppLayout'
+import ForgetPassPage from './page/ForgetPass/Index'
 
 const Router = createBrowserRouter([
     {
@@ -31,6 +32,10 @@ const Router = createBrowserRouter([
     {
         path : '/register',
         element : <RegisterPage/>
+    },
+    {
+        path : '/forget-password',
+        element : <ForgetPassPage/>
     },
 ])
 
