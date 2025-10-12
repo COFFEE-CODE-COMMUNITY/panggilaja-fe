@@ -1,0 +1,29 @@
+import React from 'react'
+import { TestimonialData } from '../dummy/TestimonialData'
+import Card from '../../../components/common/Card'
+import { FaStar } from 'react-icons/fa'
+
+const Review = () => {
+  return (
+    <div className='w-full flex flex-col gap-[15px]'>
+        <h2 className='lg:text-h2 md:text-h3 text-h4 font-semibold'>Apa kata konsumen</h2>
+        <div className='grid xl:grid-cols-5 grid-cols-3 gap-[10px]'>
+            {TestimonialData.map((review) => (
+                <Card className='w-full lg:px-[30px] md:px-[20px] px-[15px] py-[20px] flex flex-col gap-[10px] rounded-[40px] border-2 border-gray-100 relative' key={review.id}>
+                    <p className='lg:text-h4 md:text-h5 text-h6'>{review.author}</p>
+                    <p className='lg:text-h4 md:text-h5 text-h6 font-light h-full'>{review.review}</p>
+                    <div className='flex gap-[5px]'>
+                        <FaStar className='text-yellow-300' size={15}/>
+                        <FaStar className='text-yellow-300' size={15}/>
+                        <FaStar className='text-yellow-300' size={15}/>
+                        <FaStar className='text-yellow-300' size={15}/>
+                        <FaStar className='text-yellow-300' size={15}/>
+                    </div>
+                </Card>
+            ))}
+        </div>
+    </div>
+  )
+}
+
+export default Review
