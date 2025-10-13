@@ -7,7 +7,7 @@ export const AroundService = [
         review_count: 55,
         distance_km: 0.8, 
         category_id: '1',
-        price_range: 'Rp 50K - 300K',
+        price_range: 'Rp 50.000 - 300.000',
         photo_url: '/assets/img/budi.jpg',
     },
     {
@@ -18,7 +18,7 @@ export const AroundService = [
         review_count: 72,
         distance_km: 1.5,
         category_id: '3',
-        price_range: 'Mulai Rp 25K',
+        price_range: 'Rp 25.000 - Rp 100.000',
         photo_url: '/assets/img/rina.jpg',
     },
     {
@@ -29,7 +29,7 @@ export const AroundService = [
         review_count: 31,
         distance_km: 2.1,
         category_id: '2',
-        price_range: 'Rp 75K - 500K',
+        price_range: 'Rp 75.000 - 500.000',
         photo_url: '/assets/img/fajar.jpg',
     },
     {
@@ -40,7 +40,7 @@ export const AroundService = [
         review_count: 12,
         distance_km: 0.5,
         category_id: '4',
-        price_range: 'Mulai Rp 60K/Jam',
+        price_range: 'Rp 60.000 - Rp 350.000',
         photo_url: '/assets/img/santi.jpg',
     },
 ];
