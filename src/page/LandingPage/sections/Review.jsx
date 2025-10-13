@@ -9,15 +9,15 @@ const Review = () => {
         <h2 className='lg:text-h2 md:text-h3 text-h4 font-semibold'>Apa kata konsumen</h2>
         <div className='grid xl:grid-cols-5 grid-cols-3 gap-[10px]'>
             {TestimonialData.map((review) => (
-                <Card className='w-full lg:px-[30px] md:px-[20px] px-[15px] py-[20px] flex flex-col gap-[10px] rounded-[40px] border-2 border-gray-100 relative' key={review.id}>
+                <Card className='w-full lg:px-[30px] md:px-[20px] px-[15px] py-[20px] flex flex-col gap-[10px] rounded-[25px] border-2 border-gray-100 relative' key={review.id}>
                     <p className='lg:text-h4 md:text-h5 text-h6'>{review.author}</p>
                     <p className='lg:text-h4 md:text-h5 text-h6 font-light h-full'>{review.review}</p>
                     <div className='flex gap-[5px]'>
-                        <FaStar className='text-yellow-300' size={15}/>
-                        <FaStar className='text-yellow-300' size={15}/>
-                        <FaStar className='text-yellow-300' size={15}/>
-                        <FaStar className='text-yellow-300' size={15}/>
-                        <FaStar className='text-yellow-300' size={15}/>
+                        <FaStar className='text-star lg:text-[20px] md:text-[15px] text-[10px]'/>
+                        <FaStar className='text-star lg:text-[20px] md:text-[15px] text-[10px]'/>
+                        <FaStar className='text-star lg:text-[20px] md:text-[15px] text-[10px]'/>
+                        <FaStar className='text-star lg:text-[20px] md:text-[15px] text-[10px]'/>
+                        <FaStar className='text-star lg:text-[20px] md:text-[15px] text-[10px]'/>
                     </div>
                 </Card>
             ))}

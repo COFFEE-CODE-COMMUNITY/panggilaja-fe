@@ -7,12 +7,12 @@ import { FcGoogle } from 'react-icons/fc'
 
 const AuthLayout = ({title, subtitle, children, type, navAuth, reset}) => {
   return (
-    <div className='flex min-h-screen relative'>
+    <div className='flex min-h-screen relative '>
       <div className='w-full md:w-1/2 min-h-screen'>
-        <div className='xl:p-[10px] md:p-[5px] pl-[10px] sticky top-0 left-0 right-0 bg-white'>
-          <NavLink link='/' className='text-primary text-h3 lg:text-h2 font-bold' text='PanggilAja'/>
+        <div className='lg:p-[10px] md:p-[8px] px-[5px] py-[10px] pl-[10px] sticky top-0 left-0 right-0 rounded-br-[40px] sm:bg-white bg-primary'>
+          <NavLink link='/' className='text-h3 lg:text-h2 font-bold sm:text-primary text-white' text='PanggilAja'/>
         </div>
-        <div className='flex justify-center items-center h-full'>
+        <div className='flex justify-center items-center h-full rounded-tl-[40px] relative'>
           <div className='px-[30px] py-[20px] w-[532px] flex flex-col gap-[10px]'>
             <div>
               <h2 className='md:text-h3 text-h2  font-medium'>{title}</h2>

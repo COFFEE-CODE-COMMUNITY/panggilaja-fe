@@ -15,7 +15,7 @@ const Header = () => {
         <div className='w-full flex items-center gap-0 sm:gap-[5px]'>
             <div className='overflow-hidden w-full flex items-center h-[43px]'>
                 <Button className='rounded-bl-[25px] rounded-tl-[25px] items-center justify-center h-[35px] md:h-[43px] md:block hidden' variant='primary'><FaSearch size={10} color='white'/></Button>
-                <Input placeholder='Cari jasa sekarang' className='h-[35px] md:h-[43px] text-left md:indent-3 md:placeholder:text-h5 placeholder:text-h6'/>
+                <Input placeholder='Cari jasa sekarang' className='h-full text-left md:indent-3 md:placeholder:text-h5 placeholder:text-h6 border-2 border-gray-100 rounded-[25px]'/>
             </div>
             <NavLink text='Jadi Mitra' className='text-h6 sm:text-h5 md:text-h4 w-[85px] md:w-[105px] font-light text-center' link='/partner'/>
         </div>
