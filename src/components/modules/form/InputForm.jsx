@@ -6,7 +6,7 @@ const combineClass = ((baseClass, customClass) => {
 })
 
 const InputForm = ({label, id, placeholder, className, variant, type}) => {
-    const baseClass = 'px-4 py-2 rounded-[15px] shadow-md bg-white h-[62px] pl-[20px] lg:text-h4 text-h5';
+    const baseClass = 'px-4 py-2 rounded-[15px] shadow-md bg-white lg:h-[62px] md:h-[53px] h-[45px] pl-[20px] lg:text-h4 md:text-h5 text-h6 md:placeholder:text-h5 placeholder:text-h6';
     let layout = ''
 
     if(variant === 'cols' && label){
@@ -19,7 +19,7 @@ const InputForm = ({label, id, placeholder, className, variant, type}) => {
 
   return (
     <div className={layout}>
-        {label && <label htmlFor={id} className='text-h5 lg:text-h4 '>{label}</label>}
+        {label && <label htmlFor={id} className='lg:text-h4 md:text-h5 text-h6'>{label}</label>}
         <Input className={finalClass} id={id} placeholder={placeholder} type={type}/>
     </div>
   )

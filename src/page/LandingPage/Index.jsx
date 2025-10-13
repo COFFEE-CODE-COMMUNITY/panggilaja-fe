@@ -7,7 +7,7 @@ import Review from './sections/Review'
 
 const LandingPage = () => {
   return (
-    <div className='lg:px-[50px] px-[20px] py-[30px] flex flex-col lg:gap-[40px] gap-[25px]'>
+    <div className='lg:px-[20px] md:px-[15px] px-[10px] lg:py-[15px] md:py[10px] py-[5px] flex flex-col lg:gap-[30px] md:gap-[20px] gap-[10px]'>
       <Banner/>
       <Category/>
       <ServiceAround/>
