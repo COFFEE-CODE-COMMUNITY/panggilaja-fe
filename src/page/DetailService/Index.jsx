@@ -22,10 +22,28 @@ const DetailService = () => {
       }
     }, [id, dispatch])
 
+    if(serviceStatus === 'loading'){
+      return (
+        <div>Sedang memuat...</div>
+      )
+    }
+
+    if(serviceStatus === 'error'){
+      return (
+        <div>terjadi kesalahan</div>
+      )
+    }
+
+    if(!service){
+      return (
+        <div>data tidak ada</div>
+      )
+    }
+
     console.log(service)
     console.log(review)
   return (
-    <div className='flex min-h-screen gap-[35px]'>
+    <div className='md:flex min-h-screen gap-[35px]'>
         <ImageService/>
         <InformationService
           name={service.name}

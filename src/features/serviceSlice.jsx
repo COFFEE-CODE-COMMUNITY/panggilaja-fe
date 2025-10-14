@@ -36,7 +36,7 @@ const reviewEntity = createEntityAdapter({
 
 const serviceSlice = createSlice({
     name : 'service',
-    initialState : {
+    initialState : serviceEntity.getInitialState({
         allServiceStatus : 'idle',
         allServiceError : null,
 
@@ -47,7 +47,7 @@ const serviceSlice = createSlice({
         reviewService : reviewEntity.getInitialState(),
         reviewServiceStatus : 'idle',
         reviewServiceError : null,
-    },
+    }),
     reducers : {},
     extraReducers : (builder) => {
         builder

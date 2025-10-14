@@ -3,7 +3,7 @@ import { FaStar } from 'react-icons/fa'
 
 const InformationService = ({name, title, totalReview, rangePrice, description, review}) => {
   return (
-    <div className='h-full w-1/2 flex flex-col'>
+    <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col'>
         <div>
             <p className='text-h5'>{name}</p>
             <h2 className='text-h2'>{title}</h2>
