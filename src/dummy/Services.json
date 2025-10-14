@@ -1,0 +1,62 @@
+{
+  "services": [
+    {
+      "id": 101,
+      "name": "Pak Budi Tukang Pipa",
+      "role": "Tukang Pipa & Ledeng",
+      "rating": 4.9,
+      "review_count": 55,
+      "distance_km": 0.8,
+      "category_id": "1",
+      "price_range": "Rp 50.000 - 300.000",
+      "location_text": "Bandung Kota",
+      "is_available": true,
+      "description": "Saya adalah Pak Budi Santoso, ahli di bidang perpipaan dan konstruksi rumah tangga dengan pengalaman lebih dari 7 tahun. Siap mengatasi masalah pipa bocor, saluran mampet, hingga instalasi sistem air baru. Mengutamakan kerapihan, kecepatan, dan memberikan garansi pekerjaan. Harga tertera adalah estimasi, negosiasi final di lokasi."
+    },
+    {
+      "id": 102,
+      "name": "Ibu Rina Penjahit",
+      "role": "Penjahit & Permak Kilat",
+      "rating": 4.8,
+      "review_count": 72,
+      "distance_km": 1.5,
+      "category_id": "3",
+      "price_range": "Rp 25.000 - Rp 100.000",
+      "location_text": "Bandung Utara",
+      "is_available": true,
+      "description": "Ibu Rina adalah penjahit berpengalaman yang melayani permak pakaian, jahit baju baru (desain sederhana), hingga perbaikan resleting. Hasil jahitan rapi, kuat, dan pengerjaan cepat. Bisa dipanggil ke rumah atau antar jemput area Bandung Utara. Konsultasi desain gratis!"
+    },
+    {
+      "id": 103,
+      "name": "Fajar Servis AC",
+      "role": "Teknisi AC & Kulkas",
+      "rating": 4.6,
+      "review_count": 31,
+      "distance_km": 2.1,
+      "category_id": "2",
+      "price_range": "Rp 75.000 - 500.000",
+      "location_text": "Bandung Selatan",
+      "is_available": true,
+      "description": "Melayani servis, cuci, dan perbaikan AC (split/standing) serta kulkas semua merek. Garansi 3 bulan untuk setiap perbaikan sparepart. Teknisi berpengalaman dan profesional. Harga belum termasuk penggantian sparepart."
+    },
+    {
+      "id": 104,
+      "name": "Santi Cleaning Service",
+      "role": "Jasa Bersih-Bersih Rumah",
+      "rating": 5.0,
+      "review_count": 12,
+      "distance_km": 0.5,
+      "category_id": "4",
+      "price_range": "Rp 60.000 - Rp 350.000",
+      "location_text": "Bandung Tengah",
+      "is_available": true,
+      "description": "Jasa kebersihan profesional untuk rumah, apartemen, atau kantor. Melayani pembersihan harian, mingguan, hingga pasca-renovasi. Menggunakan peralatan dan cairan pembersih ramah lingkungan. Tim terpercaya dan berpengalaman."
+    }
+  ],
+  "reviews": [
+    {"id": 1, "service_id": 101, "comment": "Cepat dan jujur, pipa mampet langsung beres!", "rating": 5, "reviewer_name": "Bayu"},
+    {"id": 2, "service_id": 103, "comment": "AC jadi dingin lagi, good job!", "rating": 4, "reviewer_name": "Dewi"},
+    {"id": 3, "service_id": 101, "comment": "Harga lumayan tapi sebanding dengan kualitas kerjanya.", "rating": 4, "reviewer_name": "Rizky"},
+    {"id": 4, "service_id": 104, "comment": "Rumah jadi bersih kinclong, puas sekali!", "rating": 5, "reviewer_name": "Siska"}
+  ]
+}

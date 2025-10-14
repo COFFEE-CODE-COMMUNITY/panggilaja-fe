@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 
 const Header = () => {
   return (
-    <div className='xl:h-[80px] lg:h-[72px] md:h-[64px] sm:h-[56px] h-[48px] w-full flex justify-center xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center lg:px-[70px] md:px-[40px] px-[25px]'>
+    <div className='xl:h-[80px] lg:h-[72px] md:h-[64px] sm:h-[56px] h-[48px] w-full flex justify-center xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center lg:px-[70px] md:px-[40px] px-[25px] sticky top-0 bg-white z-20'>
         <div className='h-full flex items-center justify-center lg:pr-[125px] md:pr-[80px] pr-[10px]'>
             <NavLink link='/' text='PanggilAja' className='md:text-h4 sm:text-h3 text-h5 text-secondary font-bold'/>
         </div>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { TestimonialData } from '../dummy/TestimonialData'
+import { TestimonialData } from '../../../dummy/TestimonialData'
 import Card from '../../../components/common/Card'
 import { FaStar } from 'react-icons/fa'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import Card from '../../../components/common/Card'
-import {AroundService} from '../dummy/ServiceAroundData'
+import {AroundService} from '../../../dummy/ServiceAroundData'
 import Bannerr from '../../../assets/Bannerr.jpeg'
 import { FaStar } from 'react-icons/fa'
 
