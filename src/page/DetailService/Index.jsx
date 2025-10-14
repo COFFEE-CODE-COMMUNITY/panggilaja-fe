@@ -2,6 +2,8 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { getReviewByServicesById, getServicesById, selectAllServiceReview, selectReviewServiceStatus, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
+import ImageService from './sections/ImageService'
+import InformationService from './sections/InformationService'
 
 const DetailService = () => {
     const {id} = useParams()
@@ -23,9 +25,14 @@ const DetailService = () => {
     console.log(service)
     console.log(review)
   return (
-    <div className='flex min-h-screen'>
-        <div className='min-h-screen w-1/2'>s</div>
-        <div className='h-full w-1/2'></div>
+    <div className='flex min-h-screen gap-[35px]'>
+        <ImageService/>
+        <InformationService
+          name={service.name}
+          title={service.role}
+          totalReview={service.review_count}
+          description={service.description}
+        />
     </div>
   )
 }
