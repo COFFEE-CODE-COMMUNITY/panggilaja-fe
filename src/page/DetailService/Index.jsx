@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import { getReviewByServicesById, getServicesById, selectAllServiceReview, selectReviewServiceStatus, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
+import { getDetailServicesById, getReviewByServicesById, getServicesById, selectAllServiceReview, selectDetailService, selectDetailServiceStatus, selectReviewServiceStatus, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
 import ImageService from './sections/ImageService'
 import InformationService from './sections/InformationService'
 
@@ -13,14 +13,22 @@ const DetailService = () => {
     const serviceStatus = useSelector(selectSelectedServiceStatus)
     const review = useSelector(selectAllServiceReview)
     const reviewStatus = useSelector(selectReviewServiceStatus)
+    const detailService = useSelector(selectDetailService)
+    const detailServiceStatus = useSelector(selectDetailServiceStatus)
+
 
     useEffect(() => {
-      if(id){
+      if(id && serviceStatus == 'idle'){
         dispatch(getServicesById(id))
-
         dispatch(getReviewByServicesById(id))
       }
-    }, [id, dispatch])
+    }, [id, dispatch, serviceStatus])
+
+    useEffect(() => {
+      if(service && id && detailServiceStatus == 'idle'){
+        dispatch(getDetailServicesById(service.provider_id))
+      }
+    },[dispatch, service, detailServiceStatus])
 
     if(serviceStatus === 'loading'){
       return (
@@ -40,8 +48,8 @@ const DetailService = () => {
       )
     }
 
-    console.log(service)
-    console.log(review)
+    
+    console.log(detailService)
   return (
     <div className='md:flex min-h-screen gap-[35px]'>
         <ImageService/>
@@ -50,6 +58,9 @@ const DetailService = () => {
           title={service.role}
           totalReview={service.review_count}
           description={service.description}
+          rangePrice={service.price_range}
+          overalRating={detailService.overall_rating}
+          allTotalReview={detailService.total_reviews_count}
         />
     </div>
   )

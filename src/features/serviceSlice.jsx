@@ -26,12 +26,32 @@ export const getReviewByServicesById = createAsyncThunk(
     }
 )
 
+export const getDetailServices = createAsyncThunk(
+    'services/getDetailServices',
+    async () => {
+        const res = await axios.get(`http://localhost:3000/providers`)
+        return res.data
+    }
+)
+
+export const getDetailServicesById = createAsyncThunk(
+    'services/getDetailServicesById',
+    async (id) => {
+        const res = await axios.get(`http://localhost:3000/providers/${id}`)
+        return res.data
+    }
+)
+
 const serviceEntity = createEntityAdapter({
     selectId : (service) => service.id
 })
 
 const reviewEntity = createEntityAdapter({
     selectId : (review) => review.id
+})
+
+const detailServiceEntity = createEntityAdapter({
+    selectId : (detail) => detail.id
 })
 
 const serviceSlice = createSlice({
@@ -47,6 +67,14 @@ const serviceSlice = createSlice({
         reviewService : reviewEntity.getInitialState(),
         reviewServiceStatus : 'idle',
         reviewServiceError : null,
+
+        allDetailService : detailServiceEntity.getInitialState(),
+        allDetailServiceStatus : 'idle',
+        allDetailServiceError : null,
+
+        detailService : null,
+        detailServiceStatus : 'idle',
+        detailServiceError : null,
     }),
     reducers : {},
     extraReducers : (builder) => {
@@ -89,6 +117,32 @@ const serviceSlice = createSlice({
                 state.reviewServiceStatus = 'error',
                 state.reviewServiceStatus = action.error.message
             })
+
+            //get all detail service
+            .addCase(getDetailServices.pending, (state) => {
+                state.allDetailServiceStatus = 'loading'
+            })
+            .addCase(getDetailServices.fulfilled, (state, action) => {
+                state.allDetailServiceStatus = 'success',
+                detailServiceEntity.setAll(state.allDetailService, action.payload)
+            })
+            .addCase(getDetailServices.rejected, (state, action) => {
+                state.allDetailServiceStatus = 'error',
+                state.allDetailServiceError = action.error.message
+            })
+
+            //get detail service by id
+            .addCase(getDetailServicesById.pending, (state) => {
+                state.detailServiceStatus = 'loading'
+            })
+            .addCase(getDetailServicesById.fulfilled, (state, action) => {
+                state.detailServiceStatus = 'success',
+                state.detailService = action.payload
+            })
+            .addCase(getDetailServicesById.rejected, (state, action) => {
+                state.detailServiceStatus = 'error',
+                state.detailServiceStatus = action.error.message
+            })
     }
 })
 
@@ -101,6 +155,10 @@ export const {
     selectAll : selectAllServiceReview
 } = reviewEntity.getSelectors(state => state.service.reviewService)
 
+export const {
+    selectAll : selectAllDetailService
+} = detailServiceEntity.getSelectors(state => state.service.allDetailService)
+
 export const selectSelectedService = (state) => state.service.selectedService
 export const selectSelectedServiceStatus = (state) => state.service.selectedServiceStatus
 export const selectSelectedServiceError = (state) => state.service.selectedServiceError
@@ -110,5 +168,12 @@ export const selectAllServiceError = (state) => state.service.allServiceError
 
 export const selectReviewServiceStatus = (state) => state.service.reviewServiceStatus
 export const selectReviewServiceError = (state) => state.service.reviewServiceError
+
+export const selectAllDetailServiceStatus = (state) => state.service.allDetailServiceStatus
+export const selectAllDetailServiceError = (state) => state.service.allDetailServiceError
+
+export const selectDetailService = (state) => state.service.detailService 
+export const selectDetailServiceStatus = (state) => state.service.detailServiceStatus
+export const selectDetailServiceError = (state) => state.service.detailServiceError
 
 export default serviceSlice.reducer
