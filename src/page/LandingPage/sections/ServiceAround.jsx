@@ -43,7 +43,7 @@ const ServiceAround = () => {
                     <div className='h-3/4 bg-amber-100' style={{
                         backgroundImage : `url(${Bannerr    })`
                     }}></div>
-                    <div className='bg-white absolute bottom-0 left-0 right-0 lg:h-[120px] md:h-[120px] h-[90px]  rounded-tl-[15px] rounded-tr-[15px] lg:px-[20px] lg:py-[15px] md:px-[15px] md:py-[10px] px-[15px] py-[10px] flex flex-col md:gap-[1px] gap-0'>
+                    <div className='bg-white absolute bottom-0 left-0 right-0 lg:h-[140px] md:h-[130px] h-[90px]  rounded-tl-[15px] rounded-tr-[15px] lg:px-[20px] lg:py-[15px] md:px-[15px] md:py-[10px] px-[15px] py-[10px] flex flex-col md:gap-[1px] gap-0'>
                         <Link to={`service/${service.id}`}>
                             <p className='lg:text-h4 md:text-h5 text-h6 cursor-pointer'>{service.role}</p>
                         </Link>
