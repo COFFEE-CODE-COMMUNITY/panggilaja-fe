@@ -18,17 +18,17 @@ const DetailService = () => {
 
 
     useEffect(() => {
-      if(id && serviceStatus == 'idle'){
+      if(id){
         dispatch(getServicesById(id))
         dispatch(getReviewByServicesById(id))
       }
-    }, [id, dispatch, serviceStatus])
+    }, [id, dispatch])
 
     useEffect(() => {
-      if(service && id && detailServiceStatus == 'idle'){
+      if(service){
         dispatch(getDetailServicesById(service.provider_id))
       }
-    },[dispatch, service, detailServiceStatus])
+    },[dispatch, service])
 
     if(serviceStatus === 'loading'){
       return (
@@ -48,8 +48,25 @@ const DetailService = () => {
       )
     }
 
+    if(detailServiceStatus == 'loading'){
+      return (
+        <div>Sedang memuat...</div>
+      )
+    }
+
+    if(detailServiceStatus == 'error'){
+      return (
+        <div>data tidak ada</div>
+      )
+    }
+
+    if(!detailService){
+      return (
+        <div>Sedang memuat...</div>
+      )
+    }
     
-    console.log(detailService)
+    console.log(review)
   return (
     <div className='md:flex min-h-screen gap-[35px]'>
         <ImageService/>
@@ -59,8 +76,9 @@ const DetailService = () => {
           totalReview={service.review_count}
           description={service.description}
           rangePrice={service.price_range}
-          overalRating={detailService.overall_rating}
+          overalRating={detailService.overal_rating}
           allTotalReview={detailService.total_reviews_count}
+          review={review}
         />
     </div>
   )
