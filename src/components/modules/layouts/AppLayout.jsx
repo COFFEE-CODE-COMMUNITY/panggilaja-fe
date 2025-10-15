@@ -5,7 +5,7 @@ import Footer from './Footer'
 
 const AppLayout = () => {
   return (
-    <div>
+    <div className='relative'>
       <Header/>
       <Outlet/>
       <Footer/>
