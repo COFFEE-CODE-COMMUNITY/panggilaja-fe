@@ -1,0 +1,205 @@
+{
+  "providers": [
+    {
+      "id": "1",  
+      "full_name": "Budi Santoso",
+      "primary_role": "Spesialis Konstruksi & Pipa",
+      "overall_rating": 4.8,
+      "total_reviews_count": 83,
+      "profile_bio_long": "Saya Budi Santoso, ahli di bidang perpipaan dan konstruksi rumah tangga sejak 2015. Menjamin hasil kerja yang rapi, transparan, dan bergaransi.",
+      "location_city": "Bandung Kota",
+      "profile_photo_url": "/assets/img/budi_profile.jpg"
+    },
+    {
+      "id": "2", 
+      "full_name": "Rina Wijaya",
+      "primary_role": "Jasa Menjahit & Kreatif Digital",
+      "overall_rating": 4.6,
+      "total_reviews_count": 97,
+      "profile_bio_long": "Ibu Rina, penjahit berpengalaman, melayani permak baju hingga desain grafis sederhana. Pengerjaan cepat dan rapi. Siap dipanggil area Bandung Utara.",
+      "location_city": "Bandung Utara",
+      "profile_photo_url": "/assets/img/rina_profile.jpg"
+    },
+    {
+      "id": "3", 
+      "full_name": "Fajar Haryanto",
+      "primary_role": "Teknisi AC & Elektronik",
+      "overall_rating": 4.7,
+      "total_reviews_count": 70,
+      "profile_bio_long": "Saya Fajar, teknisi bersertifikat untuk perbaikan AC, kulkas, dan elektronik rumah tangga lainnya. Garansi 3 bulan untuk setiap perbaikan.",
+      "location_city": "Bandung Selatan",
+      "profile_photo_url": "/assets/img/fajar_profile.jpg"
+    },
+    {
+      "id": "4", 
+      "full_name": "Santi Dewi",
+      "primary_role": "Jasa Kebersihan Profesional",
+      "overall_rating": 4.9,
+      "total_reviews_count": 62,
+      "profile_bio_long": "Layanan bersih-bersih rumah dan kantor, higienis & terpercaya. Tim kami sudah terlatih dan menggunakan cairan pembersih ramah lingkungan.",
+      "location_city": "Bandung Tengah",
+      "profile_photo_url": "/assets/img/santi_profile.jpg"
+    },
+    {
+      "id": "5", 
+      "full_name": "Tono Wijoyo",
+      "primary_role": "Ahli Pertukangan Kayu & Kebun",
+      "overall_rating": 4.5,
+      "total_reviews_count": 40,
+      "profile_bio_long": "Pak Tono siap membantu dengan segala kebutuhan pertukangan kayu, mulai dari perbaikan hingga pembuatan furniture custom. Juga ahli perawatan taman.",
+      "location_city": "Bandung Timur",
+      "profile_photo_url": "/assets/img/tono_profile.jpg"
+    },
+    {
+      "id": "6", 
+      "full_name": "Lia Handayani",
+      "primary_role": "Kecantikan & Fesyen",
+      "overall_rating": 5.0,
+      "total_reviews_count": 35,
+      "profile_bio_long": "Lia MUA dan cuci sepatu premium. Layanan kecantikan profesional dan perawatan fashion Anda dengan sentuhan ahli. Kualitas terjamin.",
+      "location_city": "Bandung Utara",
+      "profile_photo_url": "/assets/img/lia_profile.jpg"
+    },
+    {
+      "id": "7", 
+      "full_name": "Yoga Pratama",
+      "primary_role": "Fotografer & Videografer",
+      "overall_rating": 4.7,
+      "total_reviews_count": 25,
+      "profile_bio_long": "Abadikan momen spesial Anda dengan Yoga Fotografi. Profesional untuk event, pre-wedding, produk, dan video dokumentasi.",
+      "location_city": "Bandung Kota",
+      "profile_photo_url": "/assets/img/yoga_profile.jpg"
+    },
+    {
+      "id": "8", 
+      "full_name": "Mita Rahayu",
+      "primary_role": "Jasa Katering & Kuliner",
+      "overall_rating": 4.9,
+      "total_reviews_count": 45,
+      "profile_bio_long": "Cicipi lezatnya masakan rumahan Mita Katering. Menerima pesanan untuk berbagai acara, dari arisan hingga pesta kecil. Higienis dan nikmat.",
+      "location_city": "Bandung Selatan",
+      "profile_photo_url": "/assets/img/mita_profile.jpg"
+    }
+  ],
+  "services": [
+    {
+      "id": "101", 
+      "provider_id": "1", 
+      "name": "Perbaikan Pipa Bocor",
+      "role": "Tukang Pipa & Ledeng",
+      "rating": 4.9,
+      "review_count": 55,
+      "distance_km": 0.8,
+      "category_id": "1",
+      "price_range": "Rp 50.000 - 300.000",
+      "location_text": "Bandung Kota",
+      "description": "Siap mengatasi masalah pipa bocor, saluran mampet, hingga instalasi sistem air baru. Mengutamakan kerapihan dan garansi pekerjaan."
+    },
+    {
+      "id": "102", 
+      "provider_id": "2", 
+      "name": "Permak Pakaian Kilat",
+      "role": "Penjahit & Permak Kilat",
+      "rating": 4.8,
+      "review_count": 72,
+      "distance_km": 1.5,
+      "category_id": "3",
+      "price_range": "Rp 25.000 - Rp 100.000",
+      "location_text": "Bandung Utara",
+      "description": "Melayani permak pakaian, perbaikan resleting, dan jahit baju baru (desain sederhana). Pengerjaan cepat dan rapi."
+    },
+    {
+      "id": "103", 
+      "provider_id": "3", 
+      "name": "Servis AC Rumah",
+      "role": "Teknisi AC & Kulkas",
+      "rating": 4.6,
+      "review_count": 31,
+      "distance_km": 2.1,
+      "category_id": "2",
+      "price_range": "Rp 75.000 - 500.000",
+      "location_text": "Bandung Selatan",
+      "description": "Melayani servis, cuci, dan perbaikan AC (split/standing) serta kulkas semua merek. Garansi 3 bulan untuk perbaikan."
+    },
+    {
+      "id": "104", 
+      "provider_id": "4", 
+      "name": "Pembersihan Rumah Harian",
+      "role": "Jasa Bersih-Bersih Rumah",
+      "rating": 5.0,
+      "review_count": 12,
+      "distance_km": 0.5,
+      "category_id": "4",
+      "price_range": "Rp 60.000 - Rp 350.000",
+      "location_text": "Bandung Tengah",
+      "description": "Jasa kebersihan profesional untuk rumah, apartemen, atau kantor. Melayani pembersihan harian, mingguan, hingga pasca-renovasi."
+    },
+    {
+      "id": "105", 
+      "provider_id": "1", 
+      "name": "Jasa Pengelasan Pagar",
+      "role": "Spesialis Konstruksi Besi",
+      "rating": 4.7,
+      "review_count": 28,
+      "distance_km": 3.2,
+      "category_id": "1",
+      "price_range": "Mulai Rp 80.000/meter",
+      "location_text": "Bandung Barat",
+      "description": "Menerima pembuatan dan perbaikan pagar besi minimalis modern, teralis, dan kanopi. Material berkualitas, pengerjaan rapi dan cepat."
+    },
+    {
+      "id": "106", 
+      "provider_id": "5", 
+      "name": "Perawatan Taman",
+      "role": "Tukang Kebun & Taman",
+      "rating": 4.5,
+      "review_count": 20,
+      "distance_km": 0.9,
+      "category_id": "4",
+      "price_range": "Rp 50.000 - 250.000",
+      "location_text": "Bandung Timur",
+      "description": "Ahli perawatan taman, pemotongan rumput, penanaman bunga, dan pembersihan kebun. Siap membuat taman Anda asri kembali."
+    },
+    {
+      "id": "107", 
+      "provider_id": "2", 
+      "name": "Desain Grafis Logo & Brosur",
+      "role": "Desainer Logo & Brosur",
+      "rating": 4.5,
+      "review_count": 15,
+      "distance_km": 4.0,
+      "category_id": "3",
+      "price_range": "Mulai Rp 150.000",
+      "location_text": "Bandung Kota",
+      "description": "Jasa desain grafis profesional untuk logo, brosur, banner, dan kartu nama. Pengerjaan cepat dan revisi sampai cocok."
+    },
+    {
+      "id": "108", 
+      "provider_id": "6", 
+      "name": "Jasa Cuci Sepatu Premium",
+      "role": "Cuci Sepatu & Tas Premium",
+      "rating": 5.0,
+      "review_count": 18,
+      "distance_km": 1.7,
+      "category_id": "5",
+      "price_range": "Mulai Rp 35.000",
+      "location_text": "Bandung Utara",
+      "description": "Jasa cuci sepatu dan tas branded dengan metode dry clean dan cairan khusus. Sepatu bersih, wangi, dan terawat seperti baru."
+    }
+  ],
+  "reviews": [
+    {"id": 1, "service_id": "101", "comment": "Cepat dan jujur, pipa mampet langsung beres!", "rating": 5, "reviewer_name": "Bayu", "date": "2024-03-01"},
+    {"id": 2, "service_id": "103", "comment": "AC jadi dingin lagi, good job!", "rating": 4, "reviewer_name": "Dewi", "date": "2024-02-28"},
+    {"id": 3, "service_id": "101", "comment": "Harga lumayan tapi sebanding dengan kualitas kerjanya.", "rating": 4, "reviewer_name": "Rizky", "date": "2024-02-25"},
+    {"id": 4, "service_id": "104", "comment": "Rumah jadi bersih kinclong, puas sekali!", "rating": 5, "reviewer_name": "Siska", "date": "2024-02-20"},
+    {"id": 5, "service_id": "105", "comment": "Pagar yang dilas Pak Budi sangat kuat dan rapi.", "rating": 5, "reviewer_name": "Dani", "date": "2024-03-05"},
+    {"id": 6, "service_id": "102", "comment": "Jahitan Ibu Rina halus, cocok untuk baju formal.", "rating": 5, "reviewer_name": "Citra", "date": "2024-03-02"},
+    {"id": 7, "service_id": "103", "comment": "Teknisi Fajar sangat sopan dan profesional.", "rating": 5, "reviewer_name": "Hadi", "date": "2024-03-03"},
+    {"id": 8, "service_id": "104", "comment": "Bu Santi sangat teliti, pasti akan dipakai lagi.", "rating": 5, "reviewer_name": "Eka", "date": "2024-03-01"},
+    {"id": 9, "service_id": "106", "comment": "Taman jadi asri, rumput dipotong rapi.", "rating": 4, "reviewer_name": "Gani", "date": "2024-03-02"},
+    {"id_id": 10, "service_id": "107", "comment": "Logo yang dibuatkan sangat sesuai harapan, cepat pengerjaannya.", "rating": 5, "reviewer_name": "Bella", "date": "2024-02-28"},
+    {"id": 11, "service_id": "108", "comment": "Sepatu kesayangan bersih kembali, wangi pula!", "rating": 5, "reviewer_name": "Desi", "date": "2024-03-04"},
+    {"id": 12, "service_id": "109", "comment": "Hasil foto Yoga sangat memuaskan untuk acara pernikahan kami.", "rating": 5, "reviewer_name": "Kevin", "date": "2024-03-01"},
+    {"id": 13, "service_id": "110", "comment": "Makanannya enak semua, tamu pada suka!", "rating": 4, "reviewer_name": "Lina", "date": "2024-02-29"}
+  ]
+}

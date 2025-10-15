@@ -7,22 +7,22 @@ import { FcGoogle } from 'react-icons/fc'
 
 const AuthLayout = ({title, subtitle, children, type, navAuth, reset}) => {
   return (
-    <div className='flex min-h-screen relative'>
+    <div className='flex min-h-screen relative '>
       <div className='w-full md:w-1/2 min-h-screen'>
-        <div className='xl:p-[10px] md:p-[5px] pl-[10px] sticky top-0 left-0 right-0 bg-white'>
-          <NavLink link='/' className='text-primary text-h3 lg:text-h2 font-bold' text='PanggilAja'/>
+        <div className='lg:p-[10px] md:p-[8px] px-[5px] py-[10px] pl-[10px] sticky top-0 left-0 right-0 rounded-br-[40px] sm:bg-white bg-primary'>
+          <NavLink link='/' className='text-h3 lg:text-h2 font-bold sm:text-primary text-white' text='PanggilAja'/>
         </div>
-        <div className='flex justify-center items-center h-full'>
+        <div className='flex justify-center items-center h-full rounded-tl-[40px] relative'>
           <div className='px-[30px] py-[20px] w-[532px] flex flex-col gap-[10px]'>
             <div>
-              <h2 className='text-h3 lg:text-h2 font-medium'>{title}</h2>
-              <p className='text-h5 lg:text-secondary lg:text-h4'>{subtitle}</p>
+              <h2 className='md:text-h3 text-h2  font-medium'>{title}</h2>
+              <p className='md:text-h5 text-h6 lg:text-secondary '>{subtitle}</p>
             </div>
             {!reset && 
-              <Button className='w-full h-[62px] bg-white shadow-sm rounded-[30px] text-h5 lg:text-h4 flex items-center'><FcGoogle size={20}/><p className='text-center w-full'>Lanjut dengan google</p></Button>}
+              <Button className='w-full md:h-[62px] h-[45px] bg-white shadow-sm rounded-[30px] md:text-h5 text-h6 lg:text-h4 flex items-center'><FcGoogle size={20}/><p className='text-center w-full'>Lanjut dengan google</p></Button>}
             {!reset && <p className='w-full text-center text-h6 lg:text-h5 font-light'>atau</p>}
             {children}
-            <Button className='w-full h-[62px] text-center text-h4 lg:text-h3 font-semibold bg-primary text-white rounded-[15px]'>{type}</Button>
+            <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[15px] flex justify-center items-center'>{type}</Button>
             {navAuth}
           </div>
         </div>
