@@ -1,9 +1,9 @@
 import React from 'react'
 import AuthLayout from '../../components/modules/layouts/AuthLayout'
-import ForgetPassForm from './sections/ForgetPassForm'
 import { Link } from 'react-router-dom'
+import RequestForm from './sections/RequestForm'
 
-const ForgetPassPage = () => {
+const RequestReset = () => {
   return (
     <AuthLayout
         title='Lupa Kata Sandi Anda?'
@@ -14,9 +14,9 @@ const ForgetPassPage = () => {
             <Link to='/login' className='text-primary text-center'>Kembali ke login</Link>
         }
     >
-        <ForgetPassForm/>
+        <RequestForm/>
     </AuthLayout>
   )
 }
 
-export default ForgetPassPage
+export default RequestReset

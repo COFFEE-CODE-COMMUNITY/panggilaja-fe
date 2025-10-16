@@ -6,8 +6,10 @@ import LoginPage from './page/Login/Index'
 import RegisterPage from './page/Register/Index'
 import NotFound from './page/NotFound'
 import AppLayout from './components/modules/layouts/AppLayout'
-import ForgetPassPage from './page/ForgetPass/Index'
 import DetailService from './page/DetailService/Index'
+import RequestReset from './page/ForgetPass/RequestReset'
+import VerifyReset from './page/ForgetPass/VerifyReset'
+import PassReset from './page/ForgetPass/PassReset'
 
 const Router = createBrowserRouter([
     {
@@ -38,8 +40,16 @@ const Router = createBrowserRouter([
         element : <RegisterPage/>
     },
     {
-        path : '/forget-password',
-        element : <ForgetPassPage/>
+        path : '/request-forget-password',
+        element : <RequestReset/>
+    },
+    {
+        path : '/verify-forget-password',
+        element : <VerifyReset/>
+    },
+    {
+        path : '/reset-forget-password',
+        element : <PassReset/>
     },
 ])
 
