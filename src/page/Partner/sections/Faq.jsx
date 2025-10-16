@@ -11,7 +11,7 @@ export default function Faq() {
         <section className="relative bg-white mt-[300px] px-10 md:px-40 py-20">
         <div className="flex flex-col md:flex-row justify-between gap-16">
 
-            {/* judul gaq */}
+            {/* judul faq */}
             <div className="flex-1">
             <h2 className="text-[38px] font-bold text-gray-900">
                 Pertanyaan Seputar Mitra
@@ -50,7 +50,7 @@ export default function Faq() {
                     </div>
                 </div>
 
-                {/* Teks Jawaban  */}
+                {/* teks jawaban  */}
                 {openId === item.id && (
                     <p className="mt-3 ml-10 pl-1 text-gray-700 text-[16px]">
                     {item.answer}
