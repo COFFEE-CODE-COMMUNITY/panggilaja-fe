@@ -1,9 +1,47 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import AuthLayout from '../../components/modules/layouts/AuthLayout'
 import NavLink from '../../components/modules/navigation/NavLink'
 import LoginForm from './sections/LoginForm'
+import { useDispatch, useSelector } from 'react-redux'
+import { loginUser, selectAuthError, selectAuthMessage, selectAuthStatus, selectCurrentUser } from '../../features/authSlice'
+import { Link, useNavigate } from 'react-router-dom'
+
 
 const LoginPage = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const status = useSelector(selectAuthStatus)
+  const message = useSelector(selectAuthMessage)
+  const error = useSelector(selectAuthError)
+  const currentUser = useSelector(selectCurrentUser)
+
+  const handleChangeEmail = (e) => {
+    setEmail(e.target.value)
+  }
+
+  const handleChangePassword = (e) => {
+    setPassword(e.target.value)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if(email && password){
+      dispatch(loginUser({email, password}))
+    }
+  }
+
+  useEffect(() => {
+      if (status === 'success' && currentUser) {
+          navigate('/'); 
+      }
+  }, [status, currentUser, navigate]);
+
+  console.log(status)
+  console.log(message)
   return (
     <AuthLayout 
       title='Masuk ke akun anda'
@@ -15,7 +53,11 @@ const LoginPage = () => {
         </p>
       }
     >
-      <LoginForm/>
+      <LoginForm 
+        handleSubmit={handleSubmit}
+        handleChangeEmail={handleChangeEmail}
+        handleChangePassword={handleChangePassword}
+      />
     </AuthLayout>
   )
 }

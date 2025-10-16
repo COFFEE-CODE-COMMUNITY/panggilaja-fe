@@ -30,7 +30,6 @@ const ServiceAround = () => {
 
     const servicesSlice = services.slice(0,8)
 
-    console.log(servicesSlice)
   return (
     <div className='w-full flex flex-col md:gap-[10px] gap-[5px]'>
         <div className='flex items-center'>

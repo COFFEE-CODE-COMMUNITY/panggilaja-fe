@@ -5,8 +5,14 @@ import Input from '../../common/Input'
 import Button from '../../common/Button'
 import { FaSearch } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
 
 const Header = () => {
+    const user = useSelector(selectCurrentUser)
+    const token = useSelector(selectAccessToken)
+
+    console.log(user)
   return (
     <div className='xl:h-[80px] lg:h-[72px] md:h-[64px] sm:h-[56px] h-[48px] w-full flex justify-center xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center lg:px-[70px] md:px-[40px] px-[25px] sticky top-0 bg-white z-20'>
         <div className='h-full flex items-center justify-center lg:pr-[125px] md:pr-[80px] pr-[10px]'>
@@ -20,10 +26,16 @@ const Header = () => {
             <NavLink text='Jadi Mitra' className='text-h6 md:text-h5 w-[85px] md:w-[105px] font-light text-center' link='/partner'/>
         </div>
         <div className='flex gap-[10px] md:gap-[15px] items-center h-full '>
-            <NavLink link='/login' className='text-h6 md:text-h5 lg:text-h4 text-secondary font-bold' text='Masuk'/>
-            <Link to='/register'>
-                <Button className='h-[30px] w-[65px] sm:h-[35px] sm:w-[70px] md:h-[40px] md:w-[100px] lg:h-[45px] lg:w-[130px] text-white lg:text-h4 md:text-h5 text-h6 rounded-[25px] font-bold flex justify-center items-center' variant='primary'>Daftar</Button>
-            </Link>
+            {!token ? (
+                <>
+                    <NavLink link='/login' className='text-h6 md:text-h5 lg:text-h4 text-secondary font-bold' text='Masuk'/>
+                    <Link to='/register'>
+                        <Button className='h-[30px] w-[65px] sm:h-[35px] sm:w-[70px] md:h-[40px] md:w-[100px] lg:h-[45px] lg:w-[130px] text-white lg:text-h4 md:text-h5 text-h6 rounded-[25px] font-bold flex justify-center items-center' variant='primary'>Daftar</Button>
+                    </Link>
+                </>
+            ) : (
+                <p>{user.username}</p>
+            )}
         </div>
     </div>
   )

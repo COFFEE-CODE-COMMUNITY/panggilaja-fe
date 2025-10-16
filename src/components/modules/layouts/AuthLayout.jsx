@@ -22,7 +22,6 @@ const AuthLayout = ({title, subtitle, children, type, navAuth, reset}) => {
               <Button className='w-full md:h-[62px] h-[45px] bg-white shadow-sm rounded-[30px] md:text-h5 text-h6 lg:text-h4 flex items-center'><FcGoogle size={20}/><p className='text-center w-full'>Lanjut dengan google</p></Button>}
             {!reset && <p className='w-full text-center text-h6 lg:text-h5 font-light'>atau</p>}
             {children}
-            <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[15px] flex justify-center items-center'>{type}</Button>
             {navAuth}
           </div>
         </div>
