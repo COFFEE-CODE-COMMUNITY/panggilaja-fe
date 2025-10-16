@@ -17,7 +17,7 @@ export default function Hero() {
         <h1 className="text-[96px] font-bold leading-tight">
           Keahlianmu, Pasar<br />Baru.
         </h1>
-        <p className="mt-4 text-[18px] font-light">
+        <p className="mt-4 text-[23px] font-light">
           Perluas jangkauan pelanggan di lingkungan terdekatmu. Gratis biaya pendaftaran!
         </p>
 
@@ -46,7 +46,7 @@ export default function Hero() {
 
             <div className="flex-1">
               <p className="text-gray-600 text-[16px] leading-relaxed">
-                PanggilAja! adalah solusi digital yang membuat keahlian Anda ditemukan,
+                PanggilAja adalah solusi digital yang membuat keahlian Anda ditemukan,
                 membangun reputasi, dan memberi Anda kendali penuh atas usaha Anda.
               </p>
             </div>

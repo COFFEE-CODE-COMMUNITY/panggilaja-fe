@@ -17,7 +17,7 @@ export default function Faq() {
                 Pertanyaan Seputar Mitra
             </h2>
             <p className="mt-2 text-gray-600 text-[16px] leading-relaxed">
-                Berapa biaya untuk mendaftar dan menjadi mitra PanggilAja!?
+                Berapa biaya untuk mendaftar dan menjadi mitra PanggilAja?
             </p>
             </div>
 
