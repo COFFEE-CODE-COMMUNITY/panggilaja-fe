@@ -3,14 +3,17 @@ import { FaStar } from 'react-icons/fa'
 import Button from '../../../components/common/Button'
 import Card from '../../../components/common/Card'
 import ReviewCard from '../../../components/modules/Cards/ReviewCard'
+import { Link } from 'react-router-dom'
 
-const InformationService = ({name, title, totalReview, rangePrice, description, review, overalRating, allTotalReview}) => {
+const InformationService = ({id, name, title, totalReview, rangePrice, description, review, overalRating, allTotalReview}) => {
   return (
     <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>
         <div className='flex flex-col gap-[5px]'>
             <div className='flex flex-col gap-[5px]'>
                 <div className='flex flex-col leading-8'>
-                    <p className='text-h5 font-light'>{name}</p>
+                    <Link to={`/profile-service/${id}`}>
+                        <p className='text-h5 font-light cursor-pointer'>{name}</p>
+                    </Link>
                     <h2 className='text-h2'>{title}</h2>
                 </div>
                 <div className='flex items-center gap-[5px]'>

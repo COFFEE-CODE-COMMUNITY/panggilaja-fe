@@ -136,7 +136,7 @@
     },
     {
       "id": "105", 
-      "provider_id": "1", 
+      "provider_id": "5", 
       "name": "Jasa Pengelasan Pagar",
       "role": "Spesialis Konstruksi Besi",
       "rating": 4.7,
@@ -149,7 +149,7 @@
     },
     {
       "id": "106", 
-      "provider_id": "5", 
+      "provider_id": "6", 
       "name": "Perawatan Taman",
       "role": "Tukang Kebun & Taman",
       "rating": 4.5,
@@ -162,7 +162,7 @@
     },
     {
       "id": "107", 
-      "provider_id": "2", 
+      "provider_id": "7", 
       "name": "Desain Grafis Logo & Brosur",
       "role": "Desainer Logo & Brosur",
       "rating": 4.5,
@@ -175,7 +175,7 @@
     },
     {
       "id": "108", 
-      "provider_id": "6", 
+      "provider_id": "8", 
       "name": "Jasa Cuci Sepatu Premium",
       "role": "Cuci Sepatu & Tas Premium",
       "rating": 5.0,

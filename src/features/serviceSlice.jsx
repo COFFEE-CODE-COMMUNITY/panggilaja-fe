@@ -141,7 +141,7 @@ const serviceSlice = createSlice({
             })
             .addCase(getDetailServicesById.rejected, (state, action) => {
                 state.detailServiceStatus = 'error',
-                state.detailServiceStatus = action.error.message
+                state.detailServiceError = action.error.message
             })
     }
 })
