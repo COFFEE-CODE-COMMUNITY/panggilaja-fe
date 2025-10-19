@@ -66,7 +66,7 @@ const DetailService = () => {
       )
     }
     
-    console.log(review)
+    console.log(service)
   return (
     <div className='md:flex min-h-screen gap-[35px]'>
         <ImageService/>
@@ -79,6 +79,7 @@ const DetailService = () => {
           overalRating={detailService.overal_rating}
           allTotalReview={detailService.total_reviews_count}
           review={review}
+          id={service.provider_id}
         />
     </div>
   )
