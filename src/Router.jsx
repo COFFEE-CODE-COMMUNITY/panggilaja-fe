@@ -14,6 +14,7 @@ import ProfileIndex from './page/ProfileService/ProfileIndex'
 import ProfileReviews from './page/ProfileService/ProfileReviews'
 import ProfilePhotos from './page/ProfileService/ProfilePhotos'
 import ProfileServices from './page/ProfileService/ProfileServices'
+import SearchPage from './page/Search/Index'
 
 const Router = createBrowserRouter([
     {
@@ -32,6 +33,10 @@ const Router = createBrowserRouter([
             {
                 path : 'service/:id',
                 element : <DetailService/>
+            },
+            {
+                path : 'search-result',
+                element : <SearchPage/>
             },
             {
                 path : 'profile-service/:id',

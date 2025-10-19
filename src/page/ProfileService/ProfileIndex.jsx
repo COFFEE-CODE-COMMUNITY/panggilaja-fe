@@ -3,9 +3,9 @@ import ProfileLayout from '../../components/modules/layouts/ProfileLayout'
 import { useOutletContext } from 'react-router-dom'
 
 const ProfileIndex = () => {
-  const {profileData} = useOutletContext()
+  const {profileData, search} = useOutletContext()
   
-  console.log(profileData)
+  console.log(useOutletContext())
   return (
     <div className='min-h-screen'></div>
   )
