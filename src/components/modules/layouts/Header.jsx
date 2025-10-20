@@ -20,7 +20,7 @@ const Header = ({handleChange, handleSubmit}) => {
         <div className='w-full flex items-center gap-0 sm:gap-[5px]'>
             <form className='overflow-hidden w-full flex items-center h-[43px] relative' onSubmit={handleSubmit}>
                 <Input placeholder='Cari jasa sekarang' className='h-full text-left md:indent-3 md:placeholder:text-h5 placeholder:text-h6 lg:px-[50px] px-[10px] border-2 border-gray-100 rounded-[25px] text-gray-600 md:text-h5 text-h6' onChange={handleChange}/>
-                <Button className='rounded-bl-[25px] rounded-tl-[25px] items-center justify-center h-[35px] md:h-[43px] md:block hidden absolute left-0' variant='primary'><FaSearch size={10} color='white'/></Button>
+                <Button className='rounded-bl-[25px] rounded-tl-[25px] items-center justify-center h-[35px] md:h-[43px] md:block hidden absolute left-0 lg:px-[20px] lg:py-[15px] md:px-[15px] md:py-[10px] px-[10px] py-[5px]' variant='primary'><FaSearch size={10} color='white'/></Button>
             </form>
             <NavLink text='Jadi Mitra' className='text-h6 md:text-h5 w-[85px] md:w-[105px] font-light text-center' link='/partner'/>
         </div>

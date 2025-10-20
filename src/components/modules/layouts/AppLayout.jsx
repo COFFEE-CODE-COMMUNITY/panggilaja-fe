@@ -4,7 +4,6 @@ import Header from './Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectSearchText, setSearchText } from '../../../features/searchSlice'
-import SearchPage from '../../../page/Search/Index'
 
 const AppLayout = () => {
   const dispatch = useDispatch()

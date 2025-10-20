@@ -9,7 +9,7 @@ const Button = ({className, onClick = (() => ''), children, variant, link}) => {
     }else if(variant === 'secondary'){
         baseColor = ' bg-secondary'
     }
-    const baseClass = 'lg:px-[20px] lg:py-[15px] md:px-[15px] md:py-[10px] px-[10px] py-[5px]   cursor-pointer' + baseColor;
+    const baseClass = 'cursor-pointer' + baseColor;
 
     const finalClass = combineClass(baseClass, className);
 
