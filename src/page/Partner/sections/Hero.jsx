@@ -1,8 +1,12 @@
 import Button from "../../../components/common/Button";
 import bgPartner from "../../../assets/bgPartner.jpg";
 import { isiCard } from "../dummy/IsiCard"
+import { useSelector } from "react-redux";
+import { selectAccessToken } from "../../../features/authSlice";
+import { Link } from "react-router-dom";
 
 export default function Hero() {
+  const token = useSelector(selectAccessToken)
   return (
     <div
       className="relative w-full h-[900px] flex flex-col justify-center bg-cover bg-center bg-no-repeat"
@@ -22,12 +26,14 @@ export default function Hero() {
         </p>
 
         <div className="mt-10">
-          <Button
-            variant="secondary"
-            className="w-[280px] h-[50px] text-white text-[px] font-semibold rounded-[10px]"
-          >
-            Gabung Sekarang, GRATIS!
-          </Button>
+          <Link to={!token ? '/login' : '/'}>
+            <Button
+              variant="secondary"
+              className="w-[280px] h-[50px] text-white text-[px] font-semibold rounded-[10px]"
+            >
+              Gabung Sekarang, GRATIS!
+            </Button>
+          </Link>
         </div>
       </div>
 

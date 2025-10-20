@@ -3,7 +3,7 @@ import AuthLayout from '../../components/modules/layouts/AuthLayout'
 import NavLink from '../../components/modules/navigation/NavLink'
 import LoginForm from './sections/LoginForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { loginUser, selectAuthError, selectAuthMessage, selectAuthStatus, selectCurrentUser } from '../../features/authSlice'
+import { loginUser, selectAccessToken, selectAuthError, selectAuthMessage, selectAuthStatus, selectCurrentUser } from '../../features/authSlice'
 import { Link, useNavigate } from 'react-router-dom'
 
 
@@ -18,6 +18,14 @@ const LoginPage = () => {
   const message = useSelector(selectAuthMessage)
   const error = useSelector(selectAuthError)
   const currentUser = useSelector(selectCurrentUser)
+  const token = useSelector(selectAccessToken)
+
+
+  useEffect(() => {
+    if(token){
+      navigate('/')
+    }
+  }, token)
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value)

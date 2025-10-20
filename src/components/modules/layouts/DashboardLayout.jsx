@@ -1,22 +1,19 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { SidebarDashboard } from './SidebarDashboard';
+import { NavbarDashboard } from './HeaderDashboard';
+import { Outlet } from 'react-router-dom';
 
 const DashboardLayout = () => {
   return (
-    <div className=''>
-        <div className='w-full xl:h-[80px] lg:h-[72px] md:h-[64px] sm:h-[56px] h-[48px] bg-amber-50'></div>
-        <div className='w-full relative'>
-            <div className='bg-amber-200 w-1/5 min-h-screen fixed left-0 flex flex-col px-[15px]'>
-                <Link to='.'>Kelola Pesanan</Link>
-                <Link to='manage-services'>Kelola Jasa</Link>
-                <Link>Kelola Profile</Link>
-            </div>
-            <div className='min-h-screen'>
-
-            </div>
-        </div>
+    <div className="min-h-screen flex flex-col relative">
+      <NavbarDashboard />
+      <div className="flex flex-1 overflow-hidden">        
+        <SidebarDashboard/>
+        <main className="flex flex-1 lg:p-4 overflow-y-auto w-4/5 lg:absolute lg:right-0">
+          <Outlet/>
+        </main>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default DashboardLayout
+export default DashboardLayout;
