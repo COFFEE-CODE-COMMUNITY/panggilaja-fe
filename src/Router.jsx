@@ -61,27 +61,23 @@ const Router = createBrowserRouter([
                     },
                 ]
             },
+        ]
+    },
+    {
+        path : 'dashboard',
+        element : <DashboardLayout/>,
+        children : [
             {
-                path : 'dashboard',
-                element : <DashboardLayout/>,
-                children : [
-                    {
-                        index : true,
-                        element : <ProfileIndex/>
-                    },
-                    {
-                        path : 'services',
-                        element : <ProfileServices/>
-                    },
-                    {
-                        path : 'reviews',
-                        element : <ProfileReviews/>
-                    },
-                    {
-                        path : 'photos',
-                        element : <ProfilePhotos/>
-                    },
-                ]
+                index : true,
+                element : <ProfileIndex/>
+            },
+            {
+                path : 'manage-services',
+                element : <ProfileServices/>
+            },
+            {
+                path : 'manage-profile',
+                element : <ProfileReviews/>
             },
         ]
     },
