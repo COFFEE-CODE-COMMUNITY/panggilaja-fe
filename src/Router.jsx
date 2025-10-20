@@ -15,6 +15,7 @@ import ProfileReviews from './page/ProfileService/ProfileReviews'
 import ProfilePhotos from './page/ProfileService/ProfilePhotos'
 import ProfileServices from './page/ProfileService/ProfileServices'
 import SearchPage from './page/Search/Index'
+import DashboardLayout from './components/modules/layouts/DashboardLayout'
 
 const Router = createBrowserRouter([
     {
@@ -59,6 +60,24 @@ const Router = createBrowserRouter([
                         element : <ProfilePhotos/>
                     },
                 ]
+            },
+        ]
+    },
+    {
+        path : 'dashboard',
+        element : <DashboardLayout/>,
+        children : [
+            {
+                index : true,
+                element : <ProfileIndex/>
+            },
+            {
+                path : 'manage-services',
+                element : <ProfileServices/>
+            },
+            {
+                path : 'manage-profile',
+                element : <ProfileReviews/>
             },
         ]
     },

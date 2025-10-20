@@ -45,9 +45,9 @@ const ProfileLayout = () => {
               <div className='bg-amber-100 lg:w-[110px] lg:h-[110px] md:w-[90px] md:h-[90px] w-[75px] h-[75px] rounded-full'/>
               <div className='text-center'>
                 <p className='lg:text-h3 md:text-h4 text-h5 leading-5 font-medium'>{success && profile.full_name}</p>
-                <p className='md:text-h5 text-h6 font-light leading-5.5'>{success && profile.location_city}</p>
+                <p className='md:text-h5 text-h6 font-light lg:leading-9 md:leading-7 leading-5.5'>{success && profile.location_city}</p>
               </div>
-              <Button variant='primary' className='md:text-h5 text-h6 text-white rounded-[20px] lg:w-[200px] md:w-[180px] w-[100px]'>Kontak Saya</Button>
+              <Button variant='primary' className='md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] w-[100px]'>Kontak Saya</Button>
               <div className='flex flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]'>
                 <p className='text-left md:text=h5 text-h6'>Ahli Dalam</p>
                 <div>
