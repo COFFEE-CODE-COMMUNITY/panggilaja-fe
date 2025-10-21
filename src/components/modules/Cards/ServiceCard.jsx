@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 
 const ServiceCard = ({image, idService, roleService, priceService, name }) => {
   return (
-    <Card className='flex-1 lg:h-[320px] md:h-[350px] h-[220px] md:rounded-[25px] rounded-[10px] overflow-hidden relative border-2 border-gray-100'>
+    <Card className='flex-1 lg:h-[320px] md:h-[350px] h-[220px] rounded-[15px] overflow-hidden relative border-2 border-gray-100'>
         <div className='h-3/4 bg-amber-100' style={{
             backgroundImage : `url(${image})`
         }}></div>

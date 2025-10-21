@@ -25,7 +25,7 @@ const LoginPage = () => {
     if(token){
       navigate('/')
     }
-  }, token)
+  }, [token])
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value)
@@ -65,6 +65,7 @@ const LoginPage = () => {
         handleSubmit={handleSubmit}
         handleChangeEmail={handleChangeEmail}
         handleChangePassword={handleChangePassword}
+        message={message}
       />
     </AuthLayout>
   )

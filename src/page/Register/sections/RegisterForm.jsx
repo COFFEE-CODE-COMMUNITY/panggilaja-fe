@@ -6,7 +6,7 @@ import Button from '../../../components/common/Button'
 const RegisterForm = ({handleSubmit, handleChangeUsername, handleChangeEmail, handleChangePassword, handleChangeConfirmPassword}) => {
   return (
     <div className='flex flex-col lg:gap-[15px] gap-[10px]'>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-[5px]'>
         <InputForm label='Username' variant='cols' placeholder='Masukkan username' className='' type='text'  onChange={handleChangeUsername}/>
         <InputForm label='Email' variant='cols' placeholder='Masukkan email' className='' type='email' onChange={handleChangeEmail}/>
         <InputForm label='Password' variant='cols' placeholder='Masukkan password' className='' type='password' onChange={handleChangePassword}/>
