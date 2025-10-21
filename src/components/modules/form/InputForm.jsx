@@ -24,7 +24,7 @@ const InputForm = ({label, id, placeholder, className, variant, type, onChange, 
 
   return (
     <div className={layout}>
-        {label && <label htmlFor={id} className='lg:text-h4 md:text-h5 text-h6'>{label}</label>}
+        {label && <label htmlFor={id} className='lg:text-h4 md:text-h5 text-h6 w-[250px]'>{label}</label>}
         <Input className={finalClass} id={id} placeholder={placeholder} type={type} onChange={onChange}/>
     </div>
   )

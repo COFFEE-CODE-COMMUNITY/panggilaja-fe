@@ -79,7 +79,8 @@ const DetailService = () => {
           overalRating={detailService.overal_rating}
           allTotalReview={detailService.total_reviews_count}
           review={review}
-          id={service.provider_id}
+          idProvider={service.provider_id}
+          idService={service.id}
         />
     </div>
   )

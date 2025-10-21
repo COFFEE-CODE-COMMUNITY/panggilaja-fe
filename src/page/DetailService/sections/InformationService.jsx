@@ -5,13 +5,13 @@ import Card from '../../../components/common/Card'
 import ReviewCard from '../../../components/modules/Cards/ReviewCard'
 import { Link } from 'react-router-dom'
 
-const InformationService = ({id, name, title, totalReview, rangePrice, description, review, overalRating, allTotalReview}) => {
+const InformationService = ({idProvider, idService, name, title, totalReview, rangePrice, description, review, overalRating, allTotalReview}) => {
   return (
     <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>
         <div className='flex flex-col gap-[5px]'>
             <div className='flex flex-col gap-[5px]'>
                 <div className='flex flex-col leading-8'>
-                    <Link to={`/profile-service/${id}`}>
+                    <Link to={`/profile-service/${idProvider}`}>
                         <p className='text-h5 font-light cursor-pointer'>{name}</p>
                     </Link>
                     <h2 className='text-h2'>{title}</h2>
@@ -45,9 +45,11 @@ const InformationService = ({id, name, title, totalReview, rangePrice, descripti
                     </div>
                 </div>
                 <div className='flex flex-1 gap-[10px]'>
-                    <Button variant='primary' className='flex-1 rounded-[20px] text-white font-medium h-[50px] flex items-center justify-center'>
-                        Hubungi sekarang
-                    </Button>
+                    <Link to={`/service/chat/${idService}`} className='w-full'>
+                        <Button variant='primary' className='flex-1 rounded-[20px] text-white font-medium h-[50px] flex items-center justify-center w-full '>
+                                Hubungi sekarang
+                        </Button>
+                    </Link>
                     <div className='h-[50px] w-[50px] rounded-full border-1 border-gray-500'></div>
                 </div>
             </div>
