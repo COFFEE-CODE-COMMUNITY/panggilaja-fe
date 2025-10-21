@@ -1,19 +1,28 @@
 import React, { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import InputForm from '../../components/modules/form/InputForm'
 import Button from '../../components/common/Button'
 import { getDetailServicesById, getServicesById, selectAllServiceReview, selectDetailService, selectDetailServiceStatus, selectReviewServiceStatus, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import { selectAccessToken } from '../../features/authSlice'
 
 const ChatPage = () => {
     const {id} = useParams()
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const service = useSelector(selectSelectedService)
     const serviceStatus = useSelector(selectSelectedServiceStatus)
     const detailService = useSelector(selectDetailService)
     const detailServiceStatus = useSelector(selectDetailServiceStatus)
 
+    const token = useSelector(selectAccessToken)
+    
+    useEffect(() => {
+        if(!token){
+            navigate('/login')
+        }
+    }, [token])
 
     useEffect(() => {
       if(id){
@@ -25,8 +34,6 @@ const ChatPage = () => {
       if(service){
         dispatch(getDetailServicesById(service.provider_id))
       }
-
-
     },[dispatch, service])
 
     if(serviceStatus === 'loading'){

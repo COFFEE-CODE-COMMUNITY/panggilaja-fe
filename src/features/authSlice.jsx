@@ -124,6 +124,7 @@ const authSlice = createSlice({
             state.accessToken = null
             state.error = null
             state.message = null
+            state.status = null
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
         },
@@ -201,9 +202,10 @@ const authSlice = createSlice({
                 state.resetEmail = action.payload.email; 
             })
             .addCase(requestResetPassword.rejected, (state, action) => {
-                state.resetPasswordRequestStatus = action.payload.message;
-                state.resetPasswordRequestError = action.payload.message;
-                state.resetPasswordRequestMessage = action.payload.message
+                const errorPayload = action.payload || {};
+                state.resetPasswordRequestStatus = 'failed'; 
+                state.resetPasswordRequestError = errorPayload.message || 'Gagal mengirim kode reset.';
+                state.resetPasswordRequestMessage = errorPayload.message || 'Proses gagal.';
                 state.resetEmail = null;
             })
 
@@ -214,13 +216,13 @@ const authSlice = createSlice({
                 state.resetPasswordVerifyError = null
             })
             .addCase(verifyCodeResetPassword.fulfilled, (state, action) => {
-                state.resetPasswordVerifyStatus = action.payload.status
+                state.resetPasswordVerifyStatus = 'success'
                 state.resetPasswordVerifyMessage = action.payload.message
                 state.isVerified = true
                 state.resetCode = action.meta.arg.resetCode
             })
             .addCase(verifyCodeResetPassword.rejected, (state, action) => {
-                state.resetPasswordVerifyStatus = action.payload.status
+                state.resetPasswordVerifyStatus = 'error'
                 state.resetPasswordVerifyMessage = action.payload.message
                 state.resetPasswordVerifyError = action.payload.data
                 state.isVerified = false

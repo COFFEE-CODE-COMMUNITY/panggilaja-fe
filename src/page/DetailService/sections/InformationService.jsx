@@ -1,15 +1,14 @@
 import React from 'react'
-import { FaStar } from 'react-icons/fa'
+import { FaStar, FaRegHeart } from 'react-icons/fa'
 import Button from '../../../components/common/Button'
-import Card from '../../../components/common/Card'
 import ReviewCard from '../../../components/modules/Cards/ReviewCard'
 import { Link } from 'react-router-dom'
 
 const InformationService = ({idProvider, idService, name, title, totalReview, rangePrice, description, review, overalRating, allTotalReview}) => {
   return (
-    <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>
-        <div className='flex flex-col gap-[5px]'>
-            <div className='flex flex-col gap-[5px]'>
+    <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col gap-[30px] lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>
+        <div className='flex flex-col gap-[10px]'>
+            <div className='flex flex-col gap-[10px]'>
                 <div className='flex flex-col leading-8'>
                     <Link to={`/profile-service/${idProvider}`}>
                         <p className='text-h5 font-light cursor-pointer'>{name}</p>
@@ -50,7 +49,9 @@ const InformationService = ({idProvider, idService, name, title, totalReview, ra
                                 Hubungi sekarang
                         </Button>
                     </Link>
-                    <div className='h-[50px] w-[50px] rounded-full border-1 border-gray-500'></div>
+                    <Button className='h-[50px] w-[50px] rounded-full border-1 border-gray-500 flex justify-center items-center'>
+                        <FaRegHeart className='text-gray-500 text-2xl'/>
+                    </Button>
                 </div>
             </div>
         </div>

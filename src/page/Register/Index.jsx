@@ -56,7 +56,7 @@ const RegisterPage = () => {
       subtitle='Daftar & Dapatkan Jasa Terbaik di Dekat Anda'
       type='Daftar'
       navAuth={
-        <p className='text-h5 text-primary w-full text-center'>
+        <p className='text-h6 lg:text-h5 text-primary w-full text-center'>
           Sudah punya akun? <NavLink className="font-semibold text-primary" link='/login' text='masuk disini'/>'
         </p>
       }
