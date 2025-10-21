@@ -8,7 +8,7 @@ export default function Faq() {
     };
 
     return (
-        <section className="relative bg-white mt-[300px] px-10 md:px-40 py-20">
+        <section className="relative bg-white mt-[360px] md:mt-[250px] px-10 md:px-40 py-20">
         <div className="flex flex-col md:flex-row justify-between gap-16">
 
             {/* judul faq */}
@@ -36,7 +36,7 @@ export default function Faq() {
                     <div 
                     className={`
                         mr-4 mt-1 text-xl font-bold text-gray-800 transition-transform duration-300
-                        ${openId === item.id ? 'rotate-0' : 'rotate-[-90deg]'} // 👈 Rotasi Ikon
+                        ${openId === item.id ? 'rotate-0' : 'rotate-[-90deg]'}
                     `}
                     >
                     &#x25BE; 
