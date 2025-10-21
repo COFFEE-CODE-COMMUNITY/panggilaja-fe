@@ -20,6 +20,9 @@ import ManageOrder from './page/Dashboard/ManageOrder'
 import ManageServices from './page/Dashboard/ManageServices'
 import ManageProfile from './page/Dashboard/ManageProfile'
 import AddService from './page/Dashboard/AddService'
+import FormAfterRegist from './page/FormDetailProfil/Index'
+import Chat from './page/Chat/Index'
+import ChatPage from './page/Chat/Index'
 
 const Router = createBrowserRouter([
     {
@@ -37,7 +40,11 @@ const Router = createBrowserRouter([
             },
             {
                 path : 'service/:id',
-                element : <DetailService/>
+                element : <DetailService/>,
+            },
+            {
+                path : 'service/chat/:id',
+                element : <ChatPage/>
             },
             {
                 path : 'search-result',
@@ -96,6 +103,10 @@ const Router = createBrowserRouter([
     {
         path : '/register',
         element : <RegisterPage/>
+    },
+    {
+        path : '/form-detail-profile',
+        element : <FormAfterRegist/>
     },
     {
         path : '/request-forget-password',
