@@ -1,86 +1,36 @@
-import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import { getDetailServicesById, getReviewByServicesById, getServicesById, selectAllServiceReview, selectDetailService, selectDetailServiceStatus, selectReviewServiceStatus, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
 import ImageService from './sections/ImageService'
+import { getServicesById, selectSelectedService } from '../../features/serviceSlice'
+import { useEffect } from 'react'
 import InformationService from './sections/InformationService'
 
 const DetailService = () => {
-    const {id} = useParams()
-    const dispatch = useDispatch()
+  const {id} = useParams()
+  const dispatch = useDispatch()
 
-    const service = useSelector(selectSelectedService)
-    const serviceStatus = useSelector(selectSelectedServiceStatus)
-    const review = useSelector(selectAllServiceReview)
-    const reviewStatus = useSelector(selectReviewServiceStatus)
-    const detailService = useSelector(selectDetailService)
-    const detailServiceStatus = useSelector(selectDetailServiceStatus)
+  const service = useSelector(selectSelectedService)
 
-
-    useEffect(() => {
-      if(id){
-        dispatch(getServicesById(id))
-        dispatch(getReviewByServicesById(id))
-      }
-    }, [id, dispatch])
-
-    useEffect(() => {
-      if(service){
-        dispatch(getDetailServicesById(service.provider_id))
-      }
-    },[dispatch, service])
-
-    if(serviceStatus === 'loading'){
-      return (
-        <div>Sedang memuat...</div>
-      )
+  useEffect(() => {
+    if(id){
+      dispatch(getServicesById(id))
     }
+  },[dispatch])
 
-    if(serviceStatus === 'error'){
-      return (
-        <div>terjadi kesalahan</div>
-      )
-    }
-
-    if(!service){
-      return (
-        <div>data tidak ada</div>
-      )
-    }
-
-    if(detailServiceStatus == 'loading'){
-      return (
-        <div>Sedang memuat...</div>
-      )
-    }
-
-    if(detailServiceStatus == 'error'){
-      return (
-        <div>data tidak ada</div>
-      )
-    }
-
-    if(!detailService){
-      return (
-        <div>Sedang memuat...</div>
-      )
-    }
-    
-    console.log(service)
+  const rangePrice = `${service.base_price} - ${service.top_price}`
+  
+  console.log(service)
   return (
     <div className='md:flex min-h-screen gap-[35px]'>
         <ImageService/>
         <InformationService
-          name={service.name}
-          title={service.role}
-          totalReview={service.review_count}
-          description={service.description}
-          rangePrice={service.price_range}
-          overalRating={detailService.overal_rating}
-          allTotalReview={detailService.total_reviews_count}
-          review={review}
-          idProvider={service.provider_id}
+          description={service.deskripsi}
+          idProvider={service.seller_id}
           idService={service.id}
+          nameService={service.nama_jasa}
+          rangePrice={rangePrice}
+          totalReview={service.rata_rata_rating}
+          totalReviewSeller={service.jumlah_rating}
         />
     </div>
   )

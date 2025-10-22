@@ -1,87 +1,19 @@
-import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import InputForm from '../../components/modules/form/InputForm'
 import Button from '../../components/common/Button'
-import { getDetailServicesById, getServicesById, selectAllServiceReview, selectDetailService, selectDetailServiceStatus, selectReviewServiceStatus, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccessToken } from '../../features/authSlice'
 
 const ChatPage = () => {
     const {id} = useParams()
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const service = useSelector(selectSelectedService)
-    const serviceStatus = useSelector(selectSelectedServiceStatus)
-    const detailService = useSelector(selectDetailService)
-    const detailServiceStatus = useSelector(selectDetailServiceStatus)
-
-    const token = useSelector(selectAccessToken)
     
-    useEffect(() => {
-        if(!token){
-            navigate('/login')
-        }
-    }, [token])
-
-    useEffect(() => {
-      if(id){
-        dispatch(getServicesById(id))
-      }
-    }, [id, dispatch])
-
-    useEffect(() => {
-      if(service){
-        dispatch(getDetailServicesById(service.provider_id))
-      }
-    },[dispatch, service])
-
-    if(serviceStatus === 'loading'){
-      return (
-        <div>Sedang memuat...</div>
-      )
-    }
-
-    if(serviceStatus === 'error'){
-      return (
-        <div>terjadi kesalahan</div>
-      )
-    }
-
-    if(!service){
-      return (
-        <div>data tidak ada</div>
-      )
-    }
-
-    if(detailServiceStatus == 'loading'){
-      return (
-        <div>Sedang memuat...</div>
-      )
-    }
-
-    if(detailServiceStatus == 'error'){
-      return (
-        <div>data tidak ada</div>
-      )
-    }
-
-    if(!detailService){
-      return (
-        <div>Sedang memuat...</div>
-      )
-    }
-    
-    console.log(detailService)
   return (
     <div className='w-full md:min-h-screen flex justify-center p-[20px]'>
         <div className='lg:w-7/10 md:w-9/10 w-full md:flex md:flex-row flex flex-col gap-[10px]'>
             <div className='md:hidden border-2 border-gray-100 px-[10px] py-[5px] flex flex-col gap-[10px]'>
                 <p>Detail Jasa</p>
                 <div className='flex flex-col gap-[5px]'>
-                    <p className='text-h4 font-medium'>{service.role}</p>
-                    <p>{service.price_range}</p>
-                    <p>{detailService.full_name}</p>
                 </div>
             </div>
             <div className='md:w-3/4 w-full md:h-full lg:px-[30px] md:px-[15px] px-[10px] lg:py-[25px] md:py-[10px] py-[5px] flex flex-col gap-[10px] md:justify-center border-2 border-gray-100'>
@@ -110,9 +42,6 @@ const ChatPage = () => {
                 <p>Detail Jasa</p>
                 <div className='flex flex-col gap-[5px]'>
                     <div className='w-full bg-amber-100 h-[200px]'></div>
-                    <p className='text-h4 font-medium'>{service.role}</p>
-                    <p>{service.price_range}</p>
-                    <p>{detailService.full_name}</p>
                 </div>
             </div>
         </div>
