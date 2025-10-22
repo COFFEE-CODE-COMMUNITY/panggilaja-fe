@@ -23,6 +23,9 @@ import AddService from './page/Dashboard/AddService'
 import FormAfterRegist from './page/FormDetailProfil/Index'
 import Chat from './page/Chat/Index'
 import ChatPage from './page/Chat/Index'
+import ProfileSetting from './page/Setting/ProfileSetting'
+import SettingLayout from './components/modules/layouts/SettingLayout'
+import { GuestRoute, HomeRoute, ProtectedRoute } from './ProtectedRoute'
 
 const Router = createBrowserRouter([
     {
@@ -32,19 +35,41 @@ const Router = createBrowserRouter([
         children : [
             {
                 index : true,
-                element : <LandingPage/>
+                element : (
+                    <HomeRoute>
+                        <LandingPage/>
+                    </HomeRoute>
+                )
+            },
+            {
+                path : 'about',
+                element : (
+                    <PartnerPage/>
+                )
             },
             {
                 path : 'partner',
-                element : <PartnerPage/>
+                element : (
+                    <ProtectedRoute>
+                        <PartnerPage/>
+                    </ProtectedRoute>
+                )
             },
             {
                 path : 'service/:id',
-                element : <DetailService/>,
+                element : (
+                    <ProtectedRoute>
+                        <DetailService/>
+                    </ProtectedRoute>
+                ),
             },
             {
                 path : 'service/chat/:id',
-                element : <ChatPage/>
+                element : (
+                    <ProtectedRoute>
+                        <ChatPage/>
+                    </ProtectedRoute>
+                )
             },
             {
                 path : 'search-result',
@@ -52,7 +77,11 @@ const Router = createBrowserRouter([
             },
             {
                 path : 'profile-service/:id',
-                element : <ProfileLayout/>,
+                element : (
+                    <ProtectedRoute>
+                        <ProfileLayout/>
+                    </ProtectedRoute>
+                ),
                 children : [
                     {
                         index : true,
@@ -72,11 +101,29 @@ const Router = createBrowserRouter([
                     },
                 ]
             },
+            {
+                path : 'profile-setting',
+                element : (
+                    <ProtectedRoute>
+                        <SettingLayout/>
+                    </ProtectedRoute>
+                ),
+                children : [
+                    {
+                        index : true,
+                        element : <ProfileSetting/>
+                    }
+                ]
+            }
         ]
     },
     {
         path : 'dashboard',
-        element : <DashboardLayout/>,
+        element : (
+            <ProtectedRoute>
+                <DashboardLayout/>
+            </ProtectedRoute>
+        ),
         children : [
             {
                 index : true,
@@ -98,15 +145,27 @@ const Router = createBrowserRouter([
     },
     {
         path : '/login',
-        element : <LoginPage/>
+        element : (
+            <GuestRoute>
+                <LoginPage/>
+            </GuestRoute>
+        )
     },
     {
         path : '/register',
-        element : <RegisterPage/>
+        element : (
+            <GuestRoute>
+                <RegisterPage/>
+            </GuestRoute>
+        )
     },
     {
         path : '/form-detail-profile',
-        element : <FormAfterRegist/>
+        element : (
+            <ProtectedRoute>
+                <FormAfterRegist/>
+            </ProtectedRoute>
+        )
     },
     {
         path : '/request-forget-password',

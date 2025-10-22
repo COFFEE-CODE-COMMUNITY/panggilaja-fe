@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode"
-import api from '../api/apiInstance'
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import axios from "axios"
+import api from "../api/api"
 
 const getToken = () => localStorage.getItem('accessToken') || null
 const getUser = () => {
@@ -19,6 +19,8 @@ const initialState = {
     status : 'idle',
     error : null,
     message : null,
+
+    statusToken : 'idle',
 
     resetPasswordRequestStatus : 'idle',
     resetPasswordRequestMessage : null,
@@ -39,11 +41,28 @@ const initialState = {
 
 const url = 'http://localhost:5000/api/'
 
+export const refreshAccessToken = createAsyncThunk(
+  "auth/refreshAccessToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const refreshResponse = await api.post(
+        `${url}auth/refresh`,
+        {},
+        { withCredentials: true }
+      );
+      return refreshResponse.data;
+    } catch (err) {
+      console.error("Gagal refresh token:", err);
+      return rejectWithValue(err.response?.data || "Gagal refresh token");
+    }
+  }
+);
+
 export const loginUser = createAsyncThunk(
     'auth/loginUser',
     async (userData, { rejectWithValue }) => {
         try {
-            const response = await axios.post(`${url}auth/login`, userData);
+            const response = await api.post(`${url}auth/login`, userData);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -57,24 +76,16 @@ export const loginUser = createAsyncThunk(
 export const registerUser = createAsyncThunk(
     'auth/registerUser',
     async (userData) => {
-        const response = await axios.post(`${url}auth/register`, userData);
+        const response = await api.post(`${url}auth/register`, userData);
         return response.data;
     }
 );
-
-export const refreshAccessToken = createAsyncThunk(
-    'auth/refreshAccessToken',
-    async () => {
-        const response = await axios.post(`${url}auth/refresh`); 
-        return response.data; 
-    }
-)
 
 export const requestResetPassword = createAsyncThunk(
     'auth/requestResetPassword',
     async (email, {rejectWithValue}) => {
         try {
-            const response = await axios.post(`${url}auth/request-reset`, {email});
+            const response = await api.post(`${url}auth/request-reset`, {email});
             return { message: response.data, email: email };
         }catch (error) {
             if (error.response) {
@@ -89,7 +100,7 @@ export const verifyCodeResetPassword = createAsyncThunk(
     'auth/verifyCodeResetPassword',
     async (data, {rejectWithValue}) => {
         try {
-            const response = await axios.post(`${url}auth/verify-reset-code`, data);
+            const response = await api.post(`${url}auth/verify-reset-code`, data);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -104,7 +115,7 @@ export const resetPassword = createAsyncThunk(
     'auth/resetPassword',
     async (data, {rejectWithValue}) => {
         try {
-            const response = await axios.post(`${url}auth/reset-password`, data);
+            const response = await api.post(`${url}auth/reset-password`, data);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -127,10 +138,6 @@ const authSlice = createSlice({
             state.status = null
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
-        },
-        setNewAccessToken : (state, action) => {
-            state.accessToken = action.payload
-            localStorage.setItem('accessToken', action.payload)
         }
     },
     extraReducers : (builder) => {
@@ -165,7 +172,6 @@ const authSlice = createSlice({
             //register
             .addCase(registerUser.fulfilled, (state, action) => {
                 const {status, message} = action.payload
-                
                 state.status = status
                 state.error = null
                 state.message = message
@@ -179,14 +185,36 @@ const authSlice = createSlice({
                 state.accessToken = null
                 state.user = null
             })
-            .addCase(registerUser.pending, (state, action) => {
+            .addCase(registerUser.pending, (state) => {
                 state.status = 'loading'
             })
 
-            //refreshtoken
+            .addCase(refreshAccessToken.pending, (state) => {
+                state.statusToken = 'refreshing';
+                console.log('refres pending')
+            })
             .addCase(refreshAccessToken.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.error = null;
+                const {status, message, data} = action.payload
+                const {accessToken} = data.user
+
+                const decodeToken = jwtDecode(accessToken)
+                const userData = decodeToken.user
+                
+                console.log('berhasil')
+
+                state.statusToken = 'succeeded yeayy';
+                state.accessToken = action.payload.accessToken;
+                state.user = action.payload.user;
+                localStorage.setItem("accessToken", action.payload.accessToken);
+                localStorage.setItem("user", JSON.stringify(action.payload.user));
+            })
+            .addCase(refreshAccessToken.rejected, (state) => {
+                console.log('refresh gagal')
+                state.statusToken = 'failed';
+                state.user = null;
+                state.accessToken = null;
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("user");
             })
 
             //request password
@@ -210,7 +238,7 @@ const authSlice = createSlice({
             })
 
             //verify reset password
-            .addCase(verifyCodeResetPassword.pending, (state, action) => {
+            .addCase(verifyCodeResetPassword.pending, (state) => {
                 state.resetPasswordVerifyStatus = 'loading'
                 state.resetPasswordVerifyMessage = null
                 state.resetPasswordVerifyError = null
@@ -229,7 +257,7 @@ const authSlice = createSlice({
             })
 
             //reset password
-            .addCase(resetPassword.pending, (state, action) => {
+            .addCase(resetPassword.pending, (state) => {
                 state.resetPasswordStatus = 'loading'
                 state.resetPasswordMessage = null
                 state.resetPasswordError = null
@@ -241,11 +269,9 @@ const authSlice = createSlice({
                 state.resetEmail = null
             })
             .addCase(resetPassword.rejected, (state, action) => {
-                state.resetPasswordStatus = action
+                state.resetPasswordStatus = 'failed'
                 state.resetPasswordMessage = action.payload
             })
-
-            
     }
 })
 
@@ -271,5 +297,7 @@ export const selectResetPasswordVerifyMessage = (state) => state.auth.resetPassw
 export const selectResetPasswordStatus = (state) => state.auth.resetPasswordStatus;
 export const selectResetPasswordError = (state) => state.auth.resetPasswordError;
 export const selectResetPasswordMessage = (state) => state.auth.resetPasswordMessage;
+
+export const selectStatusRefresh = (state) => state.auth.statusToken;
 
 export default authSlice.reducer

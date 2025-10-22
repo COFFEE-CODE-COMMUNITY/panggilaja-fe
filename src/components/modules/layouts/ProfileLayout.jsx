@@ -2,40 +2,11 @@ import React, { useEffect } from 'react'
 import { Link, NavLink, Outlet, useOutletContext, useParams } from 'react-router-dom'
 import Button from '../../common/Button'
 import { useDispatch, useSelector } from 'react-redux'
-import { getDetailServicesById, selectDetailService, selectDetailServiceStatus } from '../../../features/serviceSlice'
 
 const ProfileLayout = () => {
     const {id} = useParams()
 
     const dispatch = useDispatch()
-    const profile = useSelector(selectDetailService)
-    const status = useSelector(selectDetailServiceStatus)
-
-    useEffect(() => {
-        if(id){
-            dispatch(getDetailServicesById(id))
-        }
-    },[dispatch, id])
-
-    const success = status === 'success'
-
-    if(status === 'loading'){
-        return (
-            <div>Sedang memuat..</div>
-        )
-    }
-
-    if(status === 'error'){
-        return (
-            <div>data error</div>
-        )
-    }
-
-    if(!status){
-        return (
-            <div>data tidak ada</div>
-        )
-    }
 
   return (
     <div className='flex flex-col'>

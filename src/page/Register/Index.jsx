@@ -43,7 +43,7 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (status === 'success') {
-        navigate('/login'); 
+        navigate('/form-detail-profile'); 
     }
   }, [status]);
 

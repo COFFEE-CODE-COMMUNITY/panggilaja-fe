@@ -3,11 +3,10 @@ import NavLink from '../navigation/NavLink'
 import SearchBar from '../navigation/SearchBar'
 import Input from '../../common/Input'
 import Button from '../../common/Button'
-import { FaSearch } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout, selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
-import { FaBars, FaRegComment, FaRegHeart } from 'react-icons/fa'
+import { FaBars, FaRegComment, FaRegHeart, FaSearch, FaTimes } from 'react-icons/fa'
 import { IoMdLogOut } from 'react-icons/io'
 
 const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, sidebarMobile, setSidebarMobile}) => {
@@ -24,6 +23,8 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
             setSidebarProfile(false)
         }
     },[token])
+
+    console.log(user)
   return (
     <>
         <div className='xl:h-[80px] lg:h-[72px] md:h-[64px] sm:h-[56px] h-[48px] w-full flex justify-center xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200'>
@@ -62,10 +63,10 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                             }}
                         ></img>
                         <button 
-                            className='sm:hidden block'
+                            className='sm:hidden block cursor-pointer'
                             onClick={() => setSidebarMobile(!sidebarMobile)}
-                        >
-                            <FaBars/>
+                        >   
+                            {!sidebarMobile ? <FaBars className='text-gray-500'/> : <FaTimes className='text-gray-500'/>}
                         </button>
                     </>
                 )}
@@ -93,13 +94,15 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                         </div>
                     )}
                     <div className='shadow-xl w-[200px] z-50 bg-white border-2 border-gray-100 gap-[10px] rounded-[15px] overflow-hidden h-[300px] relative'>
-                        <div className='flex gap-[10px] px-[20px] py-[15px]'>
-                            <div className='w-[40px] h-[40px] bg-amber-100 rounded-full'></div>
-                            <div>
-                                <p>{token && user.username}</p>
-                                <p className='text-h6 font-light'>Konsumen</p>
+                        <Link to='profile-setting'>
+                            <div className='flex gap-[10px] px-[20px] py-[15px] hover:bg-gray-50'>
+                                <div className='w-[40px] h-[40px] bg-amber-100 rounded-full'></div>
+                                <div>
+                                    <p>{token && user.username}</p>
+                                    <p className='text-h6 font-light'>Konsumen</p>
+                                </div>
                             </div>
-                        </div>
+                        </Link>
                         <div className=''>
                             <div 
                                 className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
@@ -110,6 +113,16 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                             >
                                 <FaRegComment className='text-gray-400 text-[15px]'/>
                                 <p className='text-h6'>Pesan</p>
+                            </div>
+                            <div 
+                                className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
+                                onClick={() => {
+                                    setFavorite(!favorite)
+                                    setChat(false)
+                                }}
+                            >
+                                <FaRegHeart className='text-gray-400 text-[15px]'/>
+                                <p className='text-h6'>Favorit</p>
                             </div>
                             <div 
                                 className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
