@@ -7,7 +7,7 @@ export const dataFaq = [
 
     {
         id: 2,
-        question: "Berapa biaya untuk mendaftar dan menjadi mitra PanggilAja!?", 
+        question: "Berapa biaya untuk mendaftar dan menjadi mitra PanggilAja?", 
         answer: "lorem ipsum",
     },
 

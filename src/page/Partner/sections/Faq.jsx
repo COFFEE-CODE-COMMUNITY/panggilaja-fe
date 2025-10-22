@@ -8,15 +8,15 @@ export default function Faq() {
     };
 
     return (
-        <section className="relative bg-white mt-[360px] md:mt-[250px] px-10 md:px-40 py-20">
+        <section className="relative bg-white py-20 px-10 md:px-20 lg:px-30 mt-[350px] md:mt-[280px] lg:mt-[360px]">
         <div className="flex flex-col md:flex-row justify-between gap-16">
 
             {/* judul faq */}
             <div className="flex-1">
-            <h2 className="text-[38px] font-bold text-gray-900">
+            <h2 className="text-[40px] md:text-[30px] lg:text-[40px] font-bold text-gray-900">
                 Pertanyaan Seputar Mitra
             </h2>
-            <p className="mt-2 text-gray-600 text-[16px] leading-relaxed">
+            <p className="mt-2 text-gray-600 text-[16px] md:text-[17px] lg:text-[20px] leading-relaxed">
                 Berapa biaya untuk mendaftar dan menjadi mitra PanggilAja?
             </p>
             </div>
