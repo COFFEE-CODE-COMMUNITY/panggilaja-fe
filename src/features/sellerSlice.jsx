@@ -12,7 +12,7 @@ export const getSellers = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-      });
+      }, { withCredentials: true });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -28,7 +28,7 @@ export const getSellerById = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-      });
+      }, { withCredentials: true });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -44,7 +44,7 @@ export const addSeller = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-      });
+      }, { withCredentials: true });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -60,7 +60,7 @@ export const getAllServicesByIdSeller = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-      });
+      }, { withCredentials: true });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -76,7 +76,7 @@ export const updateSellerById = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-      });
+      }, { withCredentials: true });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -92,7 +92,7 @@ export const deleteSellerById = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-      });
+      }, { withCredentials: true });
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
     }
@@ -107,7 +107,7 @@ export const getOrderBySellerId = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-      });
+      }, { withCredentials: true });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');

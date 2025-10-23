@@ -17,21 +17,12 @@ const DetailService = () => {
     }
   },[dispatch])
 
-  const rangePrice = `${service.base_price} - ${service.top_price}`
   
   console.log(service)
   return (
     <div className='md:flex min-h-screen gap-[35px]'>
         <ImageService/>
-        <InformationService
-          description={service.deskripsi}
-          idProvider={service.seller_id}
-          idService={service.id}
-          nameService={service.nama_jasa}
-          rangePrice={rangePrice}
-          totalReview={service.rata_rata_rating}
-          totalReviewSeller={service.jumlah_rating}
-        />
+        
     </div>
   )
 }

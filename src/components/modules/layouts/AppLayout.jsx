@@ -4,6 +4,8 @@ import Header from './Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectSearchText, selectStatus, setSearchText, setStatus } from '../../../features/searchSlice'
+import api from '../../../api/api'
+import { refreshAccessToken } from '../../../features/authSlice'
 
 const AppLayout = () => {
   const dispatch = useDispatch()
@@ -37,7 +39,6 @@ const AppLayout = () => {
 
     navigate('/search-result')
   }
-
 
   return (
     <div className='relative'>
