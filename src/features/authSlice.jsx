@@ -45,12 +45,8 @@ export const refreshAccessToken = createAsyncThunk(
   "auth/refreshAccessToken",
   async (_, { rejectWithValue }) => {
     try {
-      const refreshResponse = await api.post(
-        `${url}auth/refresh`,
-        {},
-        { withCredentials: true }
-      );
-      return refreshResponse.data;
+        const res = await api.post("/auth/refresh", {}, { withCredentials: true });
+        return res.data.data.accessToken;
     } catch (err) {
       console.error("Gagal refresh token:", err);
       return rejectWithValue(err.response?.data || "Gagal refresh token");
@@ -62,7 +58,7 @@ export const loginUser = createAsyncThunk(
     'auth/loginUser',
     async (userData, { rejectWithValue }) => {
         try {
-            const response = await api.post(`${url}auth/login`, userData);
+            const response = await api.post(`${url}auth/login`, userData, { withCredentials: true });
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -76,7 +72,7 @@ export const loginUser = createAsyncThunk(
 export const registerUser = createAsyncThunk(
     'auth/registerUser',
     async (userData) => {
-        const response = await api.post(`${url}auth/register`, userData);
+        const response = await api.post(`${url}auth/register`, userData, { withCredentials: true });
         return response.data;
     }
 );
@@ -85,7 +81,7 @@ export const requestResetPassword = createAsyncThunk(
     'auth/requestResetPassword',
     async (email, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/request-reset`, {email});
+            const response = await api.post(`${url}auth/request-reset`, {email}, { withCredentials: true });
             return { message: response.data, email: email };
         }catch (error) {
             if (error.response) {
@@ -100,7 +96,7 @@ export const verifyCodeResetPassword = createAsyncThunk(
     'auth/verifyCodeResetPassword',
     async (data, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/verify-reset-code`, data);
+            const response = await api.post(`${url}auth/verify-reset-code`, data, { withCredentials: true });
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -115,7 +111,7 @@ export const resetPassword = createAsyncThunk(
     'auth/resetPassword',
     async (data, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/reset-password`, data);
+            const response = await api.post(`${url}auth/reset-password`, data, { withCredentials: true });
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -194,28 +190,27 @@ const authSlice = createSlice({
                 console.log('refres pending')
             })
             .addCase(refreshAccessToken.fulfilled, (state, action) => {
-                const {status, message, data} = action.payload
-                const {accessToken} = data.user
+                const { status, message, data } = action.payload;
+                const { accessToken } = data;
 
-                const decodeToken = jwtDecode(accessToken)
-                const userData = decodeToken.user
-                
-                console.log('berhasil')
+                const decodedToken = jwtDecode(accessToken);
+                const userData = decodedToken.user;
 
-                state.statusToken = 'succeeded yeayy';
-                state.accessToken = action.payload.accessToken;
-                state.user = action.payload.user;
-                localStorage.setItem("accessToken", action.payload.accessToken);
-                localStorage.setItem("user", JSON.stringify(action.payload.user));
-            })
+                state.statusToken = "succeeded";
+                state.accessToken = accessToken;
+                state.user = userData;
+
+                localStorage.setItem("accessToken", accessToken);
+                localStorage.setItem("user", JSON.stringify(userData));
+                })
             .addCase(refreshAccessToken.rejected, (state) => {
-                console.log('refresh gagal')
-                state.statusToken = 'failed';
+                console.log("refresh gagal");
+                state.statusToken = "failed";
                 state.user = null;
                 state.accessToken = null;
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("user");
-            })
+                })
 
             //request password
             .addCase(requestResetPassword.pending, (state) => {

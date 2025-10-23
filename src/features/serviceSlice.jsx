@@ -12,7 +12,7 @@ export const getServices = createAsyncThunk(
                 headers : {
                     Authorization : `Bearer ${localStorage.getItem('accessToken')}`
                 }
-            })
+            }, { withCredentials: true })
             return res.data.data;
         } catch (err) {
             return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan')
@@ -28,7 +28,7 @@ export const getServicesById = createAsyncThunk(
                 headers : {
                     Authorization : `Bearer ${localStorage.getItem('accessToken')}`
                 }
-            })
+            }, { withCredentials: true })
             return res.data.data || res.data
         } catch (err) {
             return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')

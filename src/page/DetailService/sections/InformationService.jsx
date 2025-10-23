@@ -1,7 +1,6 @@
 import React from 'react'
 import { FaStar, FaRegHeart } from 'react-icons/fa'
 import Button from '../../../components/common/Button'
-import ReviewCard from '../../../components/modules/Cards/ReviewCard'
 import { Link } from 'react-router-dom'
 
 const InformationService = ({idProvider,  idService, nameService, totalReview, rangePrice, description, totalReviewSeller, }) => {
