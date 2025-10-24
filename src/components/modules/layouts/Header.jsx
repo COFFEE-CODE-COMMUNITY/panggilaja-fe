@@ -178,17 +178,6 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                             <div 
                                 className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
                                 onClick={() => {
-                                    setChat(!chat)
-                                    setFavorite(false)
-                                    setOrder(false)
-                                }}
-                            >
-                                <FaRegComment className='text-gray-400 text-[15px]'/>
-                                <p className='text-h6'>Pesan</p>
-                            </div>
-                            <div 
-                                className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
-                                onClick={() => {
                                     setFavorite(!favorite)
                                     setChat(false)
                                     setOrder(false)
@@ -206,7 +195,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                 }}
                             >
                                 <FaRegHeart className='text-gray-400 text-[15px]'/>
-                                <p className='text-h6'>Daftar Pesanan</p>
+                                <p className='text-h6'>Pesanan</p>
                             </div>
                         </div>  
                         <div className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-primary hover:text-white cursor-pointer mt-auto group' onClick={() => dispatch(logout())}>

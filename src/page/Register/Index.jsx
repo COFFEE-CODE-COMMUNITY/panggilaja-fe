@@ -48,7 +48,6 @@ const RegisterPage = () => {
   }, [status]);
 
   console.log(status)
-  console.log(message)
 
   return (
     <AuthLayout
@@ -67,6 +66,7 @@ const RegisterPage = () => {
         handleChangePassword={handleChangePassword}
         handleChangeConfirmPassword={handleChangeConfirmPassword}
         handleSubmit={handleSubmit}
+        message={message}
       />
     </AuthLayout>
   )

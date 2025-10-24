@@ -119,14 +119,17 @@ const Router = createBrowserRouter([
       },
     ],
   },
-
   {
     path: "partner/mitra-form",
     element: <ServiceMitraLayout />,
     children: [
       {
         index: true,
-        element: <ProfileMitraForm />,
+        element: <TambahJasaForm />,
+      },
+      {
+        index: '/add-service',
+        element: <TambahJasaForm />,
       },
     ],
   },

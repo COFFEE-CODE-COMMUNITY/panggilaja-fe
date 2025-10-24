@@ -1,4 +1,5 @@
 import Button from '../../../components/common/Button'
+import Input from '../../../components/common/Input'
 
 const AfterRegistForm = ({handleSubmit}) => {
   return (
@@ -25,9 +26,7 @@ const AfterRegistForm = ({handleSubmit}) => {
                 <select className='border-2 border-gray-200 px-[10px] py-[5px] rounded-[35px] bg-white'>
                     <option value="kecamatan">Kecamatan</option>
                 </select>
-                <select className='border-2 border-gray-200 px-[10px] py-[5px] rounded-[35px] bg-white'>
-                    <option value="kelurahan">Kelurahan</option>
-                </select>
+                <Input placeholder='Kode pos' className='border-2 border-gray-200 rounded-[35px]'></Input>
             </div>
         </div>
         <div className='flex'>

@@ -24,12 +24,12 @@ export const getSellerById = createAsyncThunk(
   'seller/getSellerById',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(url + '/sellers/' + id, {
+      const res = await api.get(url + `/users/${id}/seller`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       }, { withCredentials: true });
-      return res.data;
+      return res.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
     }
@@ -101,6 +101,22 @@ export const deleteSellerById = createAsyncThunk(
 
 export const getOrderBySellerId = createAsyncThunk(
   'seller/getOrderBySellerId',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(url + '/sellers/' + id + '/orders', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      }, { withCredentials: true });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
+export const getCategory = createAsyncThunk(
+  'seller/getCategory',
   async (id, { rejectWithValue }) => {
     try {
       const res = await api.get(url + '/sellers/' + id + '/orders', {

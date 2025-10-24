@@ -3,12 +3,15 @@ import { FaStar, FaRegHeart } from 'react-icons/fa'
 import Button from '../../../components/common/Button'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { getReviewServicesById, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
+import { addFavoriteService, getReviewServicesById, selectAddFavoriteServiceError, selectAddFavoriteServiceStatus, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
 
 const InformationService = ({sellerName, idProvider,  idService, nameService, totalReview, topPrice, basePrice, description, totalReviewSeller, }) => {
     const dispatch = useDispatch()
     const reviews = useSelector(selectReviewService)
     const status = useSelector(selectReviewServiceStatus)
+
+    const statusAdd = useSelector(selectAddFavoriteServiceStatus)
+    const errorAdd = useSelector(selectAddFavoriteServiceError)
 
     useEffect(() => {
         if(idProvider){
@@ -16,7 +19,14 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
         }
     },[dispatch, idProvider])
 
-    console.log(reviews)
+    console.log(statusAdd)
+
+    const handleAddFavorite = () => {
+        const favoriteData = {
+            'service_id': idService 
+        };
+        dispatch(addFavoriteService(favoriteData));
+    };
   return (
     <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col gap-[30px] lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>
         <div className='flex flex-col gap-[10px]'>
@@ -59,7 +69,10 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
                             Hubungi sekarang
                         </Button>
                     </Link>
-                    <Button className='h-[50px] w-[50px] rounded-full border-1 border-gray-500 flex justify-center items-center'>
+                    <Button 
+                        className='h-[50px] w-[50px] rounded-full border-1 border-gray-500 flex justify-center items-center'
+                        onClick={handleAddFavorite}
+                    >
                         <FaRegHeart className='text-gray-500 text-2xl'/>
                     </Button>
                 </div>
