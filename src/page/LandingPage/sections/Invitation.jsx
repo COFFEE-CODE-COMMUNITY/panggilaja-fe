@@ -7,7 +7,6 @@ import { useSelector } from 'react-redux'
 import { selectAccessToken } from '../../../features/authSlice'
 
 const Invitation = () => {
-    const token = useSelector(selectAccessToken)
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 md:gap-[20px] gap-[10px] w-full md:my-[100px] my-[50px]'>
         <InvitationCard>

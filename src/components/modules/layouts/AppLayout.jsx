@@ -4,40 +4,41 @@ import Header from './Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectSearchText, selectStatus, setSearchText, setStatus } from '../../../features/searchSlice'
-import api from '../../../api/api'
-import { refreshAccessToken } from '../../../features/authSlice'
 
 const AppLayout = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [sidebarProfile, setSidebarProfile] = useState(false)
-  const [sidebarMobile, setSidebarMobile] = useState(false)
-
+  const searchParams = new URLSearchParams(location.search)
+  const urlSearchText = searchParams.get('q') || '' 
+  
   const searchText = useSelector(selectSearchText)
 
-  const [search, setSearch] = useState(searchText)
-
-  const location = useLocation()
+  const [sidebarProfile, setSidebarProfile] = useState(false)
+  const [sidebarMobile, setSidebarMobile] = useState(false)
+  
+  const [search, setSearch] = useState(urlSearchText || searchText)
 
   useEffect(() => {
-    if(sidebarProfile){
-      setSidebarProfile(false)
-    }
+      setSearch(urlSearchText)
+      dispatch(setSearchText(urlSearchText))
+  }, [location.search, dispatch]) 
+
+  useEffect(() => {
+      if(sidebarProfile){
+          setSidebarProfile(false)
+      }
   },[location.pathname])
 
-  useEffect(() => {
-    setSearch(searchText)
-  },[searchText])
 
   const handleChange = (e) => {
-    setSearch(e.target.value)
+      setSearch(e.target.value)
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    dispatch(setSearchText(search))
-
-    navigate('/search-result')
+      e.preventDefault()
+      dispatch(setSearchText(search)) 
+      const targetPath = search ? `/search-result?q=${encodeURIComponent(search)}` : '/search-result';
+      navigate(targetPath)
   }
 
   return (
@@ -49,6 +50,7 @@ const AppLayout = () => {
         sidebarProfile={sidebarProfile} 
         sidebarMobile={sidebarMobile}
         setSidebarMobile={setSidebarMobile}
+        search={search}
       />
       <Outlet context={search}/>
       <Footer/>
