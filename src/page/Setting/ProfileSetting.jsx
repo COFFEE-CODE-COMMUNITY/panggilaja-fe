@@ -4,6 +4,7 @@ import { selectCurrentUser } from '../../features/authSlice'
 
 const ProfileSetting = () => {
     const user = useSelector(selectCurrentUser)
+    console.log(user)
   return (
     <div className='px-[10px] py-[5px] flex flex-col gap-[20px]'>
         <div>

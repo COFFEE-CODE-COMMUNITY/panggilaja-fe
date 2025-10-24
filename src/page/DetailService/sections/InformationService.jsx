@@ -1,16 +1,29 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FaStar, FaRegHeart } from 'react-icons/fa'
 import Button from '../../../components/common/Button'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { getReviewServicesById, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
 
-const InformationService = ({idProvider,  idService, nameService, totalReview, rangePrice, description, totalReviewSeller, }) => {
+const InformationService = ({idProvider,  idService, nameService, totalReview, topPrice, basePrice, description, totalReviewSeller, }) => {
+    const dispatch = useDispatch()
+    const reviews = useSelector(selectReviewService)
+    const status = useSelector(selectReviewServiceStatus)
+
+    useEffect(() => {
+        if(idProvider){
+            dispatch(getReviewServicesById(idProvider))
+        }
+    },[dispatch, idProvider])
+
+    console.log(reviews)
   return (
     <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col gap-[30px] lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>
         <div className='flex flex-col gap-[10px]'>
             <div className='flex flex-col gap-[10px]'>
                 <div className='flex flex-col leading-8'>
                     <Link to={`/profile-service/${idProvider}`}>
-                        <p className='text-h5 font-light cursor-pointer'>{name}</p>
+                        <p className='text-h5 font-light cursor-pointer'>{nameService}</p>
                     </Link>
                     <h2 className='text-h2'>{nameService}</h2>
                 </div>
@@ -24,7 +37,7 @@ const InformationService = ({idProvider,  idService, nameService, totalReview, r
                     </div>
                     <p className='text-h5 font-light'>{totalReview} ulasan</p>
                 </div>
-                <h2 className='text-h3'>{rangePrice}</h2>
+                <h2 className='text-h3'>Rp. {basePrice} - {topPrice}</h2>
                 <p className='text-h5 font-light'>
                     {description}
                 </p>
@@ -33,7 +46,6 @@ const InformationService = ({idProvider,  idService, nameService, totalReview, r
                 <div className='flex gap-[10px]'>
                     <img className='bg-amber-500 w-[40px] h-[40px] rounded-full' />
                     <div>
-                        <p>{name}</p>
                         <div className='flex items-center gap-[5px]'>
                             <FaStar className='text-star lg:text-[15px] md:text-[13px] text-[10px]'/>
                             <p>{totalReviewSeller}</p>
@@ -55,6 +67,9 @@ const InformationService = ({idProvider,  idService, nameService, totalReview, r
         </div>
         <div className='flex flex-col'>
             <p className='text-h3 font-medium'>Ulasan warga</p>
+            <div>
+
+            </div>
         </div>
     </div>
   )
