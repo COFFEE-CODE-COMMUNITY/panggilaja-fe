@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Link, NavLink, Outlet, useOutletContext, useParams } from 'react-router-dom'
+import { Link, NavLink, Outlet,useParams } from 'react-router-dom'
 import Button from '../../common/Button'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -15,8 +15,8 @@ const ProfileLayout = () => {
             <div className='w-2/7 h-full flex flex-col items-center lg:px-[20px] lg:py-[35px] md:px-[15px] md:py-[30px] px-[10px] py-[25px] gap-[15px]'>
               <div className='bg-amber-100 lg:w-[110px] lg:h-[110px] md:w-[90px] md:h-[90px] w-[75px] h-[75px] rounded-full'/>
               <div className='text-center w-full'>
-                <p className='lg:text-h3 md:text-h4 text-h5 font-medium w-full'>{success && profile.full_name}</p>
-                <p className='md:text-h5 text-h6 font-light'>{success && profile.location_city}</p>
+                <p className='lg:text-h3 md:text-h4 text-h5 font-medium w-full'></p>
+                <p className='md:text-h5 text-h6 font-light'></p>
               </div>
               <Button variant='primary' className='md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] w-[100px] py-[10px]'>Kontak Saya</Button>
               <div className='flex flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]'>
@@ -67,7 +67,7 @@ const ProfileLayout = () => {
 
                 </div>
                 <div>
-                    <Outlet context={{profileData : profile}}/>
+                    <Outlet />
                 </div>
             </div>
         </div>

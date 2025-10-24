@@ -20,6 +20,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
     const [chat, setChat] = useState(false)
     const [searchMobile, setSearchMobile] = useState(false)
     const [iconSearch, setIconSearch] = useState(true)
+    const [order, setOrder] = useState(false)
 
     useEffect(() => {
         if(!token){
@@ -148,6 +149,21 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                             </div>
                         </div>
                     )}
+                    {order && (
+                        <div className='w-[400px] h-[300px] bg-white rounded-[15px] shadow-xl border-2 border-gray-100 overflow-auto'>
+                            <div className='border-t-1 border-b-1 border-gray-100 px-[10px] py-[15px] flex flex-col gap-[5px]'>
+                                <p className='text-h6'>asep</p>
+                                <div className='flex gap-[10px]'>
+                                    <div className=''>
+                                        <img src="" alt="" className='w-[40px] h-[40px] rounded-full bg-amber-100'/>
+                                    </div>
+                                    <div className='w-full flex items-center'>
+                                        <p className='text-h6 font-light'>{'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dignissimos, dicta porro. Et quod aperiam assumenda! Ut minima, odit ab quo, voluptas consequatur autem tempore accusantium, ipsa expedita qui laboriosam aperiam.'.substring(0, 100)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div className='shadow-xl w-[200px] z-50 bg-white border-2 border-gray-100 gap-[10px] rounded-[15px] overflow-hidden h-[300px] relative'>
                         <Link to='profile-setting'>
                             <div className='flex gap-[10px] px-[20px] py-[15px] hover:bg-gray-50'>
@@ -164,6 +180,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                 onClick={() => {
                                     setChat(!chat)
                                     setFavorite(false)
+                                    setOrder(false)
                                 }}
                             >
                                 <FaRegComment className='text-gray-400 text-[15px]'/>
@@ -174,6 +191,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                 onClick={() => {
                                     setFavorite(!favorite)
                                     setChat(false)
+                                    setOrder(false)
                                 }}
                             >
                                 <FaRegHeart className='text-gray-400 text-[15px]'/>
@@ -182,8 +200,9 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                             <div 
                                 className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
                                 onClick={() => {
-                                    setFavorite(!favorite)
+                                    setFavorite(false)
                                     setChat(false)
+                                    setOrder(!order)
                                 }}
                             >
                                 <FaRegHeart className='text-gray-400 text-[15px]'/>
