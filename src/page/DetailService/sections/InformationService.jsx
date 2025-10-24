@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getReviewServicesById, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
 
-const InformationService = ({idProvider,  idService, nameService, totalReview, topPrice, basePrice, description, totalReviewSeller, }) => {
+const InformationService = ({sellerName, idProvider,  idService, nameService, totalReview, topPrice, basePrice, description, totalReviewSeller, }) => {
     const dispatch = useDispatch()
     const reviews = useSelector(selectReviewService)
     const status = useSelector(selectReviewServiceStatus)
@@ -23,7 +23,7 @@ const InformationService = ({idProvider,  idService, nameService, totalReview, t
             <div className='flex flex-col gap-[10px]'>
                 <div className='flex flex-col leading-8'>
                     <Link to={`/profile-service/${idProvider}`}>
-                        <p className='text-h5 font-light cursor-pointer'>{nameService}</p>
+                        <p className='text-h5 font-light cursor-pointer'>{sellerName}</p>
                     </Link>
                     <h2 className='text-h2'>{nameService}</h2>
                 </div>
