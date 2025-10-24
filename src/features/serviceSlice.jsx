@@ -52,6 +52,59 @@ export const getReviewServicesById = createAsyncThunk(
     }
 )
 
+export const addFavoriteService = createAsyncThunk(
+    'services/addFavoriteService',
+    async (data, { rejectWithValue }) => {
+        try {
+            const res = await api.post(url+`/users/favorites`,
+            data,
+            {
+                headers : {
+                    Authorization : `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                withCredentials: true
+            }) 
+            return res.data || res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
+        }
+    }
+)
+
+export const getFavoriteService = createAsyncThunk(
+    'services/getFavoriteService',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.get(url+`/users/${id}/favorites`,
+            {
+                headers : {
+                    Authorization : `Bearer ${localStorage.getItem('accessToken')}`
+                },
+            }, 
+            { withCredentials: true })
+            return res.data || res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
+        }
+    }
+)
+
+export const getCategoryService = createAsyncThunk(
+  'seller/getCategoryService',
+  async ({ rejectWithValue }) => {
+    try {
+      const res = await api.get(url + '/services/category', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      }, { withCredentials: true });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
 const serviceEntity = createEntityAdapter({
     selectId : (service) => service.id
 })
@@ -69,6 +122,17 @@ const serviceSlice = createSlice({
         reviewService : null,
         reviewServiceStatus : 'idle',
         reviewServiceError : null,
+
+        getFavoritesService : null,
+        getFavoritesServiceStatus : 'idle',
+        getFavoritesServiceError : null,
+
+        CategoryService : null,
+        CategoryServiceStatus : 'idle',
+        CategoryServiceError : null,
+
+        addFavoriteStatus : 'idle',
+        addFavoriteError : null,
     }),
     reducers : {},
     extraReducers : (builder) => {
@@ -115,6 +179,46 @@ const serviceSlice = createSlice({
                 state.reviewServiceStatus = 'error';
                 state.reviewServiceError = action.payload || action.error.message
             })
+
+            //add favorite service
+            .addCase(addFavoriteService.pending, (state) => {
+                state.addFavoriteStatus = 'loading'
+                state.addFavoriteError = null
+            })
+            .addCase(addFavoriteService.fulfilled, (state) => {
+                state.addFavoriteStatus = 'success';
+            })
+            .addCase(addFavoriteService.rejected, (state, action) => {
+                state.addFavoriteStatus = 'error';
+                state.addFavoriteError = action.payload || action.error.message
+            })
+
+            //get favorite service
+            .addCase(getFavoriteService.pending, (state) => {
+                state.getFavoriteServiceStatus = 'loading'
+                state.getFavoriteServiceError = null
+            })
+            .addCase(getFavoriteService.fulfilled, (state) => {
+                state.getFavoriteServiceStatus = 'success';
+            })
+            .addCase(getFavoriteService.rejected, (state, action) => {
+                state.getFavoriteServiceStatus = 'error';
+                state.getFavoriteServiceError = action.payload || action.error.message
+            })
+
+            //get category service
+            .addCase(getCategoryService.pending, (state) => {
+                state.CategoryServiceStatus = 'loading'
+                state.CategoryServiceError = null
+            })
+            .addCase(getCategoryService.fulfilled, (state, action) => {
+                state.CategoryServiceStatus = 'success';
+                state.CategoryService = action.payload
+            })
+            .addCase(getCategoryService.rejected, (state, action) => {
+                state.FavoriteServiceStatus = 'error';
+                state.FavoriteServiceError = action.payload || action.error.message
+            })
     }
 })
 
@@ -130,6 +234,17 @@ export const selectSelectedServiceError = (state) => state.service.selectedServi
 export const selectReviewService = (state) => state.service.reviewService
 export const selectReviewServiceStatus = (state) => state.service.reviewServiceStatus
 export const selectReviewServiceError = (state) => state.service.reviewServiceError
+
+export const selectFavoriteService = (state) => state.service.getFavoritesService
+export const selectFavoriteServiceStatus = (state) => state.service.getFavoritesServiceStatus
+export const selectFavoriteServiceError = (state) => state.service.getFavoritesServiceError
+
+export const selectCategoryService = (state) => state.service.getCategoryService
+export const selectCategoryServiceStatus = (state) => state.service.getCategoryServiceStatus
+export const selectCategoryServiceError = (state) => state.service.getCategoryServiceError
+
+export const selectAddFavoriteServiceStatus = (state) => state.service.addFavoriteServiceStatus
+export const selectAddFavoriteServiceError = (state) => state.service.addFavoriteServiceError
 
 export const selectAllServiceStatus = (state) => state.service.allServiceStatus
 export const selectAllServiceError = (state) => state.service.allServiceError

@@ -1,13 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "../../../components/common/Button"; 
 import InputForm from "../../../components/modules/form/InputForm"; 
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getCategoryService, selectCategoryService, selectCategoryServiceStatus } from "../../../features/serviceSlice";
 
 function ProfileMitraForm({ onFormSubmit }) {
+    const category = useSelector(selectCategoryService)
+    const status = useSelector(selectCategoryServiceStatus)
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(getCategoryService())
+    },[dispatch])
+
     const handleLanjut = (e) => {
         e.preventDefault();
         onFormSubmit();
     };
 
+    console.log(category)
     return (
         <div className="flex items-center justify-center"> 
             <form 
@@ -50,7 +62,7 @@ function ProfileMitraForm({ onFormSubmit }) {
 
                     {/* email */}
                     <label htmlFor="email" className="block text-[15px] font-medium text-gray-700 md:col-span-1"> 
-                        Email
+                        Deskripsi Toko
                     </label>
                     <div className="mt-1 md:mt-0 md:col-span-3"> 
                         <InputForm
@@ -62,7 +74,29 @@ function ProfileMitraForm({ onFormSubmit }) {
 
                     {/* nama */}
                     <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
-                        Nama
+                        Kategori
+                    </label>
+                    <div className="mt-1 md:mt-0 md:col-span-3">
+                        <select>
+                            
+                        </select>
+                    </div>
+
+                    {/* nama */}
+                    <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
+                        Pengalaman
+                    </label>
+                    <div className="mt-1 md:mt-0 md:col-span-3">
+                        <InputForm
+                            type="text"
+                            id="name"
+                            placeholder="Masukkan nama"
+                        />
+                    </div>
+
+                    {/* nama */}
+                    <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
+                        Keahlian
                     </label>
                     <div className="mt-1 md:mt-0 md:col-span-3">
                         <InputForm
@@ -101,9 +135,11 @@ function ProfileMitraForm({ onFormSubmit }) {
                     {/* button selanjut nya */}
                     <div className="hidden md:block md:col-span-1"></div> 
                     <div className="md:col-span-3 flex justify-end"> 
-                        <Button type="submit" variant="secondary" className="px-6 py-2 rounded-[20px] text-white"> 
-                            Selanjutnya
-                        </Button>
+                        <Link to='/partner/mitra-form/add-service'>
+                            <Button type="submit" variant="secondary" className="px-6 py-2 rounded-[20px] text-white"> 
+                                Selanjutnya
+                            </Button>
+                        </Link>
                     </div>
                 </div> 
             </form>
