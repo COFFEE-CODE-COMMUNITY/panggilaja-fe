@@ -8,7 +8,6 @@ import VerifyResetForm from './sections/VerifyResetForm'
 const VerifyReset = () => {
   const email = useSelector(selectResetEmail)
   const navigate = useNavigate()
-  const dispatch = useDispatch()
   const statusVerify = useSelector(selectResetPasswordVerifyStatus)
 
   useEffect(() => {

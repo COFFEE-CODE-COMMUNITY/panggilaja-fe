@@ -1,5 +1,3 @@
-import React from 'react'
-import InputForm from '../../../components/modules/form/InputForm'
 import Button from '../../../components/common/Button'
 
 const AfterRegistForm = ({handleSubmit}) => {

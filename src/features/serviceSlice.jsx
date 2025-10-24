@@ -36,6 +36,22 @@ export const getServicesById = createAsyncThunk(
     }
 )
 
+export const getReviewServicesById = createAsyncThunk(
+    'services/getReviewServicesById',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.get(url+`/reviews/seller/${id}`,{
+                headers : {
+                    Authorization : `Bearer ${localStorage.getItem('accessToken')}`
+                }
+            }, { withCredentials: true })
+            return res.data || res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
+        }
+    }
+)
+
 const serviceEntity = createEntityAdapter({
     selectId : (service) => service.id
 })
@@ -49,6 +65,10 @@ const serviceSlice = createSlice({
         selectedService : null,
         selectedServiceStatus : 'idle',
         selectedServiceError : null,
+
+        reviewService : null,
+        reviewServiceStatus : 'idle',
+        reviewServiceError : null,
     }),
     reducers : {},
     extraReducers : (builder) => {
@@ -81,6 +101,20 @@ const serviceSlice = createSlice({
                 state.selectedServiceStatus = 'error';
                 state.selectedServiceError = action.payload || action.error.message
             })
+
+            //get service by id
+            .addCase(getReviewServicesById.pending, (state) => {
+                state.reviewServiceStatus = 'loading'
+                state.reviewServiceError = null
+            })
+            .addCase(getReviewServicesById.fulfilled, (state, action) => {
+                state.reviewServiceStatus = 'success';
+                state.reviewService = action.payload
+            })
+            .addCase(getReviewServicesById.rejected, (state, action) => {
+                state.reviewServiceStatus = 'error';
+                state.reviewServiceError = action.payload || action.error.message
+            })
     }
 })
 
@@ -92,6 +126,10 @@ export const {
 export const selectSelectedService = (state) => state.service.selectedService
 export const selectSelectedServiceStatus = (state) => state.service.selectedServiceStatus
 export const selectSelectedServiceError = (state) => state.service.selectedServiceError
+
+export const selectReviewService = (state) => state.service.reviewService
+export const selectReviewServiceStatus = (state) => state.service.reviewServiceStatus
+export const selectReviewServiceError = (state) => state.service.reviewServiceError
 
 export const selectAllServiceStatus = (state) => state.service.allServiceStatus
 export const selectAllServiceError = (state) => state.service.allServiceError

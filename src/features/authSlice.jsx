@@ -1,6 +1,5 @@
 import { jwtDecode } from "jwt-decode"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import axios from "axios"
 import api from "../api/api"
 
 const getToken = () => localStorage.getItem('accessToken') || null
@@ -19,8 +18,6 @@ const initialState = {
     status : 'idle',
     error : null,
     message : null,
-
-    statusToken : 'idle',
 
     resetPasswordRequestStatus : 'idle',
     resetPasswordRequestMessage : null,
@@ -41,24 +38,14 @@ const initialState = {
 
 const url = 'http://localhost:5000/api/'
 
-export const refreshAccessToken = createAsyncThunk(
-  "auth/refreshAccessToken",
-  async (_, { rejectWithValue }) => {
-    try {
-        const res = await api.post("/auth/refresh", {}, { withCredentials: true });
-        return res.data.data.accessToken;
-    } catch (err) {
-      console.error("Gagal refresh token:", err);
-      return rejectWithValue(err.response?.data || "Gagal refresh token");
-    }
-  }
-);
+// ❌ HAPUS refreshAccessToken dari authSlice
+// Karena refresh token sudah di-handle di api interceptor
 
 export const loginUser = createAsyncThunk(
     'auth/loginUser',
     async (userData, { rejectWithValue }) => {
         try {
-            const response = await api.post(`${url}auth/login`, userData, { withCredentials: true });
+            const response = await api.post(`${url}auth/login`, userData);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -71,9 +58,31 @@ export const loginUser = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
     'auth/registerUser',
-    async (userData) => {
-        const response = await api.post(`${url}auth/register`, userData, { withCredentials: true });
-        return response.data;
+    async (userData, { rejectWithValue }) => {
+        try {
+            const response = await api.post(`${url}auth/register`, userData);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                return rejectWithValue(error.response.data);
+            }
+            return rejectWithValue({ message: 'Gagal terhubung ke server. Cek koneksi.' });
+        }
+    }
+);
+
+export const logoutUser = createAsyncThunk(
+    'auth/logoutUser',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.post(`${url}auth/logout`);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                return rejectWithValue(error.response.data);
+            }
+            return rejectWithValue({ message: 'Gagal logout' });
+        }
     }
 );
 
@@ -81,7 +90,7 @@ export const requestResetPassword = createAsyncThunk(
     'auth/requestResetPassword',
     async (email, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/request-reset`, {email}, { withCredentials: true });
+            const response = await api.post(`${url}auth/request-reset`, {email});
             return { message: response.data, email: email };
         }catch (error) {
             if (error.response) {
@@ -96,7 +105,7 @@ export const verifyCodeResetPassword = createAsyncThunk(
     'auth/verifyCodeResetPassword',
     async (data, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/verify-reset-code`, data, { withCredentials: true });
+            const response = await api.post(`${url}auth/verify-reset-code`, data);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -111,7 +120,7 @@ export const resetPassword = createAsyncThunk(
     'auth/resetPassword',
     async (data, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/reset-password`, data, { withCredentials: true });
+            const response = await api.post(`${url}auth/reset-password`, data);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -131,7 +140,7 @@ const authSlice = createSlice({
             state.accessToken = null
             state.error = null
             state.message = null
-            state.status = null
+            state.status = 'idle'
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
         }
@@ -139,36 +148,48 @@ const authSlice = createSlice({
     extraReducers : (builder) => {
         builder
             //login
+            .addCase(loginUser.pending, (state) => {
+                state.status = 'loading'
+                state.error = null
+            })
             .addCase(loginUser.fulfilled, (state, action) => {
-                const {status, message, data} = action.payload
-                const {accessToken} = data.user
+                console.log('✅ Login fulfilled:', action.payload)
+                const { status, message, data } = action.payload
+                const { accessToken, userInfo } = data.user
 
+                // Decode token untuk get user data
                 const decodeToken = jwtDecode(accessToken)
                 const userData = decodeToken.user
                 
-                state.status = status
+                state.status = 'success'
                 state.error = null
                 state.message = message
                 state.accessToken = accessToken
                 state.user = userData
 
+                // Simpan di localStorage
                 localStorage.setItem('accessToken', accessToken)
                 localStorage.setItem('user', JSON.stringify(userData))
+                
+                console.log('💾 Token dan user disimpan')
             })
             .addCase(loginUser.rejected, (state, action) => {
-                state.message = action.payload.message
-                state.status = action.payload.status
+                console.error('❌ Login rejected:', action.payload)
+                state.message = action.payload?.message || 'Login gagal'
+                state.status = 'failed'
+                state.error = action.payload
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('user');
             })
-            .addCase(loginUser.pending, (state) => {
-                state.status = 'loading'
-            })
 
             //register
+            .addCase(registerUser.pending, (state) => {
+                state.status = 'loading'
+                state.error = null
+            })
             .addCase(registerUser.fulfilled, (state, action) => {
                 const {status, message} = action.payload
-                state.status = status
+                state.status = 'success'
                 state.error = null
                 state.message = message
                 state.accessToken = null
@@ -176,41 +197,34 @@ const authSlice = createSlice({
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.error = action.payload || action.error.message; 
-                state.message = action.payload || 'Pendaftaran gagal.'
+                state.message = action.payload?.message || 'Pendaftaran gagal.'
                 state.status = 'failed'
                 state.accessToken = null
                 state.user = null
             })
-            .addCase(registerUser.pending, (state) => {
+
+            //logout
+            .addCase(logoutUser.pending, (state) => {
                 state.status = 'loading'
             })
-
-            .addCase(refreshAccessToken.pending, (state) => {
-                state.statusToken = 'refreshing';
-                console.log('refres pending')
+            .addCase(logoutUser.fulfilled, (state) => {
+                state.user = null
+                state.accessToken = null
+                state.error = null
+                state.message = 'Logout berhasil'
+                state.status = 'idle'
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('user')
             })
-            .addCase(refreshAccessToken.fulfilled, (state, action) => {
-                const { status, message, data } = action.payload;
-                const { accessToken } = data;
-
-                const decodedToken = jwtDecode(accessToken);
-                const userData = decodedToken.user;
-
-                state.statusToken = "succeeded";
-                state.accessToken = accessToken;
-                state.user = userData;
-
-                localStorage.setItem("accessToken", accessToken);
-                localStorage.setItem("user", JSON.stringify(userData));
-                })
-            .addCase(refreshAccessToken.rejected, (state) => {
-                console.log("refresh gagal");
-                state.statusToken = "failed";
-                state.user = null;
-                state.accessToken = null;
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("user");
-                })
+            .addCase(logoutUser.rejected, (state, action) => {
+                // Tetap logout meskipun request gagal
+                state.user = null
+                state.accessToken = null
+                state.error = null
+                state.status = 'idle'
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('user')
+            })
 
             //request password
             .addCase(requestResetPassword.pending, (state) => {
@@ -270,7 +284,7 @@ const authSlice = createSlice({
     }
 })
 
-export const {logout, setNewAccessToken} = authSlice.actions
+export const { logout } = authSlice.actions
 export const selectCurrentUser = state => state.auth.user
 export const selectAccessToken = state => state.auth.accessToken
 export const selectAuthStatus = state => state.auth.status
@@ -292,7 +306,5 @@ export const selectResetPasswordVerifyMessage = (state) => state.auth.resetPassw
 export const selectResetPasswordStatus = (state) => state.auth.resetPasswordStatus;
 export const selectResetPasswordError = (state) => state.auth.resetPasswordError;
 export const selectResetPasswordMessage = (state) => state.auth.resetPasswordMessage;
-
-export const selectStatusRefresh = (state) => state.auth.statusToken;
 
 export default authSlice.reducer
