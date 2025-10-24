@@ -3,10 +3,10 @@ import Card from '../../common/Card'
 import { FaStar } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 
-const ServiceCard = ({image, idService, serviceName, basePrice, topPrice }) => {
+const ServiceCard = ({image, idService, serviceName, basePrice, topPrice, sellerName }) => {
   return (
     <Link to={`/service/${idService}`}>
-        <Card className='flex-1 lg:h-[320px] md:h-[350px] h-[220px] rounded-[15px] overflow-hidden relative hover:outline-1 hover:outline-gray-100 hover:shadow-sm'>
+        <Card className='flex-1 lg:h-[330px] md:h-[350px] h-[220px] rounded-[15px] overflow-hidden relative hover:outline-1 hover:outline-gray-100 hover:shadow-sm'>
             <img 
                 src={`${image}`} 
                 className='h-3/4 w-full object-cover' 
@@ -21,6 +21,7 @@ const ServiceCard = ({image, idService, serviceName, basePrice, topPrice }) => {
                     <FaStar className='text-star lg:text-[12px] md:text-[10px] text-[8px]'/>
                     <FaStar className='text-star lg:text-[12px] md:text-[10px] text-[8px]'/>
                 </div>
+                <p className='text-h6 font-light'>{sellerName}</p>
             </div>
         </Card>
     </Link>

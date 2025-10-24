@@ -25,7 +25,7 @@ const DetailService = () => {
       </div>
     )
   }
-
+  console.log(service)
   
   return (
     <div className='md:flex min-h-screen w-full gap-[35px] mb-[50px]'>

@@ -44,6 +44,7 @@ const ServiceAround = () => {
                     key={service.id}
                     basePrice={service.base_price}
                     topPrice={service.top_price}
+                    sellerName={service.seller.nama_toko}
                 />
             ))}
         </div>

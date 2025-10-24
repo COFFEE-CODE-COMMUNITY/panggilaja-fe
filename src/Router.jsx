@@ -26,6 +26,8 @@ import ChatPage from './page/Chat/Index'
 import ProfileSetting from './page/Setting/ProfileSetting'
 import SettingLayout from './components/modules/layouts/SettingLayout'
 import { GuestRoute, HomeRoute, ProtectedRoute } from './ProtectedRoute'
+import InboxMobile from './page/Chat/InboxMobile'
+import FavoriteMobile from './page/Favorite/Index'
 
 const Router = createBrowserRouter([
     {
@@ -114,7 +116,15 @@ const Router = createBrowserRouter([
                         element : <ProfileSetting/>
                     }
                 ]
-            }
+            },
+            {
+                path : 'chat',
+                element : <InboxMobile/>
+            },
+            {
+                path : 'favorite',
+                element : <FavoriteMobile/>
+            },
         ]
     },
     {

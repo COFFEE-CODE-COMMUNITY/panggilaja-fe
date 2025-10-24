@@ -26,6 +26,12 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
             setSidebarProfile(false)
         }
     },[token])
+
+    useEffect(() => {
+        if(sidebarMobile){
+            setSidebarMobile(false)
+        }
+    },[location.pathname])
   return (
     <>
         <div className='xl:h-[80px] lg:h-[72px] md:h-[64px] sm:h-[56px] h-[48px] w-full flex sm:justify-center justify-between xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200'>
@@ -49,6 +55,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                 <NavLink link='/' text='PanggilAja' className='md:text-h4 text-h5 text-secondary font-bold' onClick={() => {
                     setSidebarMobile(false)
                     setSidebarProfile(false)
+                    setIconSearch(true)
                 }}/>
             </div>
             <div className='sm:w-full flex items-center gap-0 sm:gap-[5px]'>
@@ -180,7 +187,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                 }}
                             >
                                 <FaRegHeart className='text-gray-400 text-[15px]'/>
-                                <p className='text-h6'>Favorit</p>
+                                <p className='text-h6'>Daftar Pesanan</p>
                             </div>
                         </div>  
                         <div className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-primary hover:text-white cursor-pointer mt-auto group' onClick={() => dispatch(logout())}>
@@ -202,7 +209,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                     }}
                 >
                     <div 
-                        className='flex items-center my-[15px] gap-[15px] border-t-1 border-b-1 border-gray-300 px-[15px] py-[10px] hover:bg-gray-50 cursor-pointe w-full'
+                        className='flex items-center my-[15px] gap-[15px] px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer w-full'
                     >
                         <div className='w-[40px] h-[40px] bg-amber-100 rounded-full'></div>
                         <div>
@@ -211,23 +218,34 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                         </div>   
                     </div>
                 </Link>
-                <Link 
-                    to='profile-setting'
-                    onClick={() => {
-                        setSidebarMobile(false)
-                        setIconSearch(true)
-                    }}
-                >
-                    <div 
-                        className='flex items-center my-[15px] gap-[15px] border-t-1 border-b-1 border-gray-300 px-[15px] py-[10px] hover:bg-gray-50 cursor-pointe w-full'
-                    >
-                        <div className='w-[40px] h-[40px] bg-amber-100 rounded-full'></div>
-                        <div>
-                            <p>{token && user.username}</p>
-                            <p className='text-h6 font-light'>Konsumen</p>
-                        </div>   
-                    </div>
-                </Link>
+                <div>
+                    <Link to='/chat'>
+                        <div 
+                            className='flex gap-[15px] items-center px-[15px] py-[15px] hover:bg-gray-50 cursor-pointer'
+                            onClick={() => {
+                                setChat(!chat)
+                                setFavorite(false)
+                                setIconSearch(true)
+                            }}
+                        >
+                            <FaRegComment className='text-gray-400 text-[20px]'/>
+                            <p className='text-h5'>Pesan</p>
+                        </div>
+                    </Link>
+                    <Link to='/favorite'>
+                        <div 
+                            className='flex gap-[15px] items-center px-[15px] py-[15px] hover:bg-gray-50 cursor-pointer'
+                            onClick={() => {
+                                setFavorite(!favorite)
+                                setChat(false)
+                                setIconSearch(true)
+                            }}
+                        >
+                            <FaRegHeart className='text-gray-400 text-[20px]'/>
+                            <p className='text-h5'>Favorit</p>
+                        </div>
+                    </Link>
+                </div>
                 
                 <Button
                     className='cursor-pointer text-white py-[15px] rounded-[35px] hover:bg-primary/90'
