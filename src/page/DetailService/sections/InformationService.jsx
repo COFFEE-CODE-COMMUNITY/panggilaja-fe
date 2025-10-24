@@ -23,7 +23,7 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
             <div className='flex flex-col gap-[10px]'>
                 <div className='flex flex-col leading-8'>
                     <Link to={`/profile-service/${idProvider}`}>
-                        <p className='text-h5 font-light cursor-pointer'>{sellerName}</p>
+                        <p className='text-h5 font-light cursor-pointer'>asep</p>
                     </Link>
                     <h2 className='text-h2'>{nameService}</h2>
                 </div>
