@@ -44,7 +44,7 @@ const LoginPage = () => {
 
   useEffect(() => {
       if (status === 'success' && currentUser) {
-          navigate('/'); 
+          navigate('/form-detail-profile'); 
       }
   }, [status, currentUser, navigate]);
 

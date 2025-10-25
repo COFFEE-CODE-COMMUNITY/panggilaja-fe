@@ -22,11 +22,11 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
     console.log(statusAdd)
 
     const handleAddFavorite = () => {
-        const favoriteData = {
-            'service_id': idService 
-        };
-        dispatch(addFavoriteService(favoriteData));
+        dispatch(addFavoriteService(idService));
     };
+
+    console.log(idService)
+
   return (
     <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col gap-[30px] lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>
         <div className='flex flex-col gap-[10px]'>
@@ -64,7 +64,7 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
                     </div>
                 </div>
                 <div className='flex flex-1 gap-[10px]'>
-                    <Link to={`/service/chat/${idService}`} className='w-full'>
+                    <Link to={`/chat`} className='w-full'>
                         <Button variant='primary' className='flex-1 rounded-[20px] text-white font-medium h-[50px] flex items-center justify-center w-full '>
                             Hubungi sekarang
                         </Button>

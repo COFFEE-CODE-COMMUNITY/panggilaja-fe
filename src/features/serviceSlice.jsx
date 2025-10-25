@@ -8,11 +8,7 @@ export const getServices = createAsyncThunk(
     'services/getServices',
     async (_, { rejectWithValue }) => {
         try {
-            const res = await api.get(url+'/services',{
-                headers : {
-                    Authorization : `Bearer ${localStorage.getItem('accessToken')}`
-                }
-            }, { withCredentials: true })
+            const res = await api.get(url+'/services', { withCredentials: true })
             return res.data.data;
         } catch (err) {
             return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan')
@@ -54,10 +50,9 @@ export const getReviewServicesById = createAsyncThunk(
 
 export const addFavoriteService = createAsyncThunk(
     'services/addFavoriteService',
-    async (data, { rejectWithValue }) => {
+    async (id, { rejectWithValue }) => {
         try {
-            const res = await api.post(url+`/users/favorites`,
-            data,
+            const res = await api.post(url+`/users/favorites/${id}`,
             {
                 headers : {
                     Authorization : `Bearer ${localStorage.getItem('accessToken')}`
@@ -82,7 +77,7 @@ export const getFavoriteService = createAsyncThunk(
                 },
             }, 
             { withCredentials: true })
-            return res.data || res.data
+            return res.data
         } catch (err) {
             return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
         }
@@ -94,6 +89,22 @@ export const getCategoryService = createAsyncThunk(
   async ({ rejectWithValue }) => {
     try {
       const res = await api.get(url + '/services/category', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      }, { withCredentials: true });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
+export const addService = createAsyncThunk(
+  'seller/addService',
+  async ({ rejectWithValue }) => {
+    try {
+      const res = await api.post(url + '/services', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -130,6 +141,9 @@ const serviceSlice = createSlice({
         CategoryService : null,
         CategoryServiceStatus : 'idle',
         CategoryServiceError : null,
+        
+        addServiceStatus : 'idle',
+        addServiceError : null,
 
         addFavoriteStatus : 'idle',
         addFavoriteError : null,
@@ -195,15 +209,16 @@ const serviceSlice = createSlice({
 
             //get favorite service
             .addCase(getFavoriteService.pending, (state) => {
-                state.getFavoriteServiceStatus = 'loading'
-                state.getFavoriteServiceError = null
+                state.getFavoritesServiceStatus = 'loading'
+                state.getFavoritesServiceError = null
             })
-            .addCase(getFavoriteService.fulfilled, (state) => {
-                state.getFavoriteServiceStatus = 'success';
+            .addCase(getFavoriteService.fulfilled, (state, action) => {
+                state.getFavoritesServiceStatus = 'success';
+                state.getFavoritesService = action.payload
             })
             .addCase(getFavoriteService.rejected, (state, action) => {
-                state.getFavoriteServiceStatus = 'error';
-                state.getFavoriteServiceError = action.payload || action.error.message
+                state.getFavoritesServiceStatus = 'error';
+                state.getFavoritesServiceError = action.payload || action.error.message
             })
 
             //get category service

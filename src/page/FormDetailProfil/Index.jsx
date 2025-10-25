@@ -10,8 +10,8 @@ const FormAfterRegist = () => {
             <p className='text-primary text-h3 font-semibold'>PanggilAja</p>
         </div>
         <div className='flex justify-center items-center h-[85vh]'>
-            <div className='w-[700px]'>
-                <p className='text-h4 font-medium'>Detail Profil</p>
+            <div className='w-[700px] flex flex-col gap-[15px]'>
+                <p className='text-h4 font-medium'>Detail Alamat</p>
                 <AfterRegistForm/>
             </div>
         </div>

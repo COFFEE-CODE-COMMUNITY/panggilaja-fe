@@ -1,11 +1,9 @@
 import { SidebarDashboard } from './SidebarDashboard';
-import { NavbarDashboard } from './HeaderDashboard';
 import { Outlet } from 'react-router-dom';
 
 const DashboardLayout = () => {
   return (
     <div className="min-h-screen flex flex-col relative">
-      <NavbarDashboard />
       <div className="flex flex-1 overflow-hidden">        
         <SidebarDashboard/>
         <main className="flex flex-1 lg:p-4 overflow-y-auto w-4/5 lg:absolute lg:right-0">
