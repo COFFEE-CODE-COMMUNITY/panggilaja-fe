@@ -18,18 +18,15 @@ import SearchPage from "./page/Search/Index";
 import DashboardLayout from "./components/modules/layouts/DashboardLayout";
 import ManageOrder from "./page/Dashboard/ManageOrder";
 import ManageServices from "./page/Dashboard/ManageServices";
-import ManageProfile from "./page/Dashboard/ManageProfile";
 import AddService from "./page/Dashboard/AddService";
 import FormAfterRegist from "./page/FormDetailProfil/Index";
-import Chat from "./page/Chat/Index";
-import ChatPage from "./page/Chat/Index";
+import ChatPage from "./page/Order/Index";
 import ProfileSetting from "./page/Setting/ProfileSetting";
 import SettingLayout from "./components/modules/layouts/SettingLayout";
 import { GuestRoute, HomeRoute, ProtectedRoute } from "./ProtectedRoute";
 import ServiceMitraLayout from "./components/modules/layouts/ServiceMitraLayout";
-import MitraForm from "./page/MitraForm/Index";
-import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
 import TambahJasaForm from "./page/MitraForm/sections/TambahJasaForm";
+import ChatLayout from "./components/modules/layouts/ChatLayout";
 
 const Router = createBrowserRouter([
   {
@@ -40,9 +37,7 @@ const Router = createBrowserRouter([
       {
         index: true,
         element: (
-          <HomeRoute>
-            <LandingPage />
-          </HomeRoute>
+          <LandingPage />
         ),
       },
       {
@@ -117,6 +112,14 @@ const Router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "chat",
+        element: (
+          <ProtectedRoute>
+            <ChatLayout />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
   {
@@ -152,7 +155,7 @@ const Router = createBrowserRouter([
       },
       {
         path: "manage-profile",
-        element: <ManageProfile />,
+        element: <ProfileSetting />,
       },
       {
         path: "manage-services/add-service",

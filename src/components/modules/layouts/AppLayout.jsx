@@ -4,6 +4,8 @@ import Header from './Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectSearchText, selectStatus, setSearchText, setStatus } from '../../../features/searchSlice'
+import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
+import { seeAddress, selectSeeAdress } from '../../../features/userSlice'
 
 const AppLayout = () => {
   const dispatch = useDispatch()
@@ -41,6 +43,24 @@ const AppLayout = () => {
       navigate(targetPath)
   }
 
+  const noFooterPaths = [
+    '/chat', 
+  ];
+
+  const shouldHideFooter = noFooterPaths.some(path => location.pathname.startsWith(path));
+
+  const user = useSelector(selectCurrentUser)
+
+  const address = useSelector(selectSeeAdress)
+
+  useEffect(() => {
+    if(user){
+      dispatch(seeAddress(user.id_buyer))
+    }
+  },[dispatch])
+
+  console.log(address)
+
   return (
     <div className='relative'>
       <Header 
@@ -51,9 +71,9 @@ const AppLayout = () => {
         sidebarMobile={sidebarMobile}
         setSidebarMobile={setSidebarMobile}
         search={search}
-      />
+      />\
       <Outlet context={search}/>
-      <Footer/>
+      {!shouldHideFooter && <Footer/>}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import serviceReducer from '../features/serviceSlice'
 import authReducer from '../features/authSlice'
 import searchReducer from '../features/searchSlice'
 import sellerReducer from '../features/sellerSlice'
+import userReducer from '../features/userSlice'
 
 export const store = configureStore({
     reducer : {
@@ -10,5 +11,6 @@ export const store = configureStore({
         auth : authReducer,
         search : searchReducer,
         seller : sellerReducer,
+        user : userReducer,
     }
 })

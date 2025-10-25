@@ -61,7 +61,7 @@ export const getAllServicesByIdSeller = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       }, { withCredentials: true });
-      return res.data;
+      return res.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
     }
@@ -115,21 +115,7 @@ export const getOrderBySellerId = createAsyncThunk(
   }
 );
 
-export const getCategory = createAsyncThunk(
-  'seller/getCategory',
-  async (id, { rejectWithValue }) => {
-    try {
-      const res = await api.get(url + '/sellers/' + id + '/orders', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
-    }
-  }
-);
+
 
 const sellerEntity = createEntityAdapter({
   selectId: (seller) => seller.id,
@@ -225,12 +211,12 @@ const seller = createSlice({
             })
             .addCase(getAllServicesByIdSeller.fulfilled, (state, action) => {
                 state.status = 'success';
-                state.message = action.payload;
+                state.message = action.payload.message;
                 state.sellerServices = action.payload;
             })
             .addCase(getAllServicesByIdSeller.rejected, (state, action) => {
                 state.status = 'error';
-                state.message = action.payload;
+                state.message = action.payload.message;
             })
 
             //get order by seller id

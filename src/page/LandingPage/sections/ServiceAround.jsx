@@ -27,7 +27,6 @@ const ServiceAround = () => {
 
     const servicesSlice = services.slice(0,8)
 
-    console.log(servicesStatus)
     if(servicesStatus === 'success'){
         return (
             
