@@ -2,6 +2,8 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../../features/authSlice'
 import { getAllServicesByIdSeller, selectSellerServices, selectSellerStatus } from '../../../features/sellerSlice'
+import { Link } from 'react-router-dom'
+import { deleteService, selectDeleteServiceStatus } from '../../../features/serviceSlice'
 
 const TableServices = () => {
     const user = useSelector(selectCurrentUser)
@@ -10,13 +12,25 @@ const TableServices = () => {
     const servicesSeller = useSelector(selectSellerServices)
     const status = useSelector(selectSellerStatus)
 
+    const statusDelete = useSelector(selectDeleteServiceStatus)
+
+    console.log(statusDelete)
     useEffect(() => {
-        if(user){
+        if(user?.id_seller){
             dispatch(getAllServicesByIdSeller(user.id_seller))
         }
-    },[dispatch])
+    },[dispatch, user?.id_seller])
 
-    console.log(servicesSeller)
+    useEffect(() => {
+        if (statusDelete === 'success') {
+            alert('Layanan berhasil dihapus!'); 
+            if (user?.id_seller) {
+                dispatch(getAllServicesByIdSeller(user.id_seller));
+            }
+        }
+    }, [statusDelete, dispatch, user?.id_seller])
+
+
   return (
     <div className='h-full'>
         <table className='w-full table-auto text-left rounded-[15px] overflow-hidden'>
@@ -29,7 +43,7 @@ const TableServices = () => {
             </thead>
             <tbody className='bg-gray-50/60'>
                 {status === 'success' && servicesSeller.map((service) => (
-                    <tr>
+                    <tr key={service.id}>
                         <td className='py-[15px] px-[10px]'>
                             <div className='flex gap-[15px] items-center'>
                                 <div>
@@ -43,8 +57,12 @@ const TableServices = () => {
                         </td>
                         <td className='py-[15px] px-[10px]'>
                             <div className='flex gap-[5px]'>
-                                <span className='px-[10px] py-[5px] border-2 border-red-600 text-red-600 rounded-[45px]'>Hapus</span>
-                                <span className='px-[10px] py-[5px] border-2 border-yellow-600 text-yellow-600 rounded-[45px]'>Edit</span>
+                                <span 
+                                    className='px-[10px] py-[5px] border-2 border-red-600 text-red-600 rounded-[45px] cursor-pointer'
+                                    onClick={() => dispatch(deleteService(service.id))}
+                                >        
+                                Hapus</span>
+                                <Link to={`edit-service/${service.id}`} className='px-[10px] py-[5px] border-2 border-yellow-600 text-yellow-600 rounded-[45px]'>Edit</Link>
                                 <span className='px-[10px] py-[5px] border-2 border-primary text-primary rounded-[45px]'>Arsip</span>
                             </div>
                         </td>

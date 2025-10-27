@@ -1,18 +1,11 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import api from "../api/api";
-
-const url = 'http://localhost:5000/api';
 
 export const getSellers = createAsyncThunk(
   'seller/getSellers',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get(url + '/sellers', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
+      const res = await api.get('/sellers')
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -24,11 +17,7 @@ export const getSellerById = createAsyncThunk(
   'seller/getSellerById',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(url + `/users/${id}/seller`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
+      const res = await api.get(`/users/${id}/seller`)
       return res.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -40,11 +29,7 @@ export const addSeller = createAsyncThunk(
   'seller/addSeller',
   async (data, { rejectWithValue }) => {
     try {
-      const res = await api.post(url + '/sellers', data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
+      const res = await api.post('/sellers', data)
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -56,11 +41,7 @@ export const getAllServicesByIdSeller = createAsyncThunk(
   'seller/getAllServicesByIdSeller',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(url + '/sellers/' + id + '/services', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
+      const res = await api.get(`/sellers/${id}/services`)
       return res.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -72,11 +53,7 @@ export const updateSellerById = createAsyncThunk(
   'seller/updateSellerById',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const res = await api.put(url + '/sellers/' + id, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
+      const res = await api.put(`/sellers/${id}`, data)
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -88,11 +65,8 @@ export const deleteSellerById = createAsyncThunk(
   'seller/deleteSellerById',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.delete(url + '/sellers/' + id, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
+      const res = await api.delete(`/sellers/${id}`)
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
     }
@@ -103,19 +77,13 @@ export const getOrderBySellerId = createAsyncThunk(
   'seller/getOrderBySellerId',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(url + '/sellers/' + id + '/orders', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
+      const res = await api.get(`/sellers/${id}/orders`)
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
     }
   }
 );
-
-
 
 const sellerEntity = createEntityAdapter({
   selectId: (seller) => seller.id,
@@ -137,7 +105,7 @@ const seller = createSlice({
         builder
             //get seller
             .addCase(getSellers.pending, (state) => {
-                state.status = true;
+                state.status = 'loading';
             })
             .addCase(getSellers.fulfilled, (state, action) => {
                 state.status = 'success';
@@ -220,7 +188,7 @@ const seller = createSlice({
             })
 
             //get order by seller id
-            .addCase(getOrderBySellerId.pending, (state, action) => {
+            .addCase(getOrderBySellerId.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(getOrderBySellerId.fulfilled, (state, action) => {

@@ -1,36 +1,124 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../features/authSlice'
+import { seeAddress, selectSeeAddress, selectSeeAddressStatus } from '../../features/userSlice' 
+import { FaEdit } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
 
 const ProfileSetting = () => {
     const user = useSelector(selectCurrentUser)
-    console.log(user)
-  return (
-    <div className='px-[10px] py-[5px] flex flex-col gap-[20px]'>
-        <div>
-            <p className='lg:text-h3 md:text-h4 text-h5 font-medium'>Profil Saya</p>
-            <p className='font-light md:text-h5 text-h6 '>Ini adalah akun Konsumen</p>
-        </div>
+    const dispatch = useDispatch()
+    
+    const address = useSelector(selectSeeAddress)
+    const statusAddress = useSelector(selectSeeAddressStatus)
+    
+    const [edit, setEdit] = useState(false)
 
-        <div className='w-full lg:px-[20px] lg:py-[25px] px-[20px] py-[15px] flex flex-col lg:gap-[20px] md:gap-[15px] gap-[10px] border-1 border-gray-50 shadow-sm rounded-[15px]'>
-            <p className='font-medium'>Akun</p>
-            <div className='w-full flex lg:flex-row flex-col lg:gap-[50px] gap-[10px] lg:items-center '>
-                <img alt="" className='w-[100px] h-[100px] rounded-full bg-amber-200'/>
-                <div className='flex flex-col gap-[10px]'>
-                    <div className='flex flex-col'>
-                        <p className='font-light'>Username</p>
-                        <p>{user.username}</p>
-                    </div>
-                    <div className='flex flex-col'>
-                        <p className='font-light'>Email</p>
-                        <p>{user.email}</p>
-                    </div>
+    useEffect(() => {
+        console.log('🔍 ProfileSetting Debug:', {
+            user,
+            address,
+            statusAddress,
+            hasIdBuyer: user?.id_buyer,
+        })
+    }, [user, address, statusAddress])
+
+    useEffect(() => {
+        if (user?.id_buyer && statusAddress === 'idle') {
+            console.log('📡 Fetching address for buyer:', user.id_buyer)
+            dispatch(seeAddress(user.id_buyer))
+        }
+    }, [dispatch, user?.id_buyer, statusAddress])
+
+    if (statusAddress === 'loading') {
+        return (
+            <div className='flex justify-center items-center h-screen'>
+                <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
+                    <p className='mt-4 text-gray-600'>Memuat data profil...</p>
                 </div>
             </div>
-        </div>
+        )
+    }
 
-    </div>
-  )
+    if (statusAddress === 'error') {
+        return (
+            <div className='flex justify-center items-center h-screen'>
+                <div className='text-center text-red-600'>
+                    <p className='font-semibold'>Gagal memuat data alamat</p>
+                    <button 
+                        onClick={() => dispatch(seeAddress(user.id_buyer))}
+                        className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
+                    >
+                        Coba Lagi
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className='px-[10px] py-[5px] flex flex-col gap-[20px]'>
+            <div>
+                <p className='lg:text-h3 md:text-h4 text-h5 font-medium'>Profil Saya</p>
+                <p className='font-light md:text-h5 text-h6 '>Ini adalah akun Konsumen</p>
+            </div>
+
+            <div className='w-full lg:px-[20px] lg:py-[25px] px-[20px] py-[15px] flex flex-col lg:gap-[20px] md:gap-[15px] gap-[10px] border-1 border-gray-50 shadow-sm rounded-[15px] relative'>
+                <p className='font-medium'>Akun</p>
+                <div className='w-full flex lg:flex-row flex-col lg:gap-[50px] gap-[10px] lg:items-center '>
+                    <img alt="" className='w-[100px] h-[100px] rounded-full bg-amber-200'/>
+                    <div className='flex flex-col gap-[10px] flex-1'>
+                        
+                        <div className='flex flex-col'>
+                            <p className='font-light text-sm text-gray-600'>Username</p>
+                            <p className='font-medium'>{user?.username || '-'}</p>
+                        </div>
+                        <div className='flex flex-col'>
+                            <p className='font-light text-sm text-gray-600'>Email</p>
+                            <p className='font-medium'>{user?.email || '-'}</p>
+                        </div>
+                        
+                        <div className='border-t border-gray-200 my-2'></div>
+                        <p className='font-medium text-sm'>Alamat</p>
+                        
+                        {address && address.data ? (
+                            <>
+                                <div className='flex flex-col'>
+                                    <p className='font-light text-sm text-gray-600'>Provinsi</p>
+                                    <p className='font-medium'>{address.data.provinsi || '-'}</p>
+                                </div>
+                                <div className='flex flex-col'>
+                                    <p className='font-light text-sm text-gray-600'>Kota</p>
+                                    <p className='font-medium'>{address.data.kota || '-'}</p>
+                                </div>
+                                <div className='flex flex-col'>
+                                    <p className='font-light text-sm text-gray-600'>Kecamatan</p>
+                                    <p className='font-medium'>{address.data.kecamatan || '-'}</p>
+                                </div>
+                                <div className='flex flex-col'>
+                                    <p className='font-light text-sm text-gray-600'>Kode Pos</p>
+                                    <p className='font-medium'>{address.data.kode_pos || '-'}</p>
+                                </div>
+                            </>
+                        ) : (
+                            <div className='text-gray-500 italic'>
+                                Alamat belum diatur
+                            </div>
+                        )}
+                    </div>
+                </div>
+                
+                <Link to='edit'>
+                    <FaEdit 
+                        className='absolute top-5 right-5 cursor-pointer text-gray-600 hover:text-primary transition-colors'
+                        size={20}
+                    />
+                </Link>
+            </div>
+
+        </div>
+    )
 }
 
 export default ProfileSetting

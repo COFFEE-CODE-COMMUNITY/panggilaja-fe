@@ -5,7 +5,7 @@ import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectSearchText, selectStatus, setSearchText, setStatus } from '../../../features/searchSlice'
 import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
-import { seeAddress, selectSeeAdress } from '../../../features/userSlice'
+import { seeAddress, selectSeeAddress } from '../../../features/userSlice'
 
 const AppLayout = () => {
   const dispatch = useDispatch()
@@ -49,17 +49,15 @@ const AppLayout = () => {
 
   const shouldHideFooter = noFooterPaths.some(path => location.pathname.startsWith(path));
 
-  const user = useSelector(selectCurrentUser)
+  const address = useSelector(selectSeeAddress)
 
-  const address = useSelector(selectSeeAdress)
+  const user = useSelector(selectCurrentUser); 
 
   useEffect(() => {
-    if(user){
-      dispatch(seeAddress(user.id_buyer))
-    }
-  },[dispatch])
-
-  console.log(address)
+      if (user && user.id_buyer) {
+          dispatch(seeAddress(user.id_buyer));
+      }
+  }, [dispatch, user]); 
 
   return (
     <div className='relative'>

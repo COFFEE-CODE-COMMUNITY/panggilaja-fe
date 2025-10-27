@@ -17,8 +17,6 @@ const ProfileLayout = () => {
       }
     },[id, dispatch])
 
-    console.log(seller)
-
     if(status === 'loading'){
       return(
         <div>loading...</div>
@@ -28,7 +26,6 @@ const ProfileLayout = () => {
 
     if(status === 'success'){
       const skills = seller.kategori_toko.split(' & ')
-      console.log(skills)
       return(
         <div className='flex flex-col'>
             <div className='w-full h-[12vh] bg-amber-200'></div>
@@ -42,7 +39,7 @@ const ProfileLayout = () => {
                   <Button variant='primary' className='md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] w-[100px] py-[10px]'>Kontak Saya</Button>
                   <div className='flex flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]'>
                     <p className='text-left md:text=h5 text-h6'>Ahli Dalam</p>
-                    <div className='w-full bg-amber-100 flex'>
+                    <div className='w-full flex'>
                       {skills.map((skill) => (
                         <p className='px-[10px] py-[5px] border-2 border-gray-200 rounded-[20px] text-h6 w-fit'>{skill}</p>
                       ))}
