@@ -5,7 +5,7 @@ const combineClass = ((baseClass, customClass) => {
     return `${baseClass} ${customClass}`.trim();
 })
 
-const InputForm = ({label, id, placeholder, className, variant, type, onChange, height}) => {
+const InputForm = ({label, id, placeholder, className, variant, type, onChange, height, value}) => {
     const baseClass = `lg:h-[62px] md:h-[53px] h-[55px] px-4 py-2 rounded-[15px] border-2 border-gray-100 bg-white pl-[20px] lg:text-h4 md:text-h5 text-h6 md:placeholder:text-h5 placeholder:text-h6`;
 
     let layout = ''
@@ -21,7 +21,7 @@ const InputForm = ({label, id, placeholder, className, variant, type, onChange, 
   return (
     <div className={layout}>
         {label && <label htmlFor={id} className='lg:text-h4 text-h5 w-[250px]'>{label}</label>}
-        <Input className={finalClass} id={id} placeholder={placeholder} type={type} onChange={onChange}/>
+        <Input className={finalClass} id={id} placeholder={placeholder} type={type} onChange={onChange} value={value}/>
     </div>
   )
 }

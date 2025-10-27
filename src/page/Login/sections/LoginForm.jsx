@@ -14,7 +14,7 @@ const LoginForm = ({handleSubmit, handleChangeEmail, handleChangePassword, messa
           <p className='text-h6 lg:text-h5 font-light w-full text-right'>Lupa password?</p>
         </Link>
         <p>{message}</p>
-        <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[15px] flex justify-center items-center' >Login</Button>
+        <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[35px] flex justify-center items-center' >Login</Button>
       </form>
     </div>
   )

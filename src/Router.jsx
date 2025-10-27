@@ -27,6 +27,9 @@ import { GuestRoute, HomeRoute, ProtectedRoute } from "./ProtectedRoute";
 import ServiceMitraLayout from "./components/modules/layouts/ServiceMitraLayout";
 import TambahJasaForm from "./page/MitraForm/sections/TambahJasaForm";
 import ChatLayout from "./components/modules/layouts/ChatLayout";
+import EditProfile from "./page/Setting/EditProfile";
+import SearchAllService from "./page/Search/SearchAllService";
+import EditService from "./page/Dashboard/EditService";
 
 const Router = createBrowserRouter([
   {
@@ -73,6 +76,10 @@ const Router = createBrowserRouter([
         element: <SearchPage />,
       },
       {
+        path: "all-service-result",
+        element: <SearchAllService />,
+      },
+      {
         path: "profile-service/:id",
         element: (
           <ProtectedRoute>
@@ -109,6 +116,10 @@ const Router = createBrowserRouter([
           {
             index: true,
             element: <ProfileSetting />,
+          },
+          {
+            path : 'edit',
+            element: <EditProfile />,
           },
         ],
       },
@@ -160,6 +171,10 @@ const Router = createBrowserRouter([
       {
         path: "manage-services/add-service",
         element: <AddService />,
+      },
+      {
+        path: "manage-services/edit-service/:id",
+        element: <EditService />,
       },
     ],
   },

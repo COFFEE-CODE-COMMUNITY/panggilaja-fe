@@ -29,14 +29,12 @@ const VerifyResetForm = () => {
     }
   },[status])
 
-  console.log(email)
-  console.log(status)
 
   return (
     <form onSubmit={handleSubmit}>
       <div className='flex flex-col gap-[10px]'>
         <InputForm onChange={(e) => setResetCode(e.target.value)}/>
-        <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[15px] flex justify-center items-center' >Reset</Button>
+        <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[35px] flex justify-center items-center' >Reset</Button>
       </div>
     </form>
   )

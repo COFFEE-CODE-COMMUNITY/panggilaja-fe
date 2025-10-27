@@ -1,14 +1,11 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import api from "../api/api";
-
-const url = 'http://localhost:5000/api'
 
 export const getServices = createAsyncThunk(
     'services/getServices',
     async (_, { rejectWithValue }) => {
         try {
-            const res = await api.get(url+'/services', { withCredentials: true })
+            const res = await api.get('/services')
             return res.data.data;
         } catch (err) {
             return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan')
@@ -20,11 +17,7 @@ export const getServicesById = createAsyncThunk(
     'services/getServicesById',
     async (id, { rejectWithValue }) => {
         try {
-            const res = await api.get(url+`/services/${id}`,{
-                headers : {
-                    Authorization : `Bearer ${localStorage.getItem('accessToken')}`
-                }
-            }, { withCredentials: true })
+            const res = await api.get(`/services/${id}`)
             return res.data.data || res.data
         } catch (err) {
             return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
@@ -36,14 +29,10 @@ export const getReviewServicesById = createAsyncThunk(
     'services/getReviewServicesById',
     async (id, { rejectWithValue }) => {
         try {
-            const res = await api.get(url+`/reviews/seller/${id}`,{
-                headers : {
-                    Authorization : `Bearer ${localStorage.getItem('accessToken')}`
-                }
-            }, { withCredentials: true })
+            const res = await api.get(`/reviews/seller/${id}`)
             return res.data || res.data
         } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
+            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil review')
         }
     }
 )
@@ -52,16 +41,10 @@ export const addFavoriteService = createAsyncThunk(
     'services/addFavoriteService',
     async (id, { rejectWithValue }) => {
         try {
-            const res = await api.post(url+`/users/favorites/${id}`,
-            {
-                headers : {
-                    Authorization : `Bearer ${localStorage.getItem('accessToken')}`
-                },
-                withCredentials: true
-            }) 
-            return res.data || res.data
+            const res = await api.post(`/users/favorites/${id}`)
+            return res.data
         } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
+            return rejectWithValue(err.response?.data?.message || 'Gagal menambah favorit')
         }
     }
 )
@@ -70,29 +53,19 @@ export const getFavoriteService = createAsyncThunk(
     'services/getFavoriteService',
     async (id, { rejectWithValue }) => {
         try {
-            const res = await api.get(url+`/users/${id}/favorites`,
-            {
-                headers : {
-                    Authorization : `Bearer ${localStorage.getItem('accessToken')}`
-                },
-            }, 
-            { withCredentials: true })
+            const res = await api.get(`/users/${id}/favorites`)
             return res.data
         } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
+            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil favorit')
         }
     }
 )
 
 export const getCategoryService = createAsyncThunk(
-  'seller/getCategoryService',
-  async ({ rejectWithValue }) => {
+  'services/getCategoryService',
+  async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get(url + '/services/category', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      }, { withCredentials: true });
+      const res = await api.get('/services/category')
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -101,17 +74,41 @@ export const getCategoryService = createAsyncThunk(
 );
 
 export const addService = createAsyncThunk(
-  'seller/addService',
-  async ({ rejectWithValue }) => {
+  'services/addService',
+  async (data, { rejectWithValue }) => {
     try {
-      const res = await api.post(url + '/services', {
+        const res = await api.post('/services', data, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'multipart/form-data',
         },
-      }, { withCredentials: true });
-      return res.data;
+      });
+        return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+        return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
+export const editService = createAsyncThunk(
+  'services/editService',
+  async ({id, data}, { rejectWithValue }) => {
+    try {
+        const res = await api.put(`/services/${id}`, data);
+        return res.data;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
+export const deleteService = createAsyncThunk(
+  'services/deleteService',
+  async (id, { rejectWithValue }) => {
+    try {
+        const res = await api.delete(`/services/${id}`);
+        return res.data;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
     }
   }
 );
@@ -147,8 +144,19 @@ const serviceSlice = createSlice({
 
         addFavoriteStatus : 'idle',
         addFavoriteError : null,
+        
+        editServiceStatus : 'idle',
+        editServiceError : null,
+
+        deleteServiceStatus : 'idle',
+        deleteServiceError : null,
     }),
-    reducers : {},
+    reducers : {
+        resetEditStatus : (state) => {
+            state.editServiceStatus = 'idle'
+            state.editServiceError = ''
+        }
+    },
     extraReducers : (builder) => {
         builder
             //get service
@@ -163,7 +171,6 @@ const serviceSlice = createSlice({
             .addCase(getServices.rejected, (state, action) => {
                 state.allServiceStatus = 'error';
                 state.allServiceError = action.payload || action.error.message
-                console.error('Rejected:', action.payload)
             })
 
             //get service by id
@@ -180,7 +187,7 @@ const serviceSlice = createSlice({
                 state.selectedServiceError = action.payload || action.error.message
             })
 
-            //get service by id
+            //get review by id
             .addCase(getReviewServicesById.pending, (state) => {
                 state.reviewServiceStatus = 'loading'
                 state.reviewServiceError = null
@@ -231,8 +238,47 @@ const serviceSlice = createSlice({
                 state.CategoryService = action.payload
             })
             .addCase(getCategoryService.rejected, (state, action) => {
-                state.FavoriteServiceStatus = 'error';
-                state.FavoriteServiceError = action.payload || action.error.message
+                state.CategoryServiceStatus = 'error';
+                state.CategoryServiceError = action.payload || action.error.message
+            })
+
+            //add service
+            .addCase(addService.pending, (state) => {
+                state.addServiceStatus = 'loading'
+                state.addServiceError = null
+            })
+            .addCase(addService.fulfilled, (state) => {
+                state.addServiceStatus = 'success';
+            })
+            .addCase(addService.rejected, (state, action) => {
+                state.addServiceStatus = 'error';
+                state.addServiceError = action.payload || action.error.message
+            })
+
+            //edit service
+            .addCase(editService.pending, (state) => {
+                state.editServiceStatus = 'loading'
+                state.editServiceError = null
+            })
+            .addCase(editService.fulfilled, (state) => {
+                state.editServiceStatus = 'success';
+            })
+            .addCase(editService.rejected, (state, action) => {
+                state.editServiceStatus = 'error';
+                state.editServiceError = action.payload || action.error.message
+            })
+
+            //delete service
+            .addCase(deleteService.pending, (state) => {
+                state.deleteServiceStatus = 'loading'
+                state.deleteServiceError = null
+            })
+            .addCase(deleteService.fulfilled, (state) => {
+                state.deleteServiceStatus = 'success';
+            })
+            .addCase(deleteService.rejected, (state, action) => {
+                state.deleteServiceStatus = 'error';
+                state.deleteServiceError = action.payload || action.error.message
             })
     }
 })
@@ -242,9 +288,15 @@ export const {
     selectById : selectdServiceById
 } = serviceEntity.getSelectors(state => state.service)
 
+export const {resetEditStatus} = serviceSlice.actions
+
 export const selectSelectedService = (state) => state.service.selectedService
 export const selectSelectedServiceStatus = (state) => state.service.selectedServiceStatus
 export const selectSelectedServiceError = (state) => state.service.selectedServiceError
+
+export const selectAddService = (state) => state.service.addService
+export const selectAddServiceStatus = (state) => state.service.addServiceStatus
+export const selectAddServiceError = (state) => state.service.addServiceError
 
 export const selectReviewService = (state) => state.service.reviewService
 export const selectReviewServiceStatus = (state) => state.service.reviewServiceStatus
@@ -254,12 +306,18 @@ export const selectFavoriteService = (state) => state.service.getFavoritesServic
 export const selectFavoriteServiceStatus = (state) => state.service.getFavoritesServiceStatus
 export const selectFavoriteServiceError = (state) => state.service.getFavoritesServiceError
 
-export const selectCategoryService = (state) => state.service.getCategoryService
-export const selectCategoryServiceStatus = (state) => state.service.getCategoryServiceStatus
-export const selectCategoryServiceError = (state) => state.service.getCategoryServiceError
+export const selectCategoryService = (state) => state.service.CategoryService
+export const selectCategoryServiceStatus = (state) => state.service.CategoryServiceStatus
+export const selectCategoryServiceError = (state) => state.service.CategoryServiceError
 
-export const selectAddFavoriteServiceStatus = (state) => state.service.addFavoriteServiceStatus
-export const selectAddFavoriteServiceError = (state) => state.service.addFavoriteServiceError
+export const selectAddFavoriteServiceStatus = (state) => state.service.addFavoriteStatus
+export const selectAddFavoriteServiceError = (state) => state.service.addFavoriteError
+
+export const selectEditServicesServiceStatus = (state) => state.service.editServiceStatus
+export const selectEditServicesServiceError = (state) => state.service.editServiceError
+
+export const selectDeleteServiceStatus = (state) => state.service.deleteServiceStatus
+export const selectDeleteServiceError = (state) => state.service.deleteServiceError
 
 export const selectAllServiceStatus = (state) => state.service.allServiceStatus
 export const selectAllServiceError = (state) => state.service.allServiceError

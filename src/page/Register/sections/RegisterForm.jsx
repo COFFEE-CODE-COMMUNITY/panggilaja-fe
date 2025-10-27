@@ -11,7 +11,7 @@ const RegisterForm = ({message, handleSubmit, handleChangeUsername, handleChange
         <InputForm label='Email' variant='cols' placeholder='Masukkan email' className='' type='email' onChange={handleChangeEmail}/>
         <InputForm label='Password' variant='cols' placeholder='Masukkan password' className='' type='password' onChange={handleChangePassword}/>
         <InputForm label='Konfirmasi Password' variant='cols' placeholder='Masukkan password' className='' type='password' onChange={handleChangeConfirmPassword}/>
-        <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[15px] flex justify-center items-center' >Register</Button>
+        <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[35px] flex justify-center items-center' >Register</Button>
         {message && <p>{message}</p>}
       </form>
     </div>

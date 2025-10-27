@@ -43,13 +43,11 @@ const LoginPage = () => {
   }
 
   useEffect(() => {
-      if (status === 'success' && currentUser) {
-          navigate('/form-detail-profile'); 
-      }
+    if (status === 'success' && currentUser) {
+      navigate('/')
+    }
   }, [status, currentUser, navigate]);
 
-  console.log(status)
-  console.log(message)
   return (
     <AuthLayout 
       title='Masuk ke akun anda'

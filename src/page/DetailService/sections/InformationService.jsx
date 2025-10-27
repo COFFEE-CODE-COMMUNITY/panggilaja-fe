@@ -3,15 +3,28 @@ import { FaStar, FaRegHeart } from 'react-icons/fa'
 import Button from '../../../components/common/Button'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { addFavoriteService, getReviewServicesById, selectAddFavoriteServiceError, selectAddFavoriteServiceStatus, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
+import { addFavoriteService, getFavoriteService, getReviewServicesById, selectAddFavoriteServiceError, selectAddFavoriteServiceStatus, selectFavoriteService, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
+import { selectCurrentUser } from '../../../features/authSlice'
 
 const InformationService = ({sellerName, idProvider,  idService, nameService, totalReview, topPrice, basePrice, description, totalReviewSeller, }) => {
     const dispatch = useDispatch()
     const reviews = useSelector(selectReviewService)
     const status = useSelector(selectReviewServiceStatus)
 
+    const user = useSelector(selectCurrentUser)
+
     const statusAdd = useSelector(selectAddFavoriteServiceStatus)
     const errorAdd = useSelector(selectAddFavoriteServiceError)
+
+    const getFavorites = useSelector(selectFavoriteService)
+
+    useEffect(() => {
+        if(user.id_buyer){
+            dispatch(getFavoriteService(user.id_buyer))
+        }
+    },[dispatch])
+
+    console.log(getFavoriteService)
 
     useEffect(() => {
         if(idProvider){
@@ -25,7 +38,6 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
         dispatch(addFavoriteService(idService));
     };
 
-    console.log(idService)
 
   return (
     <div className='lg:min-h-screen h-1/2 lg:w-1/2 w-full flex flex-col gap-[30px] lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>

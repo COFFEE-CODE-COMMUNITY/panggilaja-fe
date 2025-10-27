@@ -4,34 +4,25 @@ import { selectCurrentUser } from '../../../features/authSlice';
 import InputForm from '../../../components/modules/form/InputForm';
 import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
-import { addService, selectAddServiceStatus } from '../../../features/serviceSlice';
+import { addService, editService, resetEditStatus, selectAddServiceStatus, selectEditServicesServiceError, selectEditServicesServiceStatus } from '../../../features/serviceSlice';
 import { useNavigate } from 'react-router-dom';
 
-const FormAddService = () => {
+const FormEditService = ({serviceName, basePrice, topPrice, description, category, id}) => {
     const dispatch = useDispatch();
     const user = useSelector(selectCurrentUser); 
-    const status = useSelector(selectAddServiceStatus); 
+    const status = useSelector(selectEditServicesServiceStatus); 
     const navigate = useNavigate()
-    
-    const [file, setFile] = useState(null);
-    const [nama_jasa, setNama_Jasa] = useState('');
-    const [base_price, setBase_Price] = useState('');
-    const [top_price, setTop_Price] = useState('');
-    const [deskripsi, setDeskripsi] = useState('');
+
+    const [nama_jasa, setNama_Jasa] = useState(serviceName);
+    const [base_price, setBase_Price] = useState(basePrice);
+    const [top_price, setTop_Price] = useState(topPrice);
+    const [deskripsi, setDeskripsi] = useState(description);
     
     const kategori_id = '744a6833-b60d-4873-b5ee-42876yui987y';
 
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        if (!file) {
-            alert("Harap pilih file gambar jasa.");
-            return;
-        }
         
         const serviceData = {
             nama_jasa: nama_jasa,
@@ -40,14 +31,8 @@ const FormAddService = () => {
             top_price: top_price ? parseInt(top_price) : 0,
             kategori_id: kategori_id,
         };
-        
-        const formData = new FormData();
-        
-        formData.append('file', file);
-        
-        formData.append('data', JSON.stringify(serviceData));
-        
-        dispatch(addService(formData));
+                
+        dispatch(editService({id, data : serviceData}));
         
         console.log(status)
     };
@@ -56,16 +41,17 @@ const FormAddService = () => {
         if(status === 'success'){
             alert('Data berhasil masuk')
             navigate('/dashboard/manage-services')
+            dispatch(resetEditStatus())
         }
     },[status])
 
+    console.log(status)
     return (
         <form onSubmit={handleSubmit} className='flex'>
             <div className='w-1/2 flex items-center justify-center p-[30px]'>
                 <input 
                     type='file' 
                     className='aspect-square w-full bg-gray-50 px-[50px] py-[200px]'
-                    onChange={handleFileChange}
                 />
             </div>
             <div className='w-1/2 flex items-center justify-center'>
@@ -82,8 +68,8 @@ const FormAddService = () => {
                             label='Kategori Jasa'
                             type='text'
                             placeholder='Kategori Default'
-                            value='Kategori Default'
                             disabled
+                            value={category}
                         />
                         <div>
                             <label htmlFor="harga">Harga</label>
@@ -123,4 +109,4 @@ const FormAddService = () => {
     )
 }
 
-export default FormAddService;
+export default FormEditService;

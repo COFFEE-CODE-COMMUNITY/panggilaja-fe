@@ -50,12 +50,17 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
         }
     },[statusChange])
     
-    let favoritesService = ''
+    let favoritesService = []
 
     if(favoritesStatus === 'success'){
-        favoritesService = services.filter((service, index) => service.id === favorites.data[index].service_id)
-    }
+        favoritesService = services.filter((service, index) => {
+            const favoriteItem = favorites.data && favorites.data[index];
+            
+            return favoriteItem && (service.id === favoriteItem.service_id);
+        });
+    }
 
+    console.log(favoritesService)
     return (
         <>
             <div className='lg:py-[15px] md:py-[10px] py-[5px] w-full flex sm:justify-center justify-between xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200'>
@@ -157,11 +162,12 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                 <p className='text-h6 border-b-1 border-gray-100 py-[5px]'>Jasa Favorit</p>
                                 <div>
                                     {favoritesService.map((favorite) => (
-                                        <div className='flex gap-[20px] hover:bg-gray-50 px-[10px] py-[5px]'>
-                                            <img src={favorite.foto_product} className='w-[100px]'></img>
-                                            <p className='w-full text-h6'>{favorite.nama_jasa}</p>
-                                            
-                                        </div>
+                                        <Link to={`service/${favorite.id}`}>
+                                            <div className='flex gap-[20px] hover:bg-gray-50 px-[10px] py-[5px]'>
+                                                <img src={favorite.foto_product} className='w-[100px]'></img>
+                                                <p className='w-full text-h6'>{favorite.nama_jasa}</p>
+                                            </div>
+                                        </Link>
                                     ))}
                                 </div>
                             </div>

@@ -44,13 +44,12 @@ const initialState = {
     resetCode : null
 }
 
-const url = 'http://localhost:5000/api/'
 
 export const loginUser = createAsyncThunk(
     'auth/loginUser',
     async (userData, { rejectWithValue }) => {
         try {
-            const response = await api.post(`${url}auth/login`, userData);
+            const response = await api.post(`auth/login`, userData);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -65,7 +64,7 @@ export const registerUser = createAsyncThunk(
     'auth/registerUser',
     async (userData, { rejectWithValue }) => {
         try {
-            const response = await api.post(`${url}auth/register`, userData);
+            const response = await api.post(`auth/register`, userData);
             return response.data;
         } catch (error) {
             if (error.response) {
@@ -80,7 +79,7 @@ export const logoutUser = createAsyncThunk(
     'auth/logoutUser',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.post(`${url}auth/logout`);
+            const response = await api.post(`auth/logout`);
             return response.data;
         } catch (error) {
             if (error.response) {
@@ -95,7 +94,7 @@ export const requestResetPassword = createAsyncThunk(
     'auth/requestResetPassword',
     async (email, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/request-reset`, {email});
+            const response = await api.post(`auth/request-reset`, {email});
             return { message: response.data, email: email };
         }catch (error) {
             if (error.response) {
@@ -110,7 +109,7 @@ export const verifyCodeResetPassword = createAsyncThunk(
     'auth/verifyCodeResetPassword',
     async (data, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/verify-reset-code`, data);
+            const response = await api.post(`auth/verify-reset-code`, data);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -125,7 +124,7 @@ export const resetPassword = createAsyncThunk(
     'auth/resetPassword',
     async (data, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/reset-password`, data);
+            const response = await api.post(`auth/reset-password`, data);
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -140,7 +139,7 @@ export const changeAccount = createAsyncThunk(
     'auth/changeAccount',
     async (_, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/change-user`, {
+            const response = await api.post(`auth/change-user`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
                 },
@@ -159,7 +158,7 @@ export const changeAccountToBuyer = createAsyncThunk(
     'auth/changeAccountToBuyer',
     async (_, {rejectWithValue}) => {
         try {
-            const response = await api.post(`${url}auth/change-user`, {
+            const response = await api.post(`auth/change-user`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
                 },

@@ -22,7 +22,6 @@ const VerifyReset = () => {
       }
   }, [email, navigate]);
 
-  console.log(statusVerify)
   return (
     <AuthLayout
         title='Reset Password'
