@@ -30,6 +30,7 @@ import ChatLayout from "./components/modules/layouts/ChatLayout";
 import EditProfile from "./page/Setting/EditProfile";
 import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
+import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
 
 const Router = createBrowserRouter([
   {
@@ -133,16 +134,17 @@ const Router = createBrowserRouter([
       },
     ],
   },
+  
   {
     path: "partner/mitra-form",
     element: <ServiceMitraLayout />,
     children: [
       {
         index: true,
-        element: <TambahJasaForm />,
+        element: <ProfileMitraForm />,
       },
       {
-        index: '/add-service',
+        path: 'add-service',
         element: <TambahJasaForm />,
       },
     ],
