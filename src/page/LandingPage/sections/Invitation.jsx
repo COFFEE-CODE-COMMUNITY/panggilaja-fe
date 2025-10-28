@@ -1,17 +1,13 @@
-import React from 'react'
-import Card from '../../../components/common/Card'
 import InvitationCard from '../../../components/modules/Cards/InvitationCard'
 import Button from '../../../components/common/Button'
-import { Link, useSearchParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { selectAccessToken } from '../../../features/authSlice'
+import { Link } from 'react-router-dom'
 
 const Invitation = () => {
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 md:gap-[20px] gap-[10px] w-full md:my-[100px] my-[50px]'>
         <InvitationCard className='gap-[10px]'>
             <div>
-                <h1 className='font-bold lg:text-h1 md:text-h2 text-h3 text-white w-3/4 lg:leading-14 md:leading-12 leading-8'>Saya Ingin Mencari Jasa Terbaik</h1>
+                <h1 className='font-bold lg:text-h1 md:text-h2 text-h3 text-white w-3/4'>Saya Ingin Mencari Jasa Terbaik</h1>
                 <p className='lg:text-h4 md:text-h5 text-h6 text-white h-full'>Temukan ahli di radius 3 KM Anda, lihat ulasan tepercaya, dan segera mulai negosiasi harga.</p>
             </div>
             <Link>
@@ -22,7 +18,7 @@ const Invitation = () => {
         </InvitationCard>
         <InvitationCard className='gap-[10px]'>
             <div>
-                <h1 className='font-bold lg:text-h1 md:text-h2 text-h3 text-white w-full lg:leading-14 md:leading-12 leading-8'>Saya Ingin Menjadi Mitra & Berpenghasilan</h1>
+                <h1 className='font-bold lg:text-h1 md:text-h2 text-h3 text-white w-full'>Saya Ingin Menjadi Mitra & Berpenghasilan</h1>
                 <p className='lg:text-h4 md:text-h5 text-h6 text-white h-full'>Ubah keahlian Anda menjadi penghasilan stabil. Proses pendaftaran mudah, GRATIS, dan sepenuhnya transparan.</p>
             </div>
             <Link to='partner'>

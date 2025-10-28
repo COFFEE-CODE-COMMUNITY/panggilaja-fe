@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../../features/authSlice'
 import { getAllServicesByIdSeller, selectSellerServices, selectSellerStatus } from '../../../features/sellerSlice'
 import { Link } from 'react-router-dom'
-import { deleteService, selectDeleteServiceStatus } from '../../../features/serviceSlice'
+import { deleteService, resetDeleteStatus, selectDeleteServiceStatus } from '../../../features/serviceSlice'
 
 const TableServices = () => {
     const user = useSelector(selectCurrentUser)
@@ -26,6 +26,7 @@ const TableServices = () => {
             alert('Layanan berhasil dihapus!'); 
             if (user?.id_seller) {
                 dispatch(getAllServicesByIdSeller(user.id_seller));
+                dispatch(resetDeleteStatus())
             }
         }
     }, [statusDelete, dispatch, user?.id_seller])

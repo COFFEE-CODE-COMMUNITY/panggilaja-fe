@@ -44,7 +44,7 @@ const AppLayout = () => {
   }
 
   const noFooterPaths = [
-    '/chat', 
+    '/chat', '/service'
   ];
 
   const shouldHideFooter = noFooterPaths.some(path => location.pathname.startsWith(path));
@@ -59,8 +59,16 @@ const AppLayout = () => {
       }
   }, [dispatch, user]); 
 
+  let containerClasses = 'relative min-h-screen flex flex-col'
+  let mainContentClasses = 'flex-grow h-full';
+
+  if (shouldHideFooter) {
+    containerClasses = 'relative h-screen flex flex-col'
+    mainContentClasses = 'flex-grow'
+  }
+
   return (
-    <div className='relative'>
+    <div className={containerClasses}>
       <Header 
         handleChange={handleChange} 
         handleSubmit={handleSubmit} 
@@ -69,8 +77,10 @@ const AppLayout = () => {
         sidebarMobile={sidebarMobile}
         setSidebarMobile={setSidebarMobile}
         search={search}
-      />\
-      <Outlet context={search}/>
+      />
+      <div className={mainContentClasses}> 
+        <Outlet context={search}/>
+      </div>
       {!shouldHideFooter && <Footer/>}
     </div>
   )
