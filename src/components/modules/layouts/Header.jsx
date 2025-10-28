@@ -1,6 +1,5 @@
-import React, { useEffect, useEffectEvent, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import NavLink from '../navigation/NavLink'
-import SearchBar from '../navigation/SearchBar'
 import Input from '../../common/Input'
 import Button from '../../common/Button'
 import { Link, useNavigate } from 'react-router-dom'
@@ -10,10 +9,15 @@ import { FaBars, FaRegComment, FaRegHeart, FaSearch, FaTimes, FaUser } from 'rea
 import { MdSearch } from 'react-icons/md'
 import { IoMdLogOut } from 'react-icons/io'
 import { getFavoriteService, getServices, selectAllService, selectFavoriteService, selectFavoriteServiceStatus } from '../../../features/serviceSlice'
+import { seeProfile, selectSeeProfile, selectSeeProfileStatus } from '../../../features/userSlice'
 
 const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, sidebarMobile, setSidebarMobile, search}) => {
     const user = useSelector(selectCurrentUser)
     const token = useSelector(selectAccessToken)
+
+    const profile = useSelector(selectSeeProfile)
+    const statusProfile = useSelector(selectSeeProfileStatus)
+
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -26,6 +30,12 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
     const [searchMobile, setSearchMobile] = useState(false)
     const [iconSearch, setIconSearch] = useState(true)
     const [order, setOrder] = useState(false)
+
+    useEffect(() => {
+        if (user?.id_buyer && statusProfile === 'idle' && !profile) {
+            dispatch(seeProfile(user.id_buyer))
+        }
+    },[statusProfile, dispatch, user?.id_buyer])
 
     useEffect(() => {
         if(!token){
@@ -63,7 +73,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
     console.log(favoritesService)
     return (
         <>
-            <div className='lg:py-[15px] md:py-[10px] py-[5px] w-full flex sm:justify-center justify-between xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200'>
+            <div className='lg:py-[20px] md:py-[15px] py-[10px] w-full flex sm:justify-center justify-between xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200'>
                 {token && (
                     <button 
                         className='sm:hidden block cursor-pointer'
@@ -114,20 +124,21 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                         <>
                             <img 
                                 className='w-[40px] h-[40px] bg-amber-100 rounded-full sm:block hidden cursor-pointer'
+                                src={profile?.foto_buyer}
                                 onClick={() => {
                                     setSidebarProfile(!sidebarProfile)
                                     setFavorite(false)
                                     setChat(false)
                                 }}
                             ></img>
-                            {iconSearch && (
                                 <button 
-                                    className='sm:hidden block cursor-pointer'
+                                    className='sm:hidden block cursor-pointer w-[20px] h-[20px] '
                                     onClick={() => setSearchMobile(!searchMobile)}
                                 >   
-                                    <MdSearch className='text-gray-80000 text-[20px]'/>
+                                    {iconSearch && (
+                                        <MdSearch className='text-gray-80000 text-[20px]'/>
+                                    )}
                                 </button>
-                            )}
                         </>
                     )}
                 </div>
@@ -164,7 +175,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                     {favoritesService.map((favorite) => (
                                         <Link to={`service/${favorite.id}`}>
                                             <div className='flex gap-[20px] hover:bg-gray-50 px-[10px] py-[5px]'>
-                                                <img src={favorite.foto_product} className='w-[100px]'></img>
+                                                <img src={favorite?.foto_product} className='w-[100px]'></img>
                                                 <p className='w-full text-h6'>{favorite.nama_jasa}</p>
                                             </div>
                                         </Link>
@@ -205,7 +216,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                         <div className='shadow-xl w-[200px] z-50 bg-white border-2 border-gray-100 gap-[10px] rounded-[15px] overflow-hidden h-[300px] relative'>
                             <Link to='profile-setting'>
                                 <div className='flex gap-[10px] px-[20px] py-[15px] hover:bg-gray-50'>
-                                    <div className='w-[40px] h-[40px] bg-amber-100 rounded-full'></div>
+                                    <img src={profile?.foto_buyer} className='w-[40px] h-[40px] bg-amber-100 rounded-full'></img>
                                     <div>
                                         <p>{token && user.username}</p>
                                         <p className='text-h6 font-light'>Konsumen</p>
@@ -261,7 +272,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
             </div>
             {sidebarMobile && (
                 <div 
-                    className='sm:w-0 sm:h-0 fixed w-full min-h-screen bg-white z-100 flex flex-col px-[15px] transition duration-500 sm:hidden'>
+                    className='sm:w-0 sm:h-0 fixed w-full min-h-screen bg-white z-100 flex flex-col px-[15px] transition duration-500 sm:hidden my-[25px]'>
                     <Link 
                         to='profile-setting'
                         onClick={() => {
@@ -272,7 +283,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                         <div 
                             className='flex items-center my-[15px] gap-[15px] px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer w-full'
                         >
-                            <div className='w-[40px] h-[40px] bg-amber-100 rounded-full'></div>
+                            <img src={profile.foto_buyer} className='w-[40px] h-[40px] bg-amber-100 rounded-full'></img>
                             <div>
                                 <p>{token && user.username}</p>
                                 <p className='text-h6 font-light'>Konsumen</p>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../features/authSlice'
-import { seeAddress, selectSeeAddress, selectSeeAddressStatus } from '../../features/userSlice' 
+import { seeAddress, seeProfile, selectSeeAddress, selectSeeAddressStatus, selectSeeProfile, selectSeeProfileStatus } from '../../features/userSlice' 
 import { FaEdit } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 
@@ -9,23 +9,22 @@ const ProfileSetting = () => {
     const user = useSelector(selectCurrentUser)
     const dispatch = useDispatch()
     
+    const profile = useSelector(selectSeeProfile)
+    const statusProfile = useSelector(selectSeeProfileStatus)
+
     const address = useSelector(selectSeeAddress)
     const statusAddress = useSelector(selectSeeAddressStatus)
     
     const [edit, setEdit] = useState(false)
 
     useEffect(() => {
-        console.log('🔍 ProfileSetting Debug:', {
-            user,
-            address,
-            statusAddress,
-            hasIdBuyer: user?.id_buyer,
-        })
-    }, [user, address, statusAddress])
+        if (user?.id_buyer && statusProfile === 'idle' && !profile) {
+            dispatch(seeProfile(user.id_buyer))
+        }
+    },[statusProfile, dispatch, user?.id_buyer])
 
     useEffect(() => {
         if (user?.id_buyer && statusAddress === 'idle') {
-            console.log('📡 Fetching address for buyer:', user.id_buyer)
             dispatch(seeAddress(user.id_buyer))
         }
     }, [dispatch, user?.id_buyer, statusAddress])
@@ -66,13 +65,24 @@ const ProfileSetting = () => {
 
             <div className='w-full lg:px-[20px] lg:py-[25px] px-[20px] py-[15px] flex flex-col lg:gap-[20px] md:gap-[15px] gap-[10px] border-1 border-gray-50 shadow-sm rounded-[15px] relative'>
                 <p className='font-medium'>Akun</p>
-                <div className='w-full flex lg:flex-row flex-col lg:gap-[50px] gap-[10px] lg:items-center '>
-                    <img alt="" className='w-[100px] h-[100px] rounded-full bg-amber-200'/>
+                <div className='w-full flex lg:flex-row flex-col lg:gap-[50px] gap-[10px] lg:items-center h-full'>
                     <div className='flex flex-col gap-[10px] flex-1'>
-                        
+                        <div className='w-full flex justify-center'>
+                            <div className='relative'>
+                                <FaEdit 
+                                    className='absolute top-0 right-0 cursor-pointer text-gray-600 hover:text-primary transition-colors'
+                                    size={20}
+                                />
+                                <img src={profile?.foto_buyer} alt="" className='w-[100px] h-[100px] rounded-full '/>
+                            </div>
+                        </div>
                         <div className='flex flex-col'>
                             <p className='font-light text-sm text-gray-600'>Username</p>
                             <p className='font-medium'>{user?.username || '-'}</p>
+                        </div>
+                        <div className='flex flex-col'>
+                            <p className='font-light text-sm text-gray-600'>Full Name</p>
+                            <p className='font-medium'>{profile?.fullname || '-'}</p>
                         </div>
                         <div className='flex flex-col'>
                             <p className='font-light text-sm text-gray-600'>Email</p>
@@ -80,7 +90,6 @@ const ProfileSetting = () => {
                         </div>
                         
                         <div className='border-t border-gray-200 my-2'></div>
-                        <p className='font-medium text-sm'>Alamat</p>
                         
                         {address && address.data ? (
                             <>

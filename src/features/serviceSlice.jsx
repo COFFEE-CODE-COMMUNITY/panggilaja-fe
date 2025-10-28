@@ -155,7 +155,11 @@ const serviceSlice = createSlice({
         resetEditStatus : (state) => {
             state.editServiceStatus = 'idle'
             state.editServiceError = ''
-        }
+        },
+        resetDeleteStatus : (state) => {
+            state.deleteServiceStatus = 'idle'
+            state.deleteServiceError = ''
+        },
     },
     extraReducers : (builder) => {
         builder
@@ -288,7 +292,7 @@ export const {
     selectById : selectdServiceById
 } = serviceEntity.getSelectors(state => state.service)
 
-export const {resetEditStatus} = serviceSlice.actions
+export const {resetEditStatus, resetDeleteStatus} = serviceSlice.actions
 
 export const selectSelectedService = (state) => state.service.selectedService
 export const selectSelectedServiceStatus = (state) => state.service.selectedServiceStatus

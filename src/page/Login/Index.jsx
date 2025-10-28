@@ -20,7 +20,6 @@ const LoginPage = () => {
   const currentUser = useSelector(selectCurrentUser)
   const token = useSelector(selectAccessToken)
 
-
   useEffect(() => {
     if(token){
       navigate('/')
@@ -64,6 +63,7 @@ const LoginPage = () => {
         handleChangeEmail={handleChangeEmail}
         handleChangePassword={handleChangePassword}
         message={message}
+        status={status}
       />
     </AuthLayout>
   )
