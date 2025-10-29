@@ -72,7 +72,7 @@ function ProfileMitraForm({ onFormSubmit }) {
                         />
                     </div>
 
-                    {/* nama */}
+                    {/* kategori */}
                     <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
                         Kategori
                     </label>
@@ -82,7 +82,7 @@ function ProfileMitraForm({ onFormSubmit }) {
                         </select>
                     </div>
 
-                    {/* nama */}
+                    {/* pengalaman */}
                     <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
                         Pengalaman
                     </label>
@@ -90,11 +90,11 @@ function ProfileMitraForm({ onFormSubmit }) {
                         <InputForm
                             type="text"
                             id="name"
-                            placeholder="Masukkan nama"
+                            placeholder="Masukkan pengalaman"
                         />
                     </div>
 
-                    {/* nama */}
+                    {/* keahlian */}
                     <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
                         Keahlian
                     </label>
@@ -102,11 +102,11 @@ function ProfileMitraForm({ onFormSubmit }) {
                         <InputForm
                             type="text"
                             id="name"
-                            placeholder="Masukkan nama"
+                            placeholder="Masukkan keahlian"
                         />
                     </div>
 
-                    {/* deskripsi */}
+                    {/* deskripsi toko */}
                     <label htmlFor="deskripsi" className="block text-[15px] font-medium text-gray-700 md:pt-2 md:col-span-1"> 
                         Deskripsi Toko
                     </label>
@@ -115,7 +115,7 @@ function ProfileMitraForm({ onFormSubmit }) {
                             as="textarea" 
                             id="deskripsi"
                             rows="4" 
-                            placeholder="Masukkan deskripsi profil"
+                            placeholder="Masukkan deskripsi toko"
                         />
                     </div>
 
