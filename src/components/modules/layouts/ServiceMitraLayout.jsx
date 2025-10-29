@@ -6,7 +6,7 @@ function ServicesMitraLayout() {
     const currentPath = location.pathname;
 
     let currentStepId = 1; 
-    if (currentPath.startsWith('/mitra/tambah-jasa')) {
+    if (currentPath.startsWith('/partner/mitra-form/add-service')) {
         currentStepId = 2;
     }
 
@@ -14,7 +14,7 @@ function ServicesMitraLayout() {
         <div>
             <div className="w-full p-2 md:p-2 lg:p-2 shadow-sm sticky z-10 relative">
                 <div className="absolute left-3 top-3 md:left-4 md:top-4 lg:left-5 lg:top-5">
-                    <Link to="/" className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-600">
+                    <Link to={currentStepId === 1 ? "/partner" : "/partner/mitra-form"} className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-600">
                         &lt; Kembali
                     </Link>
                 </div>
