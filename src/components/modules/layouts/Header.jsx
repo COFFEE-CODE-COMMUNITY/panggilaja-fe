@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import NavLink from '../navigation/NavLink'
 import Input from '../../common/Input'
 import Button from '../../common/Button'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeAccount, logout, selectAccessToken, selectChangeAccountStatus, selectCurrentUser } from '../../../features/authSlice'
 import { FaBars, FaRegComment, FaRegHeart, FaSearch, FaTimes, FaUser } from 'react-icons/fa'
@@ -20,6 +20,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const location = useLocation()
 
     const favorites = useSelector(selectFavoriteService)
     const favoritesStatus = useSelector(selectFavoriteServiceStatus)
@@ -70,7 +71,6 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
         });
     }
 
-    console.log(favoritesService)
     return (
         <>
             <div className='lg:py-[20px] md:py-[15px] py-[10px] w-full flex sm:justify-center justify-between xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200'>
@@ -110,7 +110,9 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                         />
                         <Button className='rounded-bl-[25px] rounded-tl-[25px] items-center justify-center h-[35px] md:h-[43px] md:block hidden absolute left-0 lg:px-[20px] lg:py-[15px] md:px-[15px] md:py-[10px] px-[10px] py-[5px]' variant='primary'><FaSearch size={10} color='white'/></Button>
                     </form>
-                    <NavLink text='Jadi Mitra' className='text-h6 md:text-h5 w-[85px] md:w-[105px] font-light text-center sm:block hidden' link='/partner'/>
+                    {location.pathname === '/partner' ? '' : (
+                        <NavLink text='Jadi Mitra' className='text-h6 md:text-h5 w-[85px] md:w-[105px] font-light text-center sm:block hidden' link='/partner'/>
+                    )}
                 </div>
                 <div className='flex gap-[10px] md:gap-[15px] items-center h-full relative lg:w-[300px] justify-end' on>
                     {!token ? (
@@ -129,6 +131,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                     setSidebarProfile(!sidebarProfile)
                                     setFavorite(false)
                                     setChat(false)
+                                    setOrder(false)
                                 }}
                             ></img>
                                 <button 

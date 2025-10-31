@@ -27,7 +27,7 @@ const DetailService = () => {
   }
   
   return (
-    <div className='md:flex h-full w-full gap-[35px] mb-[50px]'>
+    <div className='md:flex h-full w-full gap-[40px] mb-[50px] px-[100px] pt-[20px]'>
         {status === 'loading' && <div className='w-full h-screen'>loading</div>}
         {status === 'success' && (
           <>

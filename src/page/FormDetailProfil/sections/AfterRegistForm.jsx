@@ -2,7 +2,15 @@ import { useEffect, useState } from 'react'
 import Button from '../../../components/common/Button'
 import Input from '../../../components/common/Input'
 import { useDispatch, useSelector } from 'react-redux'
-import { addAddress, selectSeeAddress, selectSeeAddressStatus, selectAddAddressStatus } from '../../../features/userSlice'
+// ❌ ERROR FIX: Import addAddress dengan alias untuk avoid naming conflict
+import { 
+    addAddress as addAddressAction, 
+    selectSeeAddress, 
+    selectSeeAddressStatus, 
+    selectAddAddressStatus, 
+    seeAddress, 
+    selectAddAddress 
+} from '../../../features/userSlice'
 import { selectCurrentUser } from '../../../features/authSlice'
 import { useNavigate } from 'react-router-dom'
 
@@ -11,6 +19,17 @@ const AfterRegistForm = () => {
     const address = useSelector(selectSeeAddress)
     const addressStatus = useSelector(selectSeeAddressStatus)
     const addAddressStatus = useSelector(selectAddAddressStatus)
+    const addedAddress = useSelector(selectAddAddress) // ✅ Rename untuk clarity
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    console.log('🔍 Current state:', {
+        user,
+        address,
+        addressStatus,
+        addAddressStatus,
+        addedAddress
+    })
 
     const [provinsi, setProvinsi] = useState('')
     const [kota, setKota] = useState('')
@@ -19,36 +38,29 @@ const AfterRegistForm = () => {
     const [alamat, setAlamat] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-
-    // Debug logs
+    // ❌ ERROR FIX: Fetch address hanya sekali saat mount
     useEffect(() => {
-        console.log('🔍 AfterRegistForm State:', {
+        if (user?.id_buyer) {
+            console.log('📡 Fetching address for buyer:', user.id_buyer)
+            dispatch(seeAddress(user.id_buyer))
+        }
+    }, [dispatch, user?.id_buyer])
+
+    // Check redirect setelah address loaded
+    useEffect(() => {
+        console.log('🔄 Check redirect:', {
             address,
             addressStatus,
-            addAddressStatus,
-            hasAddress: address?.data?.alamat || address?.data?.provinsi
+            hasProvinsi: address?.data?.provinsi,
+            hasAlamat: address?.data?.alamat
         })
-    }, [address, addressStatus, addAddressStatus])
 
-    // ✅ Cek apakah user sudah punya alamat
-    // Backend response: address.data.provinsi, address.data.alamat, etc
-    useEffect(() => {
-        if (!address || addressStatus === 'loading') {
+        if (addressStatus === 'loading') {
             return
         }
 
-        // Cek apakah ada field alamat di response
-        const hasAddress = address?.data?.provinsi || address?.data?.alamat
-        
-        console.log('📍 Checking address:', {
-            hasProvinsi: !!address?.data?.provinsi,
-            hasAlamat: !!address?.data?.alamat,
-            hasAddress
-        })
-
-        if (hasAddress) {
+        // ✅ Cek apakah ada data alamat yang valid
+        if (address?.data?.provinsi || address?.data?.alamat) {
             console.log('✅ User sudah punya alamat, redirect ke home')
             navigate('/', { replace: true })
         } else {
@@ -56,23 +68,40 @@ const AfterRegistForm = () => {
         }
     }, [address, addressStatus, navigate])
 
-    // Redirect setelah submit berhasil
+    // Handle submit success - refresh data dan redirect
     useEffect(() => {
+        console.log('⚡ Status changed:', {
+            isSubmitting,
+            addAddressStatus,
+            addedAddress
+        })
+
         if (isSubmitting && addAddressStatus === 'success') {
             console.log('✅ Alamat berhasil ditambahkan!')
+            
+            dispatch(seeAddress(user.id_buyer))
+            
             setTimeout(() => {
                 navigate('/', { replace: true })
-            }, 500)
+            }, 1000)
         }
         
         if (addAddressStatus === 'error') {
             console.error('❌ Gagal menambahkan alamat')
             setIsSubmitting(false)
         }
-    }, [addAddressStatus, isSubmitting, navigate])
+    }, [addAddressStatus, isSubmitting, navigate, dispatch, user?.id_buyer])
 
     const handleSubmit = (e) => {
         e.preventDefault()
+
+        console.log('📤 Form submitted:', {
+            provinsi,
+            kota,
+            kecamatan,
+            kode_pos,
+            alamat
+        })
 
         if (!provinsi || !kota || !kecamatan || !kode_pos || !alamat) {
             alert('Mohon lengkapi semua field!')
@@ -86,16 +115,15 @@ const AfterRegistForm = () => {
             kecamatan,
             kode_pos
         }
-
-        console.log('📤 Submitting address for buyer:', user.id_buyer)
-        console.log('📦 Address data:', data)
+        
+        console.log('🚀 Dispatching addAddress with:', {
+            id: user.id_buyer,
+            data
+        })
         
         setIsSubmitting(true)
         
-        dispatch(addAddress({
-            id: user.id_buyer,
-            data 
-        }))
+        dispatch(addAddressAction({ id: user.id_buyer, data }))
     }
 
     // Loading state
@@ -125,16 +153,18 @@ const AfterRegistForm = () => {
                         </label>
                         <div className='flex flex-col gap-3 w-full'>
                             <select 
-                                className='border-2 border-gray-300 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
+                                className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
                                 onChange={(e) => setProvinsi(e.target.value)}
                                 value={provinsi}
                                 required
                             >
                                 <option value="">Pilih Provinsi</option>
                                 <option value="jawa-barat">Jawa Barat</option>
+                                <option value="jawa-tengah">Jawa Tengah</option>
+                                <option value="jawa-timur">Jawa Timur</option>
                             </select>
                             <select 
-                                className='border-2 border-gray-300 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
+                                className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
                                 onChange={(e) => setKota(e.target.value)}   
                                 value={kota}
                                 required
@@ -142,10 +172,12 @@ const AfterRegistForm = () => {
                             >
                                 <option value="">Pilih Kota</option>
                                 <option value="bandung">Bandung</option>
+                                <option value="jakarta">Jakarta</option>
+                                <option value="surabaya">Surabaya</option>
                             </select>
                             
                             <select 
-                                className='border-2 border-gray-300 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
+                                className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
                                 onChange={(e) => setKecamatan(e.target.value)}
                                 value={kecamatan}
                                 required
@@ -153,17 +185,15 @@ const AfterRegistForm = () => {
                             >
                                 <option value="">Pilih Kecamatan</option>
                                 <option value="coblong">Coblong</option>
+                                <option value="cicendo">Cicendo</option>
                             </select>
                             
                             <Input 
                                 placeholder='Kode Pos (contoh: 40132)' 
-                                className='border-2 border-gray-300 rounded-lg w-full px-4 py-3 focus:border-blue-500 focus:outline-none'
+                                className='border-1 border-gray-200 rounded-lg w-full px-4 py-3 focus:border-blue-500 focus:outline-none'
                                 onChange={(e) => setKode_Pos(e.target.value)}
                                 value={kode_pos}
                                 required
-                                maxLength={5}
-                                pattern="[0-9]{5}"
-                                title="Masukkan kode pos"
                             />
                         </div>
                     </div>
@@ -176,7 +206,7 @@ const AfterRegistForm = () => {
                             name="detailAdress" 
                             id="detailAdress" 
                             placeholder='Contoh: Jl. Merdeka No. 123, RT 001/RW 005, Kelurahan Dago' 
-                            className='w-full h-[120px] bg-white p-4 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none resize-none'
+                            className='w-full h-[120px] bg-white p-4 rounded-lg border-1 border-gray-200 focus:border-blue-500 focus:outline-none resize-none'
                             onChange={(e) => setAlamat(e.target.value)}
                             value={alamat}
                             required
@@ -190,11 +220,17 @@ const AfterRegistForm = () => {
                         </div>
                     )}
 
+                    {addAddressStatus === 'success' && (
+                        <div className='bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg'>
+                            ✅ Alamat berhasil disimpan! Mengalihkan...
+                        </div>
+                    )}
+
                     <div className='flex justify-end gap-3 pt-4'>
                         <Button 
                             variant='primary' 
                             type='submit'
-                            className='text-white px-8 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700'
+                            className='text-white px-8 py-3 rounded-[35px] disabled:opacity-50 disabled:cursor-not-allowed'
                             disabled={addAddressStatus === 'loading'}
                         >
                             {addAddressStatus === 'loading' ? (

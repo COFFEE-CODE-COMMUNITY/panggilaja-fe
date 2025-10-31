@@ -17,7 +17,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/40"></div>
 
       {/* hero */}
-      <div className="relative z-10 px-6 md:px-18 lg:px-24 text-white text left mt-16 md:mt-39 lg:mt-23">
+      <div className="relative z-10 px-6 md:px-18 lg:px-24 text-white text left mt-16 md:mt-39 lg:mt-[200px]">
         <h1 className="text-[46px] md:text-[64px] lg:text-[96px] font-bold leading-snug sm:leading-tight">
           Keahlianmu, Pasar
           <br className="hidden md:block" /> Baru.
@@ -40,7 +40,7 @@ export default function Hero() {
       </div>
 
       {/* Card */}
-      <div className="relative flex justify-center translate-y-[52%] md:translate-y-[67%] lg:translate-y-[77%] px-8 md:px-15 lg:px-4">
+      <div className="relative flex justify-center translate-y-[52%] md:translate-y-[67%] lg:translate-y-[67%] px-8 md:px-15 lg:px-4">
         <div className="w-[97%] md:w-[94%] lg:w-[90%] bg-white rounded-[15px] shadow-md p-5 md:p-7 lg:p-15">
           {/* text atas */}
           <div className="flex flex-col justify-between gap-3 md:flex-row md:gap-10 mb-10">

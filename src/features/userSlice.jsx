@@ -6,7 +6,6 @@ export const addAddress = createAsyncThunk(
     'user/addAddress', 
     async ({id, data}, { rejectWithValue }) => {
         try {
-            console.log('📡 Adding address for user:', id)
             const res = await api.post(`/users/${id}/addresses`, data)
             return res.data
         } catch (err) {

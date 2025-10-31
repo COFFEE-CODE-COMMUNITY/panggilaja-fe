@@ -95,12 +95,20 @@ const initialState = sellerEntity.getInitialState({
   selectedSeller: null,
   sellerServices: [],
   sellerOrders: [],
+
+  statusAdd : 'idle',
+  statusDelete : 'idle',
+  statusGetServiceSeller : 'idle'
 });
 
 const seller = createSlice({
     name: 'seller',
     initialState,
-    reducers: {},
+    reducers: {
+      resetSellerStatusDelete : (state) => {
+        state.statusDelete = 'idle'
+      }
+    },
     extraReducers: (builder) => {
         builder
             //get seller
@@ -133,15 +141,15 @@ const seller = createSlice({
 
             //add seller
             .addCase(addSeller.pending, (state) => {
-                state.status = 'loading';
+                state.statusAdd = 'loading';
             })
             .addCase(addSeller.fulfilled, (state, action) => {
-                state.status = 'success';
+                state.statusAdd = 'success';
                 state.message = action.payload;
                 sellerEntity.addOne(state, action.payload);
             })
             .addCase(addSeller.rejected, (state, action) => {
-                state.status = 'error';
+                state.statusAdd = 'error';
                 state.message = action.payload;
             })
 
@@ -161,29 +169,29 @@ const seller = createSlice({
 
             //delete seller by id
             .addCase(deleteSellerById.pending, (state) => {
-                state.status = 'loading';
+                state.statusDelete = 'loading';
             })
             .addCase(deleteSellerById.fulfilled, (state, action) => {
-                state.status = 'success';
+                state.statusDelete = 'success';
                 state.message = action.payload;
                 sellerEntity.removeOne(state, action.payload);
             })
             .addCase(deleteSellerById.rejected, (state, action) => {
-                state.status = 'error';
+                state.statusDelete = 'error';
                 state.message = action.payload;
             })
 
             //get all service by id seller
             .addCase(getAllServicesByIdSeller.pending, (state) => {
-                state.status = 'loading';
+                state.statusGetServiceSeller = 'loading';
             })
             .addCase(getAllServicesByIdSeller.fulfilled, (state, action) => {
-                state.status = 'success';
+                state.statusGetServiceSeller = 'success';
                 state.message = action.payload.message;
                 state.sellerServices = action.payload;
             })
             .addCase(getAllServicesByIdSeller.rejected, (state, action) => {
-                state.status = 'error';
+                state.statusGetServiceSeller = 'error';
                 state.message = action.payload.message;
             })
 
@@ -209,9 +217,16 @@ export const {
   selectIds: selectSellerIds,
 } = sellerEntity.getSelectors((state) => state.seller);
 
+export const {resetSellerStatusDelete} = seller.actions
+
 export const selectSelectedSeller = (state) => state.seller.selectedSeller;
 export const selectSellerServices = (state) => state.seller.sellerServices;
 export const selectSellerOrders = (state) => state.seller.sellerOrders;
 export const selectSellerStatus = (state) => state.seller.status;
+export const selectAddSellerStatus = (state) => state.seller.statusAdd;
+export const selectDeleteSellerStatus = (state) => state.seller.statusDelete;
+export const selectServiceSellerStatus = (state) => state.seller.statusGetServiceSeller;
+
+
 
 export default seller.reducer;

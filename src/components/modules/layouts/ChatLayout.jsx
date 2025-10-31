@@ -5,6 +5,10 @@ import { NavLink, Outlet } from 'react-router-dom'
 
 const ChatLayout = () => {
   const [chatMobile, setChatMobile] = useState(false)
+
+  const [text, setText] = useState('')
+  const [message, setMessage] = useState([])
+
   return (
     <div className='h-full w-full flex'>
         <div className={`h-full sm:w-1/5 w-full px-[10px] py-[5px] sm:flex flex-col lg:gap-[20px] md:gap-[15px] ${chatMobile ? 'hidden' : ''}`}>
@@ -40,7 +44,9 @@ const ChatLayout = () => {
           </div>
           <div className='w-full bg-chat/25 flex flex-col relative flex-1'>
             <div className='w-full flex-1'>
-              <Outlet/>
+              {message.map((text) => (
+                <p>{text}</p>
+              ))}
             </div>
             <div className='w-full bg-white lg:px-[20px] lg:py-[10px] px-[15px] py-[5px]'>
               <Input placeholder='Pesan'/>
