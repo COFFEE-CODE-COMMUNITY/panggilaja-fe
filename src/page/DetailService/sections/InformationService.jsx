@@ -40,7 +40,7 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
 
 
   return (
-    <div className='lg:h-full h-1/2 lg:w-1/2 w-full flex flex-col gap-[30px] lg:px-[35px] lg:py-[25px] md:px-[30px] md:py-[20px] px-[15px] py-[10px]'>
+    <div className='lg:h-full h-1/2 lg:w-[45%] w-full flex flex-col gap-[30px] lg:py-[25px] py-[10px]'>
         <div className='flex flex-col gap-[10px]'>
             <div className='flex flex-col gap-[10px]'>
                 <div className='flex flex-col leading-8'>
@@ -78,23 +78,21 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
             </div>
             <div className='flex flex-1 gap-[10px]'>
                 <div className='w-full flex gap-[10px]'>
-                    <div className='flex gap-[5px] w-full'>
-                        <Link to={`/chat`} className='w-full'>
-                            <Button variant='primary' className='flex-2 rounded-[35px] text-white font-medium h-[50px] flex items-center justify-center w-full '>
-                                Hubungi sekarang
-                            </Button>
-                        </Link>
-                        <Link to={`/chat`}>
-                            <Button variant='secondary' className='flex-1 rounded-[35px] text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]'>
-                                Negoin aja
-                            </Button>
-                        </Link>
-                    </div>
+                    <Link to={`/chat`} className='w-full'>
+                        <Button variant='primary' className='flex-2 rounded-[35px] text-white font-medium h-[50px] flex items-center justify-center w-full '>
+                            Hubungi sekarang
+                        </Button>
+                    </Link>
+                    <Link to={`/chat`}>
+                        <Button variant='secondary' className='flex-1 rounded-[35px] text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]'>
+                            Negoin aja
+                        </Button>
+                    </Link>
                     <Button 
                         className='h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center'
                         onClick={handleAddFavorite}
                     >
-                        <FaRegHeart className='text-gray-500 text-2xl'/>
+                        <FaRegHeart className='text-gray-500 text-[20px]'/>
                     </Button>
                 </div>
             </div>

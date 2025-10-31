@@ -1,119 +1,126 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../../components/common/Button"; 
 import InputForm from "../../../components/modules/form/InputForm"; 
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { addService, getCategoryService, resetAddStatus, selectAddServiceStatus, selectCategoryService } from "../../../features/serviceSlice";
+import { selectCurrentUser } from "../../../features/authSlice";
+import Input from "../../../components/common/Input";
 
-function TambahJasaForm({ onFormSubmit }) { 
-    const handleSelesai = (e) => {
-        e.preventDefault();
-        onFormSubmit(); 
+function TambahJasaForm() { 
+    const dispatch = useDispatch();
+    const status = useSelector(selectAddServiceStatus); 
+    const navigate = useNavigate()
+    
+    const [file, setFile] = useState(null);
+    const [nama_jasa, setNama_Jasa] = useState('');
+    const [base_price, setBase_Price] = useState('');
+    const [top_price, setTop_Price] = useState('');
+    const [deskripsi, setDeskripsi] = useState('');
+    
+    const kategori_id = '744a6833-b60d-4873-b5ee-42876yui987y';
+
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!file) {
+            alert("Harap pilih file gambar jasa.");
+            return;
+        }
+        
+        const serviceData = {
+            nama_jasa: nama_jasa,
+            deskripsi: deskripsi,
+            base_price: base_price ? parseInt(base_price) : 0,
+            top_price: top_price ? parseInt(top_price) : 0,
+            kategori_id: kategori_id,
+        };
+        
+        const formData = new FormData();
+        
+        formData.append('file', file);
+        
+        formData.append('data', JSON.stringify(serviceData));
+        
+        dispatch(addService(formData));
+        
+        console.log(status)
+    };
+
+    useEffect(() => {
+        if(status === 'success'){
+            alert('Data berhasil masuk')
+            dispatch(resetAddStatus())
+            navigate('/dashboard/manage-services')
+        }
+    },[status])
+
     return (
-        <div className="flex items-center justify-center"> 
-            <form 
-                onSubmit={handleSelesai} 
-                className="p-6 md:p-10 w-full max-w-3xl space-y-6" 
-            >
-                {/* judul */}
-                <h2 className="text-[25px] font-semibold text-left">
-                    Tambahkan jasa pertamamu 
-                </h2>
-
-                <div 
-                    className="
-                        space-y-6 
-                        md:space-y-0 md:grid md:grid-cols-4 
-                        md:gap-x-6 md:gap-y-6        
-                        lg:gap-x-8 lg:gap-y-8
-                    "
-                >
-                    
-                    {/* foto jasa */}
-                    <label className="block text-[15px] font-medium text-gray-700 md:pt-2 md:col-span-1"> 
-                        Unggah Foto Jasa 
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3"> 
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-gray-100 border flex items-center justify-center text-gray-400 text-sm hover:bg-gray-200 cursor-pointer"> {/* rounded-lg */}
-                                <span className="text-[12px] md:text-[14px]">Foto</span>
+        <form onSubmit={handleSubmit} className='flex'>
+            <div className='w-1/2 flex items-center justify-center p-[30px]'>
+                <input 
+                    type='file' 
+                    className='aspect-square w-full bg-gray-50 px-[50px] py-[200px]'
+                    onChange={handleFileChange}
+                />
+            </div>
+            <div className='w-1/2 flex items-center justify-center'>
+                <div className='w-full'>
+                    <div className='flex flex-col gap-[15px]'>
+                        <InputForm
+                            label='Nama Jasa'
+                            type='text'
+                            placeholder='Masukkan Nama Jasa'
+                            value={nama_jasa}
+                            onChange={(e) => setNama_Jasa(e.target.value)}
+                        />
+                        <InputForm
+                            label='Kategori Jasa'
+                            type='text'
+                            placeholder='Kategori Default'
+                            value='Kategori Default'
+                            disabled
+                        />
+                        <div>
+                            <label htmlFor="harga">Harga</label>
+                            <div className='flex items-center gap-[5px]'>
+                                <Input 
+                                    className='border-2 border-gray-100 rounded-[15px]' 
+                                    placeholder='Terendah'
+                                    type='number' 
+                                    value={base_price}
+                                    onChange={(e) => setBase_Price(e.target.value)}
+                                />
+                                <p className='text-h6 font-light'>sampai</p>
+                                <Input 
+                                    className='border-2 border-gray-100 rounded-[15px]' 
+                                    placeholder='Tertinggi'
+                                    type='number' 
+                                    value={top_price}
+                                    onChange={(e) => setTop_Price(e.target.value)}
+                                />
                             </div>
-                            <Button
-                                type="button"
-                                variant="secondary" 
-                                className="text-[15px] px-4 py-2 rounded-[20px] text-white"
-                            >
-                                Unggah
-                            </Button>
                         </div>
-                    </div>
-
-                    {/* nama jasa */}
-                    <label htmlFor="nama_jasa" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
-                        Nama Jasa 
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3">
                         <InputForm
-                            type="text"
-                            id="nama_jasa" 
-                            placeholder="Masukkan nama" 
+                            label='Deskripsi'
+                            type='text'
+                            placeholder='Masukkan deskripsi jasa'
+                            className='h-[200px]'
+                            value={deskripsi}
+                            onChange={(e) => setDeskripsi(e.target.value)}
                         />
-                    </div>
-
-                    {/* deskripsi jasa */}
-                    <label htmlFor="deskripsi_jasa" className="block text-[15px] font-medium text-gray-700 md:pt-2 md:col-span-1"> 
-                        Deskripsi Jasa 
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3"> 
-                        <InputForm
-                            as="textarea" 
-                            id="deskripsi_jasa" 
-                            rows="4" 
-                            placeholder="Masukkan deskripsi Jasa" 
-                        />
-                    </div>
-
-                    {/* harga */}
-                    <label className="block text-[15px] font-medium text-gray-700 md:col-span-1"> 
-                        Harga
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3"> 
-                        <div className="flex items-center gap-2 md:gap-4">
-                            <InputForm type="number" placeholder="" className="w-1/2"/> 
-                            <span className="text-gray-500 text-sm">sampai</span>
-                            <InputForm type="number" placeholder="" className="w-1/2"/> 
-                        </div>
-                    </div>
-
-                    {/* kategori jasa */}
-                    <label htmlFor="kategori_jasa" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
-                        Kategori Jasa
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3">
-                        <select 
-                          id="kategori_jasa" 
-                          className="block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600 text-sm text-gray-500" 
-                        >
-                          <option value="">Pilih Kategori</option>
-                          <option value="kesehatan">Perbaikan Rumah Tangga</option>
-                          <option value="kesehatan">Teknisi & Elektronik</option>
-                          <option value="kesehatan">Kerajinan & Resparasi Kreatif</option>
-                          <option value="kesehatan">Pembersihan & Kerbersihan</option>
-                          <option value="kesehatan">Perawatan & Gaya Hidup</option>
-                          <option value="kesehatan">Edukasi & Pelatihan</option>
-                        </select>
-                    </div>
-
-                    {/* button selesai */}
-                    <div className="hidden md:block md:col-span-1"></div> 
-                    <div className="md:col-span-3 flex justify-end"> 
-                        <Button type="submit" variant="secondary" className="px-6 py-2 rounded-[20px] text-white"> 
-                          Selesai 
+                        <Button type='submit' variant='primary' className='w-full text-white py-[15px] rounded-[35px]'>
+                            Tambahkan
                         </Button>
                     </div>
-                </div> 
-            </form>
-        </div>
-    );
+                </div>
+            </div>
+        </form>    
+    )
 }
 
 export default TambahJasaForm;

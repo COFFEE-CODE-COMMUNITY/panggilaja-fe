@@ -6,25 +6,25 @@ function ServicesMitraLayout() {
     const currentPath = location.pathname;
 
     let currentStepId = 1; 
-    if (currentPath.startsWith('/mitra/tambah-jasa')) {
+    if (currentPath.startsWith('/partner/mitra-form/add-service')) {
         currentStepId = 2;
     }
 
     return (
-        <div>
-            <div className="w-full p-2 md:p-2 lg:p-2 shadow-sm sticky z-10 relative">
+        <div className='h-screen flex flex-col'>
+            <div className="w-full shadow-sm z-10 relative">
                 <div className="absolute left-3 top-3 md:left-4 md:top-4 lg:left-5 lg:top-5">
                     <Link to="/" className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-600">
                         &lt; Kembali
                     </Link>
                 </div>
                 
-                <div className="w-full max-w-xs md:max-w-lg lg:max-w-xl mx-auto">
-                    <div className="text-center mb-3">
-                        <h1 className="text-[25px] md:text-[30px] lg:text-[35px] font-bold text-green-700">PanggilAja</h1>
+                <div className="w-full max-w-xs md:max-w-lg lg:max-w-xl mx-auto pb-[10px]">
+                    <div className="text-center ">
+                        <h1 className="text-[25px] md:text-[30px] lg:text-[35px] font-bold text-green-700 ">PanggilAja</h1>
                     </div>
 
-                    <div className="w-full">
+                    <div className="w-full ">
                         <div className="flex items-start justify-center">
                             <div className="flex flex-col items-center text-center w-7 md:w-9 lg:w-10">
                                 <div 
@@ -40,7 +40,7 @@ function ServicesMitraLayout() {
                                 
                                 <span 
                                 className={`
-                                    mt-2 text-[12px] md:text-[14px] lg:text-[16px] transition-all
+                                    mt-2 text-[12px] md:text-[14px] lg:text-[16px] w-[150px] transition-all
                                     ${currentStepId >= 1 ? 'text-green-700 font-semibold' : 'text-gray-400'}
                                 `}
                                 >
@@ -71,7 +71,7 @@ function ServicesMitraLayout() {
                                 
                                 <span 
                                 className={`
-                                    mt-2 text-[12px] md:text-[14px] lg:text-[16px] transition-all
+                                    mt-2 text-[12px] md:text-[14px] lg:text-[16px] w-[150px] transition-all
                                     ${currentStepId >= 2 ? 'text-green-700 font-semibold' : 'text-gray-400'}
                                 `}
                                 >
@@ -82,10 +82,7 @@ function ServicesMitraLayout() {
                     </div>
                 </div>
             </div>
-
-            <div>
-                <Outlet /> 
-            </div>
+            <Outlet /> 
         </div>
     );
 }

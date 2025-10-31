@@ -156,6 +156,10 @@ const serviceSlice = createSlice({
             state.editServiceStatus = 'idle'
             state.editServiceError = ''
         },
+        resetAddStatus : (state) => {
+            state.addServiceStatus = 'idle'
+            state.addServiceError = ''
+        },
         resetDeleteStatus : (state) => {
             state.deleteServiceStatus = 'idle'
             state.deleteServiceError = ''
@@ -292,7 +296,7 @@ export const {
     selectById : selectdServiceById
 } = serviceEntity.getSelectors(state => state.service)
 
-export const {resetEditStatus, resetDeleteStatus} = serviceSlice.actions
+export const {resetEditStatus, resetDeleteStatus, resetAddStatus} = serviceSlice.actions
 
 export const selectSelectedService = (state) => state.service.selectedService
 export const selectSelectedServiceStatus = (state) => state.service.selectedServiceStatus

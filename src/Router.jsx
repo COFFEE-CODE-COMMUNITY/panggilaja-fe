@@ -30,6 +30,8 @@ import ChatLayout from "./components/modules/layouts/ChatLayout";
 import EditProfile from "./page/Setting/EditProfile";
 import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
+import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
+import ManageProfile from "./page/Dashboard/ManageProfile";
 
 const Router = createBrowserRouter([
   {
@@ -139,10 +141,10 @@ const Router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <TambahJasaForm />,
+        element: <ProfileMitraForm />,
       },
       {
-        index: '/add-service',
+        path: 'add-service',
         element: <TambahJasaForm />,
       },
     ],
@@ -166,7 +168,7 @@ const Router = createBrowserRouter([
       },
       {
         path: "manage-profile",
-        element: <ProfileSetting />,
+        element: <ManageProfile />,
       },
       {
         path: "manage-services/add-service",
