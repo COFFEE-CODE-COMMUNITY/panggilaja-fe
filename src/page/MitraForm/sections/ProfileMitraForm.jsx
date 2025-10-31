@@ -117,7 +117,7 @@ function ProfileMitraForm() {
 
                     {/* email */}
                     <label htmlFor="email" className="block text-[15px] font-medium text-gray-700 md:col-span-1"> 
-                        Deskripsi Toko
+                        Email
                     </label>
                     <div className="mt-1 md:mt-0 md:col-span-3"> 
                         <textarea 
@@ -128,7 +128,7 @@ function ProfileMitraForm() {
                         </textarea>
                     </div>
 
-                    {/* nama */}
+                    {/* kategori */}
                     <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
                         Kategori
                     </label>
@@ -146,7 +146,7 @@ function ProfileMitraForm() {
                         </select>
                     </div>
 
-                    {/* nama */}
+                    {/* pengalaman */}
                     <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
                         Pengalaman
                     </label>
@@ -159,7 +159,7 @@ function ProfileMitraForm() {
                         />
                     </div>
 
-                    {/* nama */}
+                    {/* keahlian */}
                     <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
                         Keahlian
                     </label>

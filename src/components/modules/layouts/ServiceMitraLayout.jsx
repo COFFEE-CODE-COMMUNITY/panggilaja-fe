@@ -14,7 +14,7 @@ function ServicesMitraLayout() {
         <div className='h-screen flex flex-col'>
             <div className="w-full shadow-sm z-10 relative">
                 <div className="absolute left-3 top-3 md:left-4 md:top-4 lg:left-5 lg:top-5">
-                    <Link to="/" className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-600">
+                    <Link to={currentStepId === 1 ? "/partner" : "/partner/mitra-form"} className="text-[13px] md:text-[15px] lg:text-[16px] text-gray-600">
                         &lt; Kembali
                     </Link>
                 </div>
