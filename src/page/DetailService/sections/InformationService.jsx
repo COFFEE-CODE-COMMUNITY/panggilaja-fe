@@ -16,23 +16,11 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
     const statusAdd = useSelector(selectAddFavoriteServiceStatus)
     const errorAdd = useSelector(selectAddFavoriteServiceError)
 
-    const getFavorites = useSelector(selectFavoriteService)
-
-    useEffect(() => {
-        if(user.id_buyer){
-            dispatch(getFavoriteService(user.id_buyer))
-        }
-    },[dispatch])
-
-    console.log(getFavoriteService)
-
     useEffect(() => {
         if(idProvider){
             dispatch(getReviewServicesById(idProvider))
         }
     },[dispatch, idProvider])
-
-    console.log(statusAdd)
 
     const handleAddFavorite = () => {
         dispatch(addFavoriteService(idService));
@@ -40,7 +28,7 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
 
 
   return (
-    <div className='lg:h-full h-1/2 lg:w-[45%] w-full flex flex-col gap-[30px] lg:py-[25px] py-[10px]'>
+    <div className='lg:h-full h-1/2 lg:w-[45%] w-full flex flex-col gap-[30px] lg:py-[25px] py-[10px] px-[15px]'>
         <div className='flex flex-col gap-[10px]'>
             <div className='flex flex-col gap-[10px]'>
                 <div className='flex flex-col leading-8'>

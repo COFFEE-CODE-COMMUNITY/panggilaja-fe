@@ -3,7 +3,7 @@ import Card from '../../../components/common/Card'
 
 const Category = () => {
   return (
-    <div className='w-full flex flex-col md:gap-[10px] gap-[5px]'>
+    <div className='w-full flex flex-col md:gap-[10px] gap-[10px]'>
         <p  className='xl:text-h4 text-h5 font-semibold'>Kategori jasa</p>
         <div className='grid xl:grid-cols-6 grid-cols-3 xl:gap-[15px] lg:gap-[10px] gap-[5px] w-full'>
             {CategoriesService.map((category) => {

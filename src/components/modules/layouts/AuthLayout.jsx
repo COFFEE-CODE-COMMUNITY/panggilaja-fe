@@ -1,9 +1,5 @@
-import React from 'react'
 import { Link, Outlet } from 'react-router-dom'
-import NavLink from '../navigation/NavLink'
-import Button from '../../common/Button'
 import bgAuth from '../../../assets/bgAuth.jpg'
-import { FcGoogle } from 'react-icons/fc'
 
 const AuthLayout = ({title, subtitle, children, type, navAuth, reset}) => {
   return (

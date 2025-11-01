@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../../features/authSlice'
-import { getAllServicesByIdSeller, selectSellerServices, selectSellerStatus } from '../../../features/sellerSlice'
+import { getAllServicesByIdSeller, selectSellerServices, selectSellerStatus, selectServiceSellerStatus } from '../../../features/sellerSlice'
 import { Link } from 'react-router-dom'
 import { deleteService, resetDeleteStatus, selectDeleteServiceStatus } from '../../../features/serviceSlice'
 
@@ -10,27 +10,30 @@ const TableServices = () => {
     const dispatch = useDispatch()
 
     const servicesSeller = useSelector(selectSellerServices)
-    const status = useSelector(selectSellerStatus)
+    const status = useSelector(selectServiceSellerStatus)
 
     const statusDelete = useSelector(selectDeleteServiceStatus)
 
-    console.log(statusDelete)
     useEffect(() => {
-        if(user?.id_seller){
-            dispatch(getAllServicesByIdSeller(user.id_seller))
+        // Memastikan user ada dan id_seller ada sebelum dispatch
+        if (user && user.id_seller) { 
+            dispatch(getAllServicesByIdSeller(user.id_seller));
         }
-    },[dispatch, user?.id_seller])
+    }, [dispatch, user]); // <-- TAMBAHKAN user di sini
 
     useEffect(() => {
         if (statusDelete === 'success') {
             alert('Layanan berhasil dihapus!'); 
             if (user?.id_seller) {
-                dispatch(getAllServicesByIdSeller(user.id_seller));
+                dispatch(getAllServicesByIdSeller(user?.id_seller));
                 dispatch(resetDeleteStatus())
             }
         }
-    }, [statusDelete, dispatch, user?.id_seller])
+    }, [dispatch])
 
+    console.log(servicesSeller)
+    console.log(status)
+    console.log(user)
 
   return (
     <div className='h-full'>

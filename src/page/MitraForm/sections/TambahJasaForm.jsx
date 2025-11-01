@@ -4,12 +4,12 @@ import InputForm from "../../../components/modules/form/InputForm";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addService, getCategoryService, resetAddStatus, selectAddServiceStatus, selectCategoryService } from "../../../features/serviceSlice";
-import { selectCurrentUser } from "../../../features/authSlice";
+import { resetChangeAccountStatus, selectCurrentUser } from "../../../features/authSlice";
 import Input from "../../../components/common/Input";
 
 function TambahJasaForm() { 
     const dispatch = useDispatch();
-    const status = useSelector(selectAddServiceStatus); 
+    const statusAddService = useSelector(selectAddServiceStatus); 
     const navigate = useNavigate()
     
     const [file, setFile] = useState(null);
@@ -48,16 +48,16 @@ function TambahJasaForm() {
         
         dispatch(addService(formData));
         
-        console.log(status)
     };
 
     useEffect(() => {
-        if(status === 'success'){
+        if(statusAddService === 'success'){
             alert('Data berhasil masuk')
             dispatch(resetAddStatus())
+            dispatch(resetChangeAccountStatus())
             navigate('/dashboard/manage-services')
         }
-    },[status])
+    },[statusAddService])
 
     return (
         <form onSubmit={handleSubmit} className='flex'>

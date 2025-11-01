@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import NavLink from '../navigation/NavLink'
-import Input from '../../common/Input'
-import Button from '../../common/Button'
+import NavLink from '../../navigation/NavLink'
+import Input from '../../../common/Input'
+import Button from '../../../common/Button'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { changeAccount, logout, selectAccessToken, selectChangeAccountStatus, selectCurrentUser } from '../../../features/authSlice'
+import { changeAccount, logout, logoutUser, resetChangeAccountStatus, selectAccessToken, selectChangeAccountStatus, selectCurrentUser } from '../../../../features/authSlice'
 import { FaBars, FaRegComment, FaRegHeart, FaSearch, FaTimes, FaUser } from 'react-icons/fa'
 import { MdSearch } from 'react-icons/md'
 import { IoMdLogOut } from 'react-icons/io'
-import { getFavoriteService, getServices, selectAllService, selectFavoriteService, selectFavoriteServiceStatus } from '../../../features/serviceSlice'
-import { seeProfile, selectSeeProfile, selectSeeProfileStatus } from '../../../features/userSlice'
+import { getFavoriteService, getServices, selectAllService, selectFavoriteService, selectFavoriteServiceStatus } from '../../../../features/serviceSlice'
+import { seeProfile, selectSeeProfile, selectSeeProfileStatus } from '../../../../features/userSlice'
 
 const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, sidebarMobile, setSidebarMobile, search}) => {
     const user = useSelector(selectCurrentUser)
@@ -42,7 +42,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
         if(!token){
             setSidebarProfile(false)
         } else {
-            dispatch(getFavoriteService(user.id))
+            dispatch(getFavoriteService(user?.id))
         }
         dispatch(getServices())
     },[token])
@@ -54,14 +54,24 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
     },[location.pathname])
 
     const statusChange = useSelector(selectChangeAccountStatus)
-
-    useEffect(() => {
-        if(statusChange === 'success'){
-            navigate('/dashboard')
-        }
-    },[statusChange])
     
     let favoritesService = []
+
+    if (statusChange === 'loading') {
+        return (
+            <div className='flex justify-center items-center min-h-screen'>
+                <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
+                    <p className='mt-4 text-gray-600'>Memuat data...</p>
+                </div>
+            </div>
+        )
+    }
+
+    if(statusChange === 'success'){
+        dispatch(resetChangeAccountStatus())
+        navigate('/dashboard')
+    }
 
     if(favoritesStatus === 'success'){
         favoritesService = services.filter((service, index) => {
@@ -71,9 +81,11 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
         });
     }
 
+    const haveSellerAccount = user?.available_roles.length > 1    
+
     return (
         <>
-            <div className='lg:py-[20px] md:py-[15px] py-[10px] w-full flex sm:justify-center justify-between xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200'>
+            <div className='md:py-[15px] py-[10px] w-full flex sm:justify-center justify-between xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200 border-b-2 border-gray-100'>
                 {token && (
                     <button 
                         className='sm:hidden block cursor-pointer'
@@ -110,7 +122,10 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                         />
                         <Button className='rounded-bl-[25px] rounded-tl-[25px] items-center justify-center h-[35px] md:h-[43px] md:block hidden absolute left-0 lg:px-[20px] lg:py-[15px] md:px-[15px] md:py-[10px] px-[10px] py-[5px]' variant='primary'><FaSearch size={10} color='white'/></Button>
                     </form>
-                    {location.pathname === '/partner' ? '' : (
+                    {!haveSellerAccount && (
+                        <NavLink text='Jadi Mitra' className='text-h6 md:text-h5 w-[85px] md:w-[105px] font-light text-center sm:block hidden' link='/partner'/>
+                    )}
+                    {location.pathname === '/partner' && (
                         <NavLink text='Jadi Mitra' className='text-h6 md:text-h5 w-[85px] md:w-[105px] font-light text-center sm:block hidden' link='/partner'/>
                     )}
                 </div>
@@ -134,14 +149,14 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                     setOrder(false)
                                 }}
                             ></img>
-                                <button 
-                                    className='sm:hidden block cursor-pointer w-[20px] h-[20px] '
-                                    onClick={() => setSearchMobile(!searchMobile)}
-                                >   
-                                    {iconSearch && (
-                                        <MdSearch className='text-gray-80000 text-[20px]'/>
-                                    )}
-                                </button>
+                            <button 
+                                className='sm:hidden block cursor-pointer w-[20px] h-[20px] '
+                                onClick={() => setSearchMobile(!searchMobile)}
+                            >   
+                                {iconSearch && (
+                                    <MdSearch className='text-gray-400 text-[20px]'/>
+                                )}
+                            </button>
                         </>
                     )}
                 </div>
@@ -221,7 +236,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                 <div className='flex gap-[10px] px-[20px] py-[15px] hover:bg-gray-50'>
                                     <img src={profile?.foto_buyer} className='w-[40px] h-[40px] bg-amber-100 rounded-full'></img>
                                     <div>
-                                        <p>{token && user.username}</p>
+                                        <p>{token && user?.username}</p>
                                         <p className='text-h6 font-light'>Konsumen</p>
                                     </div>
                                 </div>
@@ -258,14 +273,14 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                 <div 
                                     className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
                                     onClick={() => {
-                                        dispatch(changeAccount())
+                                        dispatch(changeAccount({targetRole : 'seller'}))
                                     }}
                                 >
                                     <FaUser className='text-gray-400 text-[15px]'/>
                                     <p className='text-h6'>Ganti Akun Seller</p>
                                 </div>
                             </div>  
-                            <div className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-primary hover:text-white cursor-pointer mt-auto group' onClick={() => dispatch(logout())}>
+                            <div className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-primary hover:text-white cursor-pointer mt-auto group' onClick={() => dispatch(logoutUser())}>
                                 <IoMdLogOut className='text-gray-400 text-[15px] group-hover:text-white'/>
                                 <p className='text-h6'>Logout</p>
                             </div>
@@ -275,7 +290,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
             </div>
             {sidebarMobile && (
                 <div 
-                    className='sm:w-0 sm:h-0 fixed w-full min-h-screen bg-white z-100 flex flex-col px-[15px] transition duration-500 sm:hidden my-[25px]'>
+                    className='sm:w-0 sm:h-0 fixed w-full h-screen bg-white z-100 flex flex-col px-[15px] transition duration-500 sm:hidden py-[15px]'>
                     <Link 
                         to='profile-setting'
                         onClick={() => {
@@ -286,9 +301,9 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                         <div 
                             className='flex items-center my-[15px] gap-[15px] px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer w-full'
                         >
-                            <img src={profile.foto_buyer} className='w-[40px] h-[40px] bg-amber-100 rounded-full'></img>
+                            <img src={profile?.foto_buyer} className='w-[40px] h-[40px] bg-amber-100 rounded-full'></img>
                             <div>
-                                <p>{token && user.username}</p>
+                                <p>{token && user?.username}</p>
                                 <p className='text-h6 font-light'>Konsumen</p>
                             </div>   
                         </div>

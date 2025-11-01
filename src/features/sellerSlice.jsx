@@ -42,7 +42,7 @@ export const getAllServicesByIdSeller = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const res = await api.get(`/sellers/${id}/services`)
-      return res.data.data;
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
     }
@@ -85,21 +85,24 @@ export const getOrderBySellerId = createAsyncThunk(
   }
 );
 
-const sellerEntity = createEntityAdapter({
-  selectId: (seller) => seller.id,
-});
-
-const initialState = sellerEntity.getInitialState({
+const initialState = {
   status: 'idle',
   message: null,
   selectedSeller: null,
-  sellerServices: [],
+
+  sellerServices: null,
+  sellerServicesMessage : '',
+
   sellerOrders: [],
 
   statusAdd : 'idle',
   statusDelete : 'idle',
-  statusGetServiceSeller : 'idle'
-});
+  statusGetServiceSeller : 'idle',
+
+  sellers : null,
+
+  messageDeleteSeller : ''
+};
 
 const seller = createSlice({
     name: 'seller',
@@ -117,9 +120,8 @@ const seller = createSlice({
             })
             .addCase(getSellers.fulfilled, (state, action) => {
                 state.status = 'success';
-                state.message = action.payload;
-                sellerEntity.setAll(state, action.payload);
-            })
+                state.sellers = action.payload
+              })
             .addCase(getSellers.rejected, (state, action) => {
                 state.status = 'error';
                 state.message = action.payload;
@@ -146,8 +148,8 @@ const seller = createSlice({
             .addCase(addSeller.fulfilled, (state, action) => {
                 state.statusAdd = 'success';
                 state.message = action.payload;
-                sellerEntity.addOne(state, action.payload);
-            })
+
+              })
             .addCase(addSeller.rejected, (state, action) => {
                 state.statusAdd = 'error';
                 state.message = action.payload;
@@ -160,7 +162,6 @@ const seller = createSlice({
             .addCase(updateSellerById.fulfilled, (state, action) => {
                 state.status = 'success';
                 state.message = action.payload;
-                sellerEntity.upsertOne(state, action.payload);
             })
             .addCase(updateSellerById.rejected, (state, action) => {
                 state.status = 'error';
@@ -171,14 +172,12 @@ const seller = createSlice({
             .addCase(deleteSellerById.pending, (state) => {
                 state.statusDelete = 'loading';
             })
-            .addCase(deleteSellerById.fulfilled, (state, action) => {
+            .addCase(deleteSellerById.fulfilled, (state) => {
                 state.statusDelete = 'success';
-                state.message = action.payload;
-                sellerEntity.removeOne(state, action.payload);
             })
             .addCase(deleteSellerById.rejected, (state, action) => {
                 state.statusDelete = 'error';
-                state.message = action.payload;
+                state.messageDeleteSeller = action.payload;
             })
 
             //get all service by id seller
@@ -187,12 +186,11 @@ const seller = createSlice({
             })
             .addCase(getAllServicesByIdSeller.fulfilled, (state, action) => {
                 state.statusGetServiceSeller = 'success';
-                state.message = action.payload.message;
                 state.sellerServices = action.payload;
             })
             .addCase(getAllServicesByIdSeller.rejected, (state, action) => {
                 state.statusGetServiceSeller = 'error';
-                state.message = action.payload.message;
+                console.log(`errorr : `+action.payload)
             })
 
             //get order by seller id
@@ -211,14 +209,9 @@ const seller = createSlice({
     },
 });
 
-export const {
-  selectAll: selectAllSellers,
-  selectById: selectSellerById,
-  selectIds: selectSellerIds,
-} = sellerEntity.getSelectors((state) => state.seller);
-
 export const {resetSellerStatusDelete} = seller.actions
 
+export const selectSellers = (state) => state.seller.sellers;
 export const selectSelectedSeller = (state) => state.seller.selectedSeller;
 export const selectSellerServices = (state) => state.seller.sellerServices;
 export const selectSellerOrders = (state) => state.seller.sellerOrders;
@@ -226,6 +219,7 @@ export const selectSellerStatus = (state) => state.seller.status;
 export const selectAddSellerStatus = (state) => state.seller.statusAdd;
 export const selectDeleteSellerStatus = (state) => state.seller.statusDelete;
 export const selectServiceSellerStatus = (state) => state.seller.statusGetServiceSeller;
+export const selectDeleteSellerMessage = (state) => state.seller.messageDeleteSeller;
 
 
 

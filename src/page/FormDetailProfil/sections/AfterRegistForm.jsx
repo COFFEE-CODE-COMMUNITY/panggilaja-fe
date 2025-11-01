@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import Button from '../../../components/common/Button'
 import Input from '../../../components/common/Input'
 import { useDispatch, useSelector } from 'react-redux'
-// ❌ ERROR FIX: Import addAddress dengan alias untuk avoid naming conflict
 import { 
     addAddress as addAddressAction, 
     selectSeeAddress, 
@@ -23,6 +22,8 @@ const AfterRegistForm = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    console.log(user)
+
     console.log('🔍 Current state:', {
         user,
         address,
@@ -38,7 +39,6 @@ const AfterRegistForm = () => {
     const [alamat, setAlamat] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    // ❌ ERROR FIX: Fetch address hanya sekali saat mount
     useEffect(() => {
         if (user?.id_buyer) {
             console.log('📡 Fetching address for buyer:', user.id_buyer)
@@ -46,7 +46,6 @@ const AfterRegistForm = () => {
         }
     }, [dispatch, user?.id_buyer])
 
-    // Check redirect setelah address loaded
     useEffect(() => {
         console.log('🔄 Check redirect:', {
             address,
@@ -59,7 +58,6 @@ const AfterRegistForm = () => {
             return
         }
 
-        // ✅ Cek apakah ada data alamat yang valid
         if (address?.data?.provinsi || address?.data?.alamat) {
             console.log('✅ User sudah punya alamat, redirect ke home')
             navigate('/', { replace: true })
@@ -68,7 +66,6 @@ const AfterRegistForm = () => {
         }
     }, [address, addressStatus, navigate])
 
-    // Handle submit success - refresh data dan redirect
     useEffect(() => {
         console.log('⚡ Status changed:', {
             isSubmitting,

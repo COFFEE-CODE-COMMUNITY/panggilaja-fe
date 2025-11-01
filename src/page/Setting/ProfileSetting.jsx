@@ -15,8 +15,6 @@ const ProfileSetting = () => {
     const address = useSelector(selectSeeAddress)
     const statusAddress = useSelector(selectSeeAddressStatus)
     
-    console.log(address)
-
     useEffect(() => {
         if (user?.id_buyer && statusProfile === 'idle' && !profile) {
             dispatch(seeProfile(user.id_buyer))
@@ -31,10 +29,10 @@ const ProfileSetting = () => {
 
     if (statusAddress === 'loading') {
         return (
-            <div className='flex justify-center items-center h-screen'>
+            <div className='flex justify-center items-center min-h-screen'>
                 <div className='text-center'>
                     <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
-                    <p className='mt-4 text-gray-600'>Memuat data profil...</p>
+                    <p className='mt-4 text-gray-600'>Memuat data...</p>
                 </div>
             </div>
         )
@@ -46,7 +44,7 @@ const ProfileSetting = () => {
                 <div className='text-center text-red-600'>
                     <p className='font-semibold'>Gagal memuat data alamat</p>
                     <button 
-                        onClick={() => dispatch(seeAddress(user.id_buyer))}
+                        onClick={() => dispatch(seeAddress(user?.id_buyer))}
                         className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
                     >
                         Coba Lagi

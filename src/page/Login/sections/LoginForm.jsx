@@ -31,7 +31,7 @@ const LoginForm = ({status, handleSubmit, handleChangeEmail, handleChangePasswor
       <Button 
         type='button'
         onClick={handleGoogleLogin}
-        className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-white text-gray-700 border-2 border-gray-300 rounded-[35px] flex justify-center items-center gap-3 hover:bg-gray-50'
+        className='w-full md:h-[62px] h-[45px] text-center lg:text-h4 md:text-h5 text-h6 font-semibold bg-white text-gray-700 border-1 border-gray-200 rounded-[35px] flex justify-center items-center gap-3 hover:bg-gray-50'
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
