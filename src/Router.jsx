@@ -32,6 +32,7 @@ import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
 import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
 import GoogleCallback from "./page/Auth/GoogleCallback"; // Capital 'Auth'
+import ManageProfile from "./page/Dashboard/ManageProfile";
 
 const Router = createBrowserRouter([
   {
@@ -169,7 +170,7 @@ const Router = createBrowserRouter([
       },
       {
         path: "manage-profile",
-        element: <ProfileSetting />,
+        element: <ManageProfile />,
       },
       {
         path: "manage-services/add-service",
