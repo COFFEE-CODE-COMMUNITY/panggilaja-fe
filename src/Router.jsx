@@ -31,6 +31,7 @@ import EditProfile from "./page/Setting/EditProfile";
 import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
 import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
+import GoogleCallback from "./page/Auth/GoogleCallback"; // Capital 'Auth'
 
 const Router = createBrowserRouter([
   {
@@ -195,6 +196,11 @@ const Router = createBrowserRouter([
         <RegisterPage />
       </GuestRoute>
     ),
+  },
+  // TAMBAHKAN ROUTE INI UNTUK GOOGLE OAUTH CALLBACK
+  {
+    path: "/auth/google/callback",
+    element: <GoogleCallback />,
   },
   {
     path: "/form-detail-profile",

@@ -90,6 +90,18 @@ export const logoutUser = createAsyncThunk(
     }
 );
 
+export const googleLoginSuccess = createAsyncThunk(
+    'auth/googleLoginSuccess',
+    async (userData, { rejectWithValue }) => {
+        try {
+            // userData should contain { user, token }
+            return userData;
+        } catch (error) {
+            return rejectWithValue({ message: 'Gagal proses login Google' });
+        }
+    }
+);
+
 export const requestResetPassword = createAsyncThunk(
     'auth/requestResetPassword',
     async (email, {rejectWithValue}) => {
@@ -261,6 +273,32 @@ const authSlice = createSlice({
                 localStorage.removeItem('user')
             })
 
+            // Google OAuth login
+            .addCase(googleLoginSuccess.pending, (state) => {
+                state.status = 'loading'
+                state.error = null
+            })
+            .addCase(googleLoginSuccess.fulfilled, (state, action) => {
+                const { status, message, data } = action.payload
+                const { user, token } = data
+
+                state.status = 'success'
+                state.error = null
+                state.message = message || 'Login dengan Google berhasil'
+                state.accessToken = token
+                state.user = user
+
+                localStorage.setItem('accessToken', token)
+                localStorage.setItem('user', JSON.stringify(user))
+            })
+            .addCase(googleLoginSuccess.rejected, (state, action) => {
+                state.message = action.payload?.message || 'Login dengan Google gagal'
+                state.status = 'failed'
+                state.error = action.payload
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('user')
+            })
+
             //request password
             .addCase(requestResetPassword.pending, (state) => {
                 state.resetPasswordRequestStatus = 'loading';
@@ -381,7 +419,7 @@ const authSlice = createSlice({
     }
 })
 
-export const { logout } = authSlice.actions
+export const { logout, setOAuthCredentials } = authSlice.actions
 export const selectCurrentUser = state => state.auth.user
 export const selectAccessToken = state => state.auth.accessToken
 export const selectAuthStatus = state => state.auth.status

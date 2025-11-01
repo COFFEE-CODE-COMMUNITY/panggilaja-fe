@@ -62,7 +62,7 @@ api.interceptors.response.use(
     });
 
     // Skip refresh untuk endpoint public
-    const publicEndpoints = ["/auth/login", "/auth/register", "/auth/refresh"];
+    const publicEndpoints = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/google/callback"];
     if (publicEndpoints.some((endpoint) => originalRequest?.url?.includes(endpoint))) {
       console.log("🔓 Public endpoint, skip refresh");
       return Promise.reject(error);

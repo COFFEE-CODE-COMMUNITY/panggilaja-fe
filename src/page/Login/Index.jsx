@@ -5,7 +5,7 @@ import LoginForm from './sections/LoginForm'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginUser, selectAccessToken, selectAuthError, selectAuthMessage, selectAuthStatus, selectCurrentUser } from '../../features/authSlice'
 import { Link, useNavigate } from 'react-router-dom'
-
+import axios from 'axios'
 
 const LoginPage = () => {
   const dispatch = useDispatch()
@@ -41,11 +41,17 @@ const LoginPage = () => {
     }
   }
 
+  // Handle Google Login
+  const handleGoogleLogin = () => {
+    // Redirect langsung ke backend endpoint untuk Google OAuth
+    window.location.href = 'http://localhost:5000/auth/google'
+  }
+
   useEffect(() => {
     if (status === 'success' && currentUser) {
       navigate('/')
     }
-  }, [status, currentUser, navigate]);
+  }, [status, currentUser, navigate])
 
   return (
     <AuthLayout 
@@ -54,7 +60,7 @@ const LoginPage = () => {
       type='Masuk'
       navAuth={
         <p className='text-h6 lg:text-h5 text-primary w-full text-center'>
-          Tidak punya akun? <NavLink className="font-semibold text-primary" link='/register' text='buat disini'/>'
+          Tidak punya akun? <NavLink className="font-semibold text-primary" link='/register' text='buat disini'/>
         </p>
       }
     >
@@ -62,6 +68,7 @@ const LoginPage = () => {
         handleSubmit={handleSubmit}
         handleChangeEmail={handleChangeEmail}
         handleChangePassword={handleChangePassword}
+        handleGoogleLogin={handleGoogleLogin}
         message={message}
         status={status}
       />
