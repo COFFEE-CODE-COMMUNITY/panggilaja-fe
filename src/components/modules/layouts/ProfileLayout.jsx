@@ -16,12 +16,8 @@ const ProfileLayout = () => {
     const sellerServiceStatus = useSelector(selectServiceSellerStatus)
 
     useEffect(() => {
-      if(sellerService.length === 0){
-        dispatch(getAllServicesByIdSeller(id))
-      }
-    },[dispatch])
-
-    console.log(sellerServiceStatus)
+      dispatch(getAllServicesByIdSeller(id))
+    },[dispatch, id])
 
     useEffect(() => {
       if(id){
@@ -29,13 +25,16 @@ const ProfileLayout = () => {
       }
     },[id, dispatch])
 
-    if(status === 'loading'){
-      return(
-        <div>loading...</div>
-      )
+    if (status === 'loading') {
+        return (
+            <div className='flex justify-center items-center min-h-screen'>
+                <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
+                    <p className='mt-4 text-gray-600'>Memuat data...</p>
+                </div>
+            </div>
+        )
     }
-
-    console.log(seller)
 
     if(status === 'success'){
       const skills = seller?.kategori_toko.split(' & ')

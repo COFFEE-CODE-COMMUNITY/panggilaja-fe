@@ -15,7 +15,7 @@ import ProfileReviews from "./page/ProfileService/ProfileReviews";
 import ProfilePhotos from "./page/ProfileService/ProfilePhotos";
 import ProfileServices from "./page/ProfileService/ProfileServices";
 import SearchPage from "./page/Search/Index";
-import DashboardLayout from "./components/modules/layouts/DashboardLayout";
+import DashboardLayout from "./components/modules/layouts/Dashboard/DashboardLayout";
 import ManageOrder from "./page/Dashboard/ManageOrder";
 import ManageServices from "./page/Dashboard/ManageServices";
 import AddService from "./page/Dashboard/AddService";
@@ -26,13 +26,13 @@ import SettingLayout from "./components/modules/layouts/SettingLayout";
 import { GuestRoute, HomeRoute, ProtectedRoute } from "./ProtectedRoute";
 import ServiceMitraLayout from "./components/modules/layouts/ServiceMitraLayout";
 import TambahJasaForm from "./page/MitraForm/sections/TambahJasaForm";
-import ChatLayout from "./components/modules/layouts/ChatLayout";
 import EditProfile from "./page/Setting/EditProfile";
 import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
 import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
 import GoogleCallback from "./page/Auth/GoogleCallback"; // Capital 'Auth'
 import ManageProfile from "./page/Dashboard/ManageProfile";
+import ChatLayout from "./components/modules/layouts/Chat/ChatLayout";
 
 const Router = createBrowserRouter([
   {
@@ -53,17 +53,13 @@ const Router = createBrowserRouter([
       {
         path: "partner",
         element: (
-          <ProtectedRoute>
-            <PartnerPage />
-          </ProtectedRoute>
+          <PartnerPage />
         ),
       },
       {
         path: "service/:id",
         element: (
-          <ProtectedRoute>
             <DetailService />
-          </ProtectedRoute>
         ),
       },
       {
@@ -85,9 +81,7 @@ const Router = createBrowserRouter([
       {
         path: "profile-service/:id",
         element: (
-          <ProtectedRoute>
             <ProfileLayout />
-          </ProtectedRoute>
         ),
         children: [
           {
@@ -139,7 +133,11 @@ const Router = createBrowserRouter([
   
   {
     path: "partner/mitra-form",
-    element: <ServiceMitraLayout />,
+    element: (
+      <ProtectedRoute>
+        <ServiceMitraLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -171,6 +169,10 @@ const Router = createBrowserRouter([
       {
         path: "manage-profile",
         element: <ManageProfile />,
+      },
+      {
+        path: "chat",
+        element: <ChatLayout />,
       },
       {
         path: "manage-services/add-service",

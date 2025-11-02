@@ -18,16 +18,19 @@ const DetailService = () => {
     }
   },[dispatch])
 
-  if(status === 'loading'){
+  if (status === 'loading') {
     return (
-      <div className='absolute top-0 left-0 right-0 bottom-0 bg-white flex justify-center items-center'>
-        loading...
-      </div>
+        <div className='flex justify-center items-center min-h-screen'>
+            <div className='text-center'>
+                <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
+                <p className='mt-4 text-gray-600'>Memuat data...</p>
+            </div>
+        </div>
     )
   }
   
   return (
-    <div className='md:flex h-full w-full gap-[40px] mb-[50px] px-[100px] pt-[20px]'>
+    <div className='md:flex h-full w-full gap-[40px] mb-[50px] lg:px-[100px] md:px-[50px] pt-[20px]'>
         {status === 'loading' && <div className='w-full h-screen'>loading</div>}
         {status === 'success' && (
           <>

@@ -35,10 +35,6 @@ const initialState = {
     changeAccountMessage : null,
     changeAccountError : null,
 
-    changeAccountToBuyerStatus : 'idle',
-    changeAccountToBuyerMessage : null,
-    changeAccountToBuyerError : null,
-
     isVerified : false,
     resetEmail : null,
     resetCode : null
@@ -149,13 +145,9 @@ export const resetPassword = createAsyncThunk(
 
 export const changeAccount = createAsyncThunk(
     'auth/changeAccount',
-    async (_, {rejectWithValue}) => {
+    async (data, {rejectWithValue}) => {
         try {
-            const response = await api.post(`auth/change-user`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                },
-            }, { withCredentials: true });
+            const response = await api.post(`auth/change-user`, data)
             return response.data;
         }catch (error) {
             if (error.response) {
@@ -166,24 +158,6 @@ export const changeAccount = createAsyncThunk(
     }
 );
 
-export const changeAccountToBuyer = createAsyncThunk(
-    'auth/changeAccountToBuyer',
-    async (_, {rejectWithValue}) => {
-        try {
-            const response = await api.post(`auth/change-user`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                },
-            }, { withCredentials: true });
-            return response.data;
-        }catch (error) {
-            if (error.response) {
-                return rejectWithValue(error.response.data); 
-            }
-            return rejectWithValue({ message: 'Gagal terhubung ke server. Cek koneksi.' });
-        }
-    }
-);
 
 const authSlice = createSlice({
     name : 'auth',
@@ -197,6 +171,11 @@ const authSlice = createSlice({
             state.status = 'idle'
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
+        },
+        resetChangeAccountStatus : (state) => {
+            state.changeAccountStatus = 'idle',
+            state.changeAccountMessage = null,
+            state.changeAccountError = null
         }
     },
     extraReducers : (builder) => {
@@ -269,8 +248,6 @@ const authSlice = createSlice({
                 state.accessToken = null
                 state.error = null
                 state.status = 'idle'
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('user')
             })
 
             // Google OAuth login
@@ -279,17 +256,17 @@ const authSlice = createSlice({
                 state.error = null
             })
             .addCase(googleLoginSuccess.fulfilled, (state, action) => {
-                const { status, message, data } = action.payload
-                const { user, token } = data
+                // const { status, message, data } = action.payload
+                // const { user, token } = data
+                
+                // state.status = 'success'
+                // state.error = null
+                // state.message = message || 'Login dengan Google berhasil'
+                // state.accessToken = token
+                // state.user = user
 
-                state.status = 'success'
-                state.error = null
-                state.message = message || 'Login dengan Google berhasil'
-                state.accessToken = token
-                state.user = user
-
-                localStorage.setItem('accessToken', token)
-                localStorage.setItem('user', JSON.stringify(user))
+                // localStorage.setItem('accessToken', token)
+                // localStorage.setItem('user', JSON.stringify(user))
             })
             .addCase(googleLoginSuccess.rejected, (state, action) => {
                 state.message = action.payload?.message || 'Login dengan Google gagal'
@@ -363,63 +340,37 @@ const authSlice = createSlice({
             })
             .addCase(changeAccount.fulfilled, (state, action) => {
                 const { status, message, data } = action.payload
-                const { accessToken } = data.user
+                const { accessToken, user } = data
+
+                if (!accessToken || typeof accessToken !== 'string') {
+                    console.error("Access token tidak valid:", accessToken)
+                    state.changeAccountStatus = 'failed'
+                    state.changeAccountMessage = 'Token tidak valid'
+                    return
+                }
 
                 const decodeToken = jwtDecode(accessToken)
-                const userData = decodeToken.user
+                const userDataFromToken = decodeToken.user 
                 
-                state.changeAccountToBuyerStatus = 'idle'
+                const finalUserData = userDataFromToken || user 
+
                 state.changeAccountStatus = status
                 state.changeAccountMessage = message
-
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('user')
-
-                state.accessToken = accessToken; 
-                state.user = userData;
+                state.accessToken = accessToken
+                state.user = finalUserData 
 
                 localStorage.setItem('accessToken', accessToken)
-                localStorage.setItem('user', JSON.stringify(userData))
+                localStorage.setItem('user', JSON.stringify(finalUserData))
             })
             .addCase(changeAccount.rejected, (state, action) => {
                 state.changeAccountStatus = 'failed'
                 state.changeAccountMessage = action.payload
             })
 
-            //change account to buyer
-            .addCase(changeAccountToBuyer.pending, (state) => {
-                state.changeAccountToBuyerStatus = 'loading'
-                state.changeAccountToBuyerMessage = null
-                state.changeAccountToBuyerError = null
-            })
-            .addCase(changeAccountToBuyer.fulfilled, (state, action) => {
-                const { status, message, data } = action.payload
-                const { accessToken } = data.user
-
-                const decodeToken = jwtDecode(accessToken)
-                const userData = decodeToken.user
-                
-                state.changeAccountToBuyerStatus = status
-                state.changeAccountStatus = 'idle'
-                state.changeAccountToBuyerMessage = message
-
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('user')
-
-                state.accessToken = accessToken; 
-                state.user = userData;
-
-                localStorage.setItem('accessToken', accessToken)
-                localStorage.setItem('user', JSON.stringify(userData))
-            })
-            .addCase(changeAccountToBuyer.rejected, (state, action) => {
-                state.changeAccountToBuyerStatus = 'failed'
-                state.changeAccountToBuyerMessage = action.payload
-            })
     }
 })
 
-export const { logout, setOAuthCredentials } = authSlice.actions
+export const { logout, setOAuthCredentials, resetChangeAccountStatus } = authSlice.actions
 export const selectCurrentUser = state => state.auth.user
 export const selectAccessToken = state => state.auth.accessToken
 export const selectAuthStatus = state => state.auth.status
@@ -446,8 +397,5 @@ export const selectChangeAccountStatus = (state) => state.auth.changeAccountStat
 export const selectChangeAccountError = (state) => state.auth.changeAccountError;
 export const selectChangeAccountMessage = (state) => state.auth.changeAccountMessage;
 
-export const selectChangeAccountToBuyerStatus = (state) => state.auth.changeAccountToBuyerStatus;
-export const selectChangeAccountToBuyerError = (state) => state.auth.changeAccountToBuyerError;
-export const selectChangeAccountToBuyerMessage = (state) => state.auth.changeAccountToBuyerMessage;
 
 export default authSlice.reducer

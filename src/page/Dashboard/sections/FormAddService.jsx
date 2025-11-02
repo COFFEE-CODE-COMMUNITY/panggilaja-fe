@@ -49,7 +49,6 @@ const FormAddService = () => {
         
         dispatch(addService(formData));
         
-        console.log(status)
     };
 
     useEffect(() => {

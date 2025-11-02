@@ -31,7 +31,7 @@ const ServiceAround = () => {
     if(servicesStatus === 'success'){
         return (
             
-            <div className='w-full flex flex-col md:gap-[10px] gap-[5px]'>
+            <div className='w-full flex flex-col md:gap-[10px] gap-[10px]'>
                 <div className='flex items-center'>
                     <p className='xl:text-h4 text-h5 font-semibold flex-1'>Jasa di sekitarmu</p>
                     <Link to='all-service-result'>
@@ -39,7 +39,7 @@ const ServiceAround = () => {
                     </Link>
                 </div>
                 {services.length === 0 && <div><p className='text-h6'>Jasa masih kosong</p></div>}
-                <div className='grid lg:gap-[10px] md:gap-[7px] gap-[4px] w-full lg:grid-cols-4 grid-cols-2'>
+                <div className='grid gap-[10px] w-full lg:grid-cols-4 grid-cols-2'>
                     {servicesSlice.map((service) => (
                         <ServiceCard
                             idService={service.id}

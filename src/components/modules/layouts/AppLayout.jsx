@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import Header from './Header'
+import Header from './Header/Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectSearchText, selectStatus, setSearchText, setStatus } from '../../../features/searchSlice'
-import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
-import { addAddress, seeAddress, selectSeeAddress } from '../../../features/userSlice'
+import { selectSearchText, setSearchText } from '../../../features/searchSlice'
+import { selectAuthStatus, selectCurrentUser } from '../../../features/authSlice'
+import { seeAddress, selectSeeAddress } from '../../../features/userSlice'
 
 const AppLayout = () => {
   const dispatch = useDispatch()
@@ -14,6 +14,8 @@ const AppLayout = () => {
   const searchParams = new URLSearchParams(location.search)
   const urlSearchText = searchParams.get('q') || '' 
   
+  const authStatus = useSelector(selectAuthStatus)
+
   const searchText = useSelector(selectSearchText)
 
   const [sidebarProfile, setSidebarProfile] = useState(false)
@@ -50,7 +52,6 @@ const AppLayout = () => {
           setSidebarProfile(false)
       }
   },[location.pathname])
-
 
   const handleChange = (e) => {
       setSearch(e.target.value)

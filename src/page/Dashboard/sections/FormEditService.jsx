@@ -34,7 +34,6 @@ const FormEditService = ({serviceName, basePrice, topPrice, description, categor
                 
         dispatch(editService({id, data : serviceData}));
         
-        console.log(status)
     };
 
     useEffect(() => {
@@ -45,7 +44,16 @@ const FormEditService = ({serviceName, basePrice, topPrice, description, categor
         }
     },[status])
 
-    console.log(status)
+    if (status === 'loading') {
+        return (
+            <div className='flex justify-center items-center min-h-screen w-full bg-white'>
+                <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
+                    <p className='mt-4 text-gray-600'>Memuat data...</p>
+                </div>
+            </div>
+        )
+    }
     return (
         <form onSubmit={handleSubmit} className='flex'>
             <div className='w-1/2 flex items-center justify-center p-[30px]'>

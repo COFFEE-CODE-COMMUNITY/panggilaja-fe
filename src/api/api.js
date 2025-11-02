@@ -5,9 +5,6 @@ import axios from "axios";
 const api = axios.create({
   baseURL: "http://localhost:5000/api",
   withCredentials: true,
-  headers: {
-    // 'Content-Type': 'application/json',
-  },
 });
 
 let isRefreshing = false;
@@ -30,14 +27,12 @@ api.interceptors.request.use(
     const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("🔑 Token added to:", config.url);
     } else {
       console.log("⚠️ No token found for:", config.url);
     }
     return config;
   },
   (error) => {
-    console.error("❌ Request error:", error);
     return Promise.reject(error);
   }
 );
@@ -45,14 +40,13 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    console.log("✅ Response OK:", response.config.url, response.status);
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
 
     // Log detail error
-    console.log("❌ Response Error:", {
+    console.log("Response Error:", {
       url: originalRequest?.url,
       status: error.response?.status,
       statusText: error.response?.statusText,
@@ -64,7 +58,6 @@ api.interceptors.response.use(
     // Skip refresh untuk endpoint public
     const publicEndpoints = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/google/callback"];
     if (publicEndpoints.some((endpoint) => originalRequest?.url?.includes(endpoint))) {
-      console.log("🔓 Public endpoint, skip refresh");
       return Promise.reject(error);
     }
 
@@ -73,7 +66,6 @@ api.interceptors.response.use(
       
       // Jika sedang refresh, masukkan ke queue
       if (isRefreshing) {
-        console.log("⏳ Refresh in progress, adding to queue");
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -89,23 +81,23 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      console.log("🔄 Starting token refresh...");
-      console.log("📍 Current cookies:", document.cookie);
-
       try {
         // Panggil refresh endpoint
         const res = await api.post("/auth/refresh");
         
-        console.log("✅ Refresh response:", res.data);
-        
         const newAccessToken = res.data.data.accessToken;
 
         if (!newAccessToken) {
-          throw new Error("No access token in refresh response");
+            throw new Error("No access token in refresh response");
         }
 
-        console.log("💾 Saving new token");
+        // 1. Decode token baru untuk mendapatkan user data
+        const decodedToken = jwtDecode(newAccessToken);
+        const newUserData = decodedToken.user; 
+        
+        // 2. Simpan token dan data user baru (yang mungkin berisi role yang salah/buyer)
         localStorage.setItem("accessToken", newAccessToken);
+        localStorage.setItem("user", JSON.stringify(newUserData)); // 👈 TAMBAHKAN INI
 
         // Update headers
         api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
@@ -114,12 +106,15 @@ api.interceptors.response.use(
         // Process queue
         processQueue(null, newAccessToken);
         isRefreshing = false;
+        
+        // ⚠️ Tambahkan peringatan jika role berbeda dari yang diharapkan (opsional)
+        console.warn(`⚠️ Token direfresh. Role yang dihasilkan: ${newUserData?.active_role}`);
 
-        console.log("🔁 Retrying original request:", originalRequest.url);
+
         return api(originalRequest);
         
       } catch (refreshError) {
-        console.error("❌ Refresh failed:", {
+        console.error("Refresh failed:", {
           message: refreshError.message,
           response: refreshError.response?.data,
           status: refreshError.response?.status
@@ -133,11 +128,10 @@ api.interceptors.response.use(
         localStorage.removeItem("user");
 
         // Redirect to login
-        // if (window.location.pathname !== "/login") {
-        //   console.log("🔀 Redirecting to login");
-        //   alert("Sesi Anda telah berakhir. Silakan login kembali.");
-        //   window.location.href = "/login";
-        // }
+        if (window.location.pathname !== "/login") {
+          alert("Sesi Anda telah berakhir. Silakan login kembali.");
+          window.location.href = "/login";
+        }
 
         return Promise.reject(refreshError);
       }
@@ -145,7 +139,6 @@ api.interceptors.response.use(
 
     // Handle network errors
     if (!error.response) {
-      console.error("🌐 Network error - server might be down");
       alert("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
     }
 

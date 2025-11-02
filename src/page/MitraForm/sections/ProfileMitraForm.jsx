@@ -67,7 +67,7 @@ function ProfileMitraForm() {
 
         dispatch(addSeller(formData)).unwrap()
         .then(() => {
-            dispatch(changeAccount())
+            dispatch(changeAccount({targetRole : 'seller'}))
         })
         .catch((error) => {
             alert(`Gagal membuat profil mitra: ${error.message || 'Terjadi kesalahan'}`);
@@ -214,7 +214,6 @@ function ProfileMitraForm() {
                     </div>
 
                     {/* button selanjut nya */}
-                    <div className="hidden md:block md:col-span-1"></div> 
                     <div className="md:col-span-3 flex justify-end"> 
                         <Button type="submit" variant="secondary" className="px-6 py-2 rounded-[20px] text-white"> 
                             Selanjutnya

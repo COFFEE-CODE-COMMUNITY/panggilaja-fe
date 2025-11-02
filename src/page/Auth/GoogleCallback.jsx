@@ -1,34 +1,44 @@
 import React, { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { googleLoginSuccess } from '../../features/authSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { googleLoginSuccess, selectCurrentUser } from '../../features/authSlice'
 import { jwtDecode } from "jwt-decode"
+import { selectAddAddressStatus, selectSeeAddress, selectSeeAddressStatus } from '../../features/userSlice'
 
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
+  const user = useSelector(selectCurrentUser)
+  const address = useSelector(selectSeeAddress)
+  const addressStatus = useSelector(selectSeeAddressStatus)
+  const addAddressStatus = useSelector(selectAddAddressStatus)
+  
   useEffect(() => {
     const token = searchParams.get('token')
     const user = searchParams.get('user')
     const error = searchParams.get('error')
+    
+    console.log(token)
 
     const handleGoogleCallback = async () => {
       try {
         if (token && user) {
-          // Parse user data dari URL
-          const userData = JSON.parse(decodeURIComponent(user))
-
-          // Simpan user data & token ke Redux store
+          const userData = JSON.parse(decodeURIComponent(user));
           await dispatch(googleLoginSuccess({
             status: 'success',
             message: 'Login dengan Google berhasil',
             data: { user: userData, token }
-          })).unwrap()
+          })).unwrap();
 
-          navigate('/')
-        } else if (error) {
+          if (address?.data?.provinsi || address?.data?.alamat) {
+            navigate('/', { replace: true });
+          } else {
+            navigate('/form-detail-profile');
+          }
+        }
+        else if (error) {
           navigate('/login?error=Gagal login dengan Google')
         } else {
           navigate('/login')
