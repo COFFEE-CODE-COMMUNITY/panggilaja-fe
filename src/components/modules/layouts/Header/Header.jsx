@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
-import NavLink from "../navigation/NavLink";
-import Input from "../../common/Input";
-import Button from "../../common/Button";
+import NavLink from "../../navigation/NavLink";
+import Input from "../../../common/Input";
+import Button from "../../../common/Button";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -10,7 +10,7 @@ import {
   selectAccessToken,
   selectChangeAccountStatus,
   selectCurrentUser,
-} from "../../../features/authSlice";
+} from "../../../../features/authSlice";
 import {
   FaBars,
   FaRegComment,
@@ -28,12 +28,12 @@ import {
   selectAllService,
   selectFavoriteService,
   selectFavoriteServiceStatus,
-} from "../../../features/serviceSlice";
+} from "../../../../features/serviceSlice";
 import {
   seeProfile,
   selectSeeProfile,
   selectSeeProfileStatus,
-} from "../../../features/userSlice";
+} from "../../../../features/userSlice";
 
 const Header = ({
   handleChange,

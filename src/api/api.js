@@ -141,10 +141,10 @@ api.interceptors.response.use(
         localStorage.removeItem("user");
 
         // Redirect to login
-        if (window.location.pathname !== "/login") {
-          alert("Sesi Anda telah berakhir. Silakan login kembali.");
-          window.location.href = "/login";
-        }
+        // if (window.location.pathname !== "/login") {
+        //   alert("Sesi Anda telah berakhir. Silakan login kembali.");
+        //   window.location.href = "/login";
+        // }
 
         return Promise.reject(refreshError);
       }
