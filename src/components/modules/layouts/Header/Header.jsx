@@ -5,7 +5,7 @@ import Button from '../../../common/Button'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeAccount, logout, logoutUser, resetChangeAccountStatus, selectAccessToken, selectChangeAccountStatus, selectCurrentUser } from '../../../../features/authSlice'
-import { FaBars, FaRegComment, FaRegHeart, FaSearch, FaTimes, FaUser } from 'react-icons/fa'
+import { FaBars, FaRegComment, FaRegHeart, FaSearch, FaShoppingCart, FaTimes, FaUser } from 'react-icons/fa'
 import { MdSearch } from 'react-icons/md'
 import { IoMdLogOut } from 'react-icons/io'
 import { getFavoriteService, getServices, selectAllService, selectFavoriteService, selectFavoriteServiceStatus } from '../../../../features/serviceSlice'
@@ -40,18 +40,13 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
 
     useEffect(() => {
         if (!token) {
-            setSidebarProfile(false);
+            setSidebarProfile(false)
         } 
-        
-        // Periksa token dan user ID sebelum memanggil getFavoriteService
         if (token && user?.id) { 
-            dispatch(getFavoriteService(user.id)); // Panggil dengan ID yang sudah pasti ada
-        }
-        
-        // getServices dipanggil secara terpisah karena tidak bergantung pada user
-        dispatch(getServices()); 
-
-    }, [token, user?.id, dispatch]);
+            dispatch(getFavoriteService(user.id))
+        }        
+        dispatch(getServices())
+    }, [token, user?.id, dispatch])
 
     useEffect(() => {
         if(sidebarMobile){
@@ -80,10 +75,8 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
     let favoritesService = [];
 
     if (favoritesStatus === 'success' && favorites.data && services.length > 0) {
-        // 1. Dapatkan semua ID service yang difavoritkan
         const favoritedServiceIds = favorites.data.map(fav => fav.service_id);
         
-        // 2. Filter list services utama menggunakan set ID
         favoritesService = services.filter(service => 
             favoritedServiceIds.includes(service.id)
         );
@@ -270,7 +263,7 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                         setOrder(!order)
                                     }}
                                 >
-                                    <FaRegHeart className='text-gray-400 text-[15px]'/>
+                                    <FaShoppingCart className='text-gray-400 text-[15px]'/>
                                     <p className='text-h6'>Pesanan</p>
                                 </div>
                                 <Link to='/chat'>
@@ -279,15 +272,17 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
                                         <p className='text-h6'>Chat</p>
                                     </div>
                                 </Link>
-                                <div 
-                                    className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
-                                    onClick={() => {
-                                        dispatch(changeAccount({targetRole : 'seller'}))
-                                    }}
-                                >
-                                    <FaUser className='text-gray-400 text-[15px]'/>
-                                    <p className='text-h6'>Ganti Akun Seller</p>
-                                </div>
+                                {haveSellerAccount && (
+                                    <div 
+                                        className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-gray-50 cursor-pointer'
+                                        onClick={() => {
+                                            dispatch(changeAccount({targetRole : 'seller'}))
+                                        }}
+                                    >
+                                        <FaUser className='text-gray-400 text-[15px]'/>
+                                        <p className='text-h6'>Ganti Akun Seller</p>
+                                    </div>
+                                )}
                             </div>  
                             <div className='flex gap-[10px] items-center px-[15px] py-[10px] hover:bg-primary hover:text-white cursor-pointer mt-auto group' onClick={() => dispatch(logoutUser())}>
                                 <IoMdLogOut className='text-gray-400 text-[15px] group-hover:text-white'/>

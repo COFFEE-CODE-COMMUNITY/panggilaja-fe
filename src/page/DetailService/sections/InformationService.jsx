@@ -112,7 +112,7 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
                             onClick={() => dispatch(deleteFavoriteService(isServiceFavorite.id))}
                         >
                             <FaHeart 
-                                className={`text-red-300 text-[20px]`}
+                                className={`text-red-500 text-[20px]`}
                             />
                         </Button>
                     ) : (

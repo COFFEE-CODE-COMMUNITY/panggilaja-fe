@@ -20,6 +20,7 @@ const ManageProfile = () => {
     }
   },[statusDelete])
 
+  console.log(messageDelete)
   console.log(statusDelete)
   return (
     <div className='flex flex-col'>
