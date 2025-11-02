@@ -1,8 +1,16 @@
 import React from 'react'
 
-const ImageService = () => {
+const ImageService = ({image}) => {
   return (
-    <div className='md:min-h-screen h-[50vh] lg:w-1/2 w-full bg-amber-100 rounded-tr-[15px] rounded-br-[15px]'>s</div>
+    <div 
+      className='md:h-full h-1/2 lg:w-[55%] w-full'
+      style={{
+        backgroundImage : `url(${image})`,
+        backgroundPosition : 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
+      }}
+    ></div>
   )
 }
 

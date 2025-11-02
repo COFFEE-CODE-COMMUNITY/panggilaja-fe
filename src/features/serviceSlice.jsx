@@ -1,57 +1,132 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { act } from "react";
+import api from "../api/api";
 
 export const getServices = createAsyncThunk(
     'services/getServices',
-    async () => {
-        const res = await axios.get('http://localhost:3000/services')
-        return res.data
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await api.get('/services')
+            return res.data.data;
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan')
+        }
     }
 )
 
 export const getServicesById = createAsyncThunk(
     'services/getServicesById',
-    async (id) => {
-        const res = await axios.get(`http://localhost:3000/services/${id}`)
-        return res.data
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.get(`/services/${id}`)
+            return res.data.data || res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil detail service')
+        }
     }
 )
 
-export const getReviewByServicesById = createAsyncThunk(
+export const getReviewServicesById = createAsyncThunk(
     'services/getReviewServicesById',
-    async (id) => {
-        const res = await axios.get(`http://localhost:3000/reviews?service_id=${id}`)
-        return res.data
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.get(`/reviews/seller/${id}`)
+            return res.data || res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil review')
+        }
     }
 )
 
-export const getDetailServices = createAsyncThunk(
-    'services/getDetailServices',
-    async () => {
-        const res = await axios.get(`http://localhost:3000/providers`)
-        return res.data
+export const addFavoriteService = createAsyncThunk(
+    'services/addFavoriteService',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.post(`/users/favorites/${id}`)
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal menambah favorit')
+        }
     }
 )
 
-export const getDetailServicesById = createAsyncThunk(
-    'services/getDetailServicesById',
-    async (id) => {
-        const res = await axios.get(`http://localhost:3000/providers/${id}`)
-        return res.data
+export const deleteFavoriteService = createAsyncThunk(
+    'services/deleteFavoriteService',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.delete(`/favorites/${id}`)
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal menambah favorit')
+        }
     }
 )
+
+export const getFavoriteService = createAsyncThunk(
+    'services/getFavoriteService',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.get(`/users/${id}/favorites`)
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal mengambil favorit')
+        }
+    }
+)
+
+export const getCategoryService = createAsyncThunk(
+  'services/getCategoryService',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get('/services/category')
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
+export const addService = createAsyncThunk(
+  'services/addService',
+  async (data, { rejectWithValue }) => {
+    try {
+        const res = await api.post('/services', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+        return res.data;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
+export const editService = createAsyncThunk(
+  'services/editService',
+  async ({id, data}, { rejectWithValue }) => {
+    try {
+        const res = await api.put(`/services/${id}`, data);
+        return res.data;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
+export const deleteService = createAsyncThunk(
+  'services/deleteService',
+  async (id, { rejectWithValue }) => {
+    try {
+        const res = await api.delete(`/services/${id}`);
+        return res.data;
+    } catch (err) {
+        return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
 
 const serviceEntity = createEntityAdapter({
     selectId : (service) => service.id
-})
-
-const reviewEntity = createEntityAdapter({
-    selectId : (review) => review.id
-})
-
-const detailServiceEntity = createEntityAdapter({
-    selectId : (detail) => detail.id
 })
 
 const serviceSlice = createSlice({
@@ -63,85 +138,191 @@ const serviceSlice = createSlice({
         selectedService : null,
         selectedServiceStatus : 'idle',
         selectedServiceError : null,
-        
-        reviewService : reviewEntity.getInitialState(),
+
+        reviewService : null,
         reviewServiceStatus : 'idle',
         reviewServiceError : null,
 
-        allDetailService : detailServiceEntity.getInitialState(),
-        allDetailServiceStatus : 'idle',
-        allDetailServiceError : null,
+        getFavoritesService : null,
+        getFavoritesServiceStatus : 'idle',
+        getFavoritesServiceError : null,
 
-        detailService : null,
-        detailServiceStatus : 'idle',
-        detailServiceError : null,
+        CategoryService : null,
+        CategoryServiceStatus : 'idle',
+        CategoryServiceError : null,
+        
+        addServiceStatus : 'idle',
+        addServiceError : null,
+
+        addFavoriteStatus : 'idle',
+        addFavoriteError : null,
+        
+        editServiceStatus : 'idle',
+        editServiceError : null,
+
+        deleteServiceStatus : 'idle',
+        deleteServiceError : null,
+
+        deleteFavoriteServiceStatus : 'idle',
+        deleteFavoriteServiceError : null,
     }),
-    reducers : {},
+    reducers : {
+        resetEditStatus : (state) => {
+            state.editServiceStatus = 'idle'
+            state.editServiceError = ''
+        },
+        resetAddStatus : (state) => {
+            state.addServiceStatus = 'idle'
+            state.addServiceError = ''
+        },
+        resetDeleteStatus : (state) => {
+            state.deleteServiceStatus = 'idle'
+            state.deleteServiceError = ''
+        },
+        resetAddFavoritesStatus : (state) => {
+            state.addFavoriteStatus = 'idle'
+            state.addServiceError = ''
+        },
+        resetDeleteFavoritesStatus : (state) => {
+            state.deleteFavoriteServiceStatus = 'idle'
+            state.deleteFavoriteServiceError = ''
+        }
+    },
     extraReducers : (builder) => {
         builder
             //get service
             .addCase(getServices.pending, (state) => {
                 state.allServiceStatus = 'loading'
+                state.allServiceError = null
             })
             .addCase(getServices.fulfilled, (state, action) => {
-                state.allServiceStatus = 'success',
+                state.allServiceStatus = 'success';
                 serviceEntity.setAll(state, action.payload)
             })
             .addCase(getServices.rejected, (state, action) => {
-                state.allServiceStatus = 'error',
-                state.allServiceError = action.error.message
+                state.allServiceStatus = 'error';
+                state.allServiceError = action.payload || action.error.message
             })
 
             //get service by id
             .addCase(getServicesById.pending, (state) => {
                 state.selectedServiceStatus = 'loading'
+                state.selectedServiceError = null
             })
             .addCase(getServicesById.fulfilled, (state, action) => {
-                state.selectedServiceStatus = 'success',
+                state.selectedServiceStatus = 'success';
                 state.selectedService = action.payload
             })
             .addCase(getServicesById.rejected, (state, action) => {
-                state.selectedServiceStatus = 'error',
-                state.selectedServiceError = action.error.message
+                state.selectedServiceStatus = 'error';
+                state.selectedServiceError = action.payload || action.error.message
             })
 
-            //get review
-            .addCase(getReviewByServicesById.pending, (state) => {
+            //get review by id
+            .addCase(getReviewServicesById.pending, (state) => {
                 state.reviewServiceStatus = 'loading'
+                state.reviewServiceError = null
             })
-            .addCase(getReviewByServicesById.fulfilled, (state, action) => {
-                state.reviewServiceStatus = 'success',
-                reviewEntity.setAll(state.reviewService, action.payload)
+            .addCase(getReviewServicesById.fulfilled, (state, action) => {
+                state.reviewServiceStatus = 'success';
+                state.reviewService = action.payload
             })
-            .addCase(getReviewByServicesById.rejected, (state, action) => {
-                state.reviewServiceStatus = 'error',
-                state.reviewServiceStatus = action.error.message
-            })
-
-            //get all detail service
-            .addCase(getDetailServices.pending, (state) => {
-                state.allDetailServiceStatus = 'loading'
-            })
-            .addCase(getDetailServices.fulfilled, (state, action) => {
-                state.allDetailServiceStatus = 'success',
-                detailServiceEntity.setAll(state.allDetailService, action.payload)
-            })
-            .addCase(getDetailServices.rejected, (state, action) => {
-                state.allDetailServiceStatus = 'error',
-                state.allDetailServiceError = action.error.message
+            .addCase(getReviewServicesById.rejected, (state, action) => {
+                state.reviewServiceStatus = 'error';
+                state.reviewServiceError = action.payload || action.error.message
             })
 
-            //get detail service by id
-            .addCase(getDetailServicesById.pending, (state) => {
-                state.detailServiceStatus = 'loading'
+            //add favorite service
+            .addCase(addFavoriteService.pending, (state) => {
+                state.addFavoriteStatus = 'loading'
+                state.addFavoriteError = null
             })
-            .addCase(getDetailServicesById.fulfilled, (state, action) => {
-                state.detailServiceStatus = 'success',
-                state.detailService = action.payload
+            .addCase(addFavoriteService.fulfilled, (state) => {
+                state.addFavoriteStatus = 'success';
             })
-            .addCase(getDetailServicesById.rejected, (state, action) => {
-                state.detailServiceStatus = 'error',
-                state.detailServiceStatus = action.error.message
+            .addCase(addFavoriteService.rejected, (state, action) => {
+                state.addFavoriteStatus = 'error';
+                state.addFavoriteError = action.payload.message
+            })
+
+            //get favorite service
+            .addCase(getFavoriteService.pending, (state) => {
+                state.getFavoritesServiceStatus = 'loading'
+                state.getFavoritesServiceError = null
+            })
+            .addCase(getFavoriteService.fulfilled, (state, action) => {
+                state.getFavoritesServiceStatus = 'success';
+                state.getFavoritesService = action.payload
+            })
+            .addCase(getFavoriteService.rejected, (state, action) => {
+                state.getFavoritesServiceStatus = 'error';
+                state.getFavoritesServiceError = action.payload || action.error.message
+            })
+
+            //get category service
+            .addCase(getCategoryService.pending, (state) => {
+                state.CategoryServiceStatus = 'loading'
+                state.CategoryServiceError = null
+            })
+            .addCase(getCategoryService.fulfilled, (state, action) => {
+                state.CategoryServiceStatus = 'success';
+                state.CategoryService = action.payload
+            })
+            .addCase(getCategoryService.rejected, (state, action) => {
+                state.CategoryServiceStatus = 'error';
+                state.CategoryServiceError = action.payload || action.error.message
+            })
+
+            //add service
+            .addCase(addService.pending, (state) => {
+                state.addServiceStatus = 'loading'
+                state.addServiceError = null
+            })
+            .addCase(addService.fulfilled, (state) => {
+                state.addServiceStatus = 'success';
+            })
+            .addCase(addService.rejected, (state, action) => {
+                state.addServiceStatus = 'error';
+                state.addServiceError = action.payload || action.error.message
+            })
+
+            //edit service
+            .addCase(editService.pending, (state) => {
+                state.editServiceStatus = 'loading'
+                state.editServiceError = null
+            })
+            .addCase(editService.fulfilled, (state) => {
+                state.editServiceStatus = 'success';
+            })
+            .addCase(editService.rejected, (state, action) => {
+                state.editServiceStatus = 'error';
+                state.editServiceError = action.payload || action.error.message
+            })
+
+            //delete service
+            .addCase(deleteService.pending, (state) => {
+                state.deleteServiceStatus = 'loading'
+                state.deleteServiceError = null
+            })
+            .addCase(deleteService.fulfilled, (state) => {
+                state.deleteServiceStatus = 'success';
+            })
+            .addCase(deleteService.rejected, (state, action) => {
+                state.deleteServiceStatus = 'error';
+                state.deleteServiceError = action.payload || action.error.message
+            })
+
+            //delete service
+            .addCase(deleteFavoriteService.pending, (state) => {
+                state.deleteFavoriteServiceStatus = 'loading'
+                state.deleteFavoriteServiceError = null
+            })
+            .addCase(deleteFavoriteService.fulfilled, (state) => {
+                state.deleteFavoriteServiceStatus = 'success';
+            })
+            .addCase(deleteFavoriteService.rejected, (state, action) => {
+                state.deleteFavoriteServiceStatus = 'error';
+                state.deleteFavoriteServiceError = action.payload || action.error.message
             })
     }
 })
@@ -151,29 +332,41 @@ export const {
     selectById : selectdServiceById
 } = serviceEntity.getSelectors(state => state.service)
 
-export const {
-    selectAll : selectAllServiceReview
-} = reviewEntity.getSelectors(state => state.service.reviewService)
-
-export const {
-    selectAll : selectAllDetailService
-} = detailServiceEntity.getSelectors(state => state.service.allDetailService)
+export const {resetEditStatus, resetDeleteStatus, resetAddStatus, resetAddFavoritesStatus, resetDeleteFavoritesStatus} = serviceSlice.actions
 
 export const selectSelectedService = (state) => state.service.selectedService
 export const selectSelectedServiceStatus = (state) => state.service.selectedServiceStatus
 export const selectSelectedServiceError = (state) => state.service.selectedServiceError
 
-export const selectAllServiceStatus = (state) => state.service.allServiceStatus
-export const selectAllServiceError = (state) => state.service.allServiceError
+export const selectAddService = (state) => state.service.addService
+export const selectAddServiceStatus = (state) => state.service.addServiceStatus
+export const selectAddServiceError = (state) => state.service.addServiceError
 
+export const selectReviewService = (state) => state.service.reviewService
 export const selectReviewServiceStatus = (state) => state.service.reviewServiceStatus
 export const selectReviewServiceError = (state) => state.service.reviewServiceError
 
-export const selectAllDetailServiceStatus = (state) => state.service.allDetailServiceStatus
-export const selectAllDetailServiceError = (state) => state.service.allDetailServiceError
+export const selectFavoriteService = (state) => state.service.getFavoritesService
+export const selectFavoriteServiceStatus = (state) => state.service.getFavoritesServiceStatus
+export const selectFavoriteServiceError = (state) => state.service.getFavoritesServiceError
 
-export const selectDetailService = (state) => state.service.detailService 
-export const selectDetailServiceStatus = (state) => state.service.detailServiceStatus
-export const selectDetailServiceError = (state) => state.service.detailServiceError
+export const selectCategoryService = (state) => state.service.CategoryService
+export const selectCategoryServiceStatus = (state) => state.service.CategoryServiceStatus
+export const selectCategoryServiceError = (state) => state.service.CategoryServiceError
+
+export const selectAddFavoriteServiceStatus = (state) => state.service.addFavoriteStatus
+export const selectAddFavoriteServiceError = (state) => state.service.addFavoriteError
+
+export const selectEditServicesServiceStatus = (state) => state.service.editServiceStatus
+export const selectEditServicesServiceError = (state) => state.service.editServiceError
+
+export const selectDeleteServiceStatus = (state) => state.service.deleteServiceStatus
+export const selectDeleteServiceError = (state) => state.service.deleteServiceError
+
+export const selectDeleteFavoriteServiceStatus = (state) => state.service.deleteFavoriteServiceStatus
+export const selectDeleteFavoriteServiceError = (state) => state.service.deleteFavoriteServiceError
+
+export const selectAllServiceStatus = (state) => state.service.allServiceStatus
+export const selectAllServiceError = (state) => state.service.allServiceError
 
 export default serviceSlice.reducer

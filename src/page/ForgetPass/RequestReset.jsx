@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import AuthLayout from '../../components/modules/layouts/AuthLayout'
-import ForgetPassForm from './sections/ForgetPassForm'
 import { Link } from 'react-router-dom'
+import RequestForm from './sections/RequestForm'
 
-const ForgetPassPage = () => {
+const RequestReset = () => {
   return (
     <AuthLayout
         title='Lupa Kata Sandi Anda?'
@@ -11,12 +11,12 @@ const ForgetPassPage = () => {
         type='Reset Password'
         reset='true'
         navAuth={
-            <Link to='/login' className='text-primary text-center'>Kembali ke login</Link>
+            <Link to='/login' className='text-primary text-center text-h6 lg:text-h5'>Kembali ke login</Link>
         }
     >
-        <ForgetPassForm/>
+        <RequestForm/>
     </AuthLayout>
   )
 }
 
-export default ForgetPassPage
+export default RequestReset
