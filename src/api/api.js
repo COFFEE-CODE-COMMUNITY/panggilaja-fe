@@ -51,19 +51,28 @@ api.interceptors.response.use(
       status: error.response?.status,
       statusText: error.response?.statusText,
       retry: originalRequest?._retry,
-      hasRefreshToken: document.cookie.includes('refreshToken'),
-      cookies: document.cookie
+      hasRefreshToken: document.cookie.includes("refreshToken"),
+      cookies: document.cookie,
     });
 
     // Skip refresh untuk endpoint public
-    const publicEndpoints = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/google/callback"];
-    if (publicEndpoints.some((endpoint) => originalRequest?.url?.includes(endpoint))) {
+    const publicEndpoints = [
+      "/auth/login",
+      "/auth/register",
+      "/auth/refresh",
+      "/auth/google/callback",
+    ];
+    if (
+      publicEndpoints.some((endpoint) =>
+        originalRequest?.url?.includes(endpoint)
+      )
+    ) {
+      console.log("🔓 Public endpoint, skip refresh");
       return Promise.reject(error);
     }
 
     // Handle 401 (Unauthorized)
     if (error.response?.status === 401 && !originalRequest?._retry) {
-      
       // Jika sedang refresh, masukkan ke queue
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -84,40 +93,44 @@ api.interceptors.response.use(
       try {
         // Panggil refresh endpoint
         const res = await api.post("/auth/refresh");
-        
-        const newAccessToken = res.data.data.accessToken;
+
+        console.log("✅ Refresh response:", res.data);
+
+        const newAccessToken = res.data.accessToken;
 
         if (!newAccessToken) {
-            throw new Error("No access token in refresh response");
+          throw new Error("No access token in refresh response");
         }
 
         // 1. Decode token baru untuk mendapatkan user data
         const decodedToken = jwtDecode(newAccessToken);
-        const newUserData = decodedToken.user; 
-        
+        const newUserData = decodedToken.user;
+
         // 2. Simpan token dan data user baru (yang mungkin berisi role yang salah/buyer)
         localStorage.setItem("accessToken", newAccessToken);
         localStorage.setItem("user", JSON.stringify(newUserData)); // 👈 TAMBAHKAN INI
 
         // Update headers
-        api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
+        api.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${newAccessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
         // Process queue
         processQueue(null, newAccessToken);
         isRefreshing = false;
-        
-        // ⚠️ Tambahkan peringatan jika role berbeda dari yang diharapkan (opsional)
-        console.warn(`⚠️ Token direfresh. Role yang dihasilkan: ${newUserData?.active_role}`);
 
+        // ⚠️ Tambahkan peringatan jika role berbeda dari yang diharapkan (opsional)
+        console.warn(
+          `⚠️ Token direfresh. Role yang dihasilkan: ${newUserData?.active_role}`
+        );
 
         return api(originalRequest);
-        
       } catch (refreshError) {
         console.error("Refresh failed:", {
           message: refreshError.message,
           response: refreshError.response?.data,
-          status: refreshError.response?.status
+          status: refreshError.response?.status,
         });
 
         processQueue(refreshError, null);
