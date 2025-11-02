@@ -57,20 +57,28 @@ api.interceptors.response.use(
       status: error.response?.status,
       statusText: error.response?.statusText,
       retry: originalRequest?._retry,
-      hasRefreshToken: document.cookie.includes('refreshToken'),
-      cookies: document.cookie
+      hasRefreshToken: document.cookie.includes("refreshToken"),
+      cookies: document.cookie,
     });
 
     // Skip refresh untuk endpoint public
-    const publicEndpoints = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/google/callback"];
-    if (publicEndpoints.some((endpoint) => originalRequest?.url?.includes(endpoint))) {
+    const publicEndpoints = [
+      "/auth/login",
+      "/auth/register",
+      "/auth/refresh",
+      "/auth/google/callback",
+    ];
+    if (
+      publicEndpoints.some((endpoint) =>
+        originalRequest?.url?.includes(endpoint)
+      )
+    ) {
       console.log("🔓 Public endpoint, skip refresh");
       return Promise.reject(error);
     }
 
     // Handle 401 (Unauthorized)
     if (error.response?.status === 401 && !originalRequest?._retry) {
-      
       // Jika sedang refresh, masukkan ke queue
       if (isRefreshing) {
         console.log("⏳ Refresh in progress, adding to queue");
@@ -95,10 +103,10 @@ api.interceptors.response.use(
       try {
         // Panggil refresh endpoint
         const res = await api.post("/auth/refresh");
-        
+
         console.log("✅ Refresh response:", res.data);
-        
-        const newAccessToken = res.data.data.accessToken;
+
+        const newAccessToken = res.data.accessToken;
 
         if (!newAccessToken) {
           throw new Error("No access token in refresh response");
@@ -108,7 +116,9 @@ api.interceptors.response.use(
         localStorage.setItem("accessToken", newAccessToken);
 
         // Update headers
-        api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
+        api.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${newAccessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
         // Process queue
@@ -117,12 +127,11 @@ api.interceptors.response.use(
 
         console.log("🔁 Retrying original request:", originalRequest.url);
         return api(originalRequest);
-        
       } catch (refreshError) {
         console.error("❌ Refresh failed:", {
           message: refreshError.message,
           response: refreshError.response?.data,
-          status: refreshError.response?.status
+          status: refreshError.response?.status,
         });
 
         processQueue(refreshError, null);

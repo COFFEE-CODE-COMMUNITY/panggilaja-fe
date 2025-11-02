@@ -1,62 +1,72 @@
-import React, { useEffect, useState } from 'react'
-import AuthLayout from '../../components/modules/layouts/AuthLayout'
-import NavLink from '../../components/modules/navigation/NavLink'
-import RegisterForm from './sections/RegisterForm'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { registerUser, selectAuthMessage, selectAuthStatus } from '../../features/authSlice'
+import React, { useEffect, useState } from "react";
+import AuthLayout from "../../components/modules/layouts/AuthLayout";
+import NavLink from "../../components/modules/navigation/NavLink";
+import RegisterForm from "./sections/RegisterForm";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  registerUser,
+  selectAuthMessage,
+  selectAuthStatus,
+} from "../../features/authSlice";
 
 const RegisterPage = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const message = useSelector(selectAuthMessage)
-  const status = useSelector(selectAuthStatus)
+  const message = useSelector(selectAuthMessage);
+  const status = useSelector(selectAuthStatus);
 
   const handleChangeUsername = (e) => {
-    setUsername(e.target.value)
-  }
+    setUsername(e.target.value);
+  };
 
   const handleChangeEmail = (e) => {
-    setEmail(e.target.value)
-  }
+    setEmail(e.target.value);
+  };
 
   const handleChangePassword = (e) => {
-    setPassword(e.target.value)
-  }
+    setPassword(e.target.value);
+  };
 
   const handleChangeConfirmPassword = (e) => {
-    setConfirmPassword(e.target.value)
-  }
+    setConfirmPassword(e.target.value);
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    if(username && email && password === confirmPassword){
-      dispatch(registerUser({username, email, password}))
+    e.preventDefault();
+    if (username && email && password === confirmPassword) {
+      dispatch(registerUser({ username, email, password }));
     }
-  }
+  };
 
   useEffect(() => {
-    if (status === 'success') {
-        navigate('/form-detail-profile'); 
+    if (status === "success") {
+      navigate("/form-detail-profile");
     }
   }, [status]);
 
-  console.log(status)
+  console.log(status);
 
   return (
     <AuthLayout
-      title='Buat akun baru'
-      subtitle='Daftar & Dapatkan Jasa Terbaik di Dekat Anda'
-      type='Daftar'
+      // title='Buat akun baru'
+      // subtitle='Daftar & Dapatkan Jasa Terbaik di Dekat Anda'
+      type="Daftar"
       navAuth={
-        <p className='text-h6 lg:text-h5 text-primary w-full text-center'>
-          Sudah punya akun? <NavLink className="font-semibold text-primary" link='/login' text='masuk disini'/>'
+        <p className="text-h6 lg:text-h5 text-primary w-full text-center">
+          Sudah punya akun?{" "}
+          <NavLink
+            className="font-semibold text-primary"
+            link="/login"
+            text="masuk disini"
+          />
+          '
         </p>
       }
     >
@@ -69,7 +79,7 @@ const RegisterPage = () => {
         message={message}
       />
     </AuthLayout>
-  )
-}
+  );
+};
 
-export default RegisterPage
+export default RegisterPage;
