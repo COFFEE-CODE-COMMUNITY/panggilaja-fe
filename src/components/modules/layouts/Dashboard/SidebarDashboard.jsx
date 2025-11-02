@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import Button from "../../../common/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { changeAccount, resetChangeAccountStatus, selectChangeAccountMessage, selectChangeAccountStatus } from "../../../../features/authSlice";
 
 export const SidebarDashboard = () => {
@@ -11,6 +11,8 @@ export const SidebarDashboard = () => {
   const statusChange = useSelector(selectChangeAccountStatus)
   const messageChange = useSelector(selectChangeAccountMessage)
   
+  const [mouseEnter, setMouseEnter] = useState(false)
+
   useEffect(() => {
       if(statusChange === 'success'){
           dispatch(resetChangeAccountStatus())
@@ -29,7 +31,11 @@ export const SidebarDashboard = () => {
     )
   }
   return (
-    <div className="w-1/5 bg-white border-r border-gray-200 hidden lg:flex lg:flex-col lg:px-[15px] lg:py-[25px] h-full fixed left-0">
+    <div 
+      className="w-[100px] hover:w-1/5  border-r border-gray-200 hidden lg:flex lg:flex-col lg:px-[15px] lg:py-[25px] h-screen sticky left-0 transition-all duration-500 z-100"
+      onMouseEnter={() => setMouseEnter(true)}
+      onMouseLeave={() => setMouseEnter(false)}
+    >
       <div className="h-full flex flex-col gap-[15px]">
         <NavLink 
           to={null} 
@@ -37,21 +43,28 @@ export const SidebarDashboard = () => {
           className={({ isActive }) => 
             isActive ? 'px-[20px] py-[15px] rounded-[35px] bg-gray-50' : 'text-black px-[20px] py-[15px] font-light'
         }>
-            Kelola Pesanan
+          {mouseEnter ? 'Kelola Pesanan' : ''}
         </NavLink>
         <NavLink 
           to='manage-services' 
           className={({ isActive }) => 
             isActive ? 'px-[20px] py-[15px] rounded-[35px] bg-gray-50' : 'text-black px-[20px] py-[15px] font-light'
         }>
-            Kelola Jasa
+          {mouseEnter ? 'Kelola Jasa' : ''}
         </NavLink>
         <NavLink 
           to='manage-profile' 
           className={({ isActive }) => 
             isActive ? 'px-[20px] py-[15px] rounded-[35px] bg-gray-50' : 'text-black px-[20px] py-[15px] font-light'
         }>
-            Kelola Profile
+          {mouseEnter ? 'Kelola Profile' : ''}
+        </NavLink>
+        <NavLink 
+          to='chat' 
+          className={({ isActive }) => 
+            isActive ? 'px-[20px] py-[15px] rounded-[35px] bg-gray-50' : 'text-black px-[20px] py-[15px] font-light'
+        }>
+          {mouseEnter ? 'Pesan' : ''}
         </NavLink>
       </div>
       <div>

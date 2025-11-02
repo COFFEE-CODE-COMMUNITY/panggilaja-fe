@@ -88,10 +88,16 @@ api.interceptors.response.use(
         const newAccessToken = res.data.data.accessToken;
 
         if (!newAccessToken) {
-          throw new Error("No access token in refresh response");
+            throw new Error("No access token in refresh response");
         }
 
+        // 1. Decode token baru untuk mendapatkan user data
+        const decodedToken = jwtDecode(newAccessToken);
+        const newUserData = decodedToken.user; 
+        
+        // 2. Simpan token dan data user baru (yang mungkin berisi role yang salah/buyer)
         localStorage.setItem("accessToken", newAccessToken);
+        localStorage.setItem("user", JSON.stringify(newUserData)); // 👈 TAMBAHKAN INI
 
         // Update headers
         api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
@@ -100,6 +106,10 @@ api.interceptors.response.use(
         // Process queue
         processQueue(null, newAccessToken);
         isRefreshing = false;
+        
+        // ⚠️ Tambahkan peringatan jika role berbeda dari yang diharapkan (opsional)
+        console.warn(`⚠️ Token direfresh. Role yang dihasilkan: ${newUserData?.active_role}`);
+
 
         return api(originalRequest);
         

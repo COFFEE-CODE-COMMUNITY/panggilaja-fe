@@ -15,12 +15,6 @@ const EditService = () => {
         dispatch(getServicesById(id))
     },[id, dispatch])
 
-    if(status === 'loading'){
-        return (
-            <div>loading...</div>
-        )
-    }
-
   return (
     <div className='w-full flex-1 min-h-[85vh]'>
         <p>Edit jasa</p>

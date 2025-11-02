@@ -248,8 +248,6 @@ const authSlice = createSlice({
                 state.accessToken = null
                 state.error = null
                 state.status = 'idle'
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('user')
             })
 
             // Google OAuth login
@@ -352,17 +350,17 @@ const authSlice = createSlice({
                 }
 
                 const decodeToken = jwtDecode(accessToken)
-                const userData = decodeToken.user || user
+                const userDataFromToken = decodeToken.user 
+                
+                const finalUserData = userDataFromToken || user 
 
                 state.changeAccountStatus = status
                 state.changeAccountMessage = message
                 state.accessToken = accessToken
-                state.user = userData
-
-                console.log(`ini testing : `+accessToken)
+                state.user = finalUserData 
 
                 localStorage.setItem('accessToken', accessToken)
-                localStorage.setItem('user', JSON.stringify(userData))
+                localStorage.setItem('user', JSON.stringify(finalUserData))
             })
             .addCase(changeAccount.rejected, (state, action) => {
                 state.changeAccountStatus = 'failed'

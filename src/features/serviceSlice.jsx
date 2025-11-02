@@ -49,6 +49,18 @@ export const addFavoriteService = createAsyncThunk(
     }
 )
 
+export const deleteFavoriteService = createAsyncThunk(
+    'services/deleteFavoriteService',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.delete(`/favorites/${id}`)
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Gagal menambah favorit')
+        }
+    }
+)
+
 export const getFavoriteService = createAsyncThunk(
     'services/getFavoriteService',
     async (id, { rejectWithValue }) => {
@@ -150,6 +162,9 @@ const serviceSlice = createSlice({
 
         deleteServiceStatus : 'idle',
         deleteServiceError : null,
+
+        deleteFavoriteServiceStatus : 'idle',
+        deleteFavoriteServiceError : null,
     }),
     reducers : {
         resetEditStatus : (state) => {
@@ -164,6 +179,14 @@ const serviceSlice = createSlice({
             state.deleteServiceStatus = 'idle'
             state.deleteServiceError = ''
         },
+        resetAddFavoritesStatus : (state) => {
+            state.addFavoriteStatus = 'idle'
+            state.addServiceError = ''
+        },
+        resetDeleteFavoritesStatus : (state) => {
+            state.deleteFavoriteServiceStatus = 'idle'
+            state.deleteFavoriteServiceError = ''
+        }
     },
     extraReducers : (builder) => {
         builder
@@ -219,7 +242,7 @@ const serviceSlice = createSlice({
             })
             .addCase(addFavoriteService.rejected, (state, action) => {
                 state.addFavoriteStatus = 'error';
-                state.addFavoriteError = action.payload || action.error.message
+                state.addFavoriteError = action.payload.message
             })
 
             //get favorite service
@@ -288,6 +311,19 @@ const serviceSlice = createSlice({
                 state.deleteServiceStatus = 'error';
                 state.deleteServiceError = action.payload || action.error.message
             })
+
+            //delete service
+            .addCase(deleteFavoriteService.pending, (state) => {
+                state.deleteFavoriteServiceStatus = 'loading'
+                state.deleteFavoriteServiceError = null
+            })
+            .addCase(deleteFavoriteService.fulfilled, (state) => {
+                state.deleteFavoriteServiceStatus = 'success';
+            })
+            .addCase(deleteFavoriteService.rejected, (state, action) => {
+                state.deleteFavoriteServiceStatus = 'error';
+                state.deleteFavoriteServiceError = action.payload || action.error.message
+            })
     }
 })
 
@@ -296,7 +332,7 @@ export const {
     selectById : selectdServiceById
 } = serviceEntity.getSelectors(state => state.service)
 
-export const {resetEditStatus, resetDeleteStatus, resetAddStatus} = serviceSlice.actions
+export const {resetEditStatus, resetDeleteStatus, resetAddStatus, resetAddFavoritesStatus, resetDeleteFavoritesStatus} = serviceSlice.actions
 
 export const selectSelectedService = (state) => state.service.selectedService
 export const selectSelectedServiceStatus = (state) => state.service.selectedServiceStatus
@@ -326,6 +362,9 @@ export const selectEditServicesServiceError = (state) => state.service.editServi
 
 export const selectDeleteServiceStatus = (state) => state.service.deleteServiceStatus
 export const selectDeleteServiceError = (state) => state.service.deleteServiceError
+
+export const selectDeleteFavoriteServiceStatus = (state) => state.service.deleteFavoriteServiceStatus
+export const selectDeleteFavoriteServiceError = (state) => state.service.deleteFavoriteServiceError
 
 export const selectAllServiceStatus = (state) => state.service.allServiceStatus
 export const selectAllServiceError = (state) => state.service.allServiceError

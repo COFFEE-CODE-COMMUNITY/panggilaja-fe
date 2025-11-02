@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import Input from '../../common/Input'
 import { FaSearch, FaArrowLeft } from 'react-icons/fa'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { getSellers, selectSellers, selectSellerStatus } from '../../../features/sellerSlice'
+import { getSellers, selectSellers, selectSellerStatus } from '../../../../features/sellerSlice'
+import Input from '../../../common/Input'
 
 const ChatLayout = () => {
   const [chatMobile, setChatMobile] = useState(false)
   const [searchContact, setSearchContact] = useState('')  
   
   const dispatch = useDispatch()
+  const location = useLocation()
 
   const sellers = useSelector(selectSellers)
   const sellerStatus = useSelector(selectSellerStatus)
@@ -63,7 +64,7 @@ const ChatLayout = () => {
                   </div>
                 </NavLink>
             ))}
-
+              
             {searchContact && 
               searchSellerResult?.map((contact) => (
                 <NavLink 

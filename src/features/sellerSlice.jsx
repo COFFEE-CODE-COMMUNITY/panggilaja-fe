@@ -110,6 +110,9 @@ const seller = createSlice({
     reducers: {
       resetSellerStatusDelete : (state) => {
         state.statusDelete = 'idle'
+      },
+      resetServiceSeller : (state) => {
+        state.statusGetServiceSeller = 'idle'
       }
     },
     extraReducers: (builder) => {
@@ -209,7 +212,7 @@ const seller = createSlice({
     },
 });
 
-export const {resetSellerStatusDelete} = seller.actions
+export const {resetSellerStatusDelete, resetServiceSeller} = seller.actions
 
 export const selectSellers = (state) => state.seller.sellers;
 export const selectSelectedSeller = (state) => state.seller.selectedSeller;

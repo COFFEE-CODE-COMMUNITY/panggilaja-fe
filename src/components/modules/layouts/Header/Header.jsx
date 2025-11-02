@@ -39,13 +39,19 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
     },[statusProfile, dispatch, user?.id_buyer])
 
     useEffect(() => {
-        if(!token){
-            setSidebarProfile(false)
-        } else {
-            dispatch(getFavoriteService(user?.id))
+        if (!token) {
+            setSidebarProfile(false);
+        } 
+        
+        // Periksa token dan user ID sebelum memanggil getFavoriteService
+        if (token && user?.id) { 
+            dispatch(getFavoriteService(user.id)); // Panggil dengan ID yang sudah pasti ada
         }
-        dispatch(getServices())
-    },[token])
+        
+        // getServices dipanggil secara terpisah karena tidak bergantung pada user
+        dispatch(getServices()); 
+
+    }, [token, user?.id, dispatch]);
 
     useEffect(() => {
         if(sidebarMobile){
@@ -55,8 +61,6 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
 
     const statusChange = useSelector(selectChangeAccountStatus)
     
-    let favoritesService = []
-
     if (statusChange === 'loading') {
         return (
             <div className='flex justify-center items-center min-h-screen'>
@@ -73,16 +77,21 @@ const Header = ({handleChange, handleSubmit, setSidebarProfile, sidebarProfile, 
         navigate('/dashboard')
     }
 
-    if(favoritesStatus === 'success'){
-        favoritesService = services.filter((service, index) => {
-            const favoriteItem = favorites.data && favorites.data[index];
-            
-            return favoriteItem && (service.id === favoriteItem.service_id);
-        });
-    }
+    let favoritesService = [];
+
+    if (favoritesStatus === 'success' && favorites.data && services.length > 0) {
+        // 1. Dapatkan semua ID service yang difavoritkan
+        const favoritedServiceIds = favorites.data.map(fav => fav.service_id);
+        
+        // 2. Filter list services utama menggunakan set ID
+        favoritesService = services.filter(service => 
+            favoritedServiceIds.includes(service.id)
+        );
+    }
 
     const haveSellerAccount = user?.available_roles.length > 1    
 
+    console.log(favoritesService)
     return (
         <>
             <div className='md:py-[15px] py-[10px] w-full flex sm:justify-center justify-between xl:gap-[35px] lg:gap-[27px] md:gap-[19px] sm:gap-[10px] gap-[2px] items-center xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] sticky top-0 bg-white z-200 border-b-2 border-gray-100'>

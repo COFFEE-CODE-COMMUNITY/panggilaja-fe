@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../../features/authSlice'
-import { getAllServicesByIdSeller, selectSellerServices, selectSellerStatus, selectServiceSellerStatus } from '../../../features/sellerSlice'
+import { getAllServicesByIdSeller, resetServiceSeller, selectSellerServices, selectSellerStatus, selectServiceSellerStatus } from '../../../features/sellerSlice'
 import { Link } from 'react-router-dom'
 import { deleteService, resetDeleteStatus, selectDeleteServiceStatus } from '../../../features/serviceSlice'
 
@@ -15,11 +15,10 @@ const TableServices = () => {
     const statusDelete = useSelector(selectDeleteServiceStatus)
 
     useEffect(() => {
-        // Memastikan user ada dan id_seller ada sebelum dispatch
         if (user && user.id_seller) { 
             dispatch(getAllServicesByIdSeller(user.id_seller));
         }
-    }, [dispatch, user]); // <-- TAMBAHKAN user di sini
+    }, [dispatch, user]); 
 
     useEffect(() => {
         if (statusDelete === 'success') {
@@ -27,14 +26,13 @@ const TableServices = () => {
             if (user?.id_seller) {
                 dispatch(getAllServicesByIdSeller(user?.id_seller));
                 dispatch(resetDeleteStatus())
+                dispatch(resetServiceSeller())
             }
         }
-    }, [dispatch])
+    }, [dispatch, statusDelete])
 
     console.log(servicesSeller)
     console.log(status)
-    console.log(user)
-
   return (
     <div className='h-full'>
         <table className='w-full table-auto text-left rounded-[15px] overflow-hidden'>
@@ -46,7 +44,7 @@ const TableServices = () => {
                 </tr>
             </thead>
             <tbody className='bg-gray-50/60'>
-                {status === 'success' && servicesSeller.map((service) => (
+                {status === 'success' && servicesSeller.data.map((service) => (
                     <tr key={service.id}>
                         <td className='py-[15px] px-[10px]'>
                             <div className='flex gap-[15px] items-center'>
@@ -66,7 +64,12 @@ const TableServices = () => {
                                     onClick={() => dispatch(deleteService(service.id))}
                                 >        
                                 Hapus</span>
-                                <Link to={`edit-service/${service.id}`} className='px-[10px] py-[5px] border-2 border-yellow-600 text-yellow-600 rounded-[45px]'>Edit</Link>
+                                <Link 
+                                    to={`edit-service/${service.id}`} 
+                                    className='px-[10px] py-[5px] border-2 border-yellow-600 text-yellow-600 rounded-[45px]'
+                                >
+                                    Edit
+                                </Link>
                                 <span className='px-[10px] py-[5px] border-2 border-primary text-primary rounded-[45px]'>Arsip</span>
                             </div>
                         </td>

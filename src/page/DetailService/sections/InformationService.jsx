@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
-import { FaStar, FaRegHeart } from 'react-icons/fa'
+import { FaStar, FaRegHeart, FaHeart } from 'react-icons/fa'
 import Button from '../../../components/common/Button'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { addFavoriteService, getFavoriteService, getReviewServicesById, selectAddFavoriteServiceError, selectAddFavoriteServiceStatus, selectFavoriteService, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
+import { addFavoriteService, deleteFavoriteService, getFavoriteService, getReviewServicesById, resetAddFavoritesStatus, resetDeleteFavoritesStatus, selectAddFavoriteServiceError, selectAddFavoriteServiceStatus, selectDeleteFavoriteServiceError, selectDeleteFavoriteServiceStatus, selectFavoriteService, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
 import { selectCurrentUser } from '../../../features/authSlice'
 
 const InformationService = ({sellerName, idProvider,  idService, nameService, totalReview, topPrice, basePrice, description, totalReviewSeller, }) => {
@@ -11,10 +11,15 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
     const reviews = useSelector(selectReviewService)
     const status = useSelector(selectReviewServiceStatus)
 
+    const statusFavorite = useSelector(selectAddFavoriteServiceStatus)
+    const messageFavorite = useSelector(selectAddFavoriteServiceError)
+
     const user = useSelector(selectCurrentUser)
 
     const statusAdd = useSelector(selectAddFavoriteServiceStatus)
     const errorAdd = useSelector(selectAddFavoriteServiceError)
+
+    const favorites = useSelector(selectFavoriteService)
 
     useEffect(() => {
         if(idProvider){
@@ -26,6 +31,31 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
         dispatch(addFavoriteService(idService));
     };
 
+    useEffect(() => {
+        if (statusAdd === 'success') {            
+            if (user?.id) {
+                dispatch(getFavoriteService(user.id))
+            }
+            dispatch(resetAddFavoritesStatus())
+        } 
+    }, [statusAdd, errorAdd, dispatch, user?.id]);
+
+    let isServiceFavorite = favorites?.data?.find((favorite) => favorite.service_id === idService)
+
+    const deleteFavoriteStatus = useSelector(selectDeleteFavoriteServiceStatus)
+    const deleteFavoriteMessage = useSelector(selectDeleteFavoriteServiceError)
+
+    useEffect(() => {
+        if (deleteFavoriteStatus === 'success') {            
+            if (user?.id) {
+                dispatch(getFavoriteService(user.id))
+            }
+            dispatch(resetDeleteFavoritesStatus())
+        } 
+    }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
+
+    console.log(deleteFavoriteMessage)
+    console.log(deleteFavoriteStatus)
 
   return (
     <div className='lg:h-full h-1/2 lg:w-[45%] w-full flex flex-col gap-[30px] lg:py-[25px] py-[10px] px-[15px]'>
@@ -76,12 +106,23 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
                             Negoin aja
                         </Button>
                     </Link>
-                    <Button 
-                        className='h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center'
-                        onClick={handleAddFavorite}
-                    >
-                        <FaRegHeart className='text-gray-500 text-[20px]'/>
-                    </Button>
+                    {isServiceFavorite ? (
+                        <Button 
+                            className='h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center'
+                            onClick={() => dispatch(deleteFavoriteService(isServiceFavorite.id))}
+                        >
+                            <FaHeart 
+                                className={`text-red-300 text-[20px]`}
+                            />
+                        </Button>
+                    ) : (
+                        <Button 
+                            className='h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center'
+                            onClick={handleAddFavorite}
+                        >
+                            <FaRegHeart className={`text-gray-300 text-[20px]`}/>
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>

@@ -26,13 +26,13 @@ import SettingLayout from "./components/modules/layouts/SettingLayout";
 import { GuestRoute, HomeRoute, ProtectedRoute } from "./ProtectedRoute";
 import ServiceMitraLayout from "./components/modules/layouts/ServiceMitraLayout";
 import TambahJasaForm from "./page/MitraForm/sections/TambahJasaForm";
-import ChatLayout from "./components/modules/layouts/ChatLayout";
 import EditProfile from "./page/Setting/EditProfile";
 import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
 import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
 import GoogleCallback from "./page/Auth/GoogleCallback"; // Capital 'Auth'
 import ManageProfile from "./page/Dashboard/ManageProfile";
+import ChatLayout from "./components/modules/layouts/Chat/ChatLayout";
 
 const Router = createBrowserRouter([
   {
@@ -169,6 +169,10 @@ const Router = createBrowserRouter([
       {
         path: "manage-profile",
         element: <ManageProfile />,
+      },
+      {
+        path: "chat",
+        element: <ChatLayout />,
       },
       {
         path: "manage-services/add-service",
