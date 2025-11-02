@@ -8,10 +8,10 @@ export const ProtectedRoute = ({ children }) => {
   console.log('🔒 ProtectedRoute - Checking auth for:', location.pathname);
   console.log('Token exists:', !!token);
 
-  if (!token) {
-    console.log('❌ No token, redirecting to login');
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  // if (!token) {
+  //   console.log('❌ No token, redirecting to login');
+  //   return <Navigate to="/login" state={{ from: location }} replace />;
+  // }
 
   console.log('✅ Token found, rendering protected content');
   return children;
