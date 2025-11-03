@@ -21,27 +21,23 @@ const AppLayout = () => {
     }
   },[dispatch])
 
-  useEffect(() => {
-    if (!address || !user?.id_buyer) return;
+  console.log(address)
+
+  // useEffect(() => {
+  //   if (!address || !user?.id_buyer) return;
     
-    if (address?.data && address.data.alamat === null) {
-      if (location.pathname !== '/form-detail-profile') {
-        navigate('/form-detail-profile', { replace: true })
-      }
-    }
-  }, [address, user, location.pathname, navigate])
+  //   if (address?.data && address.data.alamat === null) {
+  //     if (location.pathname !== '/form-detail-profile') {
+  //       navigate('/form-detail-profile', { replace: true })
+  //     }
+  //   }
+  // }, [address, user, location.pathname, navigate])
 
   const noFooterPaths = [
     '/chat', '/service'
   ];
 
   const shouldHideFooter = noFooterPaths.some(path => location.pathname.startsWith(path));
-
-  useEffect(() => {
-      if (user && user.id_buyer) {
-          dispatch(seeAddress(user.id_buyer));
-      }
-  }, [dispatch, user]); 
 
   let containerClasses = 'h-full'
   let mainContentClasses = '';

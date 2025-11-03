@@ -21,6 +21,8 @@ const Header = () => {
     const searchParams = new URLSearchParams(location.search)
     const urlSearchText = searchParams.get('q') || '' 
 
+    console.log(user)
+
     const authStatus = useSelector(selectAuthStatus)
 
     const profile = useSelector(selectSeeProfile)
@@ -117,7 +119,6 @@ const Header = () => {
 
     const haveSellerAccount = user?.available_roles.length > 1    
 
-    console.log(haveSellerAccount)
     return (
     <>
       {header && (
@@ -222,22 +223,37 @@ const Header = () => {
                 ) : (
                   <>
                     {/* Profile Avatar - Desktop */}
-                    <button
-                      className="hidden sm:block relative group"
-                      onClick={() => {
-                          setSidebarProfile(!sidebarProfile)
-                          setFavorite(false)
-                          setChat(false)
-                          setOrder(false)
-                      }}
-                    >
-                      <img
-                        className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-1 border-gray-50 group-hover:border-primary transition-all cursor-pointer"
-                        src={profile?.foto_buyer || "/default-avatar.png"}
-                        alt="Profile"
-                      />
-                    </button>
-
+                    {profile?.foto_buyer ? (
+                      <button
+                        className="hidden sm:block relative group cursor-pointer"
+                        onClick={() => {
+                            setSidebarProfile(!sidebarProfile)
+                            setFavorite(false)
+                            setChat(false)
+                            setOrder(false)
+                        }}
+                      >
+                          <img
+                            className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-1 border-gray-50 group-hover:border-primary transition-all cursor-pointer"
+                            src={profile?.foto_buyer || "/default-avatar.png"}
+                            alt="Profile"
+                          />
+                      </button>
+                      ) : (
+                        <button  
+                          className="group hidden sm:block relative group cursor-pointer h-10 w-10 bg-gray-100 rounded-full hover:scale-105 transition-all"
+                          onClick={() => {
+                              setSidebarProfile(!sidebarProfile)
+                              setFavorite(false)
+                              setChat(false)
+                              setOrder(false)
+                          }}
+                        >
+                          <FaUser className='group-hover:text-black/80 text-4xl p-1 border- rounded-full'/>
+                        </button>
+                      )
+                    }
+                  
                     {/* Search Icon - Mobile */}
                     <button
                       className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -400,11 +416,17 @@ const Header = () => {
             {/* Profile Header */}
             <Link to="profile-setting" onClick={() => setSidebarProfile(false)}>
               <div className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
-                <img
-                  src={profile?.foto_buyer || "/default-avatar.png"}
-                  alt="Profile"
-                  className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                />
+                {profile?.foto_buyer ? (
+                  <img
+                    src={profile?.foto_buyer || "/default-avatar.png"}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                  />
+                ) : (
+                  <div>
+                    <FaUser/>
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-800 truncate">
                     {user?.username}
@@ -417,7 +439,7 @@ const Header = () => {
             {/* Menu Items */}
             <div className="py-2">
               <button
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                 onClick={() => {
                   setFavorite(!favorite);
                   setOrder(false);
@@ -428,7 +450,7 @@ const Header = () => {
               </button>
 
               <button
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                 onClick={() => {
                   setFavorite(false);
                   setOrder(!order);
@@ -438,30 +460,41 @@ const Header = () => {
                 <span className="text-h5 text-gray-700">Pesanan</span>
               </button>
 
-              <Link to="/chat" onClick={() => setSidebarProfile(false)}>
+              <Link 
+                to="/chat" 
+                onClick={() => setSidebarProfile(false)}
+                className='cursor-pointer'
+              >
                 <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
                   <FaRegComment className="text-gray-400 text-base" />
                   <span className="text-h5 text-gray-700">Chat</span>
                 </div>
               </Link>
-
-              <button
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                onClick={() => dispatch(changeAccount({targetRole : "seller"}))}
-              >
-                <FaUser className="text-gray-400 text-base" />
-                <span className="text-h5 text-gray-700">Ganti Akun Seller</span>
-              </button>
+              
+              {haveSellerAccount && (
+                <button
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                  onClick={() => dispatch(changeAccount({targetRole : "seller"}))}
+                >
+                  <FaUser className="text-gray-400 text-base" />
+                  <span className="text-h5 text-gray-700">Ganti Akun Seller</span>
+                </button>
+              )}
             </div>
 
             {/* Logout Button */}
-            <button
-              className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 hover:bg-red-100 transition-colors border-t border-gray-100"
-              onClick={() => dispatch(logout())}
-            >
-              <IoMdLogOut className="text-red-500 text-base" />
-              <span className="text-h5 text-red-600 font-medium">Logout</span>
-            </button>
+            <div className='px-3 mb-2'>
+              <Button
+                className="flex justify-center w-full py-3 rounded-xl text-white font-medium hover:shadow-lg transition-all"
+                variant="primary"
+                onClick={() => {
+                    dispatch(logout())
+                    setSidebarMobile(false)
+                }}
+              >
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -519,23 +552,25 @@ const Header = () => {
                   <span className="text-base text-gray-700">Favorit</span>
                 </div>
               </Link>
-
-              {location.pathname !== "/partner" && (
-                <Link 
-                  to="/partner" 
-                  onClick={() => setSidebarMobile(false)}
-                >
-                  <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
-                    <FaUser className="text-gray-400 text-xl" />
-                    <span className="text-base text-gray-700">Jadi Mitra</span>
-                  </div>
-                </Link>
+              
+              {!haveSellerAccount && (
+                location.pathname !== "/partner" && (
+                  <Link 
+                    to="/partner" 
+                    onClick={() => setSidebarMobile(false)}
+                  >
+                    <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
+                      <FaUser className="text-gray-400 text-xl" />
+                      <span className="text-base text-gray-700">Jadi Mitra</span>
+                    </div>
+                  </Link>
+                )
               )}
             </div>
 
             {/* Logout Button */}
             <Button
-              className="w-full py-4 rounded-xl text-white font-medium hover:shadow-lg transition-all"
+              className="flex justify-center w-full py-4 rounded-xl text-white font-medium hover:shadow-lg transition-all"
               variant="primary"
               onClick={() => {
                   dispatch(logout())
