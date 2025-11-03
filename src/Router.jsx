@@ -33,6 +33,7 @@ import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
 import GoogleCallback from "./page/Auth/GoogleCallback"; // Capital 'Auth'
 import ManageProfile from "./page/Dashboard/ManageProfile";
 import ChatLayout from "./components/modules/layouts/Chat/ChatLayout";
+import Test from "./page/Search/Test";
 
 const Router = createBrowserRouter([
   {
@@ -182,6 +183,12 @@ const Router = createBrowserRouter([
       <GuestRoute>
         <LoginPage />
       </GuestRoute>
+    ),
+  },
+  {
+    path: "/test",
+    element: (
+      <Test />
     ),
   },
   {

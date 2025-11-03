@@ -9,6 +9,7 @@ import {
   FaShieldAlt,
   FaUser,
 } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 
 const RegisterForm = ({
   status,
@@ -21,7 +22,7 @@ const RegisterForm = ({
   handleGoogleRegister,
 }) => {
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
+    <div className="flex flex-col gap-2 md:gap-3">
       {/* Header Section */}
       <div className="text-center mb-4">
         <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">
@@ -68,8 +69,27 @@ const RegisterForm = ({
         </div>
       )}
 
+      {/* Google Register Button */}
+      <Button
+        type="button"
+        onClick={handleGoogleRegister}
+        className="group w-full h-12 md:h-14 text-base md:text-lg font-semibold bg-white text-gray-700 border-2 border-gray-100 rounded-3xl flex justify-center items-center gap-3 hover:bg-gray-50/50 hover:border-gray-100 hover:shadow-sm transition-all duration-300 "
+      >
+        <FcGoogle className="text-xl group-hover:scale-110 transition-transform duration-300" />
+        <span>Daftar dengan Google</span>
+      </Button>
+
+      {/* Divider */}
+      <div className="relative flex items-center gap-4 my-2">
+        <div className="flex-1 border-t border-gray-200"></div>
+        <span className="text-gray-500 text-sm font-medium bg-white px-2">
+          atau
+        </span>
+        <div className="flex-1 border-t border-gray-200"></div>
+      </div>
+
       {/* Register Form */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <InputForm
           label="Username"
           type="text"
@@ -134,26 +154,6 @@ const RegisterForm = ({
         </Button>
       </form>
 
-      {/* Divider */}
-      <div className="relative flex items-center gap-4 my-2">
-        <div className="flex-1 border-t border-gray-200"></div>
-        <span className="text-gray-500 text-sm font-medium bg-white px-2">
-          atau daftar dengan
-        </span>
-        <div className="flex-1 border-t border-gray-200"></div>
-      </div>
-
-      {/* Google Register Button */}
-      <Button
-        type="button"
-        onClick={handleGoogleRegister}
-        className="group w-full h-12 md:h-14 text-base md:text-lg font-semibold bg-white text-gray-700 border-2 border-gray-200 rounded-xl flex justify-center items-center gap-3 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md transition-all duration-300"
-      >
-        <FaEnvelope className="text-sky-600 text-xl group-hover:scale-110 transition-transform duration-300" />
-        <span>Daftar dengan Google</span>
-      </Button>
-
-      {/* Sign In Link */}
       <div className="text-center pt-4 border-t border-gray-100">
         <p className="text-gray-600 text-sm md:text-base">
           Sudah punya akun?{" "}
@@ -166,7 +166,7 @@ const RegisterForm = ({
         </p>
       </div>
 
-      {/* Security Badge */}
+      {/* Security Badge
       <div className="flex items-center justify-center gap-6 pt-4">
         <div className="flex items-center gap-2 text-gray-500">
           <FaShieldAlt className="text-green-500" size={16} />
@@ -176,7 +176,7 @@ const RegisterForm = ({
           <FaCheckCircle className="text-blue-500" size={16} />
           <span className="text-xs">Data Terlindungi</span>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
