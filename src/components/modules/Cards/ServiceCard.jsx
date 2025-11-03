@@ -7,7 +7,7 @@ const ServiceCard = ({image, idService, serviceName, basePrice, topPrice, seller
   return (
     <Card 
         className='hover:scale-102 hover:shadow-sm transition-all duration-300 rounded-md'
-        to={`service/${idService}`}
+        to={`/service/${idService}`}
     >
         <img 
             src={image} 

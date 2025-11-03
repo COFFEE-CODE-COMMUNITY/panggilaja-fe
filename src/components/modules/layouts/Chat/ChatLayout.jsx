@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { FaSearch, FaArrowLeft } from 'react-icons/fa'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getSellers, selectSellers, selectSellerStatus } from '../../../../features/sellerSlice'
 import Input from '../../../common/Input'
+import { selectAccessToken } from '../../../../features/authSlice'
 
 const ChatLayout = () => {
   const [chatMobile, setChatMobile] = useState(false)
   const [searchContact, setSearchContact] = useState('')  
   
+  const token = useSelector(selectAccessToken)
   const dispatch = useDispatch()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const sellers = useSelector(selectSellers)
   const sellerStatus = useSelector(selectSellerStatus)
@@ -20,7 +23,11 @@ const ChatLayout = () => {
     searchSellerResult = sellers?.data.filter((seller) => seller.nama_toko.includes(searchContact))
   }
 
-  console.log(searchSellerResult)
+  useEffect(() => {
+    if(!token){
+      navigate('/login')
+    }
+  },[])
 
   useEffect(() => {
       dispatch(getSellers())

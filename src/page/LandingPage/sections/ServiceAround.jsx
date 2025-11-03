@@ -36,7 +36,7 @@ const ServiceAround = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if(address?.data?.kecamatan){
+    if(address?.data?.kecamatan && user?.id){
       dispatch(getServicesAround({id : user.id, kecamatan : address?.data?.kecamatan}))
     }
   },[address?.data?.kecamatan])

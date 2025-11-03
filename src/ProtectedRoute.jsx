@@ -8,12 +8,6 @@ export const ProtectedRoute = ({ children }) => {
   console.log('🔒 ProtectedRoute - Checking auth for:', location.pathname);
   console.log('Token exists:', !!token);
 
-  // if (!token) {
-  //   console.log('❌ No token, redirecting to login');
-  //   return <Navigate to="/login" state={{ from: location }} replace />;
-  // }
-
-  console.log('✅ Token found, rendering protected content');
   return children;
 };
 
@@ -32,21 +26,5 @@ export const HomeRoute = ({ children }) => {
   }
 
   console.log('✅ Logged in, showing home page');
-  return children;
-};
-
-// Guest Route - untuk halaman login/register (tidak boleh diakses jika sudah login)
-export const GuestRoute = ({ children }) => {
-  const token = localStorage.getItem('accessToken');
-
-  console.log('👤 GuestRoute - Checking auth');
-  console.log('Token exists:', !!token);
-
-  if (token) {
-    console.log('✅ Already logged in, redirecting to home');
-    return <Navigate to="/" replace />;
-  }
-
-  console.log('👋 Not logged in, showing guest page');
   return children;
 };

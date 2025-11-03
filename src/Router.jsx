@@ -23,7 +23,7 @@ import FormAfterRegist from "./page/FormDetailProfil/Index";
 import ChatPage from "./page/Order/Index";
 import ProfileSetting from "./page/Setting/ProfileSetting";
 import SettingLayout from "./components/modules/layouts/SettingLayout";
-import { GuestRoute, HomeRoute, ProtectedRoute } from "./ProtectedRoute";
+import { ProtectedRoute } from "./ProtectedRoute";
 import ServiceMitraLayout from "./components/modules/layouts/ServiceMitraLayout";
 import TambahJasaForm from "./page/MitraForm/sections/TambahJasaForm";
 import EditProfile from "./page/Setting/EditProfile";
@@ -180,9 +180,7 @@ const Router = createBrowserRouter([
   {
     path: "/login",
     element: (
-      <GuestRoute>
-        <LoginPage />
-      </GuestRoute>
+      <LoginPage />
     ),
   },
   {
@@ -194,9 +192,7 @@ const Router = createBrowserRouter([
   {
     path: "/register",
     element: (
-      <GuestRoute>
-        <RegisterPage />
-      </GuestRoute>
+      <RegisterPage />
     ),
   },
   // TAMBAHKAN ROUTE INI UNTUK GOOGLE OAUTH CALLBACK

@@ -51,7 +51,11 @@ const Header = () => {
   const searchParams = new URLSearchParams(location.search);
   const urlSearchText = searchParams.get("q") || "";
 
-  console.log(user);
+  console.log(user)
+
+  // useEffect(() => {
+  //   dispatch()
+  // },[dispatch, user?.available_roles])
 
   const authStatus = useSelector(selectAuthStatus);
 
@@ -149,7 +153,7 @@ const Header = () => {
     );
   }
 
-  const haveSellerAccount = user?.available_roles.length > 1;
+  const haveSellerAccount = user?.available_roles?.length > 1;
 
   return (
     <>

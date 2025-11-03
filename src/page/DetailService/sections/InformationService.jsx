@@ -4,7 +4,7 @@ import Button from '../../../components/common/Button'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFavoriteService, deleteFavoriteService, getFavoriteService, getReviewServicesById, resetAddFavoritesStatus, resetDeleteFavoritesStatus, selectAddFavoriteServiceError, selectAddFavoriteServiceStatus, selectDeleteFavoriteServiceError, selectDeleteFavoriteServiceStatus, selectFavoriteService, selectReviewService, selectReviewServiceStatus } from '../../../features/serviceSlice'
-import { selectCurrentUser } from '../../../features/authSlice'
+import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
 
 const InformationService = ({sellerName, idProvider,  idService, nameService, totalReview, topPrice, basePrice, description, totalReviewSeller, }) => {
     const dispatch = useDispatch()
@@ -15,6 +15,7 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
     const messageFavorite = useSelector(selectAddFavoriteServiceError)
 
     const user = useSelector(selectCurrentUser)
+    const token = useSelector(selectAccessToken)
 
     const statusAdd = useSelector(selectAddFavoriteServiceStatus)
     const errorAdd = useSelector(selectAddFavoriteServiceError)
@@ -22,7 +23,7 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
     const favorites = useSelector(selectFavoriteService)
 
     useEffect(() => {
-        if(idProvider){
+        if(idProvider && token){
             dispatch(getReviewServicesById(idProvider))
         }
     },[dispatch, idProvider])
@@ -118,7 +119,7 @@ const InformationService = ({sellerName, idProvider,  idService, nameService, to
                     ) : (
                         <Button 
                             className='h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center'
-                            onClick={handleAddFavorite}
+                            onClick={token ? handleAddFavorite : ''}
                         >
                             <FaRegHeart className={`text-gray-300 text-[20px]`}/>
                         </Button>
