@@ -1,14 +1,12 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import bgAuth from '../../../assets/bgAuth.jpg'
 
-const AuthLayout = ({title, subtitle, children, type, navAuth, reset}) => {
+const AuthLayout = ({title, subtitle, children, type, reset}) => {
   return (
-    <div className='flex min-h-screen relative '>
-      <div className='w-full md:w-1/2 min-h-screen'>
-        <Link to='/'>
-          <div className='lg:p-[10px] md:p-[8px] px-[5px] py-[10px] pl-[10px] sticky top-0 left-0 right-0 rounded-br-[40px] sm:bg-white bg-primary'>
-            <p link='/' className='text-h4 lg:text-h3 font-bold sm:text-primary text-white'>Panggil Aja</p>
-          </div>
+    <div className='flex h-screen relative overflow-hidden'>
+      <div className='w-full md:w-1/2 h-full'>
+        <Link to='/' className='text-h4 lg:text-h3 font-bold cursor-pointer text-primary lg:p-[10px] md:p-[8px] px-[5px] py-[10px] pl-[10px] fixed top-0 left-0 z-100'>
+          Panggil Aja
         </Link>
         <div className='flex justify-center items-center h-full rounded-tl-[40px] relative'>
           <div className='px-[30px] py-[20px] w-[532px] flex flex-col gap-[10px]'>
@@ -17,7 +15,6 @@ const AuthLayout = ({title, subtitle, children, type, navAuth, reset}) => {
               <p className='md:text-h5 text-h6 lg:text-secondary '>{subtitle}</p>
             </div>
             {children}
-            {navAuth}
           </div>
         </div>
       </div>

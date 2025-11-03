@@ -13,6 +13,18 @@ export const getServices = createAsyncThunk(
     }
 )
 
+export const getServicesAround = createAsyncThunk(
+    'services/getServicesAround',
+    async ({id, kecamatan}, { rejectWithValue }) => {
+        try {
+            const res = await api.get(`/users/${id}/services?kecamatan=${kecamatan}`)
+            return res.data;
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan')
+        }
+    }
+)
+
 export const getServicesById = createAsyncThunk(
     'services/getServicesById',
     async (id, { rejectWithValue }) => {
@@ -165,6 +177,10 @@ const serviceSlice = createSlice({
 
         deleteFavoriteServiceStatus : 'idle',
         deleteFavoriteServiceError : null,
+
+        servicesAroundStatus : 'idle',
+        servicesAround : null,
+        servicesAroundError : '',
     }),
     reducers : {
         resetEditStatus : (state) => {
@@ -324,6 +340,20 @@ const serviceSlice = createSlice({
                 state.deleteFavoriteServiceStatus = 'error';
                 state.deleteFavoriteServiceError = action.payload || action.error.message
             })
+
+            //service sround
+            .addCase(getServicesAround.pending, (state) => {
+                state.servicesAroundStatus = 'loading'
+                state.servicesAroundError = null
+            })
+            .addCase(getServicesAround.fulfilled, (state, action) => {
+                state.servicesAroundStatus = 'success';
+                state.servicesAround = action.payload.data
+            })
+            .addCase(getServicesAround.rejected, (state, action) => {
+                state.servicesAroundStatus = 'error';
+                state.servicesAroundError = action.payload.message || action.error.message
+            })
     }
 })
 
@@ -368,5 +398,9 @@ export const selectDeleteFavoriteServiceError = (state) => state.service.deleteF
 
 export const selectAllServiceStatus = (state) => state.service.allServiceStatus
 export const selectAllServiceError = (state) => state.service.allServiceError
+
+export const selectServiceAround = (state) => state.service.servicesAround
+export const selectServiceAroundStatus = (state) => state.service.servicesAroundStatus
+export const selectServiceAroundError = (state) => state.service.servicesAroundError
 
 export default serviceSlice.reducer
