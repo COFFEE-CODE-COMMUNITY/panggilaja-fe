@@ -42,9 +42,7 @@ const Router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: (
-          <LandingPage />
-        ),
+        element: <LandingPage />,
       },
       {
         path: "about",
@@ -52,15 +50,11 @@ const Router = createBrowserRouter([
       },
       {
         path: "partner",
-        element: (
-          <PartnerPage />
-        ),
+        element: <PartnerPage />,
       },
       {
         path: "service/:id",
-        element: (
-            <DetailService />
-        ),
+        element: <DetailService />,
       },
       {
         path: "service/chat/:id",
@@ -80,9 +74,7 @@ const Router = createBrowserRouter([
       },
       {
         path: "profile-service/:id",
-        element: (
-            <ProfileLayout />
-        ),
+        element: <ProfileLayout />,
         children: [
           {
             index: true,
@@ -115,7 +107,7 @@ const Router = createBrowserRouter([
             element: <ProfileSetting />,
           },
           {
-            path : 'edit',
+            path: "edit",
             element: <EditProfile />,
           },
         ],
@@ -130,7 +122,7 @@ const Router = createBrowserRouter([
       },
     ],
   },
-  
+
   {
     path: "partner/mitra-form",
     element: (
@@ -144,7 +136,7 @@ const Router = createBrowserRouter([
         element: <ProfileMitraForm />,
       },
       {
-        path: 'add-service',
+        path: "add-service",
         element: <TambahJasaForm />,
       },
     ],
