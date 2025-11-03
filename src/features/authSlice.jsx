@@ -187,8 +187,18 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 const { status, message, data } = action.payload
-                const { accessToken, userInfo } = data.user
+                
+                // ✅ PERBAIKAN: accessToken sekarang langsung di data, bukan nested
+                const accessToken = data.accessToken
 
+                if (!accessToken) {
+                    console.error("❌ Access token tidak ditemukan di response")
+                    state.status = 'failed'
+                    state.message = 'Token tidak valid'
+                    return
+                }
+
+                // ✅ Decode token untuk mendapatkan user data
                 const decodeToken = jwtDecode(accessToken)
                 const userData = decodeToken.user
                 
@@ -198,8 +208,11 @@ const authSlice = createSlice({
                 state.accessToken = accessToken
                 state.user = userData
 
+                // ✅ Simpan ke localStorage
                 localStorage.setItem('accessToken', accessToken)
                 localStorage.setItem('user', JSON.stringify(userData))
+
+                console.log("✅ Login successful, user data:", userData)
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.message = action.payload?.message || 'Login gagal'
