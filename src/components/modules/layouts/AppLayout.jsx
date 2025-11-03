@@ -4,7 +4,7 @@ import Header from './Header/Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectAccessToken, selectAuthStatus, selectCurrentUser } from '../../../features/authSlice'
-import { seeAddress, selectSeeAddress } from '../../../features/userSlice'
+import { seeAddress, selectSeeAddress, selectSeeAddressStatus } from '../../../features/userSlice'
 
 const AppLayout = () => {
   const dispatch = useDispatch()
@@ -20,18 +20,29 @@ const AppLayout = () => {
       dispatch(seeAddress(user?.id_buyer))
     }
   },[dispatch])
+  
+  const addressStatus = useSelector(selectSeeAddressStatus); // Pastikan selector ini ada
 
-  console.log(address)
+  useEffect(() => {    
+    // 1. Cek HANYA JIKA status pengambilan data sudah SUKSES
+    if (addressStatus === 'success') {
+        
+        const addressData = address?.data;
+        
+        // 2. Cek apakah properti alamat benar-benar kosong (null, undefined, atau string kosong)
+        // Note: Gunakan 'addressData' untuk memeriksa keberadaan objek alamat itu sendiri (jika database mengembalikan null)
+        const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
 
-  // useEffect(() => {
-  //   if (!address || !user?.id_buyer) return;
+        if (isAddressMissing) {
+            if (location.pathname !== '/form-detail-profile') {
+                navigate('/form-detail-profile', { replace: true });
+            }
+        }
+    }
     
-  //   if (address?.data && address.data.alamat === null) {
-  //     if (location.pathname !== '/form-detail-profile') {
-  //       navigate('/form-detail-profile', { replace: true })
-  //     }
-  //   }
-  // }, [address, user, location.pathname, navigate])
+    // 4. Dependency Array: Gunakan status untuk mengontrol kapan cek ini dijalankan.
+    // Tidak perlu 'address' atau 'user' secara langsung, cukup statusnya yang berubah.
+  }, [addressStatus, location.pathname, navigate]);
 
   const noFooterPaths = [
     '/chat', '/service'
