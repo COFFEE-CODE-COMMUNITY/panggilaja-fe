@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import NavLink from "../../navigation/NavLink";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
@@ -8,7 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   changeAccount,
   logout,
+  logoutUser,
+  resetChangeAccountStatus,
   selectAccessToken,
+  selectAuthStatus,
   selectChangeAccountStatus,
   selectCurrentUser,
 } from "../../../../features/authSlice";
@@ -17,9 +19,9 @@ import {
   FaRegComment,
   FaRegHeart,
   FaSearch,
+  FaShoppingBag,
   FaTimes,
   FaUser,
-  FaShoppingBag,
 } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
 import { IoMdLogOut } from "react-icons/io";
@@ -35,130 +37,121 @@ import {
   selectSeeProfile,
   selectSeeProfileStatus,
 } from "../../../../features/userSlice";
-=======
-import React, { useEffect, useState } from 'react'
-import NavLink from '../../navigation/NavLink'
-import Input from '../../../common/Input'
-import Button from '../../../common/Button'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { changeAccount, logout, logoutUser, resetChangeAccountStatus, selectAccessToken, selectAuthStatus, selectChangeAccountStatus, selectCurrentUser } from '../../../../features/authSlice'
-import { FaBars, FaRegComment, FaRegHeart, FaSearch, FaShoppingBag, FaTimes, FaUser } from 'react-icons/fa'
-import { MdSearch } from 'react-icons/md'
-import { IoMdLogOut } from 'react-icons/io'
-import { getFavoriteService, getServices, selectAllService, selectFavoriteService, selectFavoriteServiceStatus } from '../../../../features/serviceSlice'
-import { seeProfile, selectSeeProfile, selectSeeProfileStatus } from '../../../../features/userSlice'
-import { selectSearchText, setSearchText } from '../../../../features/searchSlice'
->>>>>>> 7122e4237a6859c3e303ec762df253e625aa2225
+import {
+  selectSearchText,
+  setSearchText,
+} from "../../../../features/searchSlice";
 
 const Header = () => {
-    const user = useSelector(selectCurrentUser)
-    const token = useSelector(selectAccessToken)
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const location = useLocation()
-    const searchParams = new URLSearchParams(location.search)
-    const urlSearchText = searchParams.get('q') || '' 
+  const user = useSelector(selectCurrentUser);
+  const token = useSelector(selectAccessToken);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const urlSearchText = searchParams.get("q") || "";
 
-    console.log(user)
+  console.log(user);
 
-    const authStatus = useSelector(selectAuthStatus)
+  const authStatus = useSelector(selectAuthStatus);
 
-    const profile = useSelector(selectSeeProfile)
-    const statusProfile = useSelector(selectSeeProfileStatus)
-    
-    const searchText = useSelector(selectSearchText)
-  
-    const [sidebarProfile, setSidebarProfile] = useState(false)
-    const [sidebarMobile, setSidebarMobile] = useState(false)
+  const profile = useSelector(selectSeeProfile);
+  const statusProfile = useSelector(selectSeeProfileStatus);
 
-    const favorites = useSelector(selectFavoriteService)
-    const favoritesStatus = useSelector(selectFavoriteServiceStatus)
-    const services = useSelector(selectAllService)
+  const searchText = useSelector(selectSearchText);
 
-    const [favorite, setFavorite] = useState(false)
-    const [chat, setChat] = useState(false)
-    const [searchMobile, setSearchMobile] = useState(false)
-    const [iconSearch, setIconSearch] = useState(true)
-    const [order, setOrder] = useState(false)
-    const [header, setHeader] = useState(true)
-    const [search, setSearch] = useState(urlSearchText || searchText)
-  
-    const handleChange = (e) => {
-      setSearch(e.target.value)
+  const [sidebarProfile, setSidebarProfile] = useState(false);
+  const [sidebarMobile, setSidebarMobile] = useState(false);
+
+  const favorites = useSelector(selectFavoriteService);
+  const favoritesStatus = useSelector(selectFavoriteServiceStatus);
+  const services = useSelector(selectAllService);
+
+  const [favorite, setFavorite] = useState(false);
+  const [chat, setChat] = useState(false);
+  const [searchMobile, setSearchMobile] = useState(false);
+  const [iconSearch, setIconSearch] = useState(true);
+  const [order, setOrder] = useState(false);
+  const [header, setHeader] = useState(true);
+  const [search, setSearch] = useState(urlSearchText || searchText);
+
+  const handleChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(setSearchText(search));
+    const targetPath = search
+      ? `/search-result?q=${encodeURIComponent(search)}`
+      : "/search-result";
+    navigate(targetPath);
+  };
+
+  useEffect(() => {
+    setSearch(urlSearchText);
+    dispatch(setSearchText(urlSearchText));
+  }, [location.search, dispatch]);
+
+  useEffect(() => {
+    if (sidebarProfile) {
+      setSidebarProfile(false);
     }
+  }, [location.pathname]);
 
-    const handleSubmit = (e) => {
-      e.preventDefault()
-      dispatch(setSearchText(search)) 
-      const targetPath = search ? `/search-result?q=${encodeURIComponent(search)}` : '/search-result';
-      navigate(targetPath)
+  useEffect(() => {
+    if (user?.id_buyer && statusProfile === "idle" && !profile) {
+      dispatch(seeProfile(user.id_buyer));
     }
+  }, [statusProfile, dispatch, user?.id_buyer]);
 
-    useEffect(() => {
-      setSearch(urlSearchText)
-      dispatch(setSearchText(urlSearchText))
-    }, [location.search, dispatch]) 
-    
-    useEffect(() => {
-      if(sidebarProfile){
-          setSidebarProfile(false)
-      }
-    },[location.pathname])
-
-    useEffect(() => {
-      if (user?.id_buyer && statusProfile === 'idle' && !profile) {
-          dispatch(seeProfile(user.id_buyer))
-      }
-    },[statusProfile, dispatch, user?.id_buyer])
-
-    useEffect(() => {
-      if (!token) {
-          setSidebarProfile(false)
-      } 
-      if (token && user?.id) { 
-          dispatch(getFavoriteService(user.id))
-      }        
-      dispatch(getServices())
-    }, [token, user?.id, dispatch])
-
-    useEffect(() => {
-      if(sidebarMobile){
-          setSidebarMobile(false)
-      }
-    },[location.pathname])
-
-    const statusChange = useSelector(selectChangeAccountStatus)
-    
-    if (statusChange === 'loading') {
-        return (
-            <div className='flex justify-center items-center min-h-screen'>
-                <div className='text-center'>
-                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
-                    <p className='mt-4 text-gray-600'>Memuat data...</p>
-                </div>
-            </div>
-        )
+  useEffect(() => {
+    if (!token) {
+      setSidebarProfile(false);
     }
-
-    if(statusChange === 'success'){
-        dispatch(resetChangeAccountStatus())
-        navigate('/dashboard')
+    if (token && user?.id) {
+      dispatch(getFavoriteService(user.id));
     }
+    dispatch(getServices());
+  }, [token, user?.id, dispatch]);
 
-    let favoritesService = [];
-
-    if (favoritesStatus === 'success' && favorites.data && services.length > 0) {
-        const favoritedServiceIds = favorites.data.map(fav => fav.service_id);
-        
-        favoritesService = services.filter(service => 
-            favoritedServiceIds.includes(service.id)
-        );
+  useEffect(() => {
+    if (sidebarMobile) {
+      setSidebarMobile(false);
     }
+  }, [location.pathname]);
 
-    const haveSellerAccount = user?.available_roles.length > 1    
+  const statusChange = useSelector(selectChangeAccountStatus);
 
+  if (statusChange === "loading") {
     return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Memuat data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (statusChange === "success") {
+    dispatch(resetChangeAccountStatus());
+    navigate("/dashboard");
+  }
+
+  let favoritesService = [];
+
+  if (favoritesStatus === "success" && favorites.data && services.length > 0) {
+    const favoritedServiceIds = favorites.data.map((fav) => fav.service_id);
+
+    favoritesService = services.filter((service) =>
+      favoritedServiceIds.includes(service.id)
+    );
+  }
+
+  const haveSellerAccount = user?.available_roles.length > 1;
+
+  return (
     <>
       {header && (
         <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
@@ -196,11 +189,16 @@ const Header = () => {
 
               {/* Logo */}
               <div className="flex-shrink-0">
-                <NavLink link='/' text='PanggilAja' className='md:text-h4 text-h5 text-secondary font-bold' onClick={() => {
-                    setSidebarMobile(false)
-                    setSidebarProfile(false)
-                    setIconSearch(true)
-                }}/>
+                <NavLink
+                  link="/"
+                  text="PanggilAja"
+                  className="md:text-h4 text-h5 text-secondary font-bold"
+                  onClick={() => {
+                    setSidebarMobile(false);
+                    setSidebarProfile(false);
+                    setIconSearch(true);
+                  }}
+                />
               </div>
 
               {/* Search Bar - Desktop */}
@@ -218,8 +216,8 @@ const Header = () => {
                       className="w-full h-11 pl-12 pr-4 border-2 border-gray-200 rounded-full text-h5 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       onChange={handleChange}
                       onFocus={() => {
-                        setSidebarMobile(false)
-                        setSidebarProfile(false)
+                        setSidebarMobile(false);
+                        setSidebarProfile(false);
                       }}
                       value={search}
                     />
@@ -227,14 +225,12 @@ const Header = () => {
                 </form>
 
                 {/* Partner Link */}
-                {!haveSellerAccount && (
-                  location.pathname !== "/partner" && (
-                    <NavLink
-                      text="Jadi Mitra"
-                      className="ml-4 text-h5 md:text-base whitespace-nowrap text-gray-700 hover:text-primary transition-colors font-medium"
-                      link="/partner"
-                    />
-                  )
+                {!haveSellerAccount && location.pathname !== "/partner" && (
+                  <NavLink
+                    text="Jadi Mitra"
+                    className="ml-4 text-h5 md:text-base whitespace-nowrap text-gray-700 hover:text-primary transition-colors font-medium"
+                    link="/partner"
+                  />
                 )}
               </div>
 
@@ -266,39 +262,38 @@ const Header = () => {
                       <button
                         className="hidden sm:block relative group cursor-pointer"
                         onClick={() => {
-                            setSidebarProfile(!sidebarProfile)
-                            setFavorite(false)
-                            setChat(false)
-                            setOrder(false)
+                          setSidebarProfile(!sidebarProfile);
+                          setFavorite(false);
+                          setChat(false);
+                          setOrder(false);
                         }}
                       >
-                          <img
-                            className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-1 border-gray-50 group-hover:border-primary transition-all cursor-pointer"
-                            src={profile?.foto_buyer || "/default-avatar.png"}
-                            alt="Profile"
-                          />
+                        <img
+                          className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-1 border-gray-50 group-hover:border-primary transition-all cursor-pointer"
+                          src={profile?.foto_buyer || "/default-avatar.png"}
+                          alt="Profile"
+                        />
                       </button>
-                      ) : (
-                        <button  
-                          className="group hidden sm:block relative group cursor-pointer h-10 w-10 bg-gray-100 rounded-full hover:scale-105 transition-all"
-                          onClick={() => {
-                              setSidebarProfile(!sidebarProfile)
-                              setFavorite(false)
-                              setChat(false)
-                              setOrder(false)
-                          }}
-                        >
-                          <FaUser className='group-hover:text-black/80 text-4xl p-1 border- rounded-full'/>
-                        </button>
-                      )
-                    }
-                  
+                    ) : (
+                      <button
+                        className="group hidden sm:block relative group cursor-pointer h-10 w-10 bg-gray-100 rounded-full hover:scale-105 transition-all"
+                        onClick={() => {
+                          setSidebarProfile(!sidebarProfile);
+                          setFavorite(false);
+                          setChat(false);
+                          setOrder(false);
+                        }}
+                      >
+                        <FaUser className="group-hover:text-black/80 text-4xl p-1 border- rounded-full" />
+                      </button>
+                    )}
+
                     {/* Search Icon - Mobile */}
                     <button
                       className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                       onClick={() => {
-                        setSearchMobile(!searchMobile)
-                        setHeader(false)
+                        setSearchMobile(!searchMobile);
+                        setHeader(false);
                       }}
                       aria-label="Search"
                     >
@@ -313,32 +308,33 @@ const Header = () => {
           </div>
         </header>
       )}
-      
+
       {searchMobile && (
-          <div className='bg-white fixed h-screen top-0 bottom-0 right-0 left-0 px-[25px] py-[10px] sm:hidden z-100'>
-            <div className='flex gap-[15px] items-center'>
-              <form className='w-full' onSubmit={handleSubmit}>
-                  <Input 
-                      placeholder='Cari jasa terdekat' 
-                      className='bg-white rounded-[15px] shadow-sm'
-                      onChange={handleChange} onFocus={() => {
-                          setSidebarMobile(false)
-                          setSidebarProfile(false)
-                      }}
-                      value={search}    
-                  />
-              </form>
-              <p
-                  onClick={() => {
-                    setSearchMobile(false)
-                    setHeader(true)
-                  }}
-                  className='cursor-pointer text-secondary'
-              >
-                  Close
-              </p>
-            </div>
+        <div className="bg-white fixed h-screen top-0 bottom-0 right-0 left-0 px-[25px] py-[10px] sm:hidden z-100">
+          <div className="flex gap-[15px] items-center">
+            <form className="w-full" onSubmit={handleSubmit}>
+              <Input
+                placeholder="Cari jasa terdekat"
+                className="bg-white rounded-[15px] shadow-sm"
+                onChange={handleChange}
+                onFocus={() => {
+                  setSidebarMobile(false);
+                  setSidebarProfile(false);
+                }}
+                value={search}
+              />
+            </form>
+            <p
+              onClick={() => {
+                setSearchMobile(false);
+                setHeader(true);
+              }}
+              className="cursor-pointer text-secondary"
+            >
+              Close
+            </p>
           </div>
+        </div>
       )}
 
       {/* Mobile Menu for Guest Users */}
@@ -371,9 +367,12 @@ const Header = () => {
             {/* Menu Items */}
             <div className="space-y-2 mb-6">
               {location.pathname !== "/partner" && (
-                <Link to="/partner" onClick={() => {
-                  setSidebarMobile(false)
-                }}>
+                <Link
+                  to="/partner"
+                  onClick={() => {
+                    setSidebarMobile(false);
+                  }}
+                >
                   <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                     <FaUser className="text-gray-400 text-xl" />
                     <span className="text-base text-gray-700 font-medium">
@@ -463,7 +462,7 @@ const Header = () => {
                   />
                 ) : (
                   <div>
-                    <FaUser/>
+                    <FaUser />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -499,36 +498,40 @@ const Header = () => {
                 <span className="text-h5 text-gray-700">Pesanan</span>
               </button>
 
-              <Link 
-                to="/chat" 
+              <Link
+                to="/chat"
                 onClick={() => setSidebarProfile(false)}
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
                 <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
                   <FaRegComment className="text-gray-400 text-base" />
                   <span className="text-h5 text-gray-700">Chat</span>
                 </div>
               </Link>
-              
+
               {haveSellerAccount && (
                 <button
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                  onClick={() => dispatch(changeAccount({targetRole : "seller"}))}
+                  onClick={() =>
+                    dispatch(changeAccount({ targetRole: "seller" }))
+                  }
                 >
                   <FaUser className="text-gray-400 text-base" />
-                  <span className="text-h5 text-gray-700">Ganti Akun Seller</span>
+                  <span className="text-h5 text-gray-700">
+                    Ganti Akun Seller
+                  </span>
                 </button>
               )}
             </div>
 
             {/* Logout Button */}
-            <div className='px-3 mb-2'>
+            <div className="px-3 mb-2">
               <Button
                 className="flex justify-center w-full py-3 rounded-xl text-white font-medium hover:shadow-lg transition-all"
                 variant="primary"
                 onClick={() => {
-                    dispatch(logout())
-                    setSidebarMobile(false)
+                  dispatch(logout());
+                  setSidebarMobile(false);
                 }}
               >
                 Logout
@@ -541,10 +544,10 @@ const Header = () => {
       {token && sidebarMobile && (
         <div className="sm:hidden fixed inset-0 bg-white z-40 overflow-y-auto pt-16">
           <div className="p-6">
-            <Link 
-              to="profile-setting" 
+            <Link
+              to="profile-setting"
               onClick={() => {
-                  setSidebarMobile(false)
+                setSidebarMobile(false);
               }}
             >
               <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl mb-6">
@@ -555,10 +558,8 @@ const Header = () => {
                     className="w-14 h-14 rounded-full object-cover border-2 border-gray-200"
                   />
                 ) : (
-                  <div
-                    className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 flex justify-center items-center"
-                  >
-                    <FaUser className='text-3xl text-gray-500'/>
+                  <div className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 flex justify-center items-center">
+                    <FaUser className="text-3xl text-gray-500" />
                   </div>
                 )}
                 <div>
@@ -572,38 +573,27 @@ const Header = () => {
 
             {/* Menu Items */}
             <div className="space-y-2 mb-6">
-              <Link 
-                to="/chat" 
-                onClick={() => setSidebarMobile(false)}
-              >
+              <Link to="/chat" onClick={() => setSidebarMobile(false)}>
                 <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                   <FaRegComment className="text-gray-400 text-xl" />
                   <span className="text-base text-gray-700">Pesan</span>
                 </div>
               </Link>
 
-              <Link 
-                to="/favorite" 
-                onClick={() => setSidebarMobile(false)}
-              >
+              <Link to="/favorite" onClick={() => setSidebarMobile(false)}>
                 <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                   <FaRegHeart className="text-gray-400 text-xl" />
                   <span className="text-base text-gray-700">Favorit</span>
                 </div>
               </Link>
-              
-              {!haveSellerAccount && (
-                location.pathname !== "/partner" && (
-                  <Link 
-                    to="/partner" 
-                    onClick={() => setSidebarMobile(false)}
-                  >
-                    <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
-                      <FaUser className="text-gray-400 text-xl" />
-                      <span className="text-base text-gray-700">Jadi Mitra</span>
-                    </div>
-                  </Link>
-                )
+
+              {!haveSellerAccount && location.pathname !== "/partner" && (
+                <Link to="/partner" onClick={() => setSidebarMobile(false)}>
+                  <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
+                    <FaUser className="text-gray-400 text-xl" />
+                    <span className="text-base text-gray-700">Jadi Mitra</span>
+                  </div>
+                </Link>
               )}
             </div>
 
@@ -612,8 +602,8 @@ const Header = () => {
               className="flex justify-center w-full py-4 rounded-xl text-white font-medium hover:shadow-lg transition-all"
               variant="primary"
               onClick={() => {
-                  dispatch(logout())
-                  setSidebarMobile(false)
+                dispatch(logout());
+                setSidebarMobile(false);
               }}
             >
               Logout
@@ -621,8 +611,8 @@ const Header = () => {
           </div>
         </div>
       )}
-  </>
-  )
-}
+    </>
+  );
+};
 
-export default Header
+export default Header;
