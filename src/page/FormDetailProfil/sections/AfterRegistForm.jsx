@@ -10,27 +10,18 @@ import {
     seeAddress, 
     selectAddAddress 
 } from '../../../features/userSlice'
-import { selectCurrentUser } from '../../../features/authSlice'
+import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
 import { useNavigate } from 'react-router-dom'
 
 const AfterRegistForm = () => {
     const user = useSelector(selectCurrentUser)
+    const token = useSelector(selectAccessToken)
     const address = useSelector(selectSeeAddress)
     const addressStatus = useSelector(selectSeeAddressStatus)
     const addAddressStatus = useSelector(selectAddAddressStatus)
     const addedAddress = useSelector(selectAddAddress) // ✅ Rename untuk clarity
     const dispatch = useDispatch()
     const navigate = useNavigate()
-
-    console.log(user)
-
-    console.log('🔍 Current state:', {
-        user,
-        address,
-        addressStatus,
-        addAddressStatus,
-        addedAddress
-    })
 
     const [provinsi, setProvinsi] = useState('')
     const [kota, setKota] = useState('')
@@ -40,43 +31,23 @@ const AfterRegistForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
-        if (user?.id_buyer) {
-            console.log('📡 Fetching address for buyer:', user.id_buyer)
-            dispatch(seeAddress(user.id_buyer))
+        if (user?.id_buyer && token) {
+            dispatch(seeAddress(user?.id_buyer))
         }
     }, [dispatch, user?.id_buyer])
 
     useEffect(() => {
-        console.log('🔄 Check redirect:', {
-            address,
-            addressStatus,
-            hasProvinsi: address?.data?.provinsi,
-            hasAlamat: address?.data?.alamat
-        })
-
         if (addressStatus === 'loading') {
             return
         }
-
         if (address?.data?.provinsi || address?.data?.alamat) {
-            console.log('✅ User sudah punya alamat, redirect ke home')
             navigate('/', { replace: true })
-        } else {
-            console.log('📝 User belum punya alamat, tampilkan form')
         }
     }, [address, addressStatus, navigate])
-
+    
     useEffect(() => {
-        console.log('⚡ Status changed:', {
-            isSubmitting,
-            addAddressStatus,
-            addedAddress
-        })
-
         if (isSubmitting && addAddressStatus === 'success') {
-            console.log('✅ Alamat berhasil ditambahkan!')
-            
-            dispatch(seeAddress(user.id_buyer))
+            dispatch(seeAddress(user?.id_buyer))
             
             setTimeout(() => {
                 navigate('/', { replace: true })
@@ -113,14 +84,9 @@ const AfterRegistForm = () => {
             kode_pos
         }
         
-        console.log('🚀 Dispatching addAddress with:', {
-            id: user.id_buyer,
-            data
-        })
-        
         setIsSubmitting(true)
         
-        dispatch(addAddressAction({ id: user.id_buyer, data }))
+        dispatch(addAddressAction({ id: user?.id_buyer, data }))
     }
 
     // Loading state

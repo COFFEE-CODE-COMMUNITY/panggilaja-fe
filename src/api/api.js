@@ -139,13 +139,6 @@ api.interceptors.response.use(
         // Clear storage
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
-
-        // Redirect to login
-        if (window.location.pathname !== "/login") {
-          alert("Sesi Anda telah berakhir. Silakan login kembali.");
-          window.location.href = "/login";
-        }
-
         return Promise.reject(refreshError);
       }
     }

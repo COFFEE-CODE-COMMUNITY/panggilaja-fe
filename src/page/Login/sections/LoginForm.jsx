@@ -1,6 +1,6 @@
-import React from "react"; // ← Hapus useState, tidak perlu lagi!
+import React, { useEffect, useState } from "react"; // ← Hapus useState, tidak perlu lagi!
 import InputForm from "../../../components/modules/form/InputForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../../components/common/Button";
 import {
   FaLock,
@@ -9,17 +9,58 @@ import {
   FaCheckCircle,
   FaShieldAlt,
 } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, selectAccessToken, selectAuthError, selectAuthMessage, selectAuthStatus, selectCurrentUser } from "../../../features/authSlice";
 
-const LoginForm = ({
-  status,
-  handleSubmit,
-  handleChangeEmail,
-  handleChangePassword,
-  message,
-  handleGoogleLogin,
-}) => {
+const LoginForm = () => {
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const status = useSelector(selectAuthStatus);
+  const message = useSelector(selectAuthMessage);
+  const error = useSelector(selectAuthError);
+  const currentUser = useSelector(selectCurrentUser);
+  const token = useSelector(selectAccessToken);
+
+  useEffect(() => {
+    if (token) {
+      navigate("/");
+    }
+  }, [token]);
+
+  const handleChangeEmail = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handleChangePassword = (e) => {
+    setPassword(e.target.value);
+  };
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (email && password) {
+      dispatch(loginUser({ email, password }));
+    }
+  };
+
+  // Handle Google Login
+  const handleGoogleLogin = () => {
+    // Redirect langsung ke backend endpoint untuk Google OAuth
+    window.location.href = "http://localhost:5000/auth/google";
+  };
+
+  useEffect(() => {
+    if (status === "success" && currentUser) {
+      navigate("/");
+    }
+  }, [status, currentUser, navigate]);
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
+    <div className="flex flex-col gap-4 md:gap-4 h-full">
       {/* Header Section */}
       <div className="text-center mb-4">
         <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">
@@ -68,6 +109,24 @@ const LoginForm = ({
         </div>
       )}
 
+      {/* Google Login Button */}
+      <Button
+        type="button"
+        onClick={handleGoogleLogin}
+        className="group w-full h-12 md:h-14 text-base md:text-lg font-semibold bg-white text-gray-700 border-2 border-gray-100 rounded-3xl flex justify-center items-center gap-3 hover:bg-gray-50/50 hover:border-gray-100 hover:shadow-sm transition-all duration-300 "
+      >
+        <FcGoogle className="text-xl group-hover:scale-110 transition-transform duration-300" />
+        <span>Masuk dengan Google</span>
+      </Button>
+
+      <div className="relative flex items-center gap-4 my-2">
+        <div className="flex-1 border-t border-gray-200"></div>
+        <span className="text-gray-500 text-sm font-medium bg-white px-2">
+          atau
+        </span>
+        <div className="flex-1 border-t border-gray-200"></div>
+      </div>
+
       {/* Login Form */}
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         {/* Email Input - SEKARANG MENGGUNAKAN INPUTFORM */}
@@ -98,7 +157,7 @@ const LoginForm = ({
           <label className="flex items-center gap-2 cursor-pointer group">
             <input
               type="checkbox"
-              className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-2"
+              className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-1"
             />
             <span className="text-sm text-gray-600 group-hover:text-primary transition-colors">
               Ingat saya
@@ -117,64 +176,19 @@ const LoginForm = ({
           className="group w-full h-12 md:h-14 text-base md:text-lg font-bold bg-primary hover:bg-primary/90 text-white rounded-xl flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 mt-2"
         >
           <span>Masuk Sekarang</span>
-          <svg
-            className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 7l5 5m0 0l-5 5m5-5H6"
-            />
-          </svg>
         </Button>
       </form>
 
-      {/* Divider */}
-      <div className="relative flex items-center gap-4 my-2">
-        <div className="flex-1 border-t border-gray-200"></div>
-        <span className="text-gray-500 text-sm font-medium bg-white px-2">
-          atau lanjutkan dengan
-        </span>
-        <div className="flex-1 border-t border-gray-200"></div>
-      </div>
-
-      {/* Google Login Button */}
-      <Button
-        type="button"
-        onClick={handleGoogleLogin}
-        className="group w-full h-12 md:h-14 text-base md:text-lg font-semibold bg-white text-gray-700 border-2 border-gray-200 rounded-xl flex justify-center items-center gap-3 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md transition-all duration-300"
-      >
-        <FaGoogle className="text-sky-600 text-xl group-hover:scale-110 transition-transform duration-300" />
-        <span>Masuk dengan Google</span>
-      </Button>
-
-      {/* Sign Up Link */}
       <div className="text-center pt-4 border-t border-gray-100">
         <p className="text-gray-600 text-sm md:text-base">
-          Belum punya akun?{" "}
+          Belum Punya Akun?{" "}
           <Link
             to="/register"
             className="font-bold text-primary hover:text-primary/80 transition-colors"
           >
-            Daftar Gratis
+            Daftar Sekarang
           </Link>
         </p>
-      </div>
-
-      {/* Security Badge */}
-      <div className="flex items-center justify-center gap-6 pt-4">
-        <div className="flex items-center gap-2 text-gray-500">
-          <FaShieldAlt className="text-green-500" size={16} />
-          <span className="text-xs">Aman & Terenkripsi</span>
-        </div>
-        <div className="flex items-center gap-2 text-gray-500">
-          <FaCheckCircle className="text-blue-500" size={16} />
-          <span className="text-xs">Data Terlindungi</span>
-        </div>
       </div>
     </div>
   );

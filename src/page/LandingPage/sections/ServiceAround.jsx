@@ -2,21 +2,48 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getServices,
+  getServicesAround,
   selectAllService,
   selectAllServiceStatus,
+  selectServiceAround,
+  selectServiceAroundError,
+  selectServiceAroundStatus,
 } from "../../../features/serviceSlice";
 import ServiceCard from "../../../components/modules/Cards/ServiceCard";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaBox } from "react-icons/fa";
+import { selectAccessToken, selectCurrentUser } from "../../../features/authSlice";
+import { seeAddress, selectSeeAddress } from "../../../features/userSlice";
 
 const ServiceAround = () => {
   const dispatch = useDispatch();
   const services = useSelector(selectAllService);
   const servicesStatus = useSelector(selectAllServiceStatus);
+  const user = useSelector(selectCurrentUser)
+  const token = useSelector(selectAccessToken)
+  const address = useSelector(selectSeeAddress)
+
+  const servicesAround = useSelector(selectServiceAround)
+  const servicesAroundStatus = useSelector(selectServiceAroundStatus)
+  const servicesAroundError = useSelector(selectServiceAroundError)
+
 
   useEffect(() => {
     dispatch(getServices());
+    if(user?.id && token){
+      dispatch(seeAddress(user.id))
+    }
   }, [dispatch]);
+
+  useEffect(() => {
+    if(address?.data?.kecamatan){
+      dispatch(getServicesAround({id : user.id, kecamatan : address?.data?.kecamatan}))
+    }
+  },[address?.data?.kecamatan])
+
+  console.log(servicesAround)
+  console.log(servicesAroundStatus)
+  console.log(servicesAroundError)
 
   // Loading State
   if (servicesStatus === "loading") {
@@ -79,6 +106,7 @@ const ServiceAround = () => {
 
   const servicesSlice = services.slice(0, 8);
 
+
   // Success State
   if (servicesStatus === "success") {
     return (
@@ -94,7 +122,7 @@ const ServiceAround = () => {
             </p>
           </div>
           <Link to="all-service-result">
-            <div className="group flex items-center gap-2 px-4 py-2 rounded-full hover:bg-primary/5 transition-all duration-300">
+            <div className="group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300">
               <p className="xl:text-h5 text-h6 font-medium text-gray-700 group-hover:text-primary transition-colors duration-300">
                 Lihat semua
               </p>
@@ -121,21 +149,33 @@ const ServiceAround = () => {
 
         {/* Services Grid */}
         {services.length > 0 && (
-          <div className="grid lg:gap-[10px] md:gap-[7px] gap-[4px] w-full lg:grid-cols-4 grid-cols-2">
+          // <div className="grid lg:gap-[10px] md:gap-[7px] gap-[4px] w-full lg:grid-cols-4 grid-cols-2">
+          //   {servicesSlice.map((service, index) => (
+          //     <div
+          //       key={service.id}
+          //       className="transition-all duration-300 hover:scale-[1.02]"
+          //     >
+                // <ServiceCard
+                //   idService={service.id}
+                //   image={service.foto_product}
+                //   serviceName={service.nama_jasa}
+                //   basePrice={service.base_price}
+                //   topPrice={service.top_price}
+                //   sellerName={service.seller.nama_toko}
+                // />
+          //     </div>
+          //   ))}
+          // </div>
+          <div className="grid gap-x-4 gap-y-9 sm:grid-cols-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-4 xl:gap-x-4">
             {servicesSlice.map((service, index) => (
-              <div
-                key={service.id}
-                className="transition-all duration-300 hover:scale-[1.02]"
-              >
-                <ServiceCard
-                  idService={service.id}
-                  image={service.foto_product}
-                  serviceName={service.nama_jasa}
-                  basePrice={service.base_price}
-                  topPrice={service.top_price}
-                  sellerName={service.seller.nama_toko}
-                />
-              </div>
+              <ServiceCard
+                key={index}
+                idService={service.id}
+                image={service.foto_product}
+                serviceName={service.nama_jasa}
+                basePrice={service.base_price}
+                topPrice={service.top_price}
+              />
             ))}
           </div>
         )}

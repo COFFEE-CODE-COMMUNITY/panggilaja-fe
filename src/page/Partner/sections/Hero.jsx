@@ -39,7 +39,7 @@ export default function Hero() {
       {/* Hero Section */}
       <div
         ref={heroRef}
-        className="relative w-full min-h-[600px] md:min-h-[650px] lg:min-h-[700px] flex flex-col justify-center bg-cover bg-center bg-no-repeat pb-32 md:pb-40"
+        className="relative w-full min-h-[600px] md:min-h-[650px] lg:min-h-[800px] flex flex-col justify-center bg-cover bg-center bg-no-repeat pb-32 md:pb-40"
         style={{
           backgroundImage: `url(${bgPartner})`,
         }}
@@ -60,14 +60,6 @@ export default function Hero() {
             isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           } pt-16 md:pt-20`}
         >
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/20">
-            <FaRocket className="text-green-400" />
-            <span className="text-sm font-medium">
-              Platform #1 untuk Profesional Lokal
-            </span>
-          </div>
-
           {/* Main Heading with Scroll Effect */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-4">
             Keahlianmu,

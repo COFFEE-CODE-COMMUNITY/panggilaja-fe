@@ -29,7 +29,12 @@ const RequestForm = () => {
     <form onSubmit={handleSubmit}>
       <div className='flex flex-col gap-[10px]'>
         <InputForm label='Email' placeholder='Masukkan email' type='email' onChange={(e) => setEmail(e.target.value)}/>
-        <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[35px] flex justify-center items-center' >Reset</Button>
+        <Button
+          type="submit"
+          className="group w-full h-12 md:h-14 text-base md:text-lg font-bold bg-primary hover:bg-primary/90 text-white rounded-xl flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 mt-2"
+        >
+          <span>Reset Password</span>
+        </Button>
       </div>
     </form>
   )
