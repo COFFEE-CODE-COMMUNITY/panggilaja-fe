@@ -44,7 +44,7 @@ const SearchAllService = () => {
 
   return (
       <div className='min-h-screen py-[15px] flex flex-col gap-[15px] xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] mx-auto'>
-          <div className='grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
+          <div className='grid gap-y-10 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 md:gap-x-6 gap-x-4'>
               {allServices.map((service) => (
                   <ServiceCard
                       idService={service.id}

@@ -103,6 +103,7 @@ const ServiceAround = () => {
   }
 
   const servicesSlice = services.slice(0, 8);
+  const servicesAroundSlice = servicesAround?.slice(0, 8)
 
   // Success State
   if (servicesStatus === "success") {
@@ -148,8 +149,8 @@ const ServiceAround = () => {
         {services.length > 0 && (
           <>
             {address?.data?.kecamatan ? (
-              <div className="grid gap-x-2 md:gap-x-3 lg:gap-x-4 gap-y-7 md:gap-y-8 lg:gap-y-9 sm:grid-cols-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-4 ">
-                {servicesAround?.map((service, index) => (
+              <div className="grid gap-x-2 md:gap-x-3 lg:gap-x-4 gap-y-7 md:gap-y-8 lg:gap-y-9 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
+                {servicesAroundSlice?.map((service, index) => (
                   <ServiceCard
                     key={index}
                     idService={service.id}
@@ -164,7 +165,7 @@ const ServiceAround = () => {
                 ))}
               </div>
             ) : (
-              <div className="grid gap-x-4 gap-y-9 sm:grid-cols-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-4 xl:gap-x-4">
+              <div className="grid gap-x-4 gap-y-9 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-4">
                 {servicesSlice?.map((service, index) => (
                   <ServiceCard
                     key={index}

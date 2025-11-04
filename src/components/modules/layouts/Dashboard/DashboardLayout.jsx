@@ -3,13 +3,11 @@ import { Outlet } from 'react-router-dom';
 
 const DashboardLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col relative">
-      <div className="flex flex-1 overflow-hidden">        
-        <SidebarDashboard/>
-        <main className="w-full">
-          <Outlet/>
-        </main>
-      </div>
+    <div className='flex relative'>
+      <SidebarDashboard/>
+      <main className="ml-[280px] flex-1 p-10">
+        <Outlet />
+      </main>
     </div>
   );
 };
