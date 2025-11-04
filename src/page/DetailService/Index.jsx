@@ -30,7 +30,7 @@ const DetailService = () => {
   }
 
   return (
-    <div className='lg:flex h-full w-full lg:gap-[30px] md:gap-[20px] gap-[10px]  mb-[50px] pt-[20px] max-w-7xl mx-auto'>
+    <div className='lg:flex h-full w-full lg:gap-[30px] md:gap-[20px] gap-[10px]  mb-[50px] pt-[20px] xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] mx-auto'>
         {status === 'loading' && <div className='w-full h-screen'>loading</div>}
         {status === 'success' && (
           <>

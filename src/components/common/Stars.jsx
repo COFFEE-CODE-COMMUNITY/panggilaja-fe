@@ -5,9 +5,9 @@ const Stars = ({many}) => {
     let starsAmount = []
     for(let i = 0; i < 5; i++){
         if(i >= many){
-            starsAmount.push(<FaStar className='text-gray-400 lg:text-[12px] md:text-[10px] text-[8px]'/>)
+            starsAmount.push(<FaStar key={i} className='text-gray-400 lg:text-[12px] md:text-[10px] text-[8px]'/>)
         }else{
-            starsAmount.push(<FaStar className='text-black lg:text-[12px] md:text-[10px] text-[8px]'/>)
+            starsAmount.push(<FaStar key={i} className='text-black lg:text-[12px] md:text-[10px] text-[8px]'/>)
         }
     }
     return (

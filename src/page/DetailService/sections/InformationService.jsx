@@ -82,14 +82,14 @@ const InformationService = ({idSeller, sellerName, idProvider,  idService, nameS
                             <Button 
                                 onClick={() => dispatch(deleteFavoriteService(isServiceFavorite.id))}
                             >
-                                <FaBookmark className={`text-gray-700 text-xl`}
+                                <FaHeart className={`text-gray-700 text-xl`}
                                 />
                             </Button>
                         ) : (
                             <Button 
                                 onClick={token ? handleAddFavorite : ''}
                             >
-                                <FaRegBookmark className={`text-gray-700 text-xl`}/>
+                                <FaRegHeart className={`text-gray-700 text-xl`}/>
                             </Button>
                         )}
                     </div>
