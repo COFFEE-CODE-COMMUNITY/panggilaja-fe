@@ -28,9 +28,9 @@ const DetailService = () => {
         </div>
     )
   }
-  
+
   return (
-    <div className='md:flex h-full w-full gap-[40px] mb-[50px] lg:px-[100px] md:px-[50px] pt-[20px]'>
+    <div className='lg:flex h-full w-full lg:gap-[30px] md:gap-[20px] gap-[10px]  mb-[50px] pt-[20px] max-w-7xl mx-auto'>
         {status === 'loading' && <div className='w-full h-screen'>loading</div>}
         {status === 'success' && (
           <>
@@ -45,6 +45,7 @@ const DetailService = () => {
                 totalReview={service.jumlah_rating}
                 basePrice={service.base_price}
                 topPrice={service.top_price}
+                idSeller={service.seller_id}
               />
             )}
           </>

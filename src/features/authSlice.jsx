@@ -172,6 +172,11 @@ const authSlice = createSlice({
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
         },
+        updateProfile : (state) => {
+            state.accessToken = getToken();
+            const decodeToken = jwtDecode(getToken())
+            state.user = decodeToken.user
+        },
         resetChangeAccountStatus : (state) => {
             state.changeAccountStatus = 'idle',
             state.changeAccountMessage = null,
@@ -188,7 +193,6 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 const { status, message, data } = action.payload
                 
-                // ✅ PERBAIKAN: accessToken sekarang langsung di data, bukan nested
                 const accessToken = data.accessToken
 
                 if (!accessToken) {
@@ -383,7 +387,7 @@ const authSlice = createSlice({
     }
 })
 
-export const { logout, setOAuthCredentials, resetChangeAccountStatus } = authSlice.actions
+export const { logout, setOAuthCredentials, resetChangeAccountStatus, updateProfile } = authSlice.actions
 export const selectCurrentUser = state => state.auth.user
 export const selectAccessToken = state => state.auth.accessToken
 export const selectAuthStatus = state => state.auth.status

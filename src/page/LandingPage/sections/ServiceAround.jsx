@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { FaArrowRight, FaBox } from "react-icons/fa";
 import { selectAccessToken, selectCurrentUser } from "../../../features/authSlice";
 import { seeAddress, selectSeeAddress } from "../../../features/userSlice";
+import Stars from "../../../components/common/Stars";
 
 const ServiceAround = () => {
   const dispatch = useDispatch();
@@ -25,8 +26,6 @@ const ServiceAround = () => {
 
   const servicesAround = useSelector(selectServiceAround)
   const servicesAroundStatus = useSelector(selectServiceAroundStatus)
-  const servicesAroundError = useSelector(selectServiceAroundError)
-
 
   useEffect(() => {
     dispatch(getServices());
@@ -43,7 +42,6 @@ const ServiceAround = () => {
 
   console.log(servicesAround)
   console.log(servicesAroundStatus)
-  console.log(servicesAroundError)
 
   // Loading State
   if (servicesStatus === "loading") {
@@ -106,7 +104,6 @@ const ServiceAround = () => {
 
   const servicesSlice = services.slice(0, 8);
 
-
   // Success State
   if (servicesStatus === "success") {
     return (
@@ -166,18 +163,37 @@ const ServiceAround = () => {
           //     </div>
           //   ))}
           // </div>
-          <div className="grid gap-x-4 gap-y-9 sm:grid-cols-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-4 xl:gap-x-4">
-            {servicesSlice.map((service, index) => (
-              <ServiceCard
-                key={index}
-                idService={service.id}
-                image={service.foto_product}
-                serviceName={service.nama_jasa}
-                basePrice={service.base_price}
-                topPrice={service.top_price}
-              />
-            ))}
-          </div>
+          <>
+            {address?.data?.kecamatan ? (
+              <div className="grid gap-x-2 md:gap-x-3 lg:gap-x-4 gap-y-7 md:gap-y-8 lg:gap-y-9 sm:grid-cols-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-4 ">
+                {servicesAround?.map((service, index) => (
+                  <ServiceCard
+                    key={index}
+                    idService={service.id}
+                    image={service.foto_product}
+                    serviceName={service.nama_jasa}
+                    basePrice={service.base_price}
+                    topPrice={service.top_price}
+                    star={4}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-x-4 gap-y-9 sm:grid-cols-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-4 xl:gap-x-4">
+                {servicesSlice?.map((service, index) => (
+                  <ServiceCard
+                    key={index}
+                    idService={service.id}
+                    image={service.foto_product}
+                    serviceName={service.nama_jasa}
+                    basePrice={service.base_price}
+                    topPrice={service.top_price}
+                    star={4}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     );

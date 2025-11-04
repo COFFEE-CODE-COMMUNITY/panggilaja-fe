@@ -2,8 +2,9 @@ import React from 'react'
 import Card from '../../common/Card'
 import { FaStar } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import Stars from '../../common/Stars'
 
-const ServiceCard = ({image, idService, serviceName, basePrice, topPrice, sellerName }) => {
+const ServiceCard = ({image, idService, serviceName, basePrice, topPrice, sellerName, star }) => {
   return (
     <Card 
         className='hover:scale-102 hover:shadow-sm transition-all duration-300 rounded-md'
@@ -17,14 +18,10 @@ const ServiceCard = ({image, idService, serviceName, basePrice, topPrice, seller
             <h3 className="mt-4 md:text-h5 text-h6 text-gray-700">{serviceName}</h3>
             <p className="mt-1 md:text-h5 text-h6 font-medium text-gray-900">Rp {basePrice} - {topPrice}</p>
             <div className='flex gap-[5px] py-[5px]'>
-                <FaStar className='text-star lg:text-[12px] md:text-[10px] text-[8px]'/>
-                <FaStar className='text-star lg:text-[12px] md:text-[10px] text-[8px]'/>
-                <FaStar className='text-star lg:text-[12px] md:text-[10px] text-[8px]'/>
-                <FaStar className='text-star lg:text-[12px] md:text-[10px] text-[8px]'/>
-                <FaStar className='text-star lg:text-[12px] md:text-[10px] text-[8px]'/>
+                <Stars many={star}/>
             </div>
         </div>
-
+        
         {/* <img 
             src={`${image}`} 
             className='h-3/4 w-full object-cover' 

@@ -39,8 +39,8 @@ const SearchAllService = () => {
   }
 
   return (
-      <div className='min-h-screen px-[20px] py-[15px] flex flex-col gap-[15px] max-w-8xl mx-auto'>
-          {/* <div className='grid lg:grid-cols-4 grid-cols-2 gap-[10px]'>
+      <div className='min-h-screen py-[15px] flex flex-col gap-[15px] xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] mx-auto'>
+          <div className='grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
               {allServices.map((service) => (
                   <ServiceCard
                       idService={service.id}
@@ -51,8 +51,8 @@ const SearchAllService = () => {
                       topPrice={service.top_price}
                   />
               ))}
-          </div> */}
-        <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 xl:gap-x-8">
+          </div>
+        {/* <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
             <a href="#" class="group">
                 <img src="https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-04-image-card-01.jpg" alt="Tall slender porcelain bottle with natural clay textured body and cork stopper." class="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-7/8" />
                 <h3 class="mt-4 text-sm text-gray-700">Earthen Bottle</h3>
@@ -93,7 +93,7 @@ const SearchAllService = () => {
                 <h3 class="mt-4 text-sm text-gray-700">Focus Carry Pouch</h3>
                 <p class="mt-1 text-lg font-medium text-gray-900">$32</p>
             </a>
-        </div>
+        </div> */}
       </div>
   )
 }

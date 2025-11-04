@@ -13,9 +13,12 @@ import {
   selectAuthStatus,
   selectChangeAccountStatus,
   selectCurrentUser,
+  updateProfile,
 } from "../../../../features/authSlice";
 import {
   FaBars,
+  FaBookmark,
+  FaRegBookmark,
   FaRegComment,
   FaRegHeart,
   FaSearch,
@@ -26,9 +29,13 @@ import {
 import { MdSearch } from "react-icons/md";
 import { IoMdLogOut } from "react-icons/io";
 import {
+  deleteFavoriteService,
   getFavoriteService,
   getServices,
+  resetDeleteFavoritesStatus,
   selectAllService,
+  selectDeleteFavoriteServiceError,
+  selectDeleteFavoriteServiceStatus,
   selectFavoriteService,
   selectFavoriteServiceStatus,
 } from "../../../../features/serviceSlice";
@@ -85,11 +92,13 @@ const Header = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setHeader(true)
     dispatch(setSearchText(search));
     const targetPath = search
       ? `/search-result?q=${encodeURIComponent(search)}`
       : "/search-result";
     navigate(targetPath);
+    setSearchMobile(false)
   };
 
   useEffect(() => {
@@ -155,6 +164,17 @@ const Header = () => {
 
   const haveSellerAccount = user?.available_roles?.length > 1;
 
+  const deleteFavoriteStatus = useSelector(selectDeleteFavoriteServiceStatus)
+  const deleteFavoriteMessage = useSelector(selectDeleteFavoriteServiceError)
+
+  useEffect(() => {
+      if (deleteFavoriteStatus === 'success') {            
+          if (user?.id) {
+              dispatch(getFavoriteService(user.id))
+          }
+          dispatch(resetDeleteFavoritesStatus())
+      } 
+  }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
   return (
     <>
       {header && (
@@ -280,7 +300,7 @@ const Header = () => {
                       </button>
                     ) : (
                       <button
-                        className="group hidden sm:block relative group cursor-pointer h-10 w-10 bg-gray-100 rounded-full hover:scale-105 transition-all"
+                        className="hover:bg-white hover:border-gray-100 group hidden sm:block relative group cursor-pointer h-10 w-10 bg-gray-200 rounded-full hover:scale-105 transition-all"
                         onClick={() => {
                           setSidebarProfile(!sidebarProfile);
                           setFavorite(false);
@@ -288,13 +308,13 @@ const Header = () => {
                           setOrder(false);
                         }}
                       >
-                        <FaUser className="group-hover:text-black/80 text-4xl p-1 border- rounded-full" />
+                        <FaUser className="group-hover:text-primary text-white text-4xl p-1 rounded-full transition-all duration-500" />
                       </button>
                     )}
 
                     {/* Search Icon - Mobile */}
                     <button
-                      className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                       onClick={() => {
                         setSearchMobile(!searchMobile);
                         setHeader(false);
@@ -333,7 +353,7 @@ const Header = () => {
                 setSearchMobile(false);
                 setHeader(true);
               }}
-              className="cursor-pointer text-secondary"
+              className="cursor-pointer text-gray-600 hover:text-secondary"
             >
               Close
             </p>
@@ -423,26 +443,36 @@ const Header = () => {
               </div>
               <div className="overflow-y-auto max-h-80">
                 {favoritesService.length > 0 ? (
-                  favoritesService.map((favorite) => (
-                    <Link
-                      key={favorite.id}
-                      to={`service/${favorite.id}`}
-                      onClick={() => setSidebarProfile(false)}
-                    >
-                      <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors cursor-pointer">
-                        <img
-                          src={favorite?.foto_product}
-                          alt={favorite.nama_jasa}
-                          className="w-20 h-20 object-cover rounded-lg"
-                        />
-                        <div className="flex-1">
-                          <p className="text-h5 font-medium text-gray-800 line-clamp-2">
-                            {favorite.nama_jasa}
-                          </p>
+                  favoritesService.map((favorite) => {
+                    const idDelFav = favorites.data.find((service) => service.service_id === favorite.id)
+                    return (
+                      <div
+                        key={favorite.id}
+                      >
+                        <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors">
+                          <img
+                            src={favorite?.foto_product}
+                            alt={favorite.nama_jasa}
+                            className="w-20 h-20 object-cover rounded-lg"
+                          />
+                          <div className="flex flex-col flex-1">
+                            <Link 
+                              className="text-h5 font-medium text-gray-800 line-clamLink-2 w-full cursor-pointer"
+                              to={`service/${favorite.id}`}
+                            >
+                              {favorite.nama_jasa}
+                            </Link>
+                            <p className="font-light">{favorite.deskripsi.slice(0,50)}...</p>
+                          </div>
+                          <div>
+                            <FaBookmark
+                              className="cursor-pointer"
+                              onClick={() => dispatch(deleteFavoriteService(idDelFav.id))}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </Link>
-                  ))
+                  )})
                 ) : (
                   <div className="p-8 text-center text-gray-500">
                     <FaRegHeart className="mx-auto text-4xl mb-2 text-gray-300" />
@@ -465,8 +495,8 @@ const Header = () => {
                     className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
                   />
                 ) : (
-                  <div>
-                    <FaUser />
+                  <div className="w-10 aspect-square rounded-full bg-gray-200 flex justify-center items-center">
+                    <FaUser className="text-2xl text-white"/>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
