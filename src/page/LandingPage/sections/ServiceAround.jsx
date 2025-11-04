@@ -29,8 +29,9 @@ const ServiceAround = () => {
 
   useEffect(() => {
     dispatch(getServices());
-    if(user?.id && token){
-      dispatch(seeAddress(user.id))
+    if(user?.id_buyer && token){
+      console.log(user)
+      dispatch(seeAddress(user.id_buyer))
     }
   }, [dispatch]);
 
