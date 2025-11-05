@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import AuthLayout from "../../components/modules/layouts/AuthLayout";
-import NavLink from "../../components/modules/navigation/NavLink";
 import RegisterForm from "./sections/RegisterForm";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   registerUser,
-  selectAuthMessage,
-  selectAuthStatus,
+  selectRegisterMessage,
+  selectRegisterStatus,
 } from "../../features/authSlice";
 
 const RegisterPage = () => {
@@ -19,8 +18,8 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const message = useSelector(selectAuthMessage);
-  const status = useSelector(selectAuthStatus);
+  const message = useSelector(selectRegisterMessage);
+  const status = useSelector(selectRegisterStatus);
 
   const handleChangeUsername = (e) => {
     setUsername(e.target.value);
@@ -47,7 +46,7 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (status === "success") {
-      navigate("/form-detail-profile");
+      navigate("/login");
     }
   }, [status]);
 

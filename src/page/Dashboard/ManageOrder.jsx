@@ -8,9 +8,6 @@ import StatCardOrder from './sections/StatCardOrder'
 const ManageOrder = () => {
   return (
     <div className='w-full px-[15px] flex flex-col gap-[10px]'>
-        <div>
-            <p>Pesanan</p>
-        </div>
         <div className='h-full flex flex-col max-w-7xl gap-10'>
             <StatCardOrder/>
             <TableOrder/>

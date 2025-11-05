@@ -10,16 +10,13 @@ import {
   logoutUser,
   resetChangeAccountStatus,
   selectAccessToken,
-  selectAuthStatus,
   selectChangeAccountStatus,
   selectCurrentUser,
   updateProfile,
 } from "../../../../features/authSlice";
 import {
   FaBars,
-  FaBookmark,
   FaHeart,
-  FaRegBookmark,
   FaRegComment,
   FaRegHeart,
   FaSearch,
@@ -59,7 +56,6 @@ const Header = () => {
 
   const user = useSelector(selectCurrentUser);
   const token = useSelector(selectAccessToken);
-  const authStatus = useSelector(selectAuthStatus);
   const profile = useSelector(selectSeeProfile);
   const statusProfile = useSelector(selectSeeProfileStatus);
   const searchText = useSelector(selectSearchText);
@@ -520,7 +516,7 @@ const Header = () => {
 
               {haveSellerAccount && (
                 <button
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
                   onClick={() =>
                     dispatch(changeAccount({ targetRole: "seller" }))
                   }

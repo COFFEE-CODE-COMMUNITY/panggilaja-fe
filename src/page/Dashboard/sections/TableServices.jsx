@@ -32,20 +32,20 @@ const TableServices = () => {
         }
     }, [dispatch, statusDelete])
 
-    console.log(servicesSeller)
-    console.log(status)
   return (
     <div className="flex flex-col gap-2">
         <div className='flex justify-end'>
-            <Button
-                variant='primary'
-                className='px-5 py-2 text-white rounded-xl'
-            >
-                Tambah Jasa
-            </Button>
+            <Link to={`/dashboard/manage-services/add-service`}>
+                <Button
+                    variant='primary'
+                    className='px-5 py-2 text-white rounded-xl'
+                >
+                    Tambah Jasa
+                </Button>
+            </Link>
         </div>
     {/* Table */}
-        <table className="w-full text-left w-full border border-gray-400 rounded-lg overflow-x-auto">
+        <table className="w-full text-left border border-gray-400 rounded-lg overflow-x-auto">
             {/* Header */}
             <thead className="bg-primary text-white font-bold rounded-lg">
                 <tr>

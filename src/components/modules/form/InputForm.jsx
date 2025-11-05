@@ -29,7 +29,7 @@ const InputForm = ({
   const inputType = showPasswordToggle && showPassword ? "text" : type;
 
   // Base class untuk modern input style
-  const baseClass = `w-full h-12 md:h-14 px-4 ${Icon ? "pl-12" : "pl-4"} ${
+  const baseClass = `w-full py-3 px-4 ${Icon ? "pl-12" : "pl-4"} ${
     showPasswordToggle ? "pr-12" : "pr-4"
   } border-2 border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none`;
 

@@ -27,7 +27,7 @@ const ServiceCard = ({image, idService, serviceName, basePrice, topPrice, seller
 
   return (
     <Card 
-        className='group relative block overflow-hidden'
+        className='group hover:scale-101 transition-all duration-200 relative block overflow-hidden'
         to={false}
     >
         {!guest ? 
@@ -55,20 +55,19 @@ const ServiceCard = ({image, idService, serviceName, basePrice, topPrice, seller
         <img 
             src={image} 
             alt="" 
-            className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72 relative z-0" 
+            className="h-64 w-full object-cover transition duration-500 sm:h-72 relative z-0" 
         />
 
-        <div className="relative border border-gray-100 bg-white lg:p-6 md:p-5 p-4">
+        <div className="relative border border-gray-100 bg-white lg:p-4 md:p-3 p-2 flex flex-col gap-2">
+            <Link to={`/service/${idService}`} className="mt-1.5 font-medium text-gray-900 text-h5">{serviceName}</Link >
+
+            <Stars many={4}/>   
+
             <p className="text-gray-700 md:text-h5 text-h6">
                 Rp {basePrice} - {topPrice}
             </p>
 
-            <Link to={`/service/${idService}`} className="mt-1.5 font-medium text-gray-900 text-h5 md:text-xl">{serviceName}</Link >
-
-            <p className="mt-1.5 line-clamp-3 text-gray-700 mb-4 md:text-h5 text-h6">
-                {desc}
-            </p>
-            <Stars many={4}/>   
+            
         </div>
     </Card>
   )

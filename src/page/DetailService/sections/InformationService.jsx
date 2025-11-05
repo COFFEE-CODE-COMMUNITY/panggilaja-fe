@@ -11,6 +11,7 @@ import { FiSave } from 'react-icons/fi'
 import { IoSaveSharp } from 'react-icons/io5'
 import { HiOutlineSave } from 'react-icons/hi'
 import { getSellerById, selectSelectedSeller } from '../../../features/sellerSlice'
+import FaqService from './FaqService'
 
 const InformationService = ({idSeller, sellerName, idProvider,  idService, nameService, totalReview, topPrice, basePrice, description, totalReviewSeller, }) => {
     const dispatch = useDispatch()
@@ -78,19 +79,21 @@ const InformationService = ({idSeller, sellerName, idProvider,  idService, nameS
                 <div className='flex flex-col leading-8'>
                     <div className='flex'>
                         <p className='flex-1 text-h5 font-light'>{sellerProfile?.nama_toko}</p>
-                        {isServiceFavorite && token ? (
-                            <Button 
-                                onClick={() => dispatch(deleteFavoriteService(isServiceFavorite.id))}
-                            >
-                                <FaHeart className={`text-gray-700 text-xl`}
-                                />
-                            </Button>
-                        ) : (
-                            <Button 
-                                onClick={token ? handleAddFavorite : ''}
-                            >
-                                <FaRegHeart className={`text-gray-700 text-xl`}/>
-                            </Button>
+                        {token && (
+                            isServiceFavorite ? (
+                                <Button 
+                                    onClick={() => dispatch(deleteFavoriteService(isServiceFavorite.id))}
+                                >
+                                    <FaHeart className={`text-gray-700 text-xl`}
+                                    />
+                                </Button>
+                            ) : (
+                                <Button 
+                                    onClick={token ? handleAddFavorite : ''}
+                                >
+                                    <FaRegHeart className={`text-gray-700 text-xl`}/>
+                                </Button>
+                            )
                         )}
                     </div>
                     <h2 className='text-h2'>{nameService}</h2>
@@ -162,14 +165,9 @@ const InformationService = ({idSeller, sellerName, idProvider,  idService, nameS
                     )} */}
                 </div>
             </div>
-        </div>
-        {/* <div className='flex flex-col'>
-            <p className='text-h5 font-medium'>Ulasan warga</p>
-            <div>
-
-            </div>
-        </div> */}
-        
+            
+            <FaqService/>
+		  </div>
     </div>
   )
 }

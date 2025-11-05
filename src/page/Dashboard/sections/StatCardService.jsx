@@ -1,19 +1,38 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { selectCurrentUser } from '../../../features/authSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAllServicesByIdSeller, selectSellerServices, selectServiceSellerStatus } from '../../../features/sellerSlice'
+import { selectDeleteServiceStatus } from '../../../features/serviceSlice'
 
 const StatCardService = () => {
+  const user = useSelector(selectCurrentUser)
+  const dispatch = useDispatch()
+
+  const servicesSeller = useSelector(selectSellerServices)
+  const status = useSelector(selectServiceSellerStatus)
+
+  useEffect(() => {
+      if (user && user.id_seller) { 
+          dispatch(getAllServicesByIdSeller(user.id_seller));
+      }
+  }, [dispatch, user]); 
+
+  let lengthService = 0
+  servicesSeller?.data?.map(() => {
+    lengthService += 1
+  })
+
+  console.log(servicesSeller)
   return (
     <div class="flex flex-col lg:flex-row gap-4 w-full">
       <div class="bg-white p-8 rounded-lg shadow-md w-full">
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
             <p class=" text-lg font-bold text-gray-500 mb-3 md:mb-6">
-              Total Subscribers
+              Total Jasa
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              71,897
-              <span class="text-gray-500 font-semibold text-base">
-                from 70,946
-              </span>
+              {lengthService}
             </p>
           </div>
           <p class="text-gray-500 font-thin">+122</p>
@@ -24,13 +43,10 @@ const StatCardService = () => {
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
             <p class="font-bold text-lg text-gray-500 mb-3 md:mb-6">
-              Avg. Open Rate
+              Jasa Aktif
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              58.16%
-              <span class="text-gray-500 font-semibold text-base">
-                from 56.14%
-              </span>
+              {lengthService}
             </p>
           </div>
           <p class="text-gray-500 font-thin">+5.4%</p>
@@ -41,13 +57,10 @@ const StatCardService = () => {
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
             <p class="text-lg font-bold text-gray-500 mb-3 md:mb-6">
-              Avg. Click Rate
+              Jasa Non Aktif
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              24.57%
-              <span class="text-gray-500 font-semibold text-base">
-                from 28.62%
-              </span>
+              {lengthService}
             </p>
           </div>
           <p class="text-gray-500 font-thin">-3.2%</p>

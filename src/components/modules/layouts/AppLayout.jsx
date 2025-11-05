@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Header from './Header/Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccessToken, selectAuthStatus, selectCurrentUser } from '../../../features/authSlice'
+import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
 import { seeAddress, selectSeeAddress, selectSeeAddressStatus } from '../../../features/userSlice'
 
 const AppLayout = () => {
