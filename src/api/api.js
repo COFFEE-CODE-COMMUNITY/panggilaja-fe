@@ -1,9 +1,9 @@
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // ✅ TAMBAHKAN IMPORT INI
+import { jwtDecode } from "jwt-decode";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-  withCredentials: true, // ✅ Penting untuk cookie
+  baseURL: "http://localhost:5000/api", // ganti sesuai environment-mu
+  withCredentials: true, // ✅ wajib untuk kirim cookie refresh
 });
 
 let isRefreshing = false;
@@ -11,57 +11,49 @@ let failedQueue = [];
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+    if (error) prom.reject(error);
+    else prom.resolve(token);
   });
   failedQueue = [];
 };
 
-// Request interceptor
+// 🔁 Interceptor untuk setiap request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor
+// 🔁 Interceptor untuk setiap response
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    console.log("Response Error:", {
+    console.log("⚠️ Response Error:", {
       url: originalRequest?.url,
       status: error.response?.status,
       retry: originalRequest?._retry,
     });
 
-    // Skip refresh untuk endpoint public
+    // Jangan refresh untuk endpoint publik
     const publicEndpoints = [
       "/auth/login",
       "/auth/register",
       "/auth/refresh",
       "/auth/google/callback",
     ];
-    
     if (publicEndpoints.some((endpoint) => originalRequest?.url?.includes(endpoint))) {
       return Promise.reject(error);
     }
 
-    // Handle 401 (Unauthorized)
+    // 🔒 Tangani Unauthorized (401)
     if (error.response?.status === 401 && !originalRequest?._retry) {
-      // Jika sedang refresh, masukkan ke queue
       if (isRefreshing) {
+        // Jika sedang refresh, masukkan request ini ke queue
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -77,42 +69,49 @@ api.interceptors.response.use(
 
       try {
         console.log("🔄 Attempting to refresh token...");
-        
-        // ✅ PERBAIKAN: Panggil refresh endpoint
-        const response = await api.post("/auth/refresh");
 
+        const response = await api.post("/auth/refresh");
         console.log("✅ Refresh response:", response.data);
 
-        // ✅ PERBAIKAN: Ambil accessToken dari response yang benar
-        const newAccessToken = response.data.data?.accessToken || response.data.accessToken;
+        const newAccessToken =
+          response.data.data?.accessToken || response.data.accessToken;
 
         if (!newAccessToken) {
-          throw new Error("No access token in refresh response");
+          throw new Error("No access token found in refresh response");
         }
 
-        // ✅ Decode token untuk mendapatkan user data
-        const decodedToken = jwtDecode(newAccessToken);
-        const newUserData = decodedToken.user;
+        // 🔍 Decode token untuk log saja (tidak untuk overwrite user)
+        try {
+          const decodedToken = jwtDecode(newAccessToken);
+          console.log("🔑 Decoded new token payload:", decodedToken);
+        } catch (decodeError) {
+          console.warn("⚠️ Gagal decode token baru:", decodeError);
+        }
 
-        // ✅ Simpan token dan user data baru
+        // ✅ Simpan token baru
         localStorage.setItem("accessToken", newAccessToken);
-        localStorage.setItem("user", JSON.stringify(newUserData));
 
-        // ✅ Update default headers
+        // ✅ Pertahankan data user lama (jangan timpa!)
+        const existingUser = JSON.parse(localStorage.getItem("user") || "null");
+        if (existingUser) {
+          localStorage.setItem("user", JSON.stringify(existingUser));
+        }
+
+        // ✅ Update header Authorization
         api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
-        // ✅ Process queue dengan token baru
+        // ✅ Proses ulang antrean yang menunggu
         processQueue(null, newAccessToken);
         isRefreshing = false;
 
         console.log("✅ Token refreshed successfully");
+        console.log("🔁 Retrying original request:", originalRequest?.url);
 
-        // ✅ Retry original request
+        // ✅ Jalankan kembali request yang gagal
         return api(originalRequest);
-        
       } catch (refreshError) {
-        console.error("❌ Refresh failed:", {
+        console.error("❌ Refresh token failed:", {
           message: refreshError.message,
           response: refreshError.response?.data,
           status: refreshError.response?.status,
@@ -121,22 +120,22 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         isRefreshing = false;
 
-        // ✅ Clear storage dan redirect ke login
+        // ✅ Bersihkan token dan user
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
-        
-        // ✅ Redirect ke login page
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+
+        // ✅ Arahkan ke login
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
 
         return Promise.reject(refreshError);
       }
     }
 
-    // Handle network errors
+    // 🌐 Tangani error koneksi
     if (!error.response) {
-      console.error("❌ Network error - cannot connect to server");
+      console.error("❌ Network error: gagal terhubung ke server");
     }
 
     return Promise.reject(error);

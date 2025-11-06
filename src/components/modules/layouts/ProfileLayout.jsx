@@ -36,20 +36,22 @@ const ProfileLayout = () => {
         )
     }
 
+    console.log(sellerServiceStatus)
+
     if(status === 'success'){
       const skills = seller?.kategori_toko.split(' & ')
       return(
-        <div className='flex flex-col h-full'>
+        <div className='flex flex-col h-full '>
           <div className='w-full h-[12vh]' style={{
               backgroundImage : `url(${Bannerr})`,
               backgroundSize : 'cover' 
           }}></div>
-          <div className='sm:flex sm:flex-row flex-col w-full h-full gap-[10px] md:gap-[20px] lg:gap-[30px] sm:px-[50px] px-[10px]'>
-            <div className='sm:w-2/7 w-full sm:h-full flex sm:flex-col sm:items-center lg:px-[20px] lg:py-[35px] md:px-[15px] md:py-[30px] px-[10px] sm:py-[25px] py-[15px] gap-[15px]'>
-              <div className='bg-amber-100 lg:w-[110px] lg:h-[110px] md:w-[90px] md:h-[90px] w-[75px] h-[75px] rounded-full aspect-square'/>
+          <div className='xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] sm:flex sm:flex-row flex-col w-full h-full gap-[10px] md:gap-[20px] lg:gap-[30px] mx-auto'>
+            <div className='sm:h-full flex sm:flex-col sm:items-center lg:px-[20px] lg:py-[35px] md:px-[15px] md:py-[30px] px-[10px] sm:py-[25px] py-[15px] gap-[15px]'>
+              <img src={seller?.foto_toko} className='bg-gray-200 lg:w-[110px] lg:h-[110px] md:w-[90px] md:h-[90px] w-[75px] h-[75px] rounded-full aspect-square'/>
               <div className='sm:text-center w-full'>
                 <p className='lg:text-h3 md:text-h4 text-h5 font-medium w-full'>{seller?.nama_toko}</p>
-                <p className='md:text-h5 text-h6 font-light'></p>
+                <p className='md:text-h5 text-h6 font-light'>Jalan cibaduyut</p>
               </div>
               <Button variant='primary' className='sm:block hidden md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] w-[100px] py-[10px]'>Kontak Saya</Button>
               <div className='sm:flex hidden flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]'>

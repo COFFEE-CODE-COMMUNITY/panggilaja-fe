@@ -73,12 +73,17 @@ const InformationService = ({idSeller, sellerName, idProvider,  idService, nameS
     const [showMoreDesc, setShowMoreDesc] = useState(false)
 
   return (
-    <div className='lg:h-full h-1/2 lg:w-[45%] w-full flex flex-col gap-[30px] lg:py-[25px] md:py-[20px] py-[15px] px-[15px]'>
+    <div className='lg:h-full h-1/2 lg:w-[40%] w-full flex flex-col gap-[30px] lg:py-7 md:py-6 py-5 px-[15px]'>
         <div className='flex flex-col gap-[10px]'>
             <div className='flex flex-col gap-[10px]'>
                 <div className='flex flex-col leading-8'>
                     <div className='flex'>
-                        <p className='flex-1 text-h5 font-light'>{sellerProfile?.nama_toko}</p>
+                        <Link 
+                            className='flex-1 text-h5 font-light'
+                            to={`/profile-service/${idSeller}`}
+                        >
+                            {sellerProfile?.nama_toko}
+                        </Link>
                         {token && (
                             isServiceFavorite ? (
                                 <Button 
@@ -104,7 +109,17 @@ const InformationService = ({idSeller, sellerName, idProvider,  idService, nameS
                     </div>
                     <p className='text-h5 font-light text-primary'>{totalReview} ulasan</p>
                 </div>
-                <p className='text-h5 font-light my-3'>
+                <div className='flex w-full'>
+                    <div className='flex-1'>
+                        <p className='w-full border-b-1 border-gray-400'>Harga Dasar</p>
+                        <p className='lg:text-h3 md:text-h4 text-h5 font-medium py-1'>Rp {basePrice}</p>
+                    </div>
+                    <div className='flex-1'>
+                        <p className='w-full border-b-1 border-gray-400'>Harga Tertinggi</p>
+                        <p className='lg:text-h3 md:text-h4 text-h5 font-medium py-1'>Rp {topPrice}</p>
+                    </div>
+                </div>
+                <p className='text-h5 font-light'>
                     {!showMoreDesc && description.slice(0,200)}{!showMoreDesc && <>
                         <span>...</span><span onClick={() => setShowMoreDesc(!showMoreDesc)} className='font-medium cursor-pointer'>selengkapnya</span>
                     </>}
@@ -123,16 +138,6 @@ const InformationService = ({idSeller, sellerName, idProvider,  idService, nameS
                     </div>
                 </div>
             </div> */}
-            <div className='flex w-full'>
-                <div className='flex-1'>
-                    <p className='w-full border-b-1 border-gray-400'>Harga Dasar</p>
-                    <p className='lg:text-h2 text-h3 font-medium py-2'>Rp {basePrice}</p>
-                </div>
-                <div className='flex-1'>
-                    <p className='w-full border-b-1 border-gray-400'>Harga Tertinggi</p>
-                    <p className='lg:text-h2 text-h3 font-medium py-2'>Rp {topPrice}</p>
-                </div>
-            </div>
             {/* <h2 className='text-h3'>Rp. {basePrice} - {topPrice}</h2> */}
             <div className='flex flex-1'>
                 <div className='w-full flex gap-1.5'>

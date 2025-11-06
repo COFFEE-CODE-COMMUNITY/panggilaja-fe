@@ -34,16 +34,16 @@ const FaqService = () => {
             {faqsData.map((faq, index) => (
                 <div 
                     key={index} 
-                    className={`relative w-full rounded-md border border-gray-300 px-6 py-5 cursor-pointer ${index > 0 ? 'my-3' : ''}`} // Tambahkan margin kecuali untuk FAQ pertama
+                    className={`relative w-full rounded-md border border-gray-300 lg:px-6 lg:py-5 md:px-5 md:py-4 px-4 py-3 cursor-pointer ${index > 0 ? 'my-3' : ''}`} // Tambahkan margin kecuali untuk FAQ pertama
                     onClick={() => toggleFaq(index)}
                 >
                     <div className="max-w-3xl">
-                        <h2 className="font-bold text-black text-h5">
+                        <h2 className="text-black text-h5">
                             {faq.question}
                         </h2>
                         {/* Tampilkan jawaban hanya jika FAQ ini sedang terbuka */}
                         {openFaqIndex === index && (
-                            <p className="font-inter mt-4 text-base font-light text-gray-500">
+                            <p className="font-inter mt-4 md:text-h5 text-h6 font-light text-gray-500">
                                 {faq.answer}
                             </p>
                         )}

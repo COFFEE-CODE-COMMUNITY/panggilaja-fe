@@ -4,6 +4,8 @@ import ImageService from './sections/ImageService'
 import { getServicesById, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
 import { useEffect } from 'react'
 import InformationService from './sections/InformationService'
+import ReviewCard from '../../components/modules/Cards/ReviewCard'
+import ReviewService from './sections/ReviewService'
 
 const DetailService = () => {
   const {id} = useParams()
@@ -34,20 +36,22 @@ const DetailService = () => {
         {status === 'loading' && <div className='w-full h-screen'>loading</div>}
         {status === 'success' && (
           <>
-            <ImageService image={service.foto_product}/>
-            {service && (
-              <InformationService
-                description={service.deskripsi}
-                idProvider={service.seller_id}
-                idService={service.id}
-                nameService={service.nama_jasa}
-                totalReviewSeller={service.jumlah_rating}
-                totalReview={service.jumlah_rating}
-                basePrice={service.base_price}
-                topPrice={service.top_price}
-                idSeller={service.seller_id}
-              />
-            )}
+            <div className='flex flex-col lg:w-[60%] gap-10'>
+              <ImageService image={service.foto_product}/>
+              <ReviewService/>
+            </div>
+            <InformationService
+              description={service.deskripsi}
+              idProvider={service.seller_id}
+              idService={service.id}
+              nameService={service.nama_jasa}
+              totalReviewSeller={service.jumlah_rating}
+              totalReview={service.jumlah_rating}
+              basePrice={service.base_price}
+              topPrice={service.top_price}
+              idSeller={service.seller_id}
+            />
+            
           </>
         )}
     </div>

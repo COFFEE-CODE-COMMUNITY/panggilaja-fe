@@ -27,7 +27,7 @@ const ServiceCard = ({image, idService, serviceName, basePrice, topPrice, seller
 
   return (
     <Card 
-        className='group hover:scale-101 transition-all duration-200 relative block overflow-hidden'
+        className='group hover:scale-101 transition-all duration-200 relative block overflow-hidden rounded-lg'
         to={false}
     >
         {!guest ? 

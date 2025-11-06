@@ -79,7 +79,7 @@ const Header = () => {
   useEffect(() => {
     if (statusChange === "success") {
       dispatch(resetChangeAccountStatus());
-      navigate("/dashboard"); 
+      navigate("/dashboard/manage-order"); 
     }
   }, [statusChange, dispatch, navigate]);
   
@@ -406,7 +406,7 @@ const Header = () => {
         <div className="hidden sm:flex fixed xl:right-[150px] lg:right-[100px] md:right-[40px] right-[25px] lg:top-[90px] md:top-[80px] top-[75px] gap-4 z-100">
           {/* Favorites Panel */}
           {favorite && (
-            <div className="w-96 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+            <div className="w-100 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
                 <h3 className="text-h5 font-semibold text-gray-800">
                   Jasa Favorit
@@ -419,21 +419,22 @@ const Header = () => {
                     return (
                       <div
                         key={favorite.id}
+                        className="w-full"
                       >
-                        <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors">
+                        <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors ">
                           <img
                             src={favorite?.foto_product}
                             alt={favorite.nama_jasa}
                             className="w-20 h-20 object-cover rounded-lg"
                           />
-                          <div className="flex flex-col flex-1">
+                          <div className="flex flex-col w-full">
                             <Link 
-                              className="text-h5 font-medium text-gray-800 line-clamLink-2 w-full cursor-pointer"
+                              className="text-h5 font-medium text-gray-800 line-clamLink-2 cursor-pointer"
                               to={`service/${favorite.id}`}
                             >
                               {favorite.nama_jasa}
                             </Link>
-                            <p className="font-light">{favorite.deskripsi.slice(0,50)}...</p>
+                            <p className="font-light w-50">{favorite.deskripsi.slice(0,20)}...</p>
                           </div>
                           <div>
                             <FaHeart
