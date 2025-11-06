@@ -20,17 +20,16 @@ import ManageOrder from "./page/Dashboard/ManageOrder";
 import ManageServices from "./page/Dashboard/ManageServices";
 import AddService from "./page/Dashboard/AddService";
 import FormAfterRegist from "./page/FormDetailProfil/Index";
-import ChatPage from "./page/Order/Index";
 import ProfileSetting from "./page/Setting/ProfileSetting";
 import SettingLayout from "./components/modules/layouts/SettingLayout";
-import { GuestRoute, HomeRoute, ProtectedRoute } from "./ProtectedRoute";
+import { GuestRoute, ProtectedRoute } from "./ProtectedRoute";
 import ServiceMitraLayout from "./components/modules/layouts/ServiceMitraLayout";
 import TambahJasaForm from "./page/MitraForm/sections/TambahJasaForm";
 import EditProfile from "./page/Setting/EditProfile";
 import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
 import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
-import GoogleCallback from "./page/Auth/GoogleCallback"; // Capital 'Auth'
+import GoogleCallback from "./page/Auth/GoogleCallback";
 import ManageProfile from "./page/Dashboard/ManageProfile";
 import ChatLayout from "./components/modules/layouts/Chat/ChatLayout";
 import Test from "./page/Search/Test";
@@ -56,14 +55,6 @@ const Router = createBrowserRouter([
       {
         path: "service/:id",
         element: <DetailService />,
-      },
-      {
-        path: "service/chat/:id",
-        element: (
-          <ProtectedRoute>
-            <ChatPage />
-          </ProtectedRoute>
-        ),
       },
       {
         path: "search-result",
@@ -113,15 +104,23 @@ const Router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "chat",
-        element: (
-          <ProtectedRoute>
-            <ChatLayout />
-          </ProtectedRoute>
-        ),
-      },
     ],
+  },
+  {
+    path: "/chat",
+    element: (
+      <ProtectedRoute>
+        <ChatLayout />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/chat/:partnerId",
+    element: (
+      <ProtectedRoute>
+        <ChatLayout />
+      </ProtectedRoute>
+    ),
   },
 
   {
@@ -168,6 +167,10 @@ const Router = createBrowserRouter([
         element: <ChatLayout />,
       },
       {
+        path: "chat/:partnerId",
+        element: <ChatLayout />,
+      },
+      {
         path: "manage-services/add-service",
         element: <AddService />,
       },
@@ -187,9 +190,7 @@ const Router = createBrowserRouter([
   },
   {
     path: "/test",
-    element: (
-      <Test />
-    ),
+    element: <Test />,
   },
   {
     path: "/register",
@@ -199,7 +200,6 @@ const Router = createBrowserRouter([
       </GuestRoute>
     ),
   },
-  // TAMBAHKAN ROUTE INI UNTUK GOOGLE OAUTH CALLBACK
   {
     path: "/auth/google/callback",
     element: <GoogleCallback />,

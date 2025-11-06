@@ -149,7 +149,7 @@ const Header = () => {
     );
   }
 
-  const haveSellerAccount = user?.available_roles.length > 1;
+  const haveSellerAccount = user?.available_roles?.length > 1;
 
   return (
     <>
