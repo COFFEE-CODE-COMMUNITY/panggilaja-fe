@@ -197,7 +197,9 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 const { status, message, data } = action.payload
                 
-                const accessToken = data.accessToken
+                // ✅ PERBAIKAN: accessToken sekarang langsung di data, bukan nested
+                console.log(data)
+                const accessToken = data.user.accessToken
 
                 if (!accessToken) {
                     console.error("❌ Access token tidak ditemukan di response")
@@ -277,17 +279,18 @@ const authSlice = createSlice({
                 state.error = null
             })
             .addCase(googleLoginSuccess.fulfilled, (state, action) => {
-                // const { status, message, data } = action.payload
-                // const { user, token } = data
+                const { status, message, data } = action.payload
+                const { user, token } = data
+                console.log(data)
                 
-                // state.status = 'success'
-                // state.error = null
-                // state.message = message || 'Login dengan Google berhasil'
-                // state.accessToken = token
-                // state.user = user
+                state.status = 'success'
+                state.error = null
+                state.message = message || 'Login dengan Google berhasil'
+                state.accessToken = token
+                state.user = user
 
-                // localStorage.setItem('accessToken', token)
-                // localStorage.setItem('user', JSON.stringify(user))
+                localStorage.setItem('accessToken', token)
+                localStorage.setItem('user', JSON.stringify(user))
             })
             .addCase(googleLoginSuccess.rejected, (state, action) => {
                 state.message = action.payload?.message || 'Login dengan Google gagal'
