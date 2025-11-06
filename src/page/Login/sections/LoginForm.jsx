@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, selectAccessToken, selectAuthError, selectAuthMessage, selectAuthStatus, selectCurrentUser } from "../../../features/authSlice";
+import { loginUser, selectAccessToken, selectCurrentUser, selectLoginError, selectLoginMessage, selectLoginStatus } from "../../../features/authSlice";
 
 const LoginForm = () => {
   
@@ -21,9 +21,9 @@ const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const status = useSelector(selectAuthStatus);
-  const message = useSelector(selectAuthMessage);
-  const error = useSelector(selectAuthError);
+  const status = useSelector(selectLoginStatus);
+  const message = useSelector(selectLoginMessage);
+  const error = useSelector(selectLoginError);
   const currentUser = useSelector(selectCurrentUser);
   const token = useSelector(selectAccessToken);
 

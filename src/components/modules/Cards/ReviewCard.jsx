@@ -1,17 +1,27 @@
 import React from 'react'
 import Card from '../../common/Card'
+import Stars from '../../common/Stars'
 
 const ReviewCard = ({profileImage, name, date, rating, reviewText}) => {
 
     return (
-    <Card className='px-[20px] py-[15px] bg-slate-50 rounded-[20px]'>
-        <div className='flex gap-[10px] items-center'>
-            <img className='bg-amber-100 h-[20px] w-[20px] rounded-full' />
-            <p className='text-h4'>{name}</p>
-            <p className='flex-1 text-h6'>{date}</p>
-            <div className='flex-1 text-right text-h6'>{rating}</div>
+    <Card className='flex gap-5'>
+        <div>
+            <img className='w-20 aspect-square rounded-full bg-amber-200'/>
         </div>
-        <p className='font-light'>{reviewText}</p> 
+        <div className='flex flex-col gap-3'>
+            <div>
+                <p>Asep</p>
+                <p className='font-light'>20-09-2025</p>
+            </div>
+            <Stars
+                many={5}
+                variant='star'
+            />
+            <p className='font-light'>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae labore praesentium mollitia iste excepturi eius minus quaerat cum unde ducimus dolorum explicabo accusamus, nostrum velit accusantium quae sunt hic totam.
+            </p>
+        </div>
     </Card>
   )
 }

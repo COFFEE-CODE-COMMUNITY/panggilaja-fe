@@ -14,8 +14,6 @@ const LandingPage = () => {
       <ServiceAround/>
       <Invitation/>
       <Review/>
-      <Stars
-      />
     </div>
   )
 }

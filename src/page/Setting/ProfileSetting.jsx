@@ -26,7 +26,7 @@ const ProfileSetting = () => {
         // 2. Pastikan status masih 'idle' (belum pernah mencoba mengambil) atau ingin refresh jika data belum ada (!address)
         if (user?.id_buyer && statusAddress === 'idle' && !address) { 
             // URL yang dikirim ke service sekarang pasti berisi ID yang valid
-            dispatch(seeAddress(user?.id_buyer))
+            dispatch(seeAddress(user.id_buyer))
         }
     // Masukkan id_buyer sebagai dependency, agar effect berjalan HANYA SETELAH id_buyer terisi
     // Masukkan statusAddress agar dispatch hanya dilakukan saat 'idle' atau butuh refresh

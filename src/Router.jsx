@@ -16,7 +16,6 @@ import ProfilePhotos from "./page/ProfileService/ProfilePhotos";
 import ProfileServices from "./page/ProfileService/ProfileServices";
 import SearchPage from "./page/Search/Index";
 import DashboardLayout from "./components/modules/layouts/Dashboard/DashboardLayout";
-import ManageOrder from "./page/Dashboard/ManageOrder";
 import ManageServices from "./page/Dashboard/ManageServices";
 import AddService from "./page/Dashboard/AddService";
 import FormAfterRegist from "./page/FormDetailProfil/Index";
@@ -34,6 +33,12 @@ import GoogleCallback from "./page/Auth/GoogleCallback"; // Capital 'Auth'
 import ManageProfile from "./page/Dashboard/ManageProfile";
 import ChatLayout from "./components/modules/layouts/Chat/ChatLayout";
 import Test from "./page/Search/Test";
+import ManageOrderLayout from "./page/Dashboard/ManageOrderLayout";
+import TableAllOrder from "./page/Dashboard/sections/TableAllOrder";
+import TableProgressOrder from "./page/Dashboard/sections/TableProgressOrder";
+import TableDoneOrder from "./page/Dashboard/sections/TableDoneOrder";
+import FavoriteMobile from "./page/Favorite/Index";
+import TableIncomingOrder from "./page/Dashboard/sections/TableIncomingOrder";
 
 const Router = createBrowserRouter([
   {
@@ -48,6 +53,12 @@ const Router = createBrowserRouter([
       {
         path: "about",
         element: <PartnerPage />,
+      },
+      {
+        path: "/favorites",
+        element: (
+          <FavoriteMobile />
+        ),
       },
       {
         path: "partner",
@@ -152,16 +163,52 @@ const Router = createBrowserRouter([
     ),
     children: [
       {
-        index: true,
-        element: <ManageOrder />,
+        path : "manage-order",
+        element: <ManageOrderLayout />,
+        children : [
+          {
+            index : true,
+            element : <TableAllOrder/>
+          },
+          {
+            path : 'incoming-order',
+            element : <TableIncomingOrder/>
+          },
+          {
+            path : 'process-order',
+            element : <TableProgressOrder/>
+          },
+          {
+            path : 'done-order',
+            element : <TableDoneOrder/>
+          },
+        ]
       },
       {
         path: "manage-services",
         element: <ManageServices />,
       },
       {
-        path: "manage-profile",
-        element: <ManageProfile />,
+        path: "manage-profile/:id",
+        element: <ProfileLayout />,
+        children : [
+          {
+            index : true,
+            element : <ProfileIndex/>
+          },
+          {
+            path: "services",
+            element: <ProfileServices />,
+          },
+          {
+            path: "reviews",
+            element: <ProfileReviews />,
+          },
+          {
+            path: "photos",
+            element: <ProfilePhotos />,
+          },
+        ]
       },
       {
         path: "chat",
