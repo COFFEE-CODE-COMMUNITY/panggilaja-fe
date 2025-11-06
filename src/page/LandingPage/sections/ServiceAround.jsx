@@ -5,6 +5,7 @@ import {
   getServicesAround,
   selectAllService,
   selectAllServiceStatus,
+  selectFavoriteService,
   selectServiceAround,
   selectServiceAroundError,
   selectServiceAroundStatus,
@@ -14,6 +15,7 @@ import { Link } from "react-router-dom";
 import { FaArrowRight, FaBox } from "react-icons/fa";
 import { selectAccessToken, selectCurrentUser } from "../../../features/authSlice";
 import { seeAddress, selectSeeAddress } from "../../../features/userSlice";
+import Stars from "../../../components/common/Stars";
 
 const ServiceAround = () => {
   const dispatch = useDispatch();
@@ -25,25 +27,21 @@ const ServiceAround = () => {
 
   const servicesAround = useSelector(selectServiceAround)
   const servicesAroundStatus = useSelector(selectServiceAroundStatus)
-  const servicesAroundError = useSelector(selectServiceAroundError)
 
+  const favorites = useSelector(selectFavoriteService)
 
   useEffect(() => {
     dispatch(getServices());
-    if(user?.id && token){
-      dispatch(seeAddress(user.id))
+    if(user?.id_buyer && token){
+      dispatch(seeAddress(user.id_buyer))
     }
   }, [dispatch]);
 
   useEffect(() => {
-    if(address?.data?.kecamatan){
+    if(address?.data?.kecamatan && user?.id){
       dispatch(getServicesAround({id : user.id, kecamatan : address?.data?.kecamatan}))
     }
-  },[address?.data?.kecamatan])
-
-  console.log(servicesAround)
-  console.log(servicesAroundStatus)
-  console.log(servicesAroundError)
+  },[address?.data?.kecamatan, favorites])
 
   // Loading State
   if (servicesStatus === "loading") {
@@ -105,7 +103,7 @@ const ServiceAround = () => {
   }
 
   const servicesSlice = services.slice(0, 8);
-
+  const servicesAroundSlice = servicesAround?.slice(0, 8)
 
   // Success State
   if (servicesStatus === "success") {
@@ -149,35 +147,39 @@ const ServiceAround = () => {
 
         {/* Services Grid */}
         {services.length > 0 && (
-          // <div className="grid lg:gap-[10px] md:gap-[7px] gap-[4px] w-full lg:grid-cols-4 grid-cols-2">
-          //   {servicesSlice.map((service, index) => (
-          //     <div
-          //       key={service.id}
-          //       className="transition-all duration-300 hover:scale-[1.02]"
-          //     >
-                // <ServiceCard
-                //   idService={service.id}
-                //   image={service.foto_product}
-                //   serviceName={service.nama_jasa}
-                //   basePrice={service.base_price}
-                //   topPrice={service.top_price}
-                //   sellerName={service.seller.nama_toko}
-                // />
-          //     </div>
-          //   ))}
-          // </div>
-          <div className="grid gap-x-4 gap-y-9 sm:grid-cols-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-4 xl:gap-x-4">
-            {servicesSlice.map((service, index) => (
-              <ServiceCard
-                key={index}
-                idService={service.id}
-                image={service.foto_product}
-                serviceName={service.nama_jasa}
-                basePrice={service.base_price}
-                topPrice={service.top_price}
-              />
-            ))}
-          </div>
+          <>
+            {address?.data?.kecamatan ? (
+              <div className="grid gap-x-2 md:gap-x-3 lg:gap-x-4 gap-y-7 md:gap-y-8 lg:gap-y-9 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
+                {servicesAroundSlice?.map((service, index) => (
+                  <ServiceCard
+                    key={index}
+                    idService={service.id}
+                    image={service.foto_product}
+                    serviceName={service.nama_jasa}
+                    basePrice={service.base_price}
+                    topPrice={service.top_price}
+                    star={4}
+                    desc={service.deskripsi}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-x-4 gap-y-9 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-4">
+                {servicesSlice?.map((service, index) => (
+                  <ServiceCard
+                    key={index}
+                    idService={service.id}
+                    image={service.foto_product}
+                    serviceName={service.nama_jasa}
+                    basePrice={service.base_price}
+                    topPrice={service.top_price}
+                    star={4}
+                    desc={service.deskripsi}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     );

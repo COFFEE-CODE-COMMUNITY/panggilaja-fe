@@ -4,6 +4,7 @@ import { selectCurrentUser } from '../../../features/authSlice'
 import { getAllServicesByIdSeller, resetServiceSeller, selectSellerServices, selectSellerStatus, selectServiceSellerStatus } from '../../../features/sellerSlice'
 import { Link } from 'react-router-dom'
 import { deleteService, resetDeleteStatus, selectDeleteServiceStatus } from '../../../features/serviceSlice'
+import Button from '../../../components/common/Button'
 
 const TableServices = () => {
     const user = useSelector(selectCurrentUser)
@@ -32,48 +33,73 @@ const TableServices = () => {
     }, [dispatch, statusDelete])
 
     console.log(servicesSeller)
-    console.log(status)
   return (
-    <div className='h-full'>
-        <table className='w-full table-auto text-left rounded-[15px] overflow-hidden'>
-            <thead className='bg-gray-50'>
+    <div className="flex flex-col gap-2">
+        <div className='flex justify-end'>
+            <Link to={`/dashboard/manage-services/add-service`}>
+                <Button
+                    variant='primary'
+                    className='px-5 py-2 text-white rounded-xl'
+                >
+                    Tambah Jasa
+                </Button>
+            </Link>
+        </div>
+    {/* Table */}
+        <table className="w-full text-left border border-gray-400 rounded-xl overflow-hidden">
+            {/* Header */}
+            <thead className="bg-primary text-white font-bold ">
                 <tr>
-                    <th className='p-[10px] w-1/3'>Jasa</th>
-                    <th className='p-[10px] w-1/3'>Status</th>
-                    <th className='p-[10px] w-1/3'>Aksi</th>
+                <th className="p-4 w-[20%] col-span-2">
+                    Gambar
+                </th>
+                <th className="px-4 py-3 w-[15%]">
+                    Nama
+                </th>
+                <th className="px-4 py-3 w-[18%]">Title 03</th>
+                <th className="px-4 py-3 w-[15%]">Title 04</th>
+                <th className="px-4 py-3 w-[22%]">Title 01</th>
+                <th className="px-4 py-3 w-[10%]"></th>
                 </tr>
             </thead>
-            <tbody className='bg-gray-50/60'>
-                {status === 'success' && servicesSeller.data.map((service) => (
-                    <tr key={service.id}>
-                        <td className='py-[15px] px-[10px]'>
-                            <div className='flex gap-[15px] items-center'>
-                                <div>
-                                    <img src={service.foto_product} className='w-[100px] h-[100px] bg-amber-100'/>
-                                </div>
-                                <p className='w-full h-full'>{service.nama_jasa}</p>
+            {/* Body */}
+            <tbody>
+                {servicesSeller?.data.map((service) => (
+                    <tr className="border-t border-gray-400 ">
+                        <td className="px-4 py-3  w-[20%]">
+                            <div className="flex items-center space-x-2 w-full">
+                                <img src={service?.foto_product} />
                             </div>
                         </td>
-                        <td className='py-[15px] px-[10px]'>
-                            <span className='px-[10px] py-[5px] border-2 border-primary text-primary rounded-[45px]'>Aktif</span>
+                        <td className="px-4 py-3 w-[15%] align-text-top">
+                            {service.nama_jasa}
                         </td>
-                        <td className='py-[15px] px-[10px]'>
-                            <div className='flex gap-[5px]'>
-                                <span 
-                                    className='px-[10px] py-[5px] border-2 border-red-600 text-red-600 rounded-[45px] cursor-pointer'
-                                    onClick={() => dispatch(deleteService(service.id))}
-                                >        
-                                Hapus</span>
-                                <Link 
-                                    to={`edit-service/${service.id}`} 
-                                    className='px-[10px] py-[5px] border-2 border-yellow-600 text-yellow-600 rounded-[45px]'
-                                >
-                                    Edit
-                                </Link>
-                                <span className='px-[10px] py-[5px] border-2 border-primary text-primary rounded-[45px]'>Arsip</span>
+                        <td className="px-4 py-3 w-[18%] align-text-top">Placeholder</td>
+                        <td className="px-4 py-3 w-[15%] align-text-top">
+                            <div className="w-full flex items-center">
+                            <div className="bg-gray-100 rounded-full h-7 w-7 border border-white -mx-0.5"></div>
+                            <div className="bg-gray-100 rounded-full h-7 w-7 border border-white -mx-0.5"></div>
+                            <div className="bg-gray-100 rounded-full h-7 w-7 border border-white -mx-0.5"></div>
+                            <div className="bg-gray-100 rounded-full h-7 w-7 border border-white -mx-0.5"></div>
+
+                            <span className="-ml-0.5 bg-gray-100 border border-white flex items-center justify-center rounded-full h-7 w-7 text-xs">
+                                +5
+                            </span>
                             </div>
                         </td>
-                    </tr>
+                        <td className="px-4 py-3 w-[22%] align-text-top">
+                            <div className="bg-gray-100 w-full h-1 rounded-full"></div>
+                        </td>
+                        <td className="px-4 py-3 w-[10%] align-text-top">
+                            <div className=" flex w-full justify-end">
+                            <button className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5">
+                                <span className="bg-black h-1 w-1 rounded-full"></span>
+                                <span className="bg-black h-1 w-1 rounded-full"></span>
+                                <span className="bg-black h-1 w-1 rounded-full"></span>
+                            </button>
+                            </div>
+                        </td>
+                    </tr>                
                 ))}
             </tbody>
         </table>

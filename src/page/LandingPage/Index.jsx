@@ -4,6 +4,7 @@ import Category from './sections/Category'
 import ServiceAround from './sections/ServiceAround'
 import Invitation from './sections/Invitation'
 import Review from './sections/Review'
+import Stars from '../../components/common/Stars'
 
 const LandingPage = () => {
   return (

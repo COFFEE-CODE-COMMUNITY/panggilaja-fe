@@ -99,6 +99,8 @@ const initialState = {
   statusDelete : 'idle',
   statusGetServiceSeller : 'idle',
 
+  messageSellerService : null,
+
   sellers : null,
 
   messageDeleteSeller : ''

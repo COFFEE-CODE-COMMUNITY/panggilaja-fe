@@ -15,9 +15,13 @@ const getUser = () => {
 const initialState = {
     user : getUser(),
     accessToken : getToken(),
-    status : 'idle',
-    error : null,
-    message : null,
+    loginStatus : 'idle',
+    loginError : null,
+    loginMessage : null,
+
+    registerStatus : 'idle',
+    registerError : null,
+    registerMessage : null,
 
     resetPasswordRequestStatus : 'idle',
     resetPasswordRequestMessage : null,
@@ -172,6 +176,11 @@ const authSlice = createSlice({
             localStorage.removeItem('accessToken')
             localStorage.removeItem('user')
         },
+        updateProfile : (state) => {
+            state.accessToken = getToken();
+            const decodeToken = jwtDecode(getToken())
+            state.user = decodeToken.user
+        },
         resetChangeAccountStatus : (state) => {
             state.changeAccountStatus = 'idle',
             state.changeAccountMessage = null,
@@ -188,12 +197,11 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 const { status, message, data } = action.payload
                 
-                // ✅ PERBAIKAN: accessToken sekarang langsung di data, bukan nested
                 const accessToken = data.accessToken
 
                 if (!accessToken) {
                     console.error("❌ Access token tidak ditemukan di response")
-                    state.status = 'failed'
+                    state.loginStatus = 'failed'
                     state.message = 'Token tidak valid'
                     return
                 }
@@ -202,7 +210,7 @@ const authSlice = createSlice({
                 const decodeToken = jwtDecode(accessToken)
                 const userData = decodeToken.user
                 
-                state.status = 'success'
+                state.loginStatus = 'success'
                 state.error = null
                 state.message = message
                 state.accessToken = accessToken
@@ -216,7 +224,7 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.message = action.payload?.message || 'Login gagal'
-                state.status = 'failed'
+                state.loginStatus = 'failed'
                 state.error = action.payload
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('user');
@@ -224,12 +232,12 @@ const authSlice = createSlice({
 
             //register
             .addCase(registerUser.pending, (state) => {
-                state.status = 'loading'
+                state.registerStatus = 'loading'
                 state.error = null
             })
             .addCase(registerUser.fulfilled, (state, action) => {
                 const {status, message} = action.payload
-                state.status = 'success'
+                state.registerStatus = 'success'
                 state.error = null
                 state.message = message
                 state.accessToken = null
@@ -238,7 +246,7 @@ const authSlice = createSlice({
             .addCase(registerUser.rejected, (state, action) => {
                 state.error = action.payload || action.error.message; 
                 state.message = action.payload?.message || 'Pendaftaran gagal.'
-                state.status = 'failed'
+                state.registerStatus = 'failed'
                 state.accessToken = null
                 state.user = null
             })
@@ -383,12 +391,17 @@ const authSlice = createSlice({
     }
 })
 
-export const { logout, setOAuthCredentials, resetChangeAccountStatus } = authSlice.actions
+export const { logout, setOAuthCredentials, resetChangeAccountStatus, updateProfile } = authSlice.actions
 export const selectCurrentUser = state => state.auth.user
 export const selectAccessToken = state => state.auth.accessToken
-export const selectAuthStatus = state => state.auth.status
-export const selectAuthError = state => state.auth.error
-export const selectAuthMessage = state => state.auth.message
+
+export const selectLoginStatus = state => state.auth.loginStatus
+export const selectLoginError = state => state.auth.loginError
+export const selectLoginMessage = state => state.auth.loginMessage
+
+export const selectRegisterStatus = state => state.auth.registerStatus
+export const selectRegisterError = state => state.auth.registerError
+export const selectRegisterMessage = state => state.auth.registerMessage
 
 export const selectIsVerified = (state) => state.auth.isVerified;
 export const selectResetEmail = (state) => state.auth.resetEmail;

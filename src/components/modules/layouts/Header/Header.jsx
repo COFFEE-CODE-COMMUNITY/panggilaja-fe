@@ -10,12 +10,13 @@ import {
   logoutUser,
   resetChangeAccountStatus,
   selectAccessToken,
-  selectAuthStatus,
   selectChangeAccountStatus,
   selectCurrentUser,
+  updateProfile,
 } from "../../../../features/authSlice";
 import {
   FaBars,
+  FaHeart,
   FaRegComment,
   FaRegHeart,
   FaSearch,
@@ -26,9 +27,13 @@ import {
 import { MdSearch } from "react-icons/md";
 import { IoMdLogOut } from "react-icons/io";
 import {
+  deleteFavoriteService,
   getFavoriteService,
   getServices,
+  resetDeleteFavoritesStatus,
   selectAllService,
+  selectDeleteFavoriteServiceError,
+  selectDeleteFavoriteServiceStatus,
   selectFavoriteService,
   selectFavoriteServiceStatus,
 } from "../../../../features/serviceSlice";
@@ -43,67 +48,113 @@ import {
 } from "../../../../features/searchSlice";
 
 const Header = () => {
-  const user = useSelector(selectCurrentUser);
-  const token = useSelector(selectAccessToken);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const urlSearchText = searchParams.get("q") || "";
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const urlSearchText = searchParams.get("q") || "";
 
-  console.log(user);
+  const user = useSelector(selectCurrentUser);
+  const token = useSelector(selectAccessToken);
+  const profile = useSelector(selectSeeProfile);
+  const statusProfile = useSelector(selectSeeProfileStatus);
+  const searchText = useSelector(selectSearchText);
+  const favorites = useSelector(selectFavoriteService);
+  const favoritesStatus = useSelector(selectFavoriteServiceStatus);
+  const services = useSelector(selectAllService);
+  const statusChange = useSelector(selectChangeAccountStatus);
+  const deleteFavoriteStatus = useSelector(selectDeleteFavoriteServiceStatus)
+  const deleteFavoriteMessage = useSelector(selectDeleteFavoriteServiceError)
 
-  const authStatus = useSelector(selectAuthStatus);
+  const [sidebarProfile, setSidebarProfile] = useState(false);
+  const [sidebarMobile, setSidebarMobile] = useState(false);
+  const [favorite, setFavorite] = useState(false);
+  const [chat, setChat] = useState(false);
+  const [searchMobile, setSearchMobile] = useState(false);
+  const [iconSearch, setIconSearch] = useState(true);
+  const [order, setOrder] = useState(false);
+  const [header, setHeader] = useState(true);
+  const [search, setSearch] = useState(urlSearchText || searchText);
 
-  const profile = useSelector(selectSeeProfile);
-  const statusProfile = useSelector(selectSeeProfileStatus);
+  useEffect(() => {
+    if (statusChange === "success") {
+      dispatch(resetChangeAccountStatus());
+      navigate("/dashboard/manage-order"); 
+    }
+  }, [statusChange, dispatch, navigate]);
+  
+  useEffect(() => {
+    setSearch(urlSearchText);
+    dispatch(setSearchText(urlSearchText));
+  }, [location.search, dispatch]);
 
-  const searchText = useSelector(selectSearchText);
+  useEffect(() => {
+    if (sidebarProfile) {
+      setSidebarProfile(false);
+    }
+  }, [location.pathname]);
 
-  const [sidebarProfile, setSidebarProfile] = useState(false);
-  const [sidebarMobile, setSidebarMobile] = useState(false);
+  useEffect(() => {
+    if (user?.id_buyer && statusProfile === "idle" && !profile) {
+      dispatch(seeProfile(user.id_buyer));
+    }
+  }, [statusProfile, dispatch, user?.id_buyer]);
 
-  const favorites = useSelector(selectFavoriteService);
-  const favoritesStatus = useSelector(selectFavoriteServiceStatus);
-  const services = useSelector(selectAllService);
+  useEffect(() => {
+    if (!token) {
+      setSidebarProfile(false);
+    }
+    if (token && user?.id) {
+      dispatch(getFavoriteService(user.id));
+    }
+    dispatch(getServices());
+  }, [token, user?.id, dispatch]);
 
-  const [favorite, setFavorite] = useState(false);
-  const [chat, setChat] = useState(false);
-  const [searchMobile, setSearchMobile] = useState(false);
-  const [iconSearch, setIconSearch] = useState(true);
-  const [order, setOrder] = useState(false);
-  const [header, setHeader] = useState(true);
-  const [search, setSearch] = useState(urlSearchText || searchText);
+  useEffect(() => {
+    if (sidebarMobile) {
+      setSidebarMobile(false);
+    }
+  }, [location.pathname]);
 
-  const handleChange = (e) => {
-    setSearch(e.target.value);
-  };
+  useEffect(() => {
+      if (deleteFavoriteStatus === 'success') {            
+          if (user?.id) {
+              dispatch(getFavoriteService(user.id))
+          }
+          dispatch(resetDeleteFavoritesStatus())
+      } 
+  }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(setSearchText(search));
-    const targetPath = search
-      ? `/search-result?q=${encodeURIComponent(search)}`
-      : "/search-result";
-    navigate(targetPath);
-  };
+  if (statusChange === "loading") {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Memuat data...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  const handleChange = (e) => {
+    setSearch(e.target.value);
+  };
 
-  useEffect(() => {
-    setSearch(urlSearchText);
-    dispatch(setSearchText(urlSearchText));
-  }, [location.search, dispatch]);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setHeader(true)
+    dispatch(setSearchText(search));
+    const targetPath = search
+      ? `/search-result?q=${encodeURIComponent(search)}`
+      : "/search-result";
+    navigate(targetPath);
+    setSearchMobile(false)
+  };
 
-  useEffect(() => {
-    if (sidebarProfile) {
-      setSidebarProfile(false);
-    }
-  }, [location.pathname]);
+  let favoritesService = [];
 
-  useEffect(() => {
-    if (user?.id_buyer && statusProfile === "idle" && !profile) {
-      dispatch(seeProfile(user.id_buyer));
-    }
-  }, [statusProfile, dispatch, user?.id_buyer]);
+  if (favoritesStatus === "success" && favorites.data && services.length > 0) {
+    const favoritedServiceIds = favorites.data.map((fav) => fav.service_id);
 
   useEffect(() => {
     if (!token) {
@@ -149,46 +200,29 @@ const Header = () => {
     );
   }
 
-  const haveSellerAccount = user?.available_roles?.length > 1;
 
+  const haveSellerAccount = user?.available_roles?.length > 1;
   return (
     <>
       {header && (
-        <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
+        <header className="sticky top-0 z-110 bg-white shadow-sm border-b border-gray-100">
           <div className="xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] lg:py-5 md:py-4 py-3">
             <div className="flex items-center justify-between gap-4">
-              {/* Mobile Menu Toggle - For Guest Users */}
-              {!token && (
-                <button
-                  className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  onClick={() => setSidebarMobile(!sidebarMobile)}
-                  aria-label="Toggle menu"
-                >
-                  {!sidebarMobile ? (
-                    <FaBars className="text-gray-600 text-lg" />
-                  ) : (
-                    <FaTimes className="text-gray-600 text-lg" />
-                  )}
-                </button>
-              )}
-
               {/* Mobile Menu Toggle - For Logged In Users */}
-              {token && (
-                <button
-                  className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  onClick={() => setSidebarMobile(!sidebarMobile)}
-                  aria-label="Toggle menu"
-                >
-                  {!sidebarMobile ? (
-                    <FaBars className="text-gray-600 text-lg cursor-pointer" />
-                  ) : (
-                    <FaTimes className="text-gray-600 text-lg cursor-pointer" />
-                  )}
-                </button>
-              )}
+              <button
+                className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setSidebarMobile(!sidebarMobile)}
+                aria-label="Toggle menu"
+              >
+                {!sidebarMobile ? (
+                  <FaBars className="text-gray-600 text-lg cursor-pointer" />
+                ) : (
+                  <FaTimes className="text-gray-600 text-lg cursor-pointer" />
+                )}
+              </button>
 
               {/* Logo */}
-              <div className="flex-shrink-0">
+              <div className="flex shrink-0">
                 <NavLink
                   link="/"
                   text="PanggilAja"
@@ -259,24 +293,26 @@ const Header = () => {
                   <>
                     {/* Profile Avatar - Desktop */}
                     {profile?.foto_buyer ? (
-                      <button
-                        className="hidden sm:block relative group cursor-pointer"
-                        onClick={() => {
-                          setSidebarProfile(!sidebarProfile);
-                          setFavorite(false);
-                          setChat(false);
-                          setOrder(false);
-                        }}
-                      >
-                        <img
-                          className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-1 border-gray-50 group-hover:border-primary transition-all cursor-pointer"
-                          src={profile?.foto_buyer || "/default-avatar.png"}
-                          alt="Profile"
-                        />
-                      </button>
+                      <>
+                        <button
+                          className="hidden sm:block relative group cursor-pointer"
+                          onClick={() => {
+                            setSidebarProfile(!sidebarProfile);
+                            setFavorite(false);
+                            setChat(false);
+                            setOrder(false);
+                          }}
+                        >
+                          <img
+                            className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-1 border-gray-50 group-hover:border-primary transition-all cursor-pointer"
+                            src={profile?.foto_buyer || "/default-avatar.png"}
+                            alt="Profile"
+                          />
+                        </button>
+                      </>
                     ) : (
                       <button
-                        className="group hidden sm:block relative group cursor-pointer h-10 w-10 bg-gray-100 rounded-full hover:scale-105 transition-all"
+                        className="hover:bg-white hover:border-gray-100 group hidden sm:block relative group cursor-pointer h-10 w-10 bg-gray-200 rounded-full hover:scale-105 transition-all"
                         onClick={() => {
                           setSidebarProfile(!sidebarProfile);
                           setFavorite(false);
@@ -284,26 +320,25 @@ const Header = () => {
                           setOrder(false);
                         }}
                       >
-                        <FaUser className="group-hover:text-black/80 text-4xl p-1 border- rounded-full" />
+                        <FaUser className="group-hover:text-primary text-white text-4xl p-1 rounded-full transition-all duration-500" />
                       </button>
                     )}
-
-                    {/* Search Icon - Mobile */}
-                    <button
-                      className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                      onClick={() => {
-                        setSearchMobile(!searchMobile);
-                        setHeader(false);
-                      }}
-                      aria-label="Search"
-                    >
-                      {iconSearch && (
-                        <MdSearch className="text-gray-600 text-xl" />
-                      )}
-                    </button>
                   </>
                 )}
+                <button
+                  className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                  onClick={() => {
+                    setSearchMobile(!searchMobile);
+                    setHeader(false);
+                  }}
+                  aria-label="Search"
+                >
+                  {iconSearch && (
+                    <MdSearch className="text-gray-600 text-xl" />
+                  )}
+                </button>
               </div>
+
             </div>
           </div>
         </header>
@@ -329,7 +364,7 @@ const Header = () => {
                 setSearchMobile(false);
                 setHeader(true);
               }}
-              className="cursor-pointer text-secondary"
+              className="cursor-pointer text-gray-600 hover:text-secondary"
             >
               Close
             </p>
@@ -339,7 +374,7 @@ const Header = () => {
 
       {/* Mobile Menu for Guest Users */}
       {!token && sidebarMobile && (
-        <div className="sm:hidden fixed inset-0 bg-white z-40 overflow-y-auto pt-16">
+        <div className="sm:hidden fixed inset-0 bg-white z-100 overflow-y-auto pt-16">
           <div className="p-6">
             {/* Search Section */}
             {/* <div className="mb-6">
@@ -408,10 +443,10 @@ const Header = () => {
 
       {/* Desktop Profile Sidebar */}
       {sidebarProfile && (
-        <div className="hidden sm:flex fixed xl:right-[150px] lg:right-[100px] md:right-[40px] right-[25px] lg:top-[90px] md:top-[80px] top-[75px] gap-4 z-40">
+        <div className="hidden sm:flex fixed xl:right-[150px] lg:right-[100px] md:right-[40px] right-[25px] lg:top-[90px] md:top-[80px] top-[75px] gap-4 z-100">
           {/* Favorites Panel */}
           {favorite && (
-            <div className="w-96 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+            <div className="w-100 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
                 <h3 className="text-h5 font-semibold text-gray-800">
                   Jasa Favorit
@@ -419,26 +454,37 @@ const Header = () => {
               </div>
               <div className="overflow-y-auto max-h-80">
                 {favoritesService.length > 0 ? (
-                  favoritesService.map((favorite) => (
-                    <Link
-                      key={favorite.id}
-                      to={`service/${favorite.id}`}
-                      onClick={() => setSidebarProfile(false)}
-                    >
-                      <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors cursor-pointer">
-                        <img
-                          src={favorite?.foto_product}
-                          alt={favorite.nama_jasa}
-                          className="w-20 h-20 object-cover rounded-lg"
-                        />
-                        <div className="flex-1">
-                          <p className="text-h5 font-medium text-gray-800 line-clamp-2">
-                            {favorite.nama_jasa}
-                          </p>
+                  favoritesService.map((favorite) => {
+                    const idDelFav = favorites.data.find((service) => service.service_id === favorite.id)
+                    return (
+                      <div
+                        key={favorite.id}
+                        className="w-full"
+                      >
+                        <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors ">
+                          <img
+                            src={favorite?.foto_product}
+                            alt={favorite.nama_jasa}
+                            className="w-20 h-20 object-cover rounded-lg"
+                          />
+                          <div className="flex flex-col w-full">
+                            <Link 
+                              className="text-h5 font-medium text-gray-800 line-clamLink-2 cursor-pointer"
+                              to={`service/${favorite.id}`}
+                            >
+                              {favorite.nama_jasa}
+                            </Link>
+                            <p className="font-light w-50">{favorite.deskripsi.slice(0,20)}...</p>
+                          </div>
+                          <div>
+                            <FaHeart
+                              className="cursor-pointer"
+                              onClick={() => dispatch(deleteFavoriteService(idDelFav.id))}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </Link>
-                  ))
+                  )})
                 ) : (
                   <div className="p-8 text-center text-gray-500">
                     <FaRegHeart className="mx-auto text-4xl mb-2 text-gray-300" />
@@ -461,8 +507,8 @@ const Header = () => {
                     className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
                   />
                 ) : (
-                  <div>
-                    <FaUser />
+                  <div className="w-10 aspect-square rounded-full bg-gray-200 flex justify-center items-center">
+                    <FaUser className="text-2xl text-white"/>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -511,7 +557,7 @@ const Header = () => {
 
               {haveSellerAccount && (
                 <button
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
                   onClick={() =>
                     dispatch(changeAccount({ targetRole: "seller" }))
                   }
@@ -542,7 +588,7 @@ const Header = () => {
       )}
 
       {token && sidebarMobile && (
-        <div className="sm:hidden fixed inset-0 bg-white z-40 overflow-y-auto pt-16">
+        <div className="sm:hidden fixed inset-0 bg-white z-10 overflow-y-auto pt-16">
           <div className="p-6">
             <Link
               to="profile-setting"
@@ -551,7 +597,7 @@ const Header = () => {
               }}
             >
               <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl mb-6">
-                {profile.foto_buyer ? (
+                {profile?.foto_buyer ? (
                   <img
                     src={profile?.foto_buyer || null}
                     alt="Profile"
@@ -580,12 +626,26 @@ const Header = () => {
                 </div>
               </Link>
 
-              <Link to="/favorite" onClick={() => setSidebarMobile(false)}>
+              <Link to="/favorites" onClick={() => setSidebarMobile(false)}>
                 <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                   <FaRegHeart className="text-gray-400 text-xl" />
                   <span className="text-base text-gray-700">Favorit</span>
                 </div>
               </Link>
+              
+              {haveSellerAccount && (
+                <button
+                  className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() =>
+                    dispatch(changeAccount({ targetRole: "seller" }))
+                  }
+                >
+                  <FaUser className="text-gray-400 text-base" />
+                  <span className="text-h5 text-gray-700">
+                    Ganti Akun Seller
+                  </span>
+                </button>
+              )}
 
               {!haveSellerAccount && location.pathname !== "/partner" && (
                 <Link to="/partner" onClick={() => setSidebarMobile(false)}>

@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Header from './Header/Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccessToken, selectAuthStatus, selectCurrentUser } from '../../../features/authSlice'
+import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
 import { seeAddress, selectSeeAddress, selectSeeAddressStatus } from '../../../features/userSlice'
 
 const AppLayout = () => {
@@ -15,22 +15,18 @@ const AppLayout = () => {
   const token = useSelector(selectAccessToken)
   const address = useSelector(selectSeeAddress)
 
+
   useEffect(() => {
-    if(user?.id_buyer && token){
-      dispatch(seeAddress(user?.id_buyer))
-    }
-  },[dispatch])
+    if(user?.id_buyer && token && (address === null || address?.data?.alamat === null)){
+      dispatch(seeAddress(user.id_buyer))
+    }
+  },[dispatch, user?.id_buyer, token, address?.data?.alamat])
   
-  const addressStatus = useSelector(selectSeeAddressStatus); // Pastikan selector ini ada
+  const addressStatus = useSelector(selectSeeAddressStatus); 
 
   useEffect(() => {    
-    // 1. Cek HANYA JIKA status pengambilan data sudah SUKSES
     if (addressStatus === 'success') {
-        
         const addressData = address?.data;
-        
-        // 2. Cek apakah properti alamat benar-benar kosong (null, undefined, atau string kosong)
-        // Note: Gunakan 'addressData' untuk memeriksa keberadaan objek alamat itu sendiri (jika database mengembalikan null)
         const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
 
         if (isAddressMissing) {
@@ -40,8 +36,6 @@ const AppLayout = () => {
         }
     }
     
-    // 4. Dependency Array: Gunakan status untuk mengontrol kapan cek ini dijalankan.
-    // Tidak perlu 'address' atau 'user' secara langsung, cukup statusnya yang berubah.
   }, [addressStatus, location.pathname, navigate]);
 
   const noFooterPaths = [
