@@ -38,6 +38,7 @@ import TableProgressOrder from "./page/Dashboard/sections/TableProgressOrder";
 import TableDoneOrder from "./page/Dashboard/sections/TableDoneOrder";
 import FavoriteMobile from "./page/Favorite/Index";
 import TableIncomingOrder from "./page/Dashboard/sections/TableIncomingOrder";
+import FilterByCategory from "./page/Search/FilterByCategory";
 
 const Router = createBrowserRouter([
   {
@@ -68,6 +69,10 @@ const Router = createBrowserRouter([
       {
         path: "search-result",
         element: <SearchPage />,
+      },
+      {
+        path: "category/:id",
+        element: <FilterByCategory />,
       },
       {
         path: "all-service-result",

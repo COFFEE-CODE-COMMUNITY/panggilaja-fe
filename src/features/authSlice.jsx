@@ -199,7 +199,7 @@ const authSlice = createSlice({
                 
                 // ✅ PERBAIKAN: accessToken sekarang langsung di data, bukan nested
                 console.log(data)
-                const accessToken = data.user.accessToken
+                const accessToken = data.accessToken
 
                 if (!accessToken) {
                     console.error("❌ Access token tidak ditemukan di response")

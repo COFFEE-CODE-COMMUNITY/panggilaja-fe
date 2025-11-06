@@ -20,6 +20,8 @@ import {
 } from "../../../features/serviceSlice";
 import axiosInstance from "../../../components/utils/axios";
 import { selectCurrentUser } from "../../../features/authSlice";
+import Stars from "../../../components/common/Stars";
+import { getSellerById, selectSelectedSeller } from "../../../features/sellerSlice";
 
 const InformationService = ({
   sellerName,
@@ -32,6 +34,7 @@ const InformationService = ({
   description,
   totalReviewSeller,
   foto_product,
+  idSeller
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -44,6 +47,13 @@ const InformationService = ({
   const messageFavorite = useSelector(selectAddFavoriteServiceError);
   const statusAdd = useSelector(selectAddFavoriteServiceStatus);
   const errorAdd = useSelector(selectAddFavoriteServiceError);
+  const seller = useSelector(selectSelectedSeller)
+
+  useEffect(() => {
+    if(idSeller){
+      dispatch(getSellerById(idSeller))
+    }
+  },[idSeller])
 
   useEffect(() => {
     if (idProvider) {
@@ -80,8 +90,7 @@ const InformationService = ({
     }
   }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
-  console.log(deleteFavoriteMessage);
-  console.log(deleteFavoriteStatus);
+  console.log(seller)
 
   const handleStartChat = async () => {
     if (isStartingChat || !idProvider || !nameService) return;
@@ -133,17 +142,13 @@ const InformationService = ({
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-col leading-8">
             <Link to={`/profile-service/${idProvider}`}>
-              <p className="text-h5 font-light cursor-pointer">Surasep</p>
+              <p className="text-h5 font-light cursor-pointer">{sellerName}</p>
             </Link>
             <h2 className="text-h2">{nameService}</h2>
           </div>
           <div className="flex items-center gap-[5px]">
             <div className="flex gap-[5px]">
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
+              <Stars many={4} variant="star"/>
             </div>
             <p className="text-h5 font-light">{totalReview} ulasan</p>
           </div>
@@ -151,18 +156,6 @@ const InformationService = ({
             Rp. {basePrice} - {topPrice}
           </h2>
           <p className="text-h5 font-light">{description}</p>
-        </div>
-        <div className="flex gap-[15px] w-full flex-col lg:flex-row">
-          <div className="flex gap-[10px]">
-            <img className="bg-amber-500 w-[40px] h-[40px] rounded-full" />
-            <div>
-              <div className="flex items-center gap-[5px]">
-                <FaStar className="text-star lg:text-[15px] md:text-[13px] text-[10px]" />
-                <p>{totalReviewSeller}</p>
-                <p className="text-h6 font-light">{totalReviewSeller} ulasan</p>
-              </div>
-            </div>
-          </div>
         </div>
         <div className="flex flex-1 gap-[10px]">
           <div className="w-full flex gap-[10px]">
