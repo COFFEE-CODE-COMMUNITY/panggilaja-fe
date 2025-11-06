@@ -58,8 +58,6 @@ const Header = () => {
   const searchParams = new URLSearchParams(location.search);
   const urlSearchText = searchParams.get("q") || "";
 
-  console.log(user)
-
   // useEffect(() => {
   //   dispatch()
   // },[dispatch, user?.available_roles])

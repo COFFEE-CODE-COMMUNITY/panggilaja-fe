@@ -20,12 +20,10 @@ const EditProfile = () => {
     const statusAddress = useSelector(selectSeeAddressStatus)
     
     useEffect(() => {
-        if(!address){
+        if(user?.id_buyer && address.data.alamat != null){
             dispatch(seeAddress(user.id_buyer))
         }
     },[statusAddress])
-
-    console.log(address)
     
     if(statusAddress === 'loading'){
         return (
