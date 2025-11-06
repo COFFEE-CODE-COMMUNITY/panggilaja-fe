@@ -159,7 +159,6 @@ const ServiceAround = () => {
                     basePrice={service.base_price}
                     topPrice={service.top_price}
                     star={4}
-                    guest={false}
                     desc={service.deskripsi}
                   />
                 ))}
@@ -175,7 +174,6 @@ const ServiceAround = () => {
                     basePrice={service.base_price}
                     topPrice={service.top_price}
                     star={4}
-                    guest={true}
                     desc={service.deskripsi}
                   />
                 ))}

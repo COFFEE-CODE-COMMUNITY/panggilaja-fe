@@ -586,12 +586,26 @@ const Header = () => {
                 </div>
               </Link>
 
-              <Link to="/favorite" onClick={() => setSidebarMobile(false)}>
+              <Link to="/favorites" onClick={() => setSidebarMobile(false)}>
                 <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                   <FaRegHeart className="text-gray-400 text-xl" />
                   <span className="text-base text-gray-700">Favorit</span>
                 </div>
               </Link>
+              
+              {haveSellerAccount && (
+                <button
+                  className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() =>
+                    dispatch(changeAccount({ targetRole: "seller" }))
+                  }
+                >
+                  <FaUser className="text-gray-400 text-base" />
+                  <span className="text-h5 text-gray-700">
+                    Ganti Akun Seller
+                  </span>
+                </button>
+              )}
 
               {!haveSellerAccount && location.pathname !== "/partner" && (
                 <Link to="/partner" onClick={() => setSidebarMobile(false)}>

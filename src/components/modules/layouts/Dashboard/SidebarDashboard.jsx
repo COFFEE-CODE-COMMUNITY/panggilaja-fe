@@ -110,15 +110,26 @@ export const SidebarDashboard = () => {
                 </li>
               </ul>
               <ul className="space-y-3 pt-3">
-                <li className="group flex items-center px-3 py-2 text-sm text-gray-500 hover:bg-primary justify-between hover:text-white rounded-lg">
-                  <span className="flex items-center">
-                    <svg className="mr-3 stroke-gray-500 group-hover:stroke-white" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 13C14.7614 13 17 10.7614 17 8C17 5.23858 14.7614 3 12 3C9.23858 3 7 5.23858 7 8C7 10.7614 9.23858 13 12 13Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M20 21C20 18.8783 19.1571 16.8434 17.6569 15.3431C16.1566 13.8429 14.1217 13 12 13C9.87827 13 7.84344 13.8429 6.34315 15.3431C4.84285 16.8434 4 18.8783 4 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    Profile Seller
+                <li>
+                  <NavLink  
+                    to={`manage-profile/${user?.id_seller}`}
+                    className={({ isActive }) => 
+                      `group flex items-center px-3 py-2 text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
+                      ${isActive
+                          ? 'bg-primary text-white'
+                          : 'text-gray-500 hover:bg-primary hover:text-white'
+                      }`
+                    }
+                  >
+                    <span className="flex items-center">
+                      <svg className="mr-3 stroke-gray-500 group-hover:stroke-white" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 13C14.7614 13 17 10.7614 17 8C17 5.23858 14.7614 3 12 3C9.23858 3 7 5.23858 7 8C7 10.7614 9.23858 13 12 13Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M20 21C20 18.8783 19.1571 16.8434 17.6569 15.3431C16.1566 13.8429 14.1217 13 12 13C9.87827 13 7.84344 13.8429 6.34315 15.3431C4.84285 16.8434 4 18.8783 4 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      Profile Seller
                   </span>
-		            </li>
+                  </NavLink>
+                </li>
     
                 <li>
                   <div className="group flex items-center px-3 py-2 text-sm text-gray-500 hover:bg-primary hover:text-white rounded-lg justify-between cursor-pointer">
