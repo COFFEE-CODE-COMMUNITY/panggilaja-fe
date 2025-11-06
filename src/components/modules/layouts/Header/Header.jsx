@@ -49,112 +49,56 @@ import {
 
 const Header = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const urlSearchText = searchParams.get("q") || "";
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const urlSearchText = searchParams.get("q") || "";
 
-  const user = useSelector(selectCurrentUser);
-  const token = useSelector(selectAccessToken);
-  const profile = useSelector(selectSeeProfile);
-  const statusProfile = useSelector(selectSeeProfileStatus);
-  const searchText = useSelector(selectSearchText);
-  const favorites = useSelector(selectFavoriteService);
-  const favoritesStatus = useSelector(selectFavoriteServiceStatus);
-  const services = useSelector(selectAllService);
-  const statusChange = useSelector(selectChangeAccountStatus);
-  const deleteFavoriteStatus = useSelector(selectDeleteFavoriteServiceStatus)
-  const deleteFavoriteMessage = useSelector(selectDeleteFavoriteServiceError)
+  const user = useSelector(selectCurrentUser);
+  const token = useSelector(selectAccessToken);
+  const profile = useSelector(selectSeeProfile);
+  const statusProfile = useSelector(selectSeeProfileStatus);
+  const searchText = useSelector(selectSearchText);
+  const favorites = useSelector(selectFavoriteService);
+  const favoritesStatus = useSelector(selectFavoriteServiceStatus);
+  const services = useSelector(selectAllService);
+  const statusChange = useSelector(selectChangeAccountStatus);
+  const deleteFavoriteStatus = useSelector(selectDeleteFavoriteServiceStatus);
+  const deleteFavoriteMessage = useSelector(selectDeleteFavoriteServiceError);
 
-  const [sidebarProfile, setSidebarProfile] = useState(false);
-  const [sidebarMobile, setSidebarMobile] = useState(false);
-  const [favorite, setFavorite] = useState(false);
-  const [chat, setChat] = useState(false);
-  const [searchMobile, setSearchMobile] = useState(false);
-  const [iconSearch, setIconSearch] = useState(true);
-  const [order, setOrder] = useState(false);
-  const [header, setHeader] = useState(true);
-  const [search, setSearch] = useState(urlSearchText || searchText);
+  const [sidebarProfile, setSidebarProfile] = useState(false);
+  const [sidebarMobile, setSidebarMobile] = useState(false);
+  const [favorite, setFavorite] = useState(false);
+  const [chat, setChat] = useState(false);
+  const [searchMobile, setSearchMobile] = useState(false);
+  const [iconSearch, setIconSearch] = useState(true);
+  const [order, setOrder] = useState(false);
+  const [header, setHeader] = useState(true);
+  const [search, setSearch] = useState(urlSearchText || searchText);
 
-  useEffect(() => {
-    if (statusChange === "success") {
-      dispatch(resetChangeAccountStatus());
-      navigate("/dashboard/manage-order"); 
-    }
-  }, [statusChange, dispatch, navigate]);
-  
-  useEffect(() => {
-    setSearch(urlSearchText);
-    dispatch(setSearchText(urlSearchText));
-  }, [location.search, dispatch]);
+  useEffect(() => {
+    if (statusChange === "success") {
+      dispatch(resetChangeAccountStatus());
+      navigate("/dashboard/manage-order");
+    }
+  }, [statusChange, dispatch, navigate]);
 
-  useEffect(() => {
-    if (sidebarProfile) {
-      setSidebarProfile(false);
-    }
-  }, [location.pathname]);
+  useEffect(() => {
+    setSearch(urlSearchText);
+    dispatch(setSearchText(urlSearchText));
+  }, [location.search, dispatch]);
 
-  useEffect(() => {
-    if (user?.id_buyer && statusProfile === "idle" && !profile) {
-      dispatch(seeProfile(user.id_buyer));
-    }
-  }, [statusProfile, dispatch, user?.id_buyer]);
+  useEffect(() => {
+    if (sidebarProfile) {
+      setSidebarProfile(false);
+    }
+  }, [location.pathname]);
 
-  useEffect(() => {
-    if (!token) {
-      setSidebarProfile(false);
-    }
-    if (token && user?.id) {
-      dispatch(getFavoriteService(user.id));
-    }
-    dispatch(getServices());
-  }, [token, user?.id, dispatch]);
-
-  useEffect(() => {
-    if (sidebarMobile) {
-      setSidebarMobile(false);
-    }
-  }, [location.pathname]);
-
-  useEffect(() => {
-      if (deleteFavoriteStatus === 'success') {            
-          if (user?.id) {
-              dispatch(getFavoriteService(user.id))
-          }
-          dispatch(resetDeleteFavoritesStatus())
-      } 
-  }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
-
-  if (statusChange === "loading") {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Memuat data...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  const handleChange = (e) => {
-    setSearch(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setHeader(true)
-    dispatch(setSearchText(search));
-    const targetPath = search
-      ? `/search-result?q=${encodeURIComponent(search)}`
-      : "/search-result";
-    navigate(targetPath);
-    setSearchMobile(false)
-  };
-
-  let favoritesService = [];
-
-  if (favoritesStatus === "success" && favorites.data && services.length > 0) {
-    const favoritedServiceIds = favorites.data.map((fav) => fav.service_id);
+  useEffect(() => {
+    if (user?.id_buyer && statusProfile === "idle" && !profile) {
+      dispatch(seeProfile(user.id_buyer));
+    }
+  }, [statusProfile, dispatch, user?.id_buyer]);
 
   useEffect(() => {
     if (!token) {
@@ -172,7 +116,14 @@ const Header = () => {
     }
   }, [location.pathname]);
 
-  const statusChange = useSelector(selectChangeAccountStatus);
+  useEffect(() => {
+    if (deleteFavoriteStatus === "success") {
+      if (user?.id) {
+        dispatch(getFavoriteService(user.id));
+      }
+      dispatch(resetDeleteFavoritesStatus());
+    }
+  }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
   if (statusChange === "loading") {
     return (
@@ -185,10 +136,20 @@ const Header = () => {
     );
   }
 
-  if (statusChange === "success") {
-    dispatch(resetChangeAccountStatus());
-    navigate("/dashboard");
-  }
+  const handleChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setHeader(true);
+    dispatch(setSearchText(search));
+    const targetPath = search
+      ? `/search-result?q=${encodeURIComponent(search)}`
+      : "/search-result";
+    navigate(targetPath);
+    setSearchMobile(false);
+  };
 
   let favoritesService = [];
 
@@ -200,8 +161,8 @@ const Header = () => {
     );
   }
 
+  const haveSellerAccount = user?.available_roles?.length > 1;
 
-  const haveSellerAccount = user?.available_roles?.length > 1;
   return (
     <>
       {header && (
@@ -333,12 +294,9 @@ const Header = () => {
                   }}
                   aria-label="Search"
                 >
-                  {iconSearch && (
-                    <MdSearch className="text-gray-600 text-xl" />
-                  )}
+                  {iconSearch && <MdSearch className="text-gray-600 text-xl" />}
                 </button>
               </div>
-
             </div>
           </div>
         </header>
@@ -376,29 +334,6 @@ const Header = () => {
       {!token && sidebarMobile && (
         <div className="sm:hidden fixed inset-0 bg-white z-100 overflow-y-auto pt-16">
           <div className="p-6">
-            {/* Search Section */}
-            {/* <div className="mb-6">
-              <form
-                onSubmit={(e) => {
-                  handleSubmit(e);
-                  setSidebarMobile(false);
-                }}
-              >
-                <div className="relative">
-                  <FaSearch
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                    size={16}
-                  />
-                  <Input
-                    placeholder="Cari jasa sekarang"
-                    className="w-full h-12 pl-12 pr-4 bg-gray-50 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    onChange={handleChange}
-                    value={search}
-                  />
-                </div>
-              </form>
-            </div> */}
-
             {/* Menu Items */}
             <div className="space-y-2 mb-6">
               {location.pathname !== "/partner" && (
@@ -455,12 +390,11 @@ const Header = () => {
               <div className="overflow-y-auto max-h-80">
                 {favoritesService.length > 0 ? (
                   favoritesService.map((favorite) => {
-                    const idDelFav = favorites.data.find((service) => service.service_id === favorite.id)
+                    const idDelFav = favorites.data.find(
+                      (service) => service.service_id === favorite.id
+                    );
                     return (
-                      <div
-                        key={favorite.id}
-                        className="w-full"
-                      >
+                      <div key={favorite.id} className="w-full">
                         <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors ">
                           <img
                             src={favorite?.foto_product}
@@ -468,23 +402,28 @@ const Header = () => {
                             className="w-20 h-20 object-cover rounded-lg"
                           />
                           <div className="flex flex-col w-full">
-                            <Link 
+                            <Link
                               className="text-h5 font-medium text-gray-800 line-clamLink-2 cursor-pointer"
                               to={`service/${favorite.id}`}
                             >
                               {favorite.nama_jasa}
                             </Link>
-                            <p className="font-light w-50">{favorite.deskripsi.slice(0,20)}...</p>
+                            <p className="font-light w-50">
+                              {favorite.deskripsi.slice(0, 20)}...
+                            </p>
                           </div>
                           <div>
                             <FaHeart
                               className="cursor-pointer"
-                              onClick={() => dispatch(deleteFavoriteService(idDelFav.id))}
+                              onClick={() =>
+                                dispatch(deleteFavoriteService(idDelFav.id))
+                              }
                             />
                           </div>
                         </div>
                       </div>
-                  )})
+                    );
+                  })
                 ) : (
                   <div className="p-8 text-center text-gray-500">
                     <FaRegHeart className="mx-auto text-4xl mb-2 text-gray-300" />
@@ -508,7 +447,7 @@ const Header = () => {
                   />
                 ) : (
                   <div className="w-10 aspect-square rounded-full bg-gray-200 flex justify-center items-center">
-                    <FaUser className="text-2xl text-white"/>
+                    <FaUser className="text-2xl text-white" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -632,7 +571,7 @@ const Header = () => {
                   <span className="text-base text-gray-700">Favorit</span>
                 </div>
               </Link>
-              
+
               {haveSellerAccount && (
                 <button
                   className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors cursor-pointer"

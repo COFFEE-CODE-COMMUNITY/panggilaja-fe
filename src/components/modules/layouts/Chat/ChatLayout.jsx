@@ -126,7 +126,6 @@ const ChatLayout = () => {
   const isBuyer = user?.active_role?.toUpperCase() === "BUYER";
   const myId = isBuyer ? user?.id_buyer : user?.id_seller;
 
-<<<<<<< HEAD
   const buyerStatus = useSelector(selectContactBuyerStatus);
   const sellerStatus = useSelector(selectContactSellerStatus);
   const conversationsData = useSelector(
@@ -147,13 +146,6 @@ const ChatLayout = () => {
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
 
   const API_BASE_URL = "http://localhost:5000/api";
-=======
-  useEffect(() => {
-    if(!token){
-      navigate('/login')
-    }
-  },[])
->>>>>>> 2a5d941932b8dc2463a4f3bd973cfdcd35238134
 
   useEffect(() => {
     if (!myId) return;
