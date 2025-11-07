@@ -19,10 +19,10 @@ const FilterByCategory = () => {
     const servicesAroundStatus = useSelector(selectServiceAroundStatus)
 
     useEffect(() => {
-        if(user?.id_buyer && token){
-        dispatch(seeAddress(user.id_buyer))
+        if(user.id_buyer && token){
+            dispatch(seeAddress(user.id_buyer))
         }
-    }, [dispatch]);
+    }, [user?.id_buyer, token]);
 
     useEffect(() => {
         if(address?.data?.kecamatan && user?.id){
@@ -30,20 +30,17 @@ const FilterByCategory = () => {
         }
     },[address?.data?.kecamatan])
 
-    servicesAround.map((service) => {
-        console.log(service)
-    })
-
+    console.log(id)
     return (
         <div className='min-h-screen xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>
             {/* <p className='font-medium'>Hasil Filter Untuk: {searchText}</p> */}
             
-            {servicesAround.length === 0 && lowerCaseSearchText !== '' && (
-                <p className='text-h5 text-gray-600'>Tidak ditemukan hasil untuk "{searchText}".</p>
-            )}
+            {/* {servicesAround?.length === 0 && (
+                <p className='text-h5 text-gray-600'>Tidak ditemukan Jasa Di Sekitar Anda.</p>
+            )} */}
 
             <div className='grid md:grid-cols-4 grid-cols-2 gap-x-1 gap-y-4 md:gap-x-2 md:gap-y-5 lg:gap-x-3 lg:gap-y-6'>
-                {servicesAround.map((service) => (
+                {servicesAround?.map((service) => (
                     <ServiceCard
                         idService={service.id}
                         image={service.foto_product}

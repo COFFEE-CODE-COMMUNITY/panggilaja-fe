@@ -15,28 +15,20 @@ const AppLayout = () => {
   const token = useSelector(selectAccessToken)
   const address = useSelector(selectSeeAddress)
 
-
   useEffect(() => {
     if(user?.id_buyer && token && (address === null || address?.data?.alamat === null)){
-      dispatch(seeAddress(user.id_buyer))
+      dispatch(seeAddress(user?.id_buyer))
     }
   },[dispatch, user?.id_buyer, token, address?.data?.alamat])
   
   const addressStatus = useSelector(selectSeeAddressStatus); 
 
-  useEffect(() => {    
-    if (addressStatus === 'success') {
-        const addressData = address?.data;
-        const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
+  const addressData = address?.data;
+  const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
 
-        if (isAddressMissing) {
-            if (location.pathname !== '/form-detail-profile') {
-                navigate('/form-detail-profile', { replace: true });
-            }
-        }
-    }
-    
-  }, [addressStatus, location.pathname, navigate]);
+  if(isAddressMissing && token && addressStatus === 'success'){
+    navigate('/form-detail-profile', { replace: true });
+  }
 
   const noFooterPaths = [
     '/chat', '/service'

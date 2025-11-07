@@ -6,7 +6,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   changeAccount,
-  logout,
   logoutUser,
   resetChangeAccountStatus,
   selectAccessToken,
@@ -515,7 +514,7 @@ const Header = () => {
                 className="flex justify-center w-full py-3 rounded-xl text-white font-medium hover:shadow-lg transition-all"
                 variant="primary"
                 onClick={() => {
-                  dispatch(logout());
+                  dispatch(logoutUser());
                   setSidebarMobile(false);
                 }}
               >
@@ -601,7 +600,7 @@ const Header = () => {
               className="flex justify-center w-full py-4 rounded-xl text-white font-medium hover:shadow-lg transition-all"
               variant="primary"
               onClick={() => {
-                dispatch(logout());
+                dispatch(logoutUser());
                 setSidebarMobile(false);
               }}
             >

@@ -19,9 +19,10 @@ import {
   selectReviewServiceStatus,
 } from "../../../features/serviceSlice";
 import axiosInstance from "../../../components/utils/axios";
-import { selectCurrentUser } from "../../../features/authSlice";
+import { selectAccessToken, selectCurrentUser } from "../../../features/authSlice";
 import Stars from "../../../components/common/Stars";
 import { getSellerById, selectSelectedSeller } from "../../../features/sellerSlice";
+import FaqService from "./FaqService";
 
 const InformationService = ({
   sellerName,
@@ -48,6 +49,8 @@ const InformationService = ({
   const statusAdd = useSelector(selectAddFavoriteServiceStatus);
   const errorAdd = useSelector(selectAddFavoriteServiceError);
   const seller = useSelector(selectSelectedSeller)
+  const token = useSelector(selectAccessToken)
+  const sellerProfile = useSelector(selectSelectedSeller)
 
   useEffect(() => {
     if(idSeller){
@@ -56,7 +59,7 @@ const InformationService = ({
   },[idSeller])
 
   useEffect(() => {
-    if (idProvider) {
+    if (idProvider && token) {
       dispatch(getReviewServicesById(idProvider));
     }
   }, [dispatch, idProvider]);
@@ -90,7 +93,7 @@ const InformationService = ({
     }
   }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
-  console.log(seller)
+  const [showMoreDesc, setShowMoreDesc] = useState(false)
 
   const handleStartChat = async () => {
     if (isStartingChat || !idProvider || !nameService) return;
@@ -137,13 +140,34 @@ const InformationService = ({
   };
 
   return (
-    <div className="lg:h-full h-1/2 lg:w-[45%] w-full flex flex-col gap-[30px] lg:py-[25px] py-[10px] px-[15px]">
+    <div className="lg:h-full h-1/2 lg:w-[40%] w-full flex flex-col gap-[30px] lg:py-7 md:py-6 py-5 px-[15px]">
       <div className="flex flex-col gap-[10px]">
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-col leading-8">
-            <Link to={`/profile-service/${idProvider}`}>
-              <p className="text-h5 font-light cursor-pointer">{sellerName}</p>
-            </Link>
+            <div className='flex'>
+              <Link 
+                  className='flex-1 text-h5 font-light'
+                  to={`/profile-service/${idSeller}`}
+              >
+                  {sellerProfile?.nama_toko}
+              </Link>
+              {token && (
+                  isServiceFavorite ? (
+                      <Button 
+                          onClick={() => dispatch(deleteFavoriteService(isServiceFavorite.id))}
+                      >
+                          <FaHeart className={`text-gray-700 text-xl`}
+                          />
+                      </Button>
+                  ) : (
+                      <Button 
+                          onClick={token ? handleAddFavorite : ''}
+                      >
+                          <FaRegHeart className={`text-gray-700 text-xl`}/>
+                      </Button>
+                  )
+              )}
+            </div>
             <h2 className="text-h2">{nameService}</h2>
           </div>
           <div className="flex items-center gap-[5px]">
@@ -155,13 +179,18 @@ const InformationService = ({
           <h2 className="text-h3">
             Rp. {basePrice} - {topPrice}
           </h2>
-          <p className="text-h5 font-light">{description}</p>
+          <p className='text-h5 font-light'>
+            {!showMoreDesc && description.slice(0,200)}{!showMoreDesc && <>
+                <span>...</span><span onClick={() => setShowMoreDesc(!showMoreDesc)} className='font-medium cursor-pointer'>selengkapnya</span>
+            </>}
+            {showMoreDesc && description}
+          </p>
         </div>
-        <div className="flex flex-1 gap-[10px]">
-          <div className="w-full flex gap-[10px]">
+        <div className="flex flex-1">
+          <div className="w-full flex gap-1.5">
             <Button
               variant="primary"
-              className="flex-2 rounded-[35px] text-white font-medium h-[50px] flex items-center justify-center w-full"
+              className="flex-2 rounded-lg text-white font-medium h-[50px] flex items-center justify-center w-full"
               onClick={handleStartChat}
               disabled={isStartingChat}
             >
@@ -170,36 +199,16 @@ const InformationService = ({
 
             <Button
               variant="secondary"
-              className="flex-1 rounded-[35px] text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]"
+              className="flex-1 rounded-lg text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]"
               onClick={handleStartChat}
               disabled={isStartingChat}
             >
               {isStartingChat ? "Memuat..." : "Negoin aja"}
             </Button>
-            {isServiceFavorite ? (
-              <Button
-                className="h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center"
-                onClick={() =>
-                  dispatch(deleteFavoriteService(isServiceFavorite.id))
-                }
-              >
-                <FaHeart className={`text-red-500 text-[20px]`} />
-              </Button>
-            ) : (
-              <Button
-                className="h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center"
-                onClick={handleAddFavorite}
-              >
-                <FaRegHeart className={`text-gray-300 text-[20px]`} />
-              </Button>
-            )}
           </div>
         </div>
       </div>
-      <div className="flex flex-col">
-        <p className="text-h3 font-medium">Ulasan warga</p>
-        <div></div>
-      </div>
+      <FaqService/>
     </div>
   );
 };

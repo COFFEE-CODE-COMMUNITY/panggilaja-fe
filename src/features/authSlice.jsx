@@ -79,16 +79,19 @@ export const logoutUser = createAsyncThunk(
     'auth/logoutUser',
     async (_, { rejectWithValue }) => {
         try {
+            isLoggingOut = true; // ✅ Blok refresh token
             const response = await api.post(`auth/logout`);
             return response.data;
         } catch (error) {
-            if (error.response) {
-                return rejectWithValue(error.response.data);
-            }
-            return rejectWithValue({ message: 'Gagal logout' });
+            return rejectWithValue(error.response?.data || 'Gagal logout');
+        } finally {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("user");
+            isLoggingOut = false;
         }
     }
 );
+
 
 export const googleLoginSuccess = createAsyncThunk(
     'auth/googleLoginSuccess',
@@ -167,15 +170,6 @@ const authSlice = createSlice({
     name : 'auth',
     initialState,
     reducers : {
-        logout : (state) => {
-            state.user = null;
-            state.accessToken = null
-            state.error = null
-            state.message = null
-            state.status = 'idle'
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('user')
-        },
         updateProfile : (state) => {
             state.accessToken = getToken();
             const decodeToken = jwtDecode(getToken())
@@ -280,17 +274,17 @@ const authSlice = createSlice({
             })
             .addCase(googleLoginSuccess.fulfilled, (state, action) => {
                 const { status, message, data } = action.payload
-                const { user, token } = data
-                console.log(data)
-                
+                const { user, token } = data                
+                const userDecode = jwtDecode(token)
+
                 state.status = 'success'
                 state.error = null
                 state.message = message || 'Login dengan Google berhasil'
                 state.accessToken = token
-                state.user = user
+                state.user = userDecode.user
 
                 localStorage.setItem('accessToken', token)
-                localStorage.setItem('user', JSON.stringify(user))
+                localStorage.setItem('user', JSON.stringify(userDecode.user))
             })
             .addCase(googleLoginSuccess.rejected, (state, action) => {
                 state.message = action.payload?.message || 'Login dengan Google gagal'
@@ -364,19 +358,9 @@ const authSlice = createSlice({
             })
             .addCase(changeAccount.fulfilled, (state, action) => {
                 const { status, message, data } = action.payload
-                const { accessToken, user } = data
 
-                if (!accessToken || typeof accessToken !== 'string') {
-                    console.error("Access token tidak valid:", accessToken)
-                    state.changeAccountStatus = 'failed'
-                    state.changeAccountMessage = 'Token tidak valid'
-                    return
-                }
-
-                const decodeToken = jwtDecode(accessToken)
-                const userDataFromToken = decodeToken.user 
-                
-                const finalUserData = userDataFromToken || user 
+                const { accessToken, user } = data 
+                const finalUserData = user        
 
                 state.changeAccountStatus = status
                 state.changeAccountMessage = message
@@ -386,6 +370,7 @@ const authSlice = createSlice({
                 localStorage.setItem('accessToken', accessToken)
                 localStorage.setItem('user', JSON.stringify(finalUserData))
             })
+
             .addCase(changeAccount.rejected, (state, action) => {
                 state.changeAccountStatus = 'failed'
                 state.changeAccountMessage = action.payload
@@ -394,7 +379,7 @@ const authSlice = createSlice({
     }
 })
 
-export const { logout, setOAuthCredentials, resetChangeAccountStatus, updateProfile } = authSlice.actions
+export const { setOAuthCredentials, resetChangeAccountStatus, updateProfile } = authSlice.actions
 export const selectCurrentUser = state => state.auth.user
 export const selectAccessToken = state => state.auth.accessToken
 
