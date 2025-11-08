@@ -2,7 +2,7 @@ import axios from "axios";
 import { store } from "../../store/Store";
 
 const axiosInstance = axios.create({
-  baseURL: "https://https://api.panggilaja.space/api", // Ganti dengan URL backend Anda
+  baseURL: "http://localhost:5000/api", // Ganti dengan URL backend Anda
   timeout: 10000,
 });
 
