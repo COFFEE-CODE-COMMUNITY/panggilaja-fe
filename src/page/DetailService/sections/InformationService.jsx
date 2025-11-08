@@ -3,6 +3,7 @@ import { FaStar, FaRegHeart, FaHeart } from "react-icons/fa";
 import Button from "../../../components/common/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import io from "socket.io-client"; // 🆕 Import socket
 import {
   addFavoriteService,
   deleteFavoriteService,
@@ -18,8 +19,10 @@ import {
   selectReviewService,
   selectReviewServiceStatus,
 } from "../../../features/serviceSlice";
-import axiosInstance from "../../../components/utils/axios";
 import { selectCurrentUser } from "../../../features/authSlice";
+
+// 🆕 Inisialisasi socket
+const socket = io("http://localhost:5000");
 
 const InformationService = ({
   sellerName,
@@ -44,6 +47,10 @@ const InformationService = ({
   const messageFavorite = useSelector(selectAddFavoriteServiceError);
   const statusAdd = useSelector(selectAddFavoriteServiceStatus);
   const errorAdd = useSelector(selectAddFavoriteServiceError);
+
+  // 🆕 Get buyer ID
+  const myId = user?.id_buyer;
+  const isBuyer = user?.active_role?.toUpperCase() === "BUYER";
 
   useEffect(() => {
     if (idProvider) {
@@ -80,52 +87,63 @@ const InformationService = ({
     }
   }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
-  console.log(deleteFavoriteMessage);
-  console.log(deleteFavoriteStatus);
-
-  const handleStartChat = async () => {
-    if (isStartingChat || !idProvider || !nameService) return;
+  // ✅ HANDLER BARU: Kirim via Socket (BUKAN HTTP!)
+  const handleStartChat = () => {
+    if (isStartingChat || !idProvider || !nameService || !myId) {
+      console.error("Missing required data:", {
+        idProvider,
+        nameService,
+        myId,
+      });
+      return;
+    }
 
     setIsStartingChat(true);
-
-    const API_BASE_URL = "http://localhost:5000/api";
 
     const imageUrl =
       foto_product ||
       "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400";
     const shortDescription = description.substring(0, 50) + "...";
 
-    try {
-      const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (Harga: Rp ${basePrice.toLocaleString(
-        "id-ID"
-      )}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
+    // Format pesan otomatis
+    const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (Harga: Rp ${basePrice.toLocaleString(
+      "id-ID"
+    )}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
 
-      const payload = {
-        receiverId: idProvider,
-        text: autoMessage,
-      };
+    // Data untuk socket
+    const messageData = {
+      id_buyer: myId,
+      id_seller: idProvider,
+      text: autoMessage,
+      sender_role: "BUYER",
+    };
 
-      const response = await axiosInstance.post(
-        `${API_BASE_URL}/chat`,
-        payload
-      );
+    console.log("📤 Emitting message via socket:", messageData);
 
-      if (response.data.status === "success") {
-        navigate(`/chat/${idProvider}`, {
-          state: { shouldRefreshList: true },
-        });
-      } else {
-        throw new Error(response.data.message || "Gagal memulai chat");
-      }
-    } catch (error) {
-      console.error(
-        "Gagal memulai chat:",
-        error.response?.data || error.message
-      );
-      alert("Gagal memulai percakapan. Silakan coba lagi.");
+    // 🔥 KIRIM VIA SOCKET (BUKAN HTTP!)
+    socket.emit("send_message", messageData);
+
+    // Navigate ke chat dengan delay kecil
+    setTimeout(() => {
       setIsStartingChat(false);
-    }
+      navigate(`/chat/${idProvider}`, {
+        state: { shouldRefreshList: true },
+      });
+    }, 300); // 300ms delay untuk memastikan socket terkirim
   };
+
+  // 🆕 Listener untuk konfirmasi pesan terkirim (optional)
+  useEffect(() => {
+    const handleMessageReceived = (msg) => {
+      console.log("✅ Message confirmed:", msg);
+    };
+
+    socket.on("receive_message", handleMessageReceived);
+
+    return () => {
+      socket.off("receive_message", handleMessageReceived);
+    };
+  }, []);
 
   return (
     <div className="lg:h-full h-1/2 lg:w-[45%] w-full flex flex-col gap-[30px] lg:py-[25px] py-[10px] px-[15px]">

@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import io from "socket.io-client";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
+import { useContactRealtime } from "../../../../hooks/contactRealtime";
 import {
   FaSearch,
   FaArrowLeft,
@@ -17,7 +18,6 @@ import {
   getContactForSeller,
   selectContactBuyerStatus,
   selectContactSellerStatus,
-  updateLastMessage,
 } from "../../../../features/chatSlice";
 
 const formatTime = (timestamp) => {
@@ -29,7 +29,7 @@ const formatTime = (timestamp) => {
   const timeOptions = {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false, // Gunakan format 24 jam
+    hour12: false,
   };
 
   const isToday =
@@ -72,6 +72,7 @@ const formatTime = (timestamp) => {
 const socket = io("http://localhost:5000");
 const autoMessageRegex =
   /Halo, saya tertarik dengan layanan "(.+?)". \(Harga: Rp (.+?)\) \(Deskripsi: (.*?)\) \(Gambar: (.*?)\)/;
+
 // Service Card Component
 const ServiceCard = ({ data }) => (
   <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
@@ -125,16 +126,21 @@ const ChatLayout = () => {
   const token = useSelector((state) => state.auth.accessToken);
   const isBuyer = user?.active_role?.toUpperCase() === "BUYER";
   const myId = isBuyer ? user?.id_buyer : user?.id_seller;
+  const role = user?.active_role?.toLowerCase();
+
+  // 🔥 AKTIFKAN REAL-TIME CONTACT UPDATE
+  useContactRealtime(socket, myId, role, isBuyer);
 
   const buyerStatus = useSelector(selectContactBuyerStatus);
   const sellerStatus = useSelector(selectContactSellerStatus);
-  const conversationsData = useSelector(
-    (state) => state.chat.contactBuyer || state.chat.contactSeller
+  const conversationsData = useSelector((state) =>
+    isBuyer ? state.chat.contactBuyer : state.chat.contactSeller
   );
   const conversations = useMemo(
     () => conversationsData || [],
     [conversationsData]
   );
+
   const [chatMobile, setChatMobile] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
   const [text, setText] = useState("");
@@ -144,9 +150,9 @@ const ChatLayout = () => {
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
-
   const API_BASE_URL = "http://localhost:5000/api";
 
+  // ===== USEEFFECT #1: LOAD CONTACTS =====
   useEffect(() => {
     if (!myId) return;
 
@@ -165,15 +171,15 @@ const ChatLayout = () => {
     isBuyer,
     buyerStatus,
     sellerStatus,
-    location,
-    navigate,
     shouldRefresh,
+    navigate,
+    location.pathname,
   ]);
 
+  // ===== USEEFFECT #2: FETCH MESSAGES =====
   useEffect(() => {
     const fetchData = async () => {
       if (!partnerId || !token) return;
-
       setMessagesLoading(true);
       setMessages([]);
 
@@ -184,8 +190,6 @@ const ChatLayout = () => {
         );
 
         console.log("📩 Messages Response:", messagesResponse.data);
-
-        let finalMessages = [];
 
         if (messagesResponse.data.success) {
           const formattedMessages = messagesResponse.data.data.map((msg) => ({
@@ -199,36 +203,31 @@ const ChatLayout = () => {
                 ? "user"
                 : "seller",
           }));
-          finalMessages = [...formattedMessages];
+          setMessages(formattedMessages);
         }
-
-        setMessages(finalMessages);
       } catch (error) {
-        console.error("❌ Error fetching messages or service card:", error);
+        console.error("❌ Error fetching messages:", error);
       } finally {
         setMessagesLoading(false);
       }
     };
 
     fetchData();
-  }, [partnerId, token, myId, isBuyer, dispatch]);
+  }, [partnerId, token, isBuyer]);
 
+  // ===== USEEFFECT #3: UPDATE SELECTED CHAT =====
   useEffect(() => {
-    console.log("ID DARI URL (partnerId):", partnerId);
-    console.log("ARRAY CONVERSATIONS (yang kita cari):", conversations);
     if (partnerId && conversations.length > 0) {
       const selected = conversations.find(
         (c) => c.id.trim() === partnerId.trim()
       );
-
-      console.log("HASIL .find():", selected);
-
       setSelectedChat(selected);
     } else if (!partnerId) {
       setSelectedChat(null);
     }
   }, [partnerId, conversations]);
 
+  // ===== USEEFFECT #4: JOIN CHAT ROOM =====
   useEffect(() => {
     if (!partnerId || !myId) return;
 
@@ -237,15 +236,36 @@ const ChatLayout = () => {
     const roomId = `${buyerId}_${sellerId}`;
 
     socket.emit("join_room", { buyerId, sellerId });
-    console.log(`👥 Joining room: ${roomId}`);
+    console.log(`👥 Joining chat room: ${roomId}`);
+
+    return () => {
+      console.log(`👋 Leaving chat room: ${roomId}`);
+    };
+  }, [partnerId, myId, isBuyer]);
+
+  // ===== USEEFFECT #5: LISTEN TO MESSAGES IN ACTIVE CHAT =====
+  useEffect(() => {
+    if (!partnerId || !myId) return;
 
     const handleNewMessage = (newMessage) => {
-      console.log("📥 New message received:", newMessage);
+      console.log("💬 New message in active chat:", newMessage);
 
-      const isMyMessage = isBuyer
-        ? newMessage.senderId === myId
-        : newMessage.senderId === myId;
+      // Cek apakah pesan untuk chat yang sedang dibuka
+      const messagePartnerId = isBuyer
+        ? newMessage.id_seller
+        : newMessage.id_buyer;
 
+      if (messagePartnerId !== partnerId) {
+        console.log("⏭️ Message not for this chat, skipping");
+        return;
+      }
+
+      // Tentukan apakah ini pesan dari saya
+      const isMyMessage =
+        (isBuyer && newMessage.sender_role?.toUpperCase() === "BUYER") ||
+        (!isBuyer && newMessage.sender_role?.toUpperCase() === "SELLER");
+
+      // Update messages state
       setMessages((prevMessages) => {
         const exists = prevMessages.some((msg) => msg.id === newMessage.id);
         if (exists) {
@@ -264,24 +284,16 @@ const ChatLayout = () => {
           },
         ];
       });
-
-      dispatch(
-        updateLastMessage({
-          partnerId: partnerId,
-          text: newMessage.text,
-          time: newMessage.created_at,
-        })
-      );
     };
 
     socket.on("receive_message", handleNewMessage);
 
     return () => {
-      console.log(`👋 Leaving room: ${roomId}`);
       socket.off("receive_message", handleNewMessage);
     };
-  }, [partnerId, myId, isBuyer, dispatch]);
+  }, [partnerId, myId, isBuyer]);
 
+  // ===== USEEFFECT #6: AUTO SCROLL =====
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -291,7 +303,7 @@ const ChatLayout = () => {
 
   // Filter conversations
   const filteredConversations = conversations.filter((conv) =>
-    conv.name.toLowerCase().includes(searchQuery.toLowerCase())
+    conv.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSendMessage = (e) => {
@@ -307,7 +319,6 @@ const ChatLayout = () => {
 
     console.log("📤 Emitting message via socket:", messageData);
     socket.emit("send_message", messageData);
-
     setText("");
   };
 
@@ -326,9 +337,7 @@ const ChatLayout = () => {
           chatMobile ? "hidden sm:flex" : "flex"
         }`}
       >
-        {/* Header with Back Button */}
         <div className="p-4 border-b border-gray-200">
-          {/* Back Button and Title in one row */}
           <div className="flex items-center gap-3 mb-4">
             <button
               onClick={handleBackToHome}
@@ -339,7 +348,6 @@ const ChatLayout = () => {
             <h2 className="text-xl font-bold text-gray-800 flex-1 text-center">
               Pesan
             </h2>
-            {/* Spacer untuk balance (sama lebar dengan button) */}
             <div className="w-10"></div>
           </div>
 
@@ -416,7 +424,7 @@ const ChatLayout = () => {
         </div>
       </div>
 
-      {/* Chat Area */}
+      {/* Chat Area - Same as before */}
       <div
         className={`flex-1 flex flex-col ${
           chatMobile ? "flex" : "hidden sm:flex"
@@ -561,7 +569,6 @@ const ChatLayout = () => {
             </div>
           </>
         ) : (
-          // Empty State
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <svg

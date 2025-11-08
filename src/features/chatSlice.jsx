@@ -49,6 +49,7 @@ const chat = createSlice({
   name: "chat",
   initialState,
   reducers: {
+    // 🔹 Update last message (existing)
     updateLastMessage: (state, action) => {
       const { partnerId, text, time } = action.payload;
       const listKey = state.contactBuyer ? "contactBuyer" : "contactSeller";
@@ -67,12 +68,72 @@ const chat = createSlice({
             },
           };
 
+          // Pindahkan ke atas
           conversations.splice(chatIndex, 1);
-
           state[listKey] = [updatedChat, ...conversations];
         }
       }
     },
+
+    // 🆕 Add new contact (untuk kontak baru pertama kali)
+    addNewContact: (state, action) => {
+      const { contact, isBuyer } = action.payload;
+      const listKey = isBuyer ? "contactBuyer" : "contactSeller";
+
+      if (state[listKey]) {
+        // Cek apakah kontak sudah ada
+        const exists = state[listKey].some((c) => c.id === contact.id);
+        if (!exists) {
+          // Tambahkan kontak baru di posisi paling atas
+          state[listKey] = [contact, ...state[listKey]];
+          console.log(`✅ New contact added: ${contact.name}`);
+        }
+      }
+    },
+
+    // 🆕 Update contact dari socket notification
+    updateContactFromSocket: (state, action) => {
+      const { partnerId, lastMessage, isBuyer } = action.payload;
+      const listKey = isBuyer ? "contactBuyer" : "contactSeller";
+
+      if (state[listKey]) {
+        const conversations = [...state[listKey]];
+
+        // Cari index kontak yang tepat berdasarkan partnerId
+        const chatIndex = conversations.findIndex((c) => c.id === partnerId);
+
+        if (chatIndex > -1) {
+          // ✅ Update HANYA kontak yang sesuai partnerId
+          const chatToUpdate = conversations[chatIndex];
+
+          // Buat objek kontak yang diupdate
+          const updatedChat = {
+            ...chatToUpdate,
+            lastMessage: {
+              text: lastMessage.text,
+              created_at: lastMessage.created_at,
+            },
+          };
+
+          // Hapus dari posisi lama
+          conversations.splice(chatIndex, 1);
+
+          // Tambahkan di posisi paling atas
+          state[listKey] = [updatedChat, ...conversations];
+
+          console.log(
+            `✅ Contact updated via socket: ${partnerId}`,
+            updatedChat
+          );
+        } else {
+          // Kontak belum ada di list, perlu refetch
+          console.log(
+            `⚠️ Contact ${partnerId} not found in list, need refetch`
+          );
+        }
+      }
+    },
+
     resetChat: (state) => {
       state.contactBuyer = null;
       state.contactBuyerStatus = "idle";
@@ -98,7 +159,7 @@ const chat = createSlice({
       })
       .addCase(getContactForBuyer.rejected, (state, action) => {
         state.contactBuyerStatus = "error";
-        state.contactBuyerError = action.payload.data;
+        state.contactBuyerError = action.payload;
       })
 
       // Seller
@@ -115,9 +176,10 @@ const chat = createSlice({
       })
       .addCase(getContactForSeller.rejected, (state, action) => {
         state.contactSellerStatus = "error";
-        state.contactSellerError = action.payload.data;
+        state.contactSellerError = action.payload;
       })
-      // Logout Success
+
+      // Logout & Switch Account
       .addCase(logoutUser.fulfilled, (state) => {
         console.log("LOGOUT terdeteksi, membersihkan state chat...");
         state.contactBuyer = null;
@@ -127,7 +189,6 @@ const chat = createSlice({
         state.contactSellerStatus = "idle";
         state.contactSellerError = null;
       })
-      // Switch Account Success
       .addCase(changeAccount.fulfilled, (state) => {
         console.log("CHANGE ACCOUNT terdeteksi, membersihkan state chat...");
         state.contactBuyer = null;
@@ -149,6 +210,7 @@ const chat = createSlice({
   },
 });
 
+// Selectors
 export const selectContactSellerStatus = (state) =>
   state.chat.contactSellerStatus;
 export const selectContactSeller = (state) => state.chat.contactSeller;
@@ -159,6 +221,13 @@ export const selectContactBuyerStatus = (state) =>
   state.chat.contactBuyerStatus;
 export const selectContactBuyer = (state) => state.chat.contactBuyer;
 export const selectContactBuyerError = (state) => state.chat.contactBuyerError;
-export const { updateLastMessage, resetChat } = chat.actions;
+
+// Actions
+export const {
+  updateLastMessage,
+  addNewContact,
+  updateContactFromSocket,
+  resetChat,
+} = chat.actions;
 
 export default chat.reducer;
