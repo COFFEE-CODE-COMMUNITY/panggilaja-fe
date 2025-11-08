@@ -69,7 +69,7 @@ const formatTime = (timestamp) => {
   return date.toLocaleDateString("id-ID", dateOptions);
 };
 
-const socket = io("http://localhost:5000");
+const socket = io("https://api.panggilaja.space");
 const autoMessageRegex =
   /Halo, saya tertarik dengan layanan "(.+?)". \(Harga: Rp (.+?)\) \(Deskripsi: (.*?)\) \(Gambar: (.*?)\)/;
 
@@ -150,7 +150,7 @@ const ChatLayout = () => {
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
-  const API_BASE_URL = "http://localhost:5000/api";
+  const API_BASE_URL = "https://api.panggilaja.space/api";
 
   // ===== USEEFFECT #1: LOAD CONTACTS =====
   useEffect(() => {
