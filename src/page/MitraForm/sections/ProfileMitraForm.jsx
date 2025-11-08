@@ -82,144 +82,148 @@ function ProfileMitraForm() {
 
     console.log(statusAdd)
     return (
-        <div className="flex items-center justify-center h-full"> 
+        <div className="flex items-center justify-center py-5 px-4 lg:px-0">
             <form 
-                onSubmit={handleSubmit} 
-                className="w-full max-w-3xl py-[25px]" 
+                onSubmit={handleSubmit}
+                autoComplete="off"
+                className="w-full max-w-4xl py-[25px] px-4 md:px-0 space-y-6"
             >
-                {/* judul */}
-                <h2 className="text-[25px] font-semibold text-left">
-                    Tentang Tokomu
-                </h2>
+                
+                {/* Judul Form */}
+                <div>
+                    <h2 className="text-[25px] md:text-[25px] lg:text-[26px] font-semibold text-left">Tentang Tokomu</h2>
+                    <p className="text-gray-600 text-sm md:text-sm lg:text-base">Lengkapi informasi berikut agar pelanggan lebih mudah mengenal tokomu.</p>
+                </div>
 
-                <div 
-                    className="
-                        md:space-y-0 md:grid md:grid-cols-4 
-                        md:gap-x-6 md:gap-y-6        
-                        lg:gap-x-8 lg:gap-y-8
-                    "
-                >
-                    
-                    {/* upload profile */}
-                    <label className="block text-[15px] font-medium text-gray-700 md:pt-2 md:col-span-1"> 
-                        Unggah Profil
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3"> 
-                        <div className="flex items-center gap-4">
+                {/* Grid Form Utama */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-x-6 md:gap-x-6 lg:gap-x-8 gap-y-8 md:gap-y-8 lg:gap-y-10"> {/* pakai border = border border-gray-200 rounded-lg p-6 md:p-8 */}
+
+                    {/* Upload Profil */}
+                    <div>
+                        <label className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Unggah Profil</label>
+                        <div className="mt-2 flex items-center gap-4 md:gap-4 lg:gap-5">
                             <input 
                                 type='file' 
-                                className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-100 border flex items-center justify-center text-gray-400 text-sm hover:bg-gray-200 cursor-pointer"
+                                className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-gray-100 border flex items-center justify-center text-gray-400 text-sm md:text-sm lg:text-base hover:bg-gray-200 cursor-pointer"
                                 onChange={handleFileChange}
+                            />
+                            <span className="text-sm md:text-sm lg:text-base text-gray-500">(jpg/png)</span>
+                        </div>
+                    </div>
+
+                    {/* Kategori Toko */}
+                    <div>
+                        <label htmlFor="kategori_toko" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Kategori Toko</label>
+                        <div className="mt-2">
+                            <select 
+                                id="kategori_toko"
+                                className="w-full bg-gray-white px-[20px] py-[15px] rounded-[15px] outline-1 outline-gray-200 text-sm md:text-sm lg:text-base"
+                                onChange={(e) => setKategori(e.target.value)}
                             >
-                            </input>
+                                <option disabled>Kategori Jasa</option>
+                                {categorys?.status === 'success' && 
+                                    categorys.data.map((category) => (
+                                        <option key={category.id} value={category.id}>{category.kategori}</option>
+                                    ))
+                                }
+                            </select>
                         </div>
                     </div>
 
-                    {/* email */}
-                    <label htmlFor="email" className="block text-[15px] font-medium text-gray-700 md:col-span-1"> 
-                        Email
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3"> 
-                        <textarea 
-                            className="w-full h-[100px] outline-1 outline-gray-200 p-[15px] rounded-[15px]" placeholder="Masukkan deskripsi toko"
-                            onChange={(e) => setDeskripsi_Toko(e.target.value)}
-                        >
-
-                        </textarea>
-                    </div>
-
-                    {/* kategori */}
-                    <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
-                        Kategori
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3">
-                        <select 
-                            className="bg-gray-white px-[20px] py-[15px] rounded-[15px] outline-1 outline-gray-200"
-                            onChange={(e) => setKategori(e.target.value)}
-                        >
-                            <option disabled>Kategori Jasa</option>
-                            {categorys?.status === 'success' && 
-                                categorys.data.map((category) => (
-                                    <option value={category.id}>{category.kategori}</option>
-                                ))
-                            }
-                        </select>
-                    </div>
-
-                    {/* pengalaman */}
-                    <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
-                        Pengalaman
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3">
-                        <InputForm
-                            type="text"
-                            id="name"
-                            placeholder="Masukkan Detail Pengalaman Anda"
-                            onChange={(e) => setPengalaman(e.target.value)}
-                        />
-                    </div>
-
-                    {/* keahlian */}
-                    <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
-                        Keahlian
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3">
-                        <InputForm
-                            type="text"
-                            id="name"
-                            placeholder="Masukkan Keahlian"
-                            onChange={(e) => setSkill(e.target.value)}
-                        />
-                    </div>
-
-                    <label htmlFor="name" className="block text-[15px] font-medium text-gray-700 md:col-span-1">
-                        Alamat 
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3">
-                        <InputForm
-                            type="text"
-                            id="name"
-                            placeholder="Masukkan Detail Alamat Anda"
-                            onChange={(e) => setAlamat(e.target.value)}
-                        />
-                    </div>
-
-                    {/* alamat */}
-                    <label className="block text-[15px] font-medium text-gray-700 md:pt-2 md:col-span-1"> 
-                        Domisili
-                    </label>
-                    <div className="mt-1 md:mt-0 md:col-span-3"> 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-                            <InputForm 
-                                type="text" 
-                                placeholder="Provinsi" 
-                                onChange={(e) => setProvinsi(e.target.value)}
-                            />
-                            <InputForm 
-                                type="text" 
-                                placeholder="Kota" 
-                                onChange={(e) => setKota(e.target.value)}
-                            />
-                            <InputForm 
-                                type="text" 
-                                placeholder="Kecamatan" 
-                                onChange={(e) => setKecamatan(e.target.value)}
-                            />
-                            <InputForm 
-                                type="text" 
-                                placeholder="Kode Pos" 
-                                onChange={(e) => setKode_Pos(e.target.value)}
+                    {/* Deskripsi Toko */}
+                    <div className="md:col-span-2">
+                        <label htmlFor="deskripsi_toko" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Deskripsi Toko</label>
+                        <div className="mt-2"> 
+                            <textarea 
+                                id="deskripsi_toko"
+                                className="w-full h-[100px] md:h-[100px] lg:h-[110px] outline-1 outline-gray-200 p-[15px] md:p-[15px] lg:p-[16px] rounded-[15px] md:rounded-[15px] lg:rounded-[16px]" 
+                                placeholder="Masukkan deskripsi toko"
+                                onChange={(e) => setDeskripsi_Toko(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    {/* button selanjut nya */}
-                    <div className="md:col-span-3 flex justify-end"> 
-                        <Button type="submit" variant="secondary" className="px-6 py-2 rounded-[20px] text-white"> 
-                            Selanjutnya
-                        </Button>
+                    {/* Pengalaman */}
+                    <div>
+                        <label htmlFor="pengalaman" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Pengalaman</label>
+                        <div className="mt-2">
+                            <InputForm
+                                type="text"
+                                id="pengalaman"
+                                placeholder="Masukkan Detail Pengalaman Anda"
+                                onChange={(e) => setPengalaman(e.target.value)}
+                            />
+                        </div>
                     </div>
-                </div> 
+
+                    {/* Keahlian */}
+                    <div>
+                        <label htmlFor="keahlian" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Keahlian</label>
+                        <div className="mt-2">
+                            <InputForm
+                                type="text"
+                                id="keahlian"
+                                placeholder="Masukkan Keahlian"
+                                onChange={(e) => setSkill(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Alamat */}
+                    <div className="md:col-span-2">
+                        <label htmlFor="alamat" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Alamat</label>
+                        <div className="mt-2">
+                            <textarea 
+                                id="alamat"
+                                className="w-full h-[100px] md:h-[100px] lg:h-[110px] outline-1 outline-gray-200 p-[15px] md:p-[15px] lg:p-[16px] rounded-[15px] md:rounded-[15px] lg:rounded-[16px]" 
+                                placeholder="Masukkan Detail Alamat Anda"
+                                onChange={(e) => setAlamat(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Domisili */}
+                    <div className="md:col-span-2"> 
+                        <label className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Domisili</label>
+                        <div className="mt-2"> 
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
+                                <InputForm 
+                                    type="text" 
+                                    placeholder="Provinsi" 
+                                    onChange={(e) => setProvinsi(e.target.value)}
+                                />
+                                <InputForm 
+                                    type="text" 
+                                    placeholder="Kota" 
+                                    onChange={(e) => setKota(e.target.value)}
+                                />
+                                <InputForm 
+                                    type="text" 
+                                    placeholder="Kecamatan" 
+                                    onChange={(e) => setKecamatan(e.target.value)}
+                                />
+                                <InputForm 
+                                    type="text" 
+                                    placeholder="Kode Pos" 
+                                    onChange={(e) => setKode_Pos(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {/* Tombol Selanjutnya */}
+                <div className="flex justify-end pt-4"> 
+                    <Button 
+                        type="submit" 
+                        variant="secondary" 
+                        className="px-6 py-2 rounded-[20px] text-white"
+                    > 
+                        Selanjutnya
+                    </Button>
+                </div>
+
             </form>
         </div>
     );
