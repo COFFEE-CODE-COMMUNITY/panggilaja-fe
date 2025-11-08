@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../../features/authSlice'
 import { getAllServicesByIdSeller, resetServiceSeller, selectSellerServices, selectSellerStatus, selectServiceSellerStatus } from '../../../features/sellerSlice'
 import { Link } from 'react-router-dom'
 import { deleteService, resetDeleteStatus, selectDeleteServiceStatus } from '../../../features/serviceSlice'
 import Button from '../../../components/common/Button'
+import { FaTimes } from 'react-icons/fa'
+import Input from '../../../components/common/Input'
 
 const TableServices = () => {
     const user = useSelector(selectCurrentUser)
@@ -15,11 +17,13 @@ const TableServices = () => {
 
     const statusDelete = useSelector(selectDeleteServiceStatus)
 
+    const [modalAction, setModalAction] = useState(false)
+
     useEffect(() => {
         if (user && user.id_seller) { 
             dispatch(getAllServicesByIdSeller(user.id_seller));
         }
-    }, [dispatch, user]); 
+    }, [dispatch, user, statusDelete]); 
 
     useEffect(() => {
         if (statusDelete === 'success') {
@@ -35,11 +39,15 @@ const TableServices = () => {
     console.log(servicesSeller)
   return (
     <div className="flex flex-col gap-2">
-        <div className='flex justify-end'>
+        <div className='flex gap-10 items-center'>
+            <Input
+                placeholder="Cari jasa sekarang"
+                className="flex-1 border-2 border-gray-200 rounded-full text-h5 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            />
             <Link to={`/dashboard/manage-services/add-service`}>
                 <Button
                     variant='primary'
-                    className='px-5 py-2 text-white rounded-xl'
+                    className='px-5 py-2 text-white rounded-xl '
                 >
                     Tambah Jasa
                 </Button>
@@ -90,13 +98,27 @@ const TableServices = () => {
                         <td className="px-4 py-3 w-[22%] align-text-top">
                             <div className="bg-gray-100 w-full h-1 rounded-full"></div>
                         </td>
-                        <td className="px-4 py-3 w-[10%] align-text-top">
-                            <div className=" flex w-full justify-end">
-                            <button className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5">
-                                <span className="bg-black h-1 w-1 rounded-full"></span>
-                                <span className="bg-black h-1 w-1 rounded-full"></span>
-                                <span className="bg-black h-1 w-1 rounded-full"></span>
-                            </button>
+                        <td className="p-1 w-[10%] align-text-top">
+                            <div className=" flex w-full justify-end relative">
+                                {modalAction && (
+                                    <div className='absolute right-7 bg-gray-50 rounded-xl w-30 px-2 py-1'>
+                                        <p className='hover:bg-primary hover:text-white p-1 cursor-pointer'>Edit</p>
+                                        <p 
+                                            className='hover:bg-primary hover:text-white p-1 cursor-pointer'
+                                            onClick={() => dispatch(deleteService(service?.id))}
+                                        >
+                                            Hapus
+                                        </p>
+                                    </div>
+                                )}
+                                <button 
+                                    className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5 cursor-pointer"
+                                    onClick={() => setModalAction(!modalAction)}
+                                >
+                                    <span className="bg-black h-1 w-1 rounded-full"></span>
+                                    <span className="bg-black h-1 w-1 rounded-full"></span>
+                                    <span className="bg-black h-1 w-1 rounded-full"></span>
+                                </button>
                             </div>
                         </td>
                     </tr>                

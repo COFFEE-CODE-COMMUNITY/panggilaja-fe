@@ -8,33 +8,10 @@ export const ProtectedRoute = ({ children }) => {
   const { accessToken, user, status } = useSelector((state) => state.auth);
   const location = useLocation();
 
-  console.log("🔒 ProtectedRoute - Checking auth for:", location.pathname);
-  console.log("Token exists:", !!accessToken);
-  console.log("User object exists:", !!user);
-  console.log("Auth Status:", status);
-
-  if (status === "loading") {
-    console.log("⏳ Auth status is 'loading'. Waiting...");
-    return (
-      <div
-        style={{
-          display: "flex",
-          height: "100vh",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <h1>Loading User Data...</h1>
-      </div>
-    );
-  }
-
   if (accessToken && user) {
     console.log("✅ Token and User found, rendering protected content");
     return children;
   }
-
-  console.log("❌ Access Denied. Redirecting to /login");
 
   if (location.pathname !== "/login") {
     toast.error("Anda harus login terlebih dahulu", {

@@ -30,7 +30,8 @@ const FilterByCategory = () => {
         }
     },[address?.data?.kecamatan])
 
-    console.log(id)
+    const servicesByCategory = servicesAround?.filter((service) => service?.kategori_id === id )
+
     return (
         <div className='min-h-screen xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>
             {/* <p className='font-medium'>Hasil Filter Untuk: {searchText}</p> */}
@@ -40,7 +41,7 @@ const FilterByCategory = () => {
             )} */}
 
             <div className='grid md:grid-cols-4 grid-cols-2 gap-x-1 gap-y-4 md:gap-x-2 md:gap-y-5 lg:gap-x-3 lg:gap-y-6'>
-                {servicesAround?.map((service) => (
+                {servicesByCategory?.map((service) => (
                     <ServiceCard
                         idService={service.id}
                         image={service.foto_product}

@@ -526,7 +526,7 @@ const Header = () => {
       )}
 
       {token && sidebarMobile && (
-        <div className="sm:hidden fixed inset-0 bg-white z-10 overflow-y-auto pt-16">
+        <div className="sm:hidden fixed inset-0 bg-white z-50 overflow-y-auto pt-16">
           <div className="p-6">
             <Link
               to="profile-setting"

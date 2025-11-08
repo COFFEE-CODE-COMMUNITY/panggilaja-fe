@@ -52,7 +52,7 @@ const LoginForm = () => {
   // Handle Google Login
   const handleGoogleLogin = () => {
     // Redirect langsung ke backend endpoint untuk Google OAuth
-    window.location.href = "http://localhost:5000/auth/google";
+    window.location.replace("http://localhost:5000/auth/google");
   };
 
   useEffect(() => {

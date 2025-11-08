@@ -38,7 +38,7 @@ const ProfileLayout = () => {
         )
     }
 
-    console.log(sellerServiceStatus)
+    console.log(seller)
 
     if(status === 'success'){
       const skills = seller?.kategori_toko.split(' & ')
@@ -53,7 +53,7 @@ const ProfileLayout = () => {
               <img src={seller?.foto_toko} className='bg-gray-200 lg:w-[110px] lg:h-[110px] md:w-[90px] md:h-[90px] w-[75px] h-[75px] rounded-full aspect-square'/>
               <div className='sm:text-center w-full'>
                 <p className='lg:text-h3 md:text-h4 text-h5 font-medium w-full'>{seller?.nama_toko}</p>
-                <p className='md:text-h5 text-h6 font-light'>Jalan cibaduyut</p>
+                <p className='md:text-h5 text-h6 font-light'>{seller?.address?.alamat}</p>
               </div>
               <Button variant='primary' className='sm:block hidden md:text-h5 text-h6 text-white rounded-lg lg:w-[220px] md:w-[180px] w-[100px] py-[10px]'>Kontak Saya</Button>
               <div className='sm:flex hidden flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]'>

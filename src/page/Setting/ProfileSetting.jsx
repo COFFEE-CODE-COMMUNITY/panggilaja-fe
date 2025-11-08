@@ -22,14 +22,9 @@ const ProfileSetting = () => {
     },[statusProfile, dispatch, user?.id_buyer])
 
     useEffect(() => {
-        // 1. Pastikan user.id_buyer sudah tersedia
-        // 2. Pastikan status masih 'idle' (belum pernah mencoba mengambil) atau ingin refresh jika data belum ada (!address)
         if (user?.id_buyer && statusAddress === 'idle' && !address) { 
-            // URL yang dikirim ke service sekarang pasti berisi ID yang valid
             dispatch(seeAddress(user.id_buyer))
         }
-    // Masukkan id_buyer sebagai dependency, agar effect berjalan HANYA SETELAH id_buyer terisi
-    // Masukkan statusAddress agar dispatch hanya dilakukan saat 'idle' atau butuh refresh
     }, [dispatch, user?.id_buyer, statusAddress, address])
 
     if (statusAddress === 'loading') {
@@ -42,7 +37,7 @@ const ProfileSetting = () => {
             </div>
         )
     }
-
+    console.log(address)
     return (
         <div className='px-[10px] py-[5px] flex flex-col gap-[20px]'>
             <div>

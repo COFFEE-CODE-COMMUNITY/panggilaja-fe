@@ -42,7 +42,6 @@ const DetailService = () => {
         <>
           <div className="flex flex-col lg:w-[60%] gap-10">
             <ImageService image={service.foto_product} />
-            <ReviewService />
           </div>
           <InformationService
             description={service.deskripsi}

@@ -23,6 +23,7 @@ import { selectAccessToken, selectCurrentUser } from "../../../features/authSlic
 import Stars from "../../../components/common/Stars";
 import { getSellerById, selectSelectedSeller } from "../../../features/sellerSlice";
 import FaqService from "./FaqService";
+import ReviewService from "./ReviewService";
 
 const InformationService = ({
   sellerName,
@@ -208,7 +209,7 @@ const InformationService = ({
           </div>
         </div>
       </div>
-      <FaqService/>
+      <ReviewService/>
     </div>
   );
 };
