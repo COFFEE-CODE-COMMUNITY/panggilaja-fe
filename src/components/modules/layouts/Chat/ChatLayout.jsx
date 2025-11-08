@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { socket } from "../../../utils/socket";
+import io from "socket.io-client";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
 import { useContactRealtime } from "../../../../hooks/contactRealtime";
@@ -69,6 +69,7 @@ const formatTime = (timestamp) => {
   return date.toLocaleDateString("id-ID", dateOptions);
 };
 
+const socket = io("http://localhost:5000");
 const autoMessageRegex =
   /Halo, saya tertarik dengan layanan "(.+?)". \(Harga: Rp (.+?)\) \(Deskripsi: (.*?)\) \(Gambar: (.*?)\)/;
 
@@ -149,8 +150,7 @@ const ChatLayout = () => {
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
-
-  const API_BASE_URL = "https://https://api.panggilaja.space/api";
+  const API_BASE_URL = "http://localhost:5000/api";
 
   // ===== USEEFFECT #1: LOAD CONTACTS =====
   useEffect(() => {
@@ -165,16 +165,7 @@ const ChatLayout = () => {
     if (shouldRefresh) {
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [
-    dispatch,
-    myId,
-    isBuyer,
-    buyerStatus,
-    sellerStatus,
-    shouldRefresh,
-    navigate,
-    location.pathname,
-  ]);
+  }, [dispatch, myId, isBuyer, buyerStatus, sellerStatus, shouldRefresh]);
 
   // ===== USEEFFECT #2: FETCH MESSAGES =====
   useEffect(() => {
@@ -287,19 +278,6 @@ const ChatLayout = () => {
     };
 
     socket.on("receive_message", handleNewMessage);
-
-    // ... sisa socket.emit dan return ...
-    socket.emit("join_user_room", {
-      userId: myId,
-      role: isBuyer ? "BUYER" : "SELLER",
-    });
-
-    if (partnerId) {
-      const buyerId = isBuyer ? myId : partnerId;
-      const sellerId = isBuyer ? partnerId : myId;
-      socket.emit("join_room", { buyerId, sellerId });
-      console.log(`👥 Joining specific chat room: ${buyerId}_${sellerId}`);
-    }
 
     return () => {
       socket.off("receive_message", handleNewMessage);
