@@ -11,7 +11,6 @@ const ProfileSetting = () => {
     const user = useSelector(selectCurrentUser)
     const dispatch = useDispatch()
     
-    // Selectors
     const profile = useSelector(selectSeeProfile)
     const statusProfile = useSelector(selectSeeProfileStatus)
     const statusUpdate = useSelector(selectUpdateProfileStatus)

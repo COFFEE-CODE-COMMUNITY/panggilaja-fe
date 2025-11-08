@@ -2,7 +2,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 const api = axios.create({
-  baseURL: "https://api.panggilaja.space/api", // ganti sesuai environment-mu
+  baseURL: "http://localhost:5000/api", // ganti sesuai environment-mu
   withCredentials: true, // ✅ wajib untuk kirim cookie refresh
 });
 
