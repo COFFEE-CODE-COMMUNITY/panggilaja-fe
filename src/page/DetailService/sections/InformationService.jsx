@@ -19,7 +19,10 @@ import {
   selectReviewService,
   selectReviewServiceStatus,
 } from "../../../features/serviceSlice";
-import { selectCurrentUser } from "../../../features/authSlice";
+import { selectAccessToken, selectCurrentUser } from "../../../features/authSlice";
+import { getSellerById, selectSelectedSeller } from "../../../features/sellerSlice";
+import Stars from "../../../components/common/Stars";
+import ReviewService from "./ReviewService";
 
 // 🆕 Inisialisasi socket
 const socket = io("http://localhost:5000");
@@ -48,9 +51,10 @@ const InformationService = ({
   const messageFavorite = useSelector(selectAddFavoriteServiceError);
   const statusAdd = useSelector(selectAddFavoriteServiceStatus);
   const errorAdd = useSelector(selectAddFavoriteServiceError);
-  const seller = useSelector(selectSelectedSeller);
   const token = useSelector(selectAccessToken);
   const sellerProfile = useSelector(selectSelectedSeller);
+
+  const [showMoreDesc, setShowMoreDesc] = useState(false)
 
   // 🆕 Get buyer ID
   const myId = user?.id_buyer;
