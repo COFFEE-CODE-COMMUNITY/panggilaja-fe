@@ -12,6 +12,7 @@ import {
 import {
   deleteSellerById,
   getSellerById,
+  resetSellerStatusDelete,
   selectDeleteSellerMessage,
   selectDeleteSellerStatus,
   selectSelectedSeller,
@@ -31,8 +32,11 @@ export const SidebarDashboard = () => {
   const deleteSellerStatus =  useSelector(selectDeleteSellerStatus)
   const deleteSellerMessage =  useSelector(selectDeleteSellerMessage)
 
+  console.log(deleteSellerStatus)
+
   useEffect(() => {
     if(deleteSellerStatus === 'success'){
+      dispatch(resetSellerStatusDelete())
       navigate('/')
     }
   },[user?.active_role, deleteSellerStatus])

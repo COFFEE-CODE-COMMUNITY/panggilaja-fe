@@ -5,7 +5,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategoryService, selectCategoryService, selectCategoryServiceStatus } from "../../../features/serviceSlice";
 import { addSeller, selectAddSellerStatus } from "../../../features/sellerSlice";
-import { changeAccount, selectChangeAccountStatus } from "../../../features/authSlice";
+import { changeAccount, resetChangeAccountStatus, selectChangeAccountStatus } from "../../../features/authSlice";
+import { fetchDistricts, fetchProvinces, fetchRegencies, resetDistricts, resetRegencies, selectAlamatStatus, selectAllDistricts, selectAllProvinces, selectAllRegencies } from "../../../features/addressSlice";
+import Input from "../../../components/common/Input";
 
 function ProfileMitraForm() {
     const categorys = useSelector(selectCategoryService)
@@ -76,11 +78,50 @@ function ProfileMitraForm() {
 
     useEffect(() => {
         if(statusChange === 'success'){
+            dispatch(resetChangeAccountStatus());
             navigate('add-service')
         }
     },[statusChange])
+    
+    const provinces = useSelector(selectAllProvinces)
+    const regencies = useSelector(selectAllRegencies)
+    const districts = useSelector(selectAllDistricts)
+    const alamatStatus = useSelector(selectAlamatStatus)
 
-    console.log(statusAdd)
+    useEffect(() => {
+        if (provinces.length === 0 && alamatStatus === 'idle') {
+            dispatch(fetchProvinces())
+        }
+    }, [dispatch, provinces.length, alamatStatus])
+
+    const handleProvinceChange = (e) => {
+        const code = e.target.value
+        setProvinsi(code) 
+        setKota('')
+        setKecamatan('')
+        dispatch(resetRegencies())
+
+        if (code) {
+            dispatch(fetchRegencies(code))
+        }
+    }
+
+    const handleRegencyChange = (e) => {
+        const code = e.target.value
+        setKota(code) 
+        setKecamatan('') 
+        dispatch(resetDistricts()) 
+
+        if (code) {
+            dispatch(fetchDistricts(code))
+        }
+    }
+    
+    const handleDistrictChange = (e) => {
+        const code = e.target.value
+        setKecamatan(code)
+    }
+    
     return (
         <div className="flex items-center justify-center py-5 px-4 lg:px-0">
             <form 
@@ -186,26 +227,58 @@ function ProfileMitraForm() {
                     <div className="md:col-span-2"> 
                         <label className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Domisili</label>
                         <div className="mt-2"> 
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
-                                <InputForm 
-                                    type="text" 
-                                    placeholder="Provinsi" 
-                                    onChange={(e) => setProvinsi(e.target.value)}
-                                />
-                                <InputForm 
-                                    type="text" 
-                                    placeholder="Kota" 
-                                    onChange={(e) => setKota(e.target.value)}
-                                />
-                                <InputForm 
-                                    type="text" 
-                                    placeholder="Kecamatan" 
-                                    onChange={(e) => setKecamatan(e.target.value)}
-                                />
-                                <InputForm 
-                                    type="text" 
-                                    placeholder="Kode Pos" 
+                            <div className='grid grid-cols-4 gap-3'>
+                                <select 
+                                    className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
+                                    onChange={handleProvinceChange}
+                                    value={provinsi} 
+                                    required
+                                    disabled={alamatStatus === 'loading' && provinces.length === 0}
+                                >
+                                    <option value="">
+                                        {provinces.length === 0 && alamatStatus === 'loading' ? 'Memuat Provinsi...' : 'Pilih Provinsi'}
+                                    </option>
+                                    {provinces.map((p) => (
+                                        <option key={p.code} value={p.code}>{p.name}</option>
+                                    ))}
+                                </select>
+
+                                <select 
+                                    className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
+                                    onChange={handleRegencyChange}  
+                                    value={kota} 
+                                    required
+                                    disabled={!provinsi || (alamatStatus === 'loading' && regencies.length === 0)}
+                                >
+                                    <option value="">
+                                        {provinsi && regencies.length === 0 && alamatStatus === 'loading' ? 'Memuat Kota/Kabupaten...' : 'Pilih Kota/Kabupaten'}
+                                    </option>
+                                    {regencies.map((r) => (
+                                        <option key={r.code} value={r.code}>{r.name}</option>
+                                    ))}
+                                </select>
+                                
+                                <select 
+                                    className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
+                                    onChange={handleDistrictChange}
+                                    value={kecamatan} 
+                                    required
+                                    disabled={!kota || (alamatStatus === 'loading' && districts.length === 0)}
+                                >
+                                    <option value="">
+                                        {kota && districts.length === 0 && alamatStatus === 'loading' ? 'Memuat Kecamatan...' : 'Pilih Kecamatan'}
+                                    </option>
+                                    {districts.map((d) => (
+                                        <option key={d.code} value={d.code}>{d.name}</option>
+                                    ))}
+                                </select>
+                                
+                                <Input  
+                                    placeholder='Kode Pos (contoh: 40132)' 
+                                    className='border-1 border-gray-200 rounded-lg w-full px-4 py-3 focus:border-blue-500 focus:outline-none'
                                     onChange={(e) => setKode_Pos(e.target.value)}
+                                    value={kode_pos}
+                                    required
                                 />
                             </div>
                         </div>

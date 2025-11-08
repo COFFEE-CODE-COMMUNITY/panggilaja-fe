@@ -331,7 +331,7 @@ const Header = () => {
 
       {/* Mobile Menu for Guest Users */}
       {!token && sidebarMobile && (
-        <div className="sm:hidden fixed inset-0 bg-white z-100 overflow-y-auto pt-16">
+        <div className="sm:hidden fixed inset-0 z-50 overflow-y-auto pt-16 bg-white">
           <div className="p-6">
             {/* Menu Items */}
             <div className="space-y-2 mb-6">
@@ -526,7 +526,7 @@ const Header = () => {
       )}
 
       {token && sidebarMobile && (
-        <div className="sm:hidden fixed inset-0 bg-white z-50 overflow-y-auto pt-16">
+        <div className="sm:hidden fixed inset-0 z-50 overflow-y-auto pt-16 bg-white">
           <div className="p-6">
             <Link
               to="profile-setting"

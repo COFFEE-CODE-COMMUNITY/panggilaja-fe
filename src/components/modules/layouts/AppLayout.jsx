@@ -49,7 +49,7 @@ const AppLayout = () => {
   }
 
   return (
-    <div className={containerClasses}>
+    <div className={`${containerClasses} overflow-hidden`}>
       <Header/>
       <div className={mainContentClasses}> 
         <Outlet/>

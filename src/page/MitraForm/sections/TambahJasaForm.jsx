@@ -115,13 +115,14 @@ function TambahJasaForm() {
             setTop_Price('')
             setDeskripsi('')
             setKategori_Id('')
-            
-            dispatch(resetAddStatus())
-            
+                        
             // Navigate
             setTimeout(() => {
-                navigate('/dashboard/manage-services')
-            }, 500)
+                navigate('/dashboard/manage-services') 
+            }, 50)
+
+            dispatch(resetAddStatus())
+
         }
         
         if(status === 'error') {

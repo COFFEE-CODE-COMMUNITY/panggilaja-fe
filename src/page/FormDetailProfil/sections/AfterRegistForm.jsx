@@ -127,26 +127,15 @@ const AfterRegistForm = () => {
         
         const data = {
             alamat,
-            provinsi: provinsiName, 
-            kota: kotaName,
-            kecamatan: kecamatanName,
+            provinsi: provinsiName.toLowerCase(), 
+            kota: kotaName.toLowerCase(),
+            kecamatan: kecamatanName.toLowerCase(),
             kode_pos
         }
         
         setIsSubmitting(true)
         
         dispatch(addAddressAction({ id: user?.id_buyer, data }))
-    }
-
-    if (addressStatus === 'loading' || alamatStatus === 'loading') {
-        return (
-            <div className='flex justify-center items-center min-h-screen'>
-                <div className='text-center'>
-                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
-                    <p className='mt-4 text-gray-600'>Memuat data alamat...</p>
-                </div>
-            </div>
-        )
     }
 
     return (

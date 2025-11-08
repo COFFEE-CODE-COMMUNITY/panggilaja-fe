@@ -10,7 +10,7 @@ const StatCardOrder = () => {
               Total Pesanan
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              71,897
+              0
             </p>
           </div>
           <p class="text-gray-500 font-thin">+122</p>
@@ -24,7 +24,7 @@ const StatCardOrder = () => {
               Pesanan Masuk
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              58.16%
+              0
             </p>
           </div>
           <p class="text-gray-500 font-thin">+5.4%</p>
@@ -38,7 +38,7 @@ const StatCardOrder = () => {
               Pesanan Diproses
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              24.57%
+              0
             </p>
           </div>
           <p class="text-gray-500 font-thin">-3.2%</p>
@@ -52,7 +52,7 @@ const StatCardOrder = () => {
               Pesanan Selesai
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              24.57%
+              0
             </p>
           </div>
           <p class="text-gray-500 font-thin">-3.2%</p>
