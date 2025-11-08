@@ -19,9 +19,15 @@ import {
   selectReviewServiceStatus,
 } from "../../../features/serviceSlice";
 import axiosInstance from "../../../components/utils/axios";
-import { selectAccessToken, selectCurrentUser } from "../../../features/authSlice";
+import {
+  selectAccessToken,
+  selectCurrentUser,
+} from "../../../features/authSlice";
 import Stars from "../../../components/common/Stars";
-import { getSellerById, selectSelectedSeller } from "../../../features/sellerSlice";
+import {
+  getSellerById,
+  selectSelectedSeller,
+} from "../../../features/sellerSlice";
 import FaqService from "./FaqService";
 import ReviewService from "./ReviewService";
 
@@ -36,7 +42,7 @@ const InformationService = ({
   description,
   totalReviewSeller,
   foto_product,
-  idSeller
+  idSeller,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -49,15 +55,15 @@ const InformationService = ({
   const messageFavorite = useSelector(selectAddFavoriteServiceError);
   const statusAdd = useSelector(selectAddFavoriteServiceStatus);
   const errorAdd = useSelector(selectAddFavoriteServiceError);
-  const seller = useSelector(selectSelectedSeller)
-  const token = useSelector(selectAccessToken)
-  const sellerProfile = useSelector(selectSelectedSeller)
+  const seller = useSelector(selectSelectedSeller);
+  const token = useSelector(selectAccessToken);
+  const sellerProfile = useSelector(selectSelectedSeller);
 
   useEffect(() => {
-    if(idSeller){
-      dispatch(getSellerById(idSeller))
+    if (idSeller) {
+      dispatch(getSellerById(idSeller));
     }
-  },[idSeller])
+  }, [idSeller]);
 
   useEffect(() => {
     if (idProvider && token) {
@@ -94,14 +100,14 @@ const InformationService = ({
     }
   }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
-  const [showMoreDesc, setShowMoreDesc] = useState(false)
+  const [showMoreDesc, setShowMoreDesc] = useState(false);
 
   const handleStartChat = async () => {
     if (isStartingChat || !idProvider || !nameService) return;
 
     setIsStartingChat(true);
 
-    const API_BASE_URL = "http://localhost:5000/api";
+    const API_BASE_URL = "https://api.panggilaja.space";
 
     const imageUrl =
       foto_product ||
@@ -145,45 +151,52 @@ const InformationService = ({
       <div className="flex flex-col gap-[10px]">
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-col leading-8">
-            <div className='flex'>
-              <Link 
-                  className='flex-1 text-h5 font-light'
-                  to={`/profile-service/${idSeller}`}
+            <div className="flex">
+              <Link
+                className="flex-1 text-h5 font-light"
+                to={`/profile-service/${idSeller}`}
               >
-                  {sellerProfile?.nama_toko}
+                {sellerProfile?.nama_toko}
               </Link>
-              {token && (
-                  isServiceFavorite ? (
-                      <Button 
-                          onClick={() => dispatch(deleteFavoriteService(isServiceFavorite.id))}
-                      >
-                          <FaHeart className={`text-gray-700 text-xl`}
-                          />
-                      </Button>
-                  ) : (
-                      <Button 
-                          onClick={token ? handleAddFavorite : ''}
-                      >
-                          <FaRegHeart className={`text-gray-700 text-xl`}/>
-                      </Button>
-                  )
-              )}
+              {token &&
+                (isServiceFavorite ? (
+                  <Button
+                    onClick={() =>
+                      dispatch(deleteFavoriteService(isServiceFavorite.id))
+                    }
+                  >
+                    <FaHeart className={`text-gray-700 text-xl`} />
+                  </Button>
+                ) : (
+                  <Button onClick={token ? handleAddFavorite : ""}>
+                    <FaRegHeart className={`text-gray-700 text-xl`} />
+                  </Button>
+                ))}
             </div>
             <h2 className="text-h2">{nameService}</h2>
           </div>
           <div className="flex items-center gap-[5px]">
             <div className="flex gap-[5px]">
-              <Stars many={4} variant="star"/>
+              <Stars many={4} variant="star" />
             </div>
             <p className="text-h5 font-light">{totalReview} ulasan</p>
           </div>
           <h2 className="text-h3">
             Rp. {basePrice} - {topPrice}
           </h2>
-          <p className='text-h5 font-light'>
-            {!showMoreDesc && description.slice(0,200)}{!showMoreDesc && <>
-                <span>...</span><span onClick={() => setShowMoreDesc(!showMoreDesc)} className='font-medium cursor-pointer'>selengkapnya</span>
-            </>}
+          <p className="text-h5 font-light">
+            {!showMoreDesc && description.slice(0, 200)}
+            {!showMoreDesc && (
+              <>
+                <span>...</span>
+                <span
+                  onClick={() => setShowMoreDesc(!showMoreDesc)}
+                  className="font-medium cursor-pointer"
+                >
+                  selengkapnya
+                </span>
+              </>
+            )}
             {showMoreDesc && description}
           </p>
         </div>
@@ -209,7 +222,7 @@ const InformationService = ({
           </div>
         </div>
       </div>
-      <ReviewService/>
+      <ReviewService />
     </div>
   );
 };
