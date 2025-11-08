@@ -11,11 +11,17 @@ import {
 } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, selectAccessToken, selectCurrentUser, selectLoginError, selectLoginMessage, selectLoginStatus } from "../../../features/authSlice";
+import {
+  loginUser,
+  selectAccessToken,
+  selectCurrentUser,
+  selectLoginError,
+  selectLoginMessage,
+  selectLoginStatus,
+} from "../../../features/authSlice";
 import { seeAddress, selectSeeAddress } from "../../../features/userSlice";
 
 const LoginForm = () => {
-  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -41,7 +47,7 @@ const LoginForm = () => {
   const handleChangePassword = (e) => {
     setPassword(e.target.value);
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (email && password) {
@@ -52,7 +58,7 @@ const LoginForm = () => {
   // Handle Google Login
   const handleGoogleLogin = () => {
     // Redirect langsung ke backend endpoint untuk Google OAuth
-    window.location.replace("http://localhost:5000/auth/google");
+    window.location.replace("https://api.panggilaja.space/auth/google");
   };
 
   useEffect(() => {
