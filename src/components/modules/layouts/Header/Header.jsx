@@ -6,7 +6,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   changeAccount,
-  logout,
   logoutUser,
   resetChangeAccountStatus,
   selectAccessToken,
@@ -332,7 +331,7 @@ const Header = () => {
 
       {/* Mobile Menu for Guest Users */}
       {!token && sidebarMobile && (
-        <div className="sm:hidden fixed inset-0 bg-white z-100 overflow-y-auto pt-16">
+        <div className="sm:hidden fixed inset-0 z-50 overflow-y-auto pt-16 bg-white">
           <div className="p-6">
             {/* Menu Items */}
             <div className="space-y-2 mb-6">
@@ -515,7 +514,7 @@ const Header = () => {
                 className="flex justify-center w-full py-3 rounded-xl text-white font-medium hover:shadow-lg transition-all"
                 variant="primary"
                 onClick={() => {
-                  dispatch(logout());
+                  dispatch(logoutUser());
                   setSidebarMobile(false);
                 }}
               >
@@ -527,7 +526,7 @@ const Header = () => {
       )}
 
       {token && sidebarMobile && (
-        <div className="sm:hidden fixed inset-0 bg-white z-10 overflow-y-auto pt-16">
+        <div className="sm:hidden fixed inset-0 z-50 overflow-y-auto pt-16 bg-white">
           <div className="p-6">
             <Link
               to="profile-setting"
@@ -601,7 +600,7 @@ const Header = () => {
               className="flex justify-center w-full py-4 rounded-xl text-white font-medium hover:shadow-lg transition-all"
               variant="primary"
               onClick={() => {
-                dispatch(logout());
+                dispatch(logoutUser());
                 setSidebarMobile(false);
               }}
             >

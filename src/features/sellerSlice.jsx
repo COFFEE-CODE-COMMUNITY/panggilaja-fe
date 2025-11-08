@@ -1,5 +1,6 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import api from "../api/api";
+import { updateProfile } from "./authSlice";
 
 export const getSellers = createAsyncThunk(
   'seller/getSellers',
@@ -62,16 +63,31 @@ export const updateSellerById = createAsyncThunk(
 );
 
 export const deleteSellerById = createAsyncThunk(
-  'seller/deleteSellerById',
-  async (id, { rejectWithValue }) => {
+  "seller/deleteSellerById",
+  async (id, { dispatch, rejectWithValue }) => {
     try {
-      const res = await api.delete(`/sellers/${id}`)
-      return res.data;
+      await api.delete(`/sellers/${id}`);
+
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      const res = await api.post(`/auth/change-user`, {
+        id_user: user.id_user, 
+        role: "buyer",        
+      });
+
+      const { accessToken, user: updatedUser } = res.data.data;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      dispatch(updateProfile());
+
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+      return rejectWithValue(err.response?.data?.message || "Gagal menghapus seller");
     }
   }
 );
+
 
 export const getOrderBySellerId = createAsyncThunk(
   'seller/getOrderBySellerId',

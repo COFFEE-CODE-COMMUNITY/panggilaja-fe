@@ -7,13 +7,10 @@ const StatCardOrder = () => {
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
             <p class=" text-lg font-bold text-gray-500 mb-3 md:mb-6">
-              Total Subscribers
+              Total Pesanan
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              71,897
-              <span class="text-gray-500 font-semibold text-base">
-                from 70,946
-              </span>
+              0
             </p>
           </div>
           <p class="text-gray-500 font-thin">+122</p>
@@ -24,13 +21,10 @@ const StatCardOrder = () => {
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
             <p class="font-bold text-lg text-gray-500 mb-3 md:mb-6">
-              Avg. Open Rate
+              Pesanan Masuk
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              58.16%
-              <span class="text-gray-500 font-semibold text-base">
-                from 56.14%
-              </span>
+              0
             </p>
           </div>
           <p class="text-gray-500 font-thin">+5.4%</p>
@@ -41,13 +35,24 @@ const StatCardOrder = () => {
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
             <p class="text-lg font-bold text-gray-500 mb-3 md:mb-6">
-              Avg. Click Rate
+              Pesanan Diproses
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              24.57%
-              <span class="text-gray-500 font-semibold text-base">
-                from 28.62%
-              </span>
+              0
+            </p>
+          </div>
+          <p class="text-gray-500 font-thin">-3.2%</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-8 rounded-lg shadow-md w-full">
+        <div class="flex justify-between w-full md:items-end">
+          <div class="flex flex-col">
+            <p class="text-lg font-bold text-gray-500 mb-3 md:mb-6">
+              Pesanan Selesai
+            </p>
+            <p class="font-semibold text-xl md:text-3xl">
+              0
             </p>
           </div>
           <p class="text-gray-500 font-thin">-3.2%</p>

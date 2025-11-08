@@ -34,7 +34,7 @@ const DetailService = () => {
       </div>
     );
   }
-
+  console.log(service)
   return (
     <div className="lg:flex h-full w-full lg:gap-[30px] md:gap-[20px] gap-[10px]  mb-[50px] pt-[20px] xl:px-[150px] lg:px-[70px] md:px-[55px] sm:px-[35px] mx-auto transition-all duration-150">
       {status === "loading" && <div className="w-full h-screen">loading</div>}
@@ -42,7 +42,6 @@ const DetailService = () => {
         <>
           <div className="flex flex-col lg:w-[60%] gap-10">
             <ImageService image={service.foto_product} />
-            <ReviewService />
           </div>
           <InformationService
             description={service.deskripsi}

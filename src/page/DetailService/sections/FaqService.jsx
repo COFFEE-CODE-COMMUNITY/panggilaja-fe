@@ -30,20 +30,20 @@ const FaqService = () => {
     };
 
     return (
-        <div className="mt-5 flex w-full max-w-4xl flex-col">
+        <div className="mt-1 flex w-full max-w-4xl flex-col">
             {faqsData.map((faq, index) => (
                 <div 
                     key={index} 
                     className={`relative w-full rounded-md border border-gray-300 lg:px-6 lg:py-5 md:px-5 md:py-4 px-4 py-3 cursor-pointer ${index > 0 ? 'my-3' : ''}`} // Tambahkan margin kecuali untuk FAQ pertama
                     onClick={() => toggleFaq(index)}
                 >
-                    <div className="max-w-3xl">
+                    <div className="max-w-3xl mr-7">
                         <h2 className="text-black text-h5">
                             {faq.question}
                         </h2>
                         {/* Tampilkan jawaban hanya jika FAQ ini sedang terbuka */}
                         {openFaqIndex === index && (
-                            <p className="font-inter mt-4 md:text-h5 text-h6 font-light text-gray-500">
+                            <p className="font-inter lg:mt-4 md:mt-3 mt-2 md:text-h5 text-h6 font-light text-gray-500">
                                 {faq.answer}
                             </p>
                         )}

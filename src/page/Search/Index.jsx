@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getServices, selectAllService, selectAllServiceError, selectAllServiceStatus } from '../../features/serviceSlice'
+import { getServices, selectAllService, selectAllServiceError, selectAllServiceStatus, selectServiceAround } from '../../features/serviceSlice'
 import { selectSearchText } from '../../features/searchSlice'
 import ServiceCard from '../../components/modules/Cards/ServiceCard'
 import { useLocation } from 'react-router-dom'
+import NoServiceNearby from '../../store/NoServiceNearby'
 
 const SearchPage = () => {
   const dispatch = useDispatch()
   
-  const allServices = useSelector(selectAllService)
+  const servicesAround = useSelector(selectServiceAround)
   const status = useSelector(selectAllServiceStatus)
   const error = useSelector(selectAllServiceError)
 
@@ -21,7 +22,7 @@ const SearchPage = () => {
       }
   }, [status, dispatch])
 
-  const serviceSearch = allServices.filter(service => {
+  const serviceSearch = servicesAround?.filter(service => {
       return service.nama_jasa.toLowerCase().includes(lowerCaseSearchText)
   })
   
@@ -46,28 +47,59 @@ const SearchPage = () => {
       )
   }
 
-  console.log(serviceSearch)
   return (
       <div className='min-h-screen xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>
-          <p className='font-medium'>Hasil Pencarian untuk: {searchText}</p>
+          {servicesAround?.length === 0 && (
+              <NoServiceNearby/>
+          )}
           
-          {serviceSearch.length === 0 && lowerCaseSearchText !== '' && (
+          {serviceSearch?.length === 0 && lowerCaseSearchText !== '' && servicesAround > 0 && (
               <p className='text-h5 text-gray-600'>Tidak ditemukan hasil untuk "{searchText}".</p>
           )}
 
-          <div className='grid md:grid-cols-4 grid-cols-2 gap-x-1 gap-y-4 md:gap-x-2 md:gap-y-5 lg:gap-x-3 lg:gap-y-6'>
-              {serviceSearch.map((service) => (
-                  <ServiceCard
-                      idService={service.id}
-                      image={service.foto_product}
-                      serviceName={service.nama_jasa}
-                      key={service.id}
-                      basePrice={service.base_price}
-                      topPrice={service.top_price}
-                  />
-              ))}
-          </div>
+          {servicesAround > 0 && (
+            <>
+              <p className='font-medium'>Hasil Pencarian untuk: {searchText}</p>
+               <div className='grid md:grid-cols-4 grid-cols-2 gap-x-1 gap-y-4 md:gap-x-2 md:gap-y-5 lg:gap-x-3 lg:gap-y-6'>
+                  {serviceSearch?.map((service) => (
+                      <ServiceCard
+                          idService={service.id}
+                          image={service.foto_product}
+                          serviceName={service.nama_jasa}
+                          key={service.id}
+                          basePrice={service.base_price}
+                          topPrice={service.top_price}
+                      />
+                  ))}
+              </div>
+            </>
+          )}
       </div>
+    //   <div className='min-h-screen xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>          
+    //         {serviceSearch.length === 0 && lowerCaseSearchText !== '' ? (
+    //             <NoServiceNearby/>
+    //         ) : (
+    //             servicesAround.length === 0 ? (
+    //                 <>
+    //                     <p className='font-medium'>Hasil Pencarian untuk: {searchText}</p>
+    //                     <div className='grid md:grid-cols-4 grid-cols-2 gap-x-1 gap-y-4 md:gap-x-2 md:gap-y-5 lg:gap-x-3 lg:gap-y-6'>
+    //                         {serviceSearch.map((service) => (
+    //                             <ServiceCard
+    //                                 idService={service.id}
+    //                                 image={service.foto_product}
+    //                                 serviceName={service.nama_jasa}
+    //                                 key={service.id}
+    //                                 basePrice={service.base_price}
+    //                                 topPrice={service.top_price}
+    //                             />
+    //                         ))}
+    //                     </div>
+    //                 </>
+    //             ) : (
+                    
+    //             )
+    //         )}
+    //     </div>
   )
 }
 

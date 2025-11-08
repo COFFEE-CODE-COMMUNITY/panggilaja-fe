@@ -5,6 +5,7 @@ import searchReducer from "../features/searchSlice";
 import sellerReducer from "../features/sellerSlice";
 import userReducer from "../features/userSlice";
 import chatReducer from "../features/chatSlice";
+import alamatReducer from "../features/addressSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     seller: sellerReducer,
     user: userReducer,
     chat: chatReducer,
+    alamat: alamatReducer,
   },
 });

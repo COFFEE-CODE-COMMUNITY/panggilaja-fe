@@ -176,14 +176,14 @@ const Banner = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
 
               {/* Banner Content - Optional */}
-              <div className="absolute bottom-8 left-8 text-white z-10 hidden md:block pointer-events-none">
-                <h2 className="text-3xl lg:text-4xl font-bold mb-2">
-                  {banner.title}
+              <div className="text-white z-10 md:block pointer-events-none mt-auto absolute bottom-0 p-4 mb-4">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold md:mb-2 mb-1">
+                    {banner.title}
                 </h2>
-                <p className="text-lg lg:text-xl opacity-90">
-                  {banner.description}
+                <p className="text-md md:text-lg lg:text-xl opacity-90">
+                    {banner.description}
                 </p>
-              </div>
+            </div>
             </div>
           ))}
         </div>

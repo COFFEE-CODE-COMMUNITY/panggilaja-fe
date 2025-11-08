@@ -5,7 +5,6 @@ import { selectCurrentUser } from './features/authSlice';
 import { addAddress, seeAddress, selectSeeAddress } from './features/userSlice';
 import { useEffect } from 'react';
 const App = () => {
-  
   return (
     <RouterProvider router={Router} />
   );

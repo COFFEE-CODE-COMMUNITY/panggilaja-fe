@@ -4,14 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import {
   changeAccount,
-  logout,
   resetChangeAccountStatus,
   selectChangeAccountMessage,
   selectChangeAccountStatus,
   selectCurrentUser,
 } from "../../../../features/authSlice";
 import {
+  deleteSellerById,
   getSellerById,
+  resetSellerStatusDelete,
+  selectDeleteSellerMessage,
+  selectDeleteSellerStatus,
   selectSelectedSeller,
 } from "../../../../features/sellerSlice";
 
@@ -26,9 +29,23 @@ export const SidebarDashboard = () => {
   const [profileSeller, setProfileSeller] = useState(false);
   const [modalProfile, setModalProfile] = useState(false);
 
+  const deleteSellerStatus =  useSelector(selectDeleteSellerStatus)
+  const deleteSellerMessage =  useSelector(selectDeleteSellerMessage)
+
+  console.log(deleteSellerStatus)
+
+  useEffect(() => {
+    if(deleteSellerStatus === 'success'){
+      dispatch(resetSellerStatusDelete())
+      navigate('/')
+    }
+  },[user?.active_role, deleteSellerStatus])
+
   const handleSwitchToBuyer = () => {
     dispatch(changeAccount({ targetRole: "buyer" }));
   };
+
+  console.log(user)
 
   useEffect(() => {
     if (user && user.id_seller) {
@@ -54,7 +71,8 @@ export const SidebarDashboard = () => {
     );
   }
 
-  console.log(modalProfile);
+  
+
   return (
     <aside
       className={`bg-white sm:flex hidden px-10 py-5 flex flex-col justify-between h-screen fixed w-70 border-r-gray-100 border-1 shadow-sm`}
@@ -63,7 +81,7 @@ export const SidebarDashboard = () => {
         {/* Logo */}
         <div>
           <h1 className="text-primary text-h3 font-semibold">
-            PanggilAja Seller
+            PanggilAja Mitra
           </h1>
         </div>
 
@@ -276,7 +294,13 @@ export const SidebarDashboard = () => {
       >
         <div>
           {modalProfile && (
-            <div className="rounded-xl w-full bg-gray-100 absolute left-0 right-0 bottom-20 px-10 py-2 flex flex-col gap-2">
+            <div className="rounded-xl w-full bg-gray-100 absolute left-0 right-0 bottom-25 px-10 py-2 flex flex-col gap-2">
+              <Button
+                className="w-full py-1 rounded-xl"
+                onClick={() => dispatch(deleteSellerById(user?.id_seller))}
+              >
+                Hapus Akun Mitra
+              </Button>
               <Button
                 variant="primary"
                 className="w-full text-white py-1 rounded-xl"

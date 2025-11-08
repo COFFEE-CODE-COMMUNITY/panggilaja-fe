@@ -35,6 +35,7 @@ const InformationService = ({
   description,
   totalReviewSeller,
   foto_product,
+  idSeller,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -47,13 +48,22 @@ const InformationService = ({
   const messageFavorite = useSelector(selectAddFavoriteServiceError);
   const statusAdd = useSelector(selectAddFavoriteServiceStatus);
   const errorAdd = useSelector(selectAddFavoriteServiceError);
+  const seller = useSelector(selectSelectedSeller);
+  const token = useSelector(selectAccessToken);
+  const sellerProfile = useSelector(selectSelectedSeller);
 
   // 🆕 Get buyer ID
   const myId = user?.id_buyer;
   const isBuyer = user?.active_role?.toUpperCase() === "BUYER";
 
   useEffect(() => {
-    if (idProvider) {
+    if (idSeller) {
+      dispatch(getSellerById(idSeller));
+    }
+  }, [idSeller]);
+
+  useEffect(() => {
+    if (idProvider && token) {
       dispatch(getReviewServicesById(idProvider));
     }
   }, [dispatch, idProvider]);
@@ -146,47 +156,64 @@ const InformationService = ({
   }, []);
 
   return (
-    <div className="lg:h-full h-1/2 lg:w-[45%] w-full flex flex-col gap-[30px] lg:py-[25px] py-[10px] px-[15px]">
+    <div className="lg:h-full h-1/2 lg:w-[40%] w-full flex flex-col gap-[30px] lg:py-7 md:py-6 py-5 px-[15px]">
       <div className="flex flex-col gap-[10px]">
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-col leading-8">
-            <Link to={`/profile-service/${idProvider}`}>
-              <p className="text-h5 font-light cursor-pointer">Surasep</p>
-            </Link>
+            <div className="flex">
+              <Link
+                className="flex-1 text-h5 font-light"
+                to={`/profile-service/${idSeller}`}
+              >
+                {sellerProfile?.nama_toko}
+              </Link>
+              {token &&
+                (isServiceFavorite ? (
+                  <Button
+                    onClick={() =>
+                      dispatch(deleteFavoriteService(isServiceFavorite.id))
+                    }
+                  >
+                    <FaHeart className={`text-gray-700 text-xl`} />
+                  </Button>
+                ) : (
+                  <Button onClick={token ? handleAddFavorite : ""}>
+                    <FaRegHeart className={`text-gray-700 text-xl`} />
+                  </Button>
+                ))}
+            </div>
             <h2 className="text-h2">{nameService}</h2>
           </div>
           <div className="flex items-center gap-[5px]">
             <div className="flex gap-[5px]">
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
-              <FaStar className="text-star lg:text-[20px] md:text-[15px] text-[10px]" />
+              <Stars many={4} variant="star" />
             </div>
             <p className="text-h5 font-light">{totalReview} ulasan</p>
           </div>
           <h2 className="text-h3">
             Rp. {basePrice} - {topPrice}
           </h2>
-          <p className="text-h5 font-light">{description}</p>
+          <p className="text-h5 font-light">
+            {!showMoreDesc && description.slice(0, 200)}
+            {!showMoreDesc && (
+              <>
+                <span>...</span>
+                <span
+                  onClick={() => setShowMoreDesc(!showMoreDesc)}
+                  className="font-medium cursor-pointer"
+                >
+                  selengkapnya
+                </span>
+              </>
+            )}
+            {showMoreDesc && description}
+          </p>
         </div>
-        <div className="flex gap-[15px] w-full flex-col lg:flex-row">
-          <div className="flex gap-[10px]">
-            <img className="bg-amber-500 w-[40px] h-[40px] rounded-full" />
-            <div>
-              <div className="flex items-center gap-[5px]">
-                <FaStar className="text-star lg:text-[15px] md:text-[13px] text-[10px]" />
-                <p>{totalReviewSeller}</p>
-                <p className="text-h6 font-light">{totalReviewSeller} ulasan</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-1 gap-[10px]">
-          <div className="w-full flex gap-[10px]">
+        <div className="flex flex-1">
+          <div className="w-full flex gap-1.5">
             <Button
               variant="primary"
-              className="flex-2 rounded-[35px] text-white font-medium h-[50px] flex items-center justify-center w-full"
+              className="flex-2 rounded-lg text-white font-medium h-[50px] flex items-center justify-center w-full"
               onClick={handleStartChat}
               disabled={isStartingChat}
             >
@@ -195,36 +222,16 @@ const InformationService = ({
 
             <Button
               variant="secondary"
-              className="flex-1 rounded-[35px] text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]"
+              className="flex-1 rounded-lg text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]"
               onClick={handleStartChat}
               disabled={isStartingChat}
             >
               {isStartingChat ? "Memuat..." : "Negoin aja"}
             </Button>
-            {isServiceFavorite ? (
-              <Button
-                className="h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center"
-                onClick={() =>
-                  dispatch(deleteFavoriteService(isServiceFavorite.id))
-                }
-              >
-                <FaHeart className={`text-red-500 text-[20px]`} />
-              </Button>
-            ) : (
-              <Button
-                className="h-[50px] w-[50px] aspect-square rounded-full border-1 border-gray-500 flex justify-center items-center"
-                onClick={handleAddFavorite}
-              >
-                <FaRegHeart className={`text-gray-300 text-[20px]`} />
-              </Button>
-            )}
           </div>
         </div>
       </div>
-      <div className="flex flex-col">
-        <p className="text-h3 font-medium">Ulasan warga</p>
-        <div></div>
-      </div>
+      <ReviewService />
     </div>
   );
 };

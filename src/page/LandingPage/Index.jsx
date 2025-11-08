@@ -5,6 +5,7 @@ import ServiceAround from './sections/ServiceAround'
 import Invitation from './sections/Invitation'
 import Review from './sections/Review'
 import Stars from '../../components/common/Stars'
+import Faq from './sections/Faq'
 
 const LandingPage = () => {
   return (
@@ -14,6 +15,7 @@ const LandingPage = () => {
       <ServiceAround/>
       <Invitation/>
       <Review/>
+      <Faq/>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import io from "socket.io-client";
+import { socket } from "../../../utils/socket";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
 import { useContactRealtime } from "../../../../hooks/contactRealtime";
@@ -69,7 +69,6 @@ const formatTime = (timestamp) => {
   return date.toLocaleDateString("id-ID", dateOptions);
 };
 
-const socket = io("http://localhost:5000");
 const autoMessageRegex =
   /Halo, saya tertarik dengan layanan "(.+?)". \(Harga: Rp (.+?)\) \(Deskripsi: (.*?)\) \(Gambar: (.*?)\)/;
 
@@ -150,7 +149,12 @@ const ChatLayout = () => {
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
+<<<<<<< HEAD
   const API_BASE_URL = "http://localhost:5000/api";
+=======
+
+  const API_BASE_URL = "https://https://api.panggilaja.space/api";
+>>>>>>> da734504d849f3a8270d45344de4fffec5abe156
 
   // ===== USEEFFECT #1: LOAD CONTACTS =====
   useEffect(() => {
@@ -229,6 +233,7 @@ const ChatLayout = () => {
 
   // ===== USEEFFECT #4: JOIN CHAT ROOM =====
   useEffect(() => {
+<<<<<<< HEAD
     if (!partnerId || !myId) return;
 
     const buyerId = isBuyer ? myId : partnerId;
@@ -284,14 +289,83 @@ const ChatLayout = () => {
           },
         ];
       });
+=======
+    if (!myId) return;
+
+    const handleNewMessage = (newMessage) => {
+      console.log("📥 New message received (global listener):", newMessage);
+
+      const msgPartnerId = isBuyer ? newMessage.id_seller : newMessage.id_buyer; // --- Logika untuk Sidebar List ---
+
+      if (
+        (isBuyer && newMessage.id_buyer === myId) ||
+        (!isBuyer && newMessage.id_seller === myId)
+      ) {
+        dispatch(
+          updateLastMessage({
+            partnerId: msgPartnerId,
+            text: newMessage.text,
+            time: newMessage.created_at,
+          })
+        );
+      } // --- Logika untuk Gelembung Chat Aktif ---
+
+      if (partnerId && partnerId === msgPartnerId) {
+        console.log("...and it's for the active chat window!");
+
+        // --- INI DIA PERBAIKANNYA ---
+        // Kita gunakan logika yang SAMA PERSIS dengan history fetch
+        const isMyMessage =
+          (isBuyer && newMessage.sender_role.toUpperCase() === "BUYER") ||
+          (!isBuyer && newMessage.sender_role.toUpperCase() === "SELLER");
+
+        setMessages((prevMessages) => {
+          const exists = prevMessages.some((msg) => msg.id === newMessage.id);
+          if (exists) {
+            console.log("⚠️ Message already exists, skipping");
+            return prevMessages;
+          }
+          return [
+            ...prevMessages,
+            {
+              id: newMessage.id,
+              type: "text",
+              Teks: newMessage.text,
+              timestamp: formatTime(newMessage.created_at),
+              sender: isMyMessage ? "user" : "seller", // <-- Sekarang ini akan benar
+            },
+          ];
+        });
+      }
+>>>>>>> da734504d849f3a8270d45344de4fffec5abe156
     };
 
     socket.on("receive_message", handleNewMessage);
 
+    // ... sisa socket.emit dan return ...
+    socket.emit("join_user_room", {
+      userId: myId,
+      role: isBuyer ? "BUYER" : "SELLER",
+    });
+
+    if (partnerId) {
+      const buyerId = isBuyer ? myId : partnerId;
+      const sellerId = isBuyer ? partnerId : myId;
+      socket.emit("join_room", { buyerId, sellerId });
+      console.log(`👥 Joining specific chat room: ${buyerId}_${sellerId}`);
+    }
+
     return () => {
+<<<<<<< HEAD
       socket.off("receive_message", handleNewMessage);
     };
   }, [partnerId, myId, isBuyer]);
+=======
+      console.log("🧹 Cleaning up chat listeners...");
+      socket.off("receive_message", handleNewMessage);
+    };
+  }, [myId, isBuyer, dispatch, partnerId]);
+>>>>>>> da734504d849f3a8270d45344de4fffec5abe156
 
   // ===== USEEFFECT #6: AUTO SCROLL =====
   useEffect(() => {

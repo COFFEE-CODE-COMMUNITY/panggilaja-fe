@@ -38,24 +38,29 @@ export const seeProfile = createAsyncThunk(
     }
 )
 
+// PERBAIKAN UTAMA: Mengganti destructuring 'formData' menjadi 'data' 
+// agar sesuai dengan payload yang dikirim dari komponen: { id: ID, data: FormDataObject }
 export const updateProfile = createAsyncThunk(
     'user/updateProfile',
-    async (id, { rejectWithValue }) => {
+    async ({ id, data }, { rejectWithValue }) => { // <-- Sekarang menerima 'data' yang berisi FormData
         try {
-            const res = await api.put(`/users/${id}`)
-            return res.data
+            // Menggunakan 'data' yang berisi objek FormData
+            const res = await api.put(`/users/${id}`, data);
+            return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan')
+            // Tambahkan log untuk debug
+            console.error("Update Profile Error:", err.response?.data);
+            return rejectWithValue(err.response?.data?.message || 'Gagal memperbarui profil.');
         }
     }
-)
+);
 
 const userSlice = createSlice({
     name : 'user',
     initialState : {
         addAddress : null,
         addAddressStatus : 'idle', 
-        addAddressError : null,   
+        addAddressError : null,    
 
         seeAddress : null,
         seeAddressStatus : 'idle',
@@ -114,7 +119,7 @@ const userSlice = createSlice({
                 state.updateProfileError = action.payload || action.error.message
             })
 
-            //update profile
+            //see profile
             .addCase(seeProfile.pending, (state) => {
                 state.seeProfileStatus = 'loading'
                 state.seeProfileError = null
