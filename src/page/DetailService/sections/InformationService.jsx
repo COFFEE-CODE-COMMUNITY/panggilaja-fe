@@ -3,7 +3,7 @@ import { FaStar, FaRegHeart, FaHeart } from "react-icons/fa";
 import Button from "../../../components/common/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import io from "socket.io-client"; // 🆕 Import socket
+import { socket } from "../../../components/utils/socket";
 import {
   addFavoriteService,
   deleteFavoriteService,
@@ -19,10 +19,16 @@ import {
   selectReviewService,
   selectReviewServiceStatus,
 } from "../../../features/serviceSlice";
-import { selectCurrentUser } from "../../../features/authSlice";
-
-// 🆕 Inisialisasi socket
-const socket = io("http://localhost:5000");
+import {
+  selectAccessToken,
+  selectCurrentUser,
+} from "../../../features/authSlice";
+import {
+  getSellerById,
+  selectSelectedSeller,
+} from "../../../features/sellerSlice";
+import Stars from "../../../components/common/Stars";
+import ReviewService from "./ReviewService";
 
 const InformationService = ({
   sellerName,
@@ -48,9 +54,10 @@ const InformationService = ({
   const messageFavorite = useSelector(selectAddFavoriteServiceError);
   const statusAdd = useSelector(selectAddFavoriteServiceStatus);
   const errorAdd = useSelector(selectAddFavoriteServiceError);
-  const seller = useSelector(selectSelectedSeller);
   const token = useSelector(selectAccessToken);
   const sellerProfile = useSelector(selectSelectedSeller);
+
+  const [showMoreDesc, setShowMoreDesc] = useState(false);
 
   // 🆕 Get buyer ID
   const myId = user?.id_buyer;
