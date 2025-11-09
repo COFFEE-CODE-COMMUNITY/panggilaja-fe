@@ -12,7 +12,7 @@ const ProfileServices = () => {
   console.log(servicesSeller)
   return (
     <div className='min-h-screen'>
-      <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
         {servicesSeller.map((service, index) => (
           <ServiceCard
             basePrice={service?.base_price}

@@ -69,13 +69,13 @@ const Invitation = () => {
 
           {/* Button */}
           {/* <Link to="/all-service-result" className="relative z-10 w-full"> */}
-            <Button
-              variant="primary"
-              className="w-full text-white rounded-full lg:h-[52px] md:h-[45px] h-[40px] lg:text-h4 md:text-h5 text-h6 font-semibold flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group/btn"
-            >
-              <span>Mulai cari jasa terdekat</span>
-              <FaArrowRight className="text-sm group-hover/btn:translate-x-1 transition-transform duration-300" />
-            </Button>
+          <Button
+            variant="primary"
+            className="w-full text-white rounded-full lg:h-[52px] md:h-[45px] h-[40px] lg:text-h4 md:text-h5 text-h6 font-semibold flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group/btn"
+          >
+            <span>Mulai cari jasa terdekat</span>
+            <FaArrowRight className="text-sm group-hover/btn:translate-x-1 transition-transform duration-300" />
+          </Button>
           {/* </Link> */}
         </InvitationCard>
 

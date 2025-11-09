@@ -9,9 +9,22 @@ import {
     selectAddAddressStatus, 
     seeAddress, 
     selectAddAddress 
-} from '../../../features/userSlice'
+} from '../../../features/userSlice' 
 import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
 import { useNavigate } from 'react-router-dom'
+
+import { 
+    fetchProvinces,
+    fetchRegencies,
+    fetchDistricts,
+    selectAllProvinces,
+    selectAllRegencies,
+    selectAllDistricts,
+    selectAlamatStatus,
+    resetRegencies, 
+    resetDistricts, 
+} from '../../../features/addressSlice'
+
 
 const AfterRegistForm = () => {
     const user = useSelector(selectCurrentUser)
@@ -19,22 +32,33 @@ const AfterRegistForm = () => {
     const address = useSelector(selectSeeAddress)
     const addressStatus = useSelector(selectSeeAddressStatus)
     const addAddressStatus = useSelector(selectAddAddressStatus)
-    const addedAddress = useSelector(selectAddAddress) // ✅ Rename untuk clarity
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const [provinsi, setProvinsi] = useState('')
-    const [kota, setKota] = useState('')
-    const [kecamatan, setKecamatan] = useState('')
+    const provinces = useSelector(selectAllProvinces)
+    const regencies = useSelector(selectAllRegencies)
+    const districts = useSelector(selectAllDistricts)
+    const alamatStatus = useSelector(selectAlamatStatus)
+
+    const [provinsiCode, setProvinsiCode] = useState('')
+    const [kotaCode, setKotaCode] = useState('')
+    const [kecamatanCode, setKecamatanCode] = useState('')
+    
     const [kode_pos, setKode_Pos] = useState('')
     const [alamat, setAlamat] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
+        if (provinces.length === 0 && alamatStatus === 'idle') {
+            dispatch(fetchProvinces())
+        }
+    }, [dispatch, provinces.length, alamatStatus])
+
+    useEffect(() => {
         if (user?.id_buyer && token) {
             dispatch(seeAddress(user?.id_buyer))
         }
-    }, [dispatch, user?.id_buyer])
+    }, [dispatch, user?.id_buyer, token])
 
     useEffect(() => {
         if (addressStatus === 'loading') {
@@ -60,45 +84,58 @@ const AfterRegistForm = () => {
         }
     }, [addAddressStatus, isSubmitting, navigate, dispatch, user?.id_buyer])
 
+    const handleProvinceChange = (e) => {
+        const code = e.target.value
+        setProvinsiCode(code) 
+        setKotaCode('')
+        setKecamatanCode('')
+        dispatch(resetRegencies())
+
+        if (code) {
+            dispatch(fetchRegencies(code))
+        }
+    }
+
+    const handleRegencyChange = (e) => {
+        const code = e.target.value
+        setKotaCode(code) 
+        setKecamatanCode('') 
+        dispatch(resetDistricts()) 
+
+        if (code) {
+            dispatch(fetchDistricts(code))
+        }
+    }
+    
+    const handleDistrictChange = (e) => {
+        const code = e.target.value
+        setKecamatanCode(code)
+    }
+
+
     const handleSubmit = (e) => {
         e.preventDefault()
 
-        console.log('📤 Form submitted:', {
-            provinsi,
-            kota,
-            kecamatan,
-            kode_pos,
-            alamat
-        })
-
-        if (!provinsi || !kota || !kecamatan || !kode_pos || !alamat) {
+        if (!provinsiCode || !kotaCode || !kecamatanCode || !kode_pos || !alamat) {
             alert('Mohon lengkapi semua field!')
             return
         }
-
+        
+        const provinsiName = provinces.find(p => p.code === provinsiCode)?.name || provinsiCode;
+        const kotaName = regencies.find(r => r.code === kotaCode)?.name || kotaCode;
+        const kecamatanName = districts.find(d => d.code === kecamatanCode)?.name || kecamatanCode;
+        
         const data = {
             alamat,
-            provinsi,
-            kota,
-            kecamatan,
+            provinsi: provinsiName.toLowerCase(), 
+            kota: kotaName.toLowerCase(),
+            kecamatan: kecamatanName.toLowerCase(),
             kode_pos
         }
         
         setIsSubmitting(true)
         
         dispatch(addAddressAction({ id: user?.id_buyer, data }))
-    }
-
-    // Loading state
-    if (addressStatus === 'loading') {
-        return (
-            <div className='flex justify-center items-center min-h-screen'>
-                <div className='text-center'>
-                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
-                    <p className='mt-4 text-gray-600'>Memuat data...</p>
-                </div>
-            </div>
-        )
     }
 
     return (
@@ -117,38 +154,47 @@ const AfterRegistForm = () => {
                         <div className='flex flex-col gap-3 w-full'>
                             <select 
                                 className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                onChange={(e) => setProvinsi(e.target.value)}
-                                value={provinsi}
+                                onChange={handleProvinceChange}
+                                value={provinsiCode} 
                                 required
+                                disabled={alamatStatus === 'loading' && provinces.length === 0}
                             >
-                                <option value="">Pilih Provinsi</option>
-                                <option value="jawa-barat">Jawa Barat</option>
-                                <option value="jawa-tengah">Jawa Tengah</option>
-                                <option value="jawa-timur">Jawa Timur</option>
+                                <option value="">
+                                    {provinces.length === 0 && alamatStatus === 'loading' ? 'Memuat Provinsi...' : 'Pilih Provinsi'}
+                                </option>
+                                {provinces.map((p) => (
+                                    <option key={p.code} value={p.code}>{p.name}</option>
+                                ))}
                             </select>
+
                             <select 
                                 className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                onChange={(e) => setKota(e.target.value)}   
-                                value={kota}
+                                onChange={handleRegencyChange}  
+                                value={kotaCode} 
                                 required
-                                disabled={!provinsi}
+                                disabled={!provinsiCode || (alamatStatus === 'loading' && regencies.length === 0)}
                             >
-                                <option value="">Pilih Kota</option>
-                                <option value="bandung">Bandung</option>
-                                <option value="jakarta">Jakarta</option>
-                                <option value="surabaya">Surabaya</option>
+                                <option value="">
+                                    {provinsiCode && regencies.length === 0 && alamatStatus === 'loading' ? 'Memuat Kota/Kabupaten...' : 'Pilih Kota/Kabupaten'}
+                                </option>
+                                {regencies.map((r) => (
+                                    <option key={r.code} value={r.code}>{r.name}</option>
+                                ))}
                             </select>
                             
                             <select 
                                 className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                onChange={(e) => setKecamatan(e.target.value)}
-                                value={kecamatan}
+                                onChange={handleDistrictChange}
+                                value={kecamatanCode} 
                                 required
-                                disabled={!kota}
+                                disabled={!kotaCode || (alamatStatus === 'loading' && districts.length === 0)}
                             >
-                                <option value="">Pilih Kecamatan</option>
-                                <option value="coblong">Coblong</option>
-                                <option value="cicendo">Cicendo</option>
+                                <option value="">
+                                    {kotaCode && districts.length === 0 && alamatStatus === 'loading' ? 'Memuat Kecamatan...' : 'Pilih Kecamatan'}
+                                </option>
+                                {districts.map((d) => (
+                                    <option key={d.code} value={d.code}>{d.name}</option>
+                                ))}
                             </select>
                             
                             <Input 

@@ -2,7 +2,7 @@ const combineClass = ((baseClass, customClass) => {
     return `${baseClass} ${customClass}`.trim()
 })
 
-const Button = ({className, onClick = (() => ''), children, variant, link}) => {
+const Button = ({className, onClick = (() => ''), children, variant}) => {
     let baseColor = ''
     if(variant === 'primary'){
         baseColor = ' bg-primary'
