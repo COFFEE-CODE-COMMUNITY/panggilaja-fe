@@ -1,12 +1,16 @@
-import React from 'react'
-import { useSelector } from 'react-redux';
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom'
-import { selectCurrentUser } from '../../../../features/authSlice';
-import { selectSelectedSeller } from '../../../../features/sellerSlice';
+import { changeAccount, selectCurrentUser } from '../../../../features/authSlice';
+import { deleteSellerById, selectSelectedSeller } from '../../../../features/sellerSlice';
+import Button from '../../../common/Button';
 
 const BottombarDashboard = () => {
     const user = useSelector(selectCurrentUser);
+    const dispatch = useDispatch();
     const sellerProfile = useSelector(selectSelectedSeller);
+
+    const [modal, setModal] = useState(false)
   return (
     <div className='fixed bottom-0 md:hidden w-full py-2 bg-white'>
       <ul className='flex justify-evenly items-center'>
@@ -17,7 +21,7 @@ const BottombarDashboard = () => {
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
                   ${
                     isActive
-                      ? "text-primary"
+                      ? "text-primary font-semibold"
                       : "text-gray-500 hover:text-primary"
                   }`
             }
@@ -71,7 +75,7 @@ const BottombarDashboard = () => {
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
                   ${
                     isActive
-                      ? "text-primary"
+                      ? "text-primary font-semibold"
                       : "text-gray-500 hover:text-primary"
                   }`
             }
@@ -119,20 +123,13 @@ const BottombarDashboard = () => {
           </NavLink>
         </li>
         <li>
-            <img
-              className="w-10 h-10 object-cover rounded-full border-1 border-gray-200 hover:border-primary/30 cursor-pointer"
-              src={sellerProfile?.foto_toko}
-              alt=""
-            />
-        </li>
-        <li>
           <NavLink
             to={"chat"}
             className={({ isActive }) =>
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
                   ${
                     isActive
-                      ? "text-primary"
+                      ? "text-primary font-semibold"
                       : "text-gray-500 hover:text-primary"
                   }`
             }
@@ -177,7 +174,7 @@ const BottombarDashboard = () => {
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
                   ${
                     isActive
-                      ? "text-primary"
+                      ? "text-primary font-semibold"
                       : "text-gray-500 hover:text-primary"
                   }`
             }
@@ -209,6 +206,31 @@ const BottombarDashboard = () => {
               Profile
             </span>
           </NavLink>
+        </li>
+        <li>
+            {modal && (
+              <div className='absolute bottom-17 p-2 right-3 bg-amber-100'>
+                <Button
+                className="w-full py-1 rounded-xl"
+                onClick={() => dispatch(deleteSellerById(user?.id_seller))}
+                >
+                  Hapus Akun Mitra
+                </Button>
+                <Button
+                  variant="primary"
+                  className="w-full text-white py-1 rounded-xl"
+                  onClick={() => dispatch(changeAccount({ targetRole: "buyer" }))}
+                >
+                  Pindah Akun
+                </Button>
+              </div>
+            )}
+            <img
+              className="w-10 h-10 object-cover rounded-full border-1 border-gray-200 hover:border-primary/30 cursor-pointer"
+              src={sellerProfile?.foto_toko}
+              alt=""
+              onClick={() => setModal(!modal)}
+            />
         </li>
       </ul>
     </div>

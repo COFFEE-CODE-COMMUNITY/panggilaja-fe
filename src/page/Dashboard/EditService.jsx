@@ -18,8 +18,7 @@ const EditService = () => {
     console.log(service)
   return (
     <div className='w-full flex-1 min-h-[85vh]'>
-        <p>Edit jasa</p>
-        <div className='h-full flex gap-[15px] py-[30px]'>
+        <div className='h-full flex gap-[15px] py-[30px] sm:mb-0 mb-10'>
             {service && status === 'success' ? (
                 <FormEditService
                   basePrice={service.base_price}

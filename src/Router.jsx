@@ -24,7 +24,6 @@ import SettingLayout from "./components/modules/layouts/SettingLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import ServiceMitraLayout from "./components/modules/layouts/ServiceMitraLayout";
 import TambahJasaForm from "./page/MitraForm/sections/TambahJasaForm";
-import EditProfile from "./page/Setting/EditProfile";
 import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
 import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
@@ -39,6 +38,7 @@ import TableDoneOrder from "./page/Dashboard/sections/TableDoneOrder";
 import FavoriteMobile from "./page/Favorite/Index";
 import TableIncomingOrder from "./page/Dashboard/sections/TableIncomingOrder";
 import FilterByCategory from "./page/Search/FilterByCategory";
+import EditProfile from "./page/Setting/EditProfile";
 
 export default function Router() {
   return (
@@ -72,7 +72,7 @@ export default function Router() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<ProfileSetting />} />
+            <Route path="profile" element={<ProfileSetting />} />
             <Route path="edit" element={<EditProfile />} />
           </Route>
         </Route>

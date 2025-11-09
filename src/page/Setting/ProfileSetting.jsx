@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
-// Pastikan path ke userSlice benar
-import { FaEdit } from 'react-icons/fa'
+import { FaArrowLeft, FaEdit } from 'react-icons/fa'
 import EditProfile from './EditProfile'
 import { selectCurrentUser } from '../../features/authSlice'
 import { seeAddress, seeProfile, selectSeeAddress, selectSeeAddressStatus, selectSeeProfile, selectSeeProfileStatus, selectUpdateProfileStatus } from '../../features/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 
 const ProfileSetting = () => {
     const user = useSelector(selectCurrentUser)
     const dispatch = useDispatch()
-    
+    const navigate = useNavigate()
+
     const profile = useSelector(selectSeeProfile)
     const statusProfile = useSelector(selectSeeProfileStatus)
     const statusUpdate = useSelector(selectUpdateProfileStatus)
@@ -34,81 +34,97 @@ const ProfileSetting = () => {
     }, [dispatch, user?.id_buyer, statusAddress, address?.data])
     
     return (
-        <div className='px-[10px] py-[5px] flex flex-col gap-[20px]'>
-            <div>
-                <p className='lg:text-h3 md:text-h4 text-h5 font-medium'>Profil Saya</p>
-                <p className='font-light md:text-h5 text-h6 '>Ini adalah akun Konsumen</p>
-            </div>
+        <div className='lg:p-6 md:p-4 p-3 max-w-xl'>
+            <div className='max-w-2xl mx-auto'>
+                {/* Header */}
+                <div className='flex items-center gap-4 mb-6'>
+                    <FaArrowLeft 
+                        className='text-gray-700 sm:hidden block cursor-pointer hover:text-gray-900'
+                        onClick={() => navigate('/setting')}
+                        size={20}
+                    />
+                    <h1 className='lg:text-3xl md:text-2xl text-xl font-semibold'>Profil Saya</h1>
+                </div>
 
-            <div className='w-full lg:px-[20px] lg:py-[25px] px-[20px] py-[15px] flex flex-col lg:gap-[20px] md:gap-[15px] gap-[10px] rounded-[15px] relative'>
-                <p className='font-medium'>Detail Akun & Alamat</p>
-                <div className='w-full flex lg:flex-row flex-col lg:gap-[50px] gap-[10px] lg:items-center h-full'>
-                    <div className='flex flex-col gap-[10px] flex-1'>
-                        <div className='w-full flex justify-center'>
-                            <img src={profile?.foto_buyer} className='w-[100px] h-[100px] rounded-full object-cover border-2 border-gray-100 shadow-md'/>
-                        </div>
+                {/* Card */}
+                <div className='relative'>
+                    {/* Tombol Edit */}
+                    <Link to='/setting/edit'>
+                        <button className='absolute top-0 right-4 bg-white text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2 font-medium cursor-pointer'>
+                            <FaEdit size={14} />
+                            <span className='hidden sm:inline'>Edit Profil</span>
+                        </button>
+                    </Link>
+
+                    {/* Profile Image */}
+                    <div className='flex justify-center mb-6'>
+                        <img 
+                            src={profile?.foto_buyer} 
+                            className='w-24 h-24 rounded-full object-cover border-2 border-gray-200 shadow'
+                            alt="Profile"
+                        />
+                    </div>
+
+                    {/* Informasi Akun */}
+                    <div className='space-y-4 mb-6'>
+                        <h2 className='font-semibold text-lg border-b pb-2 border-gray-300'>Informasi Akun</h2>
                         
-                        {/* Data Akun */}
-                        <div className='flex flex-col'>
-                            <p className='font-light text-sm text-gray-600'>Username</p>
+                        <div>
+                            <p className='text-sm text-gray-500'>Username</p>
                             <p className='font-medium'>{user?.username || '-'}</p>
                         </div>
-                        <div className='flex flex-col'>
-                            <p className='font-light text-sm text-gray-600'>Nama Lengkap</p>
+                        
+                        <div>
+                            <p className='text-sm text-gray-500'>Nama Lengkap</p>
                             <p className='font-medium'>{profile?.fullname || '-'}</p>
                         </div>
-                        <div className='flex flex-col'>
-                            <p className='font-light text-sm text-gray-600'>Email</p>
+                        
+                        <div>
+                            <p className='text-sm text-gray-500'>Email</p>
                             <p className='font-medium'>{user?.email || '-'}</p>
                         </div>
-                        
-                        <div className='border-t border-gray-200 my-4'></div>
-                        
-                        {/* Data Alamat */}
-                        <p className='font-medium text-gray-700'>Detail Alamat</p>
+                    </div>
+
+                    {/* Informasi Alamat */}
+                    <div className='space-y-4'>
+                        <h2 className='font-semibold text-lg border-b pb-2 border-gray-300'>Detail Alamat</h2>
 
                         {address && address.data ? (
                             <>
-                                <div className='flex flex-col'>
-                                    <p className='font-light text-sm text-gray-600'>Alamat Lengkap</p>
+                                <div>
+                                    <p className='text-sm text-gray-500'>Alamat Lengkap</p>
                                     <p className='font-medium'>{address.data.alamat || '-'}</p>
                                 </div>
+                                
                                 <div className='grid grid-cols-2 gap-4'>
-                                    <div className='flex flex-col'>
-                                        <p className='font-light text-sm text-gray-600'>Provinsi</p>
+                                    <div>
+                                        <p className='text-sm text-gray-500'>Provinsi</p>
                                         <p className='font-medium'>{address.data.provinsi || '-'}</p>
                                     </div>
-                                    <div className='flex flex-col'>
-                                        <p className='font-light text-sm text-gray-600'>Kota</p>
+                                    <div>
+                                        <p className='text-sm text-gray-500'>Kota</p>
                                         <p className='font-medium'>{address.data.kota || '-'}</p>
                                     </div>
                                 </div>
+                                
                                 <div className='grid grid-cols-2 gap-4'>
-                                    <div className='flex flex-col'>
-                                        <p className='font-light text-sm text-gray-600'>Kecamatan</p>
+                                    <div>
+                                        <p className='text-sm text-gray-500'>Kecamatan</p>
                                         <p className='font-medium'>{address.data.kecamatan || '-'}</p>
                                     </div>
-                                    <div className='flex flex-col'>
-                                        <p className='font-light text-sm text-gray-600'>Kode Pos</p>
+                                    <div>
+                                        <p className='text-sm text-gray-500'>Kode Pos</p>
                                         <p className='font-medium'>{address.data.kode_pos || '-'}</p>
                                     </div>
                                 </div>
                             </>
                         ) : (
-                            <div className='text-gray-500 italic'>
+                            <p className='text-gray-500 text-sm italic'>
                                 Alamat belum diatur. Silakan edit profil untuk menambahkannya.
-                            </div>
+                            </p>
                         )}
                     </div>
                 </div>
-                
-                {/* Tombol Edit */}
-                <Link to='edit'>
-                    <FaEdit 
-                        className='absolute top-5 right-5 cursor-pointer text-gray-600 hover:text-[#3A573F] transition-colors'
-                        size={20}
-                    />
-                </Link>
             </div>
         </div>
     )
