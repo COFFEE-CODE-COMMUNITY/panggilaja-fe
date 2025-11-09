@@ -74,7 +74,13 @@ const userSlice = createSlice({
         updateProfileStatus : 'idle',
         updateProfileError : null,
     },
-    reducers : {},
+    reducers : {
+        resetUpdateProfile : (state) => {
+            state.updateProfile = null,
+            state.updateProfileStatus = 'idle',
+            state.updateProfileError = null
+        }
+    },
     extraReducers : (builder) => {
         builder
             //add address
@@ -134,6 +140,8 @@ const userSlice = createSlice({
             })
     }
 })
+
+export const {resetUpdateProfile} = userSlice.actions
 
 export const selectAddAddress = (state) => state.user.addAddress
 export const selectAddAddressStatus = (state) => state.user.addAddressStatus

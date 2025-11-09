@@ -24,11 +24,11 @@ const StatCardService = () => {
 
   console.log(servicesSeller)
   return (
-    <div class="flex flex-col lg:flex-row gap-4 w-full">
+    <div class="grid grid-cols-3 gap-4 w-full">
       <div class="bg-white p-8 rounded-lg shadow-md w-full">
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
-            <p class=" text-lg font-bold text-gray-500 mb-3 md:mb-6">
+            <p class=" text-h5 font-bold text-gray-500 mb-3 md:mb-6">
               Total Jasa
             </p>
             <p class="font-semibold text-xl md:text-3xl">
@@ -42,7 +42,7 @@ const StatCardService = () => {
       <div class="bg-white p-8 rounded-lg shadow-md w-full">
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
-            <p class="font-bold text-lg text-gray-500 mb-3 md:mb-6">
+            <p class="font-bold text-h5 text-gray-500 mb-3 md:mb-6">
               Jasa Aktif
             </p>
             <p class="font-semibold text-xl md:text-3xl">
@@ -56,7 +56,7 @@ const StatCardService = () => {
       <div class="bg-white p-8 rounded-lg shadow-md w-full">
         <div class="flex justify-between w-full md:items-end">
           <div class="flex flex-col">
-            <p class="text-lg font-bold text-gray-500 mb-3 md:mb-6">
+            <p class="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
               Jasa Non Aktif
             </p>
             <p class="font-semibold text-xl md:text-3xl">

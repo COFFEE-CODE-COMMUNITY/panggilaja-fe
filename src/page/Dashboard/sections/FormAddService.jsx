@@ -140,7 +140,7 @@ const FormAddService = () => {
     
     return (
         <>
-            <form onSubmit={handleSubmit} className='flex gap-6 p-6 w-full'>
+            <form onSubmit={handleSubmit} className='flex gap-6 lg:p-6 md:p-5 p-4 w-full sm:flex-row flex-col'>
                 <div className='w-full lg:w-1/2 flex flex-col gap-4'>
                     <div className='relative aspect-square w-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden hover:border-primary transition-colors'>
                         {preview ? (

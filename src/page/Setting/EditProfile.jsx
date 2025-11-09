@@ -3,46 +3,35 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentUser } from "../../features/authSlice";
 import InputForm from "../../components/modules/form/InputForm";
 import { 
+    resetUpdateProfile,
+    seeAddress,
+    seeProfile,
     selectSeeAddress, 
+    selectSeeProfile, 
     selectUpdateProfileError, 
     selectUpdateProfileStatus, 
     updateProfile 
 } from "../../features/userSlice";
+import { useNavigate } from "react-router-dom";
 
-const EditProfile = ({ isOpen, onClose, initialProfile, initialAddress }) => {
+const EditProfile = () => {
     const dispatch = useDispatch();
     const user = useSelector(selectCurrentUser);
-    
+    const navigate = useNavigate()
     const statusEdit = useSelector(selectUpdateProfileStatus)
     const statusMessage = useSelector(selectUpdateProfileError)
-    
-    const addressDetails = initialAddress?.data || {}; 
     const address = useSelector(selectSeeAddress)
+    const profile = useSelector(selectSeeProfile)
 
-    const [fullname, setFullname] = useState(initialProfile?.fullname || "");
-    const [alamat, setAlamat] = useState(addressDetails.alamat || "");
-    const [provinsi, setProvinsi] = useState(addressDetails.provinsi || "");
-    const [kota, setKota] = useState(addressDetails.kota || "");
-    const [kecamatan, setKecamatan] = useState(addressDetails.kecamatan || "");
-    const [kode_pos, setKode_Pos] = useState(addressDetails.kode_pos || "");
+    const [fullname, setFullname] = useState(profile?.fullname );
+    const [alamat, setAlamat] = useState(address?.data?.alamat );
+    const [provinsi, setProvinsi] = useState(address?.data?.provinsi );
+    const [kota, setKota] = useState(address?.data?.kota );
+    const [kecamatan, setKecamatan] = useState(address?.data?.kecamatan );
+    const [kode_pos, setKode_Pos] = useState(address?.data?.kode_pos );
 
-    const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState(initialProfile?.foto_buyer || "");
-
-    useEffect(() => {
-        if (initialProfile && Object.keys(initialProfile).length > 0) {
-            const details = initialAddress?.data || {};
-            setFullname(initialProfile.fullname || "");
-            setAlamat(details.alamat || "");
-            setProvinsi(details.provinsi || "");
-            setKota(details.kota || "");
-            setKecamatan(details.kecamatan || "");
-            setKode_Pos(details.kode_pos || "");
-            setPreview(initialProfile.foto_buyer || "");
-            setFile(initialProfile.foto_buyer);
-        }
-    }, [initialProfile, initialAddress]);
-    
+    const [file, setFile] = useState(profile?.foto_buyer);
+    const [preview, setPreview] = useState(profile?.foto_buyer );    
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -82,28 +71,22 @@ const EditProfile = ({ isOpen, onClose, initialProfile, initialAddress }) => {
 
         const formData = new FormData();
         formData.append("data", JSON.stringify(dataJson));
+        formData.append("file", file);
 
-        // ✅ Hanya kirim file jika ada
-        if (file) {
-            formData.append("file", file);
-        }
-
-        dispatch(updateProfile({ id: addressDetails.id, data: formData }));
-        onClose();
+        dispatch(updateProfile({ id: address?.data?.id, data: formData }));
     };
 
-    if (!isOpen) return null;
-
+    useEffect(() => {
+        if(statusEdit === 'success'){
+            dispatch(resetUpdateProfile())
+            dispatch(seeAddress(user?.id_buyer))
+            dispatch(seeProfile(user?.id_buyer))
+            navigate('/setting')
+        }
+    },[statusEdit])
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-            <div className="bg-white max-w-2xl w-full rounded-xl p-6 relative shadow-xl">
-                <button
-                    className="absolute top-3 right-3 text-gray-600 hover:text-red-500"
-                    onClick={onClose}
-                >
-                    ✕
-                </button>
-
+        <div className="flex p-4 overflow-x-auto w-full min-h-screen">
+            <div className="bg-white max-w-2xl w-full p-6 relative ">
                 <h2 className="text-xl font-semibold mb-5">Edit Profil</h2>
 
                 <form onSubmit={handleSubmit} className="space-y-5">

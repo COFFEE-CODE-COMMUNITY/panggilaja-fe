@@ -15,6 +15,7 @@ const EditService = () => {
         dispatch(getServicesById(id))
     },[id, dispatch])
 
+    console.log(service)
   return (
     <div className='w-full flex-1 min-h-[85vh]'>
         <p>Edit jasa</p>
@@ -27,6 +28,7 @@ const EditService = () => {
                   serviceName={service.nama_jasa}
                   topPrice={service.top_price}
                   id={service.id}
+                  image={service.foto_product}
                 />
             ) : (
                 ''

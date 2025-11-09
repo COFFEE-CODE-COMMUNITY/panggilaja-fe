@@ -49,15 +49,20 @@ function ProfileMitraForm() {
             return;
         }
 
+        const provinsiName = provinces.find(p => p.code === provinsi)?.name || ''; 
+        const kotaObject = regencies.find(r => r.code === kota); 
+        const kotaName = kotaObject ? kotaObject.name : ''; 
+        const kecamatanName = districts.find(d => d.code === kecamatan)?.name
+
         const serviceData = {   
             deskripsi_toko,
             kategori_toko,
             pengalaman,
             skill,
-            alamat,
-            provinsi,
-            kota,
-            kecamatan,
+            alamat : alamat.toLowerCase(),
+            provinsi : provinsiName.toLowerCase(),
+            kota : kotaName.toLowerCase(),
+            kecamatan : kecamatanName.toLowerCase(),
             kode_pos
         };
         

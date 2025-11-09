@@ -5,14 +5,14 @@ import { NavLink, Outlet } from "react-router-dom";
 const ManageOrderLayout = () => {
   return (
     <div className="w-full px-[15px] flex flex-col gap-[10px]">
-      <div className="h-full flex flex-col max-w-7xl gap-10">
+      <div className="h-full flex flex-col max-w-7xl xl:gap-8 lg:gap-7 md:gap-5 gap-3">
         <StatCardOrder />
         <div>
-          <ul className="flex gap-5">
+          <ul className="flex justify-start lg:gap-5 md:gap-4 gap-3">
             <li>
               <NavLink
                 className={({ isActive }) =>
-                  `px-3 py-2 cursor-pointer transition-colors duration-300
+                  `lg:px-3 py-2 cursor-pointer transition-colors duration-300 sm:text-h5 text-h6
                             ${
                               isActive
                                 ? "border-primary border-b-2 text-primary"
@@ -28,7 +28,7 @@ const ManageOrderLayout = () => {
             <li>
               <NavLink
                 className={({ isActive }) =>
-                  `px-3 py-2 cursor-pointer transition-colors duration-300
+                  `px-3 py-2 cursor-pointer transition-colors duration-300 sm:text-h5 text-h6
                             ${
                               isActive
                                 ? "border-primary border-b-2 text-primary"
@@ -37,13 +37,13 @@ const ManageOrderLayout = () => {
                 }
                 to={`incoming-order`}
               >
-                Pesanan Masuk
+                Masuk
               </NavLink>
             </li>
             <li>
               <NavLink
                 className={({ isActive }) =>
-                  `px-3 py-2 cursor-pointer transition-colors duration-300
+                  `px-3 py-2 cursor-pointer transition-colors duration-300 sm:text-h5 text-h6
                             ${
                               isActive
                                 ? "border-primary border-b-2 text-primary"
@@ -52,13 +52,13 @@ const ManageOrderLayout = () => {
                 }
                 to={`process-order`}
               >
-                Pesanan Diproses
+                Diproses
               </NavLink>
             </li>
             <li>
               <NavLink
                 className={({ isActive }) =>
-                  `px-3 py-2 cursor-pointer transition-colors duration-300
+                  `px-3 py-2 cursor-pointer transition-colors duration-300 sm:text-h5 text-h6
                             ${
                               isActive
                                 ? "border-primary border-b-2 text-primary"
@@ -67,7 +67,7 @@ const ManageOrderLayout = () => {
                 }
                 to={`done-order`}
               >
-                Pesanan Selesai
+                Selesai
               </NavLink>
             </li>
           </ul>
