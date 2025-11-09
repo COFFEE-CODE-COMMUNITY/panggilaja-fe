@@ -3,7 +3,7 @@ import { FaStar, FaRegHeart, FaHeart } from "react-icons/fa";
 import Button from "../../../components/common/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import io from "socket.io-client"; // 🆕 Import socket
+import socket from "../../../config/socket";
 import {
   addFavoriteService,
   deleteFavoriteService,
@@ -22,7 +22,6 @@ import {
 import { selectCurrentUser } from "../../../features/authSlice";
 
 // 🆕 Inisialisasi socket
-const socket = io("http://localhost:5000");
 
 const InformationService = ({
   sellerName,

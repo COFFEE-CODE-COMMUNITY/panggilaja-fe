@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import io from "socket.io-client";
+import socket from "../../../../config/socket";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
 import { useContactRealtime } from "../../../../hooks/contactRealtime";
@@ -69,7 +69,6 @@ const formatTime = (timestamp) => {
   return date.toLocaleDateString("id-ID", dateOptions);
 };
 
-const socket = io("http://localhost:5000");
 const autoMessageRegex =
   /Halo, saya tertarik dengan layanan "(.+?)". \(Harga: Rp (.+?)\) \(Deskripsi: (.*?)\) \(Gambar: (.*?)\)/;
 
