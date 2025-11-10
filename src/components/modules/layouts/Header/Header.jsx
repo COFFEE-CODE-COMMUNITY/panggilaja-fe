@@ -379,6 +379,18 @@ const Header = () => {
       {sidebarProfile && (
         <div className="hidden sm:flex fixed xl:right-[150px] lg:right-[100px] md:right-[40px] right-[25px] lg:top-[90px] md:top-[80px] top-[75px] gap-4 z-100">
           {/* Favorites Panel */}
+          {order && (
+            <div className="w-100 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                <h3 className="text-h5 font-semibold text-gray-800">
+                  Pesanan
+                </h3>
+              </div>
+              <div className="overflow-y-auto max-h-80">
+                <p>Ini order</p>
+              </div>
+            </div>
+          )}
           {favorite && (
             <div className="w-100 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">

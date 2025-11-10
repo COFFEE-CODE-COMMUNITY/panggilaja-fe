@@ -39,6 +39,7 @@ import FavoriteMobile from "./page/Favorite/Index";
 import TableIncomingOrder from "./page/Dashboard/sections/TableIncomingOrder";
 import FilterByCategory from "./page/Search/FilterByCategory";
 import EditProfile from "./page/Setting/EditProfile";
+import OrderMobile from "./page/Order/OrderMobile";
 
 export default function Router() {
   return (
@@ -50,6 +51,7 @@ export default function Router() {
           <Route index element={<LandingPage />} />
           <Route path="about" element={<PartnerPage />} />
           <Route path="favorites" element={<FavoriteMobile />} />
+          <Route path="order" element={<OrderMobile />} />
           <Route path="partner" element={<PartnerPage />} />
           <Route path="service/:id" element={<DetailService />} />
           <Route path="search-result" element={<SearchPage />} />
