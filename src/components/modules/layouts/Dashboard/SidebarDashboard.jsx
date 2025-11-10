@@ -75,7 +75,7 @@ export const SidebarDashboard = () => {
 
   return (
     <aside
-      className={`bg-white sm:flex hidden px-10 py-5 flex flex-col justify-between h-screen fixed w-70 border-r-gray-100 border-1 shadow-sm`}
+      className={`bg-white md:flex hidden px-10 py-5 flex-col justify-between h-screen fixed w-70 border-r-gray-100 border-1 shadow-sm`}
     >
       <div>
         {/* Logo */}

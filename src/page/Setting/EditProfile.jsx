@@ -3,46 +3,55 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentUser } from "../../features/authSlice";
 import InputForm from "../../components/modules/form/InputForm";
 import { 
+    resetUpdateProfile,
+    seeAddress,
+    seeProfile,
     selectSeeAddress, 
+    selectSeeProfile, 
     selectUpdateProfileError, 
     selectUpdateProfileStatus, 
     updateProfile 
 } from "../../features/userSlice";
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaCamera } from "react-icons/fa";
 
-const EditProfile = ({ isOpen, onClose, initialProfile, initialAddress }) => {
+const EditProfile = () => {
     const dispatch = useDispatch();
     const user = useSelector(selectCurrentUser);
-    
+    const navigate = useNavigate()
     const statusEdit = useSelector(selectUpdateProfileStatus)
     const statusMessage = useSelector(selectUpdateProfileError)
-    
-    const addressDetails = initialAddress?.data || {}; 
     const address = useSelector(selectSeeAddress)
+    const profile = useSelector(selectSeeProfile)
 
-    const [fullname, setFullname] = useState(initialProfile?.fullname || "");
-    const [alamat, setAlamat] = useState(addressDetails.alamat || "");
-    const [provinsi, setProvinsi] = useState(addressDetails.provinsi || "");
-    const [kota, setKota] = useState(addressDetails.kota || "");
-    const [kecamatan, setKecamatan] = useState(addressDetails.kecamatan || "");
-    const [kode_pos, setKode_Pos] = useState(addressDetails.kode_pos || "");
+    const [fullname, setFullname] = useState(profile?.fullname );
+    const [alamat, setAlamat] = useState(address?.data?.alamat );
+    const [provinsi, setProvinsi] = useState(address?.data?.provinsi );
+    const [kota, setKota] = useState(address?.data?.kota );
+    const [kecamatan, setKecamatan] = useState(address?.data?.kecamatan );
+    const [kode_pos, setKode_Pos] = useState(address?.data?.kode_pos );
 
     const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState(initialProfile?.foto_buyer || "");
+    const [preview, setPreview] = useState(profile?.foto_buyer);
+    const [isFileChanged, setIsFileChanged] = useState(false);
 
+    // Convert URL foto yang sudah ada ke File object
     useEffect(() => {
-        if (initialProfile && Object.keys(initialProfile).length > 0) {
-            const details = initialAddress?.data || {};
-            setFullname(initialProfile.fullname || "");
-            setAlamat(details.alamat || "");
-            setProvinsi(details.provinsi || "");
-            setKota(details.kota || "");
-            setKecamatan(details.kecamatan || "");
-            setKode_Pos(details.kode_pos || "");
-            setPreview(initialProfile.foto_buyer || "");
-            setFile(initialProfile.foto_buyer);
-        }
-    }, [initialProfile, initialAddress]);
-    
+        const fetchExistingImage = async () => {
+            if (profile?.foto_buyer && !isFileChanged) {
+                try {
+                    const response = await fetch(profile.foto_buyer);
+                    const blob = await response.blob();
+                    const fileName = profile.foto_buyer.split('/').pop() || 'profile.jpg';
+                    const existingFile = new File([blob], fileName, { type: blob.type });
+                    setFile(existingFile);
+                } catch (error) {
+                    console.error("Error fetching existing image:", error);
+                }
+            }
+        };
+        fetchExistingImage();
+    }, [profile?.foto_buyer, isFileChanged]);
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -61,6 +70,7 @@ const EditProfile = ({ isOpen, onClose, initialProfile, initialAddress }) => {
 
         setFile(selectedFile);
         setPreview(URL.createObjectURL(selectedFile));
+        setIsFileChanged(true);
     };
 
     const handleSubmit = (e) => {
@@ -82,100 +92,112 @@ const EditProfile = ({ isOpen, onClose, initialProfile, initialAddress }) => {
 
         const formData = new FormData();
         formData.append("data", JSON.stringify(dataJson));
+        formData.append("file", file); // Selalu kirim file (foto lama atau baru)
 
-        // ✅ Hanya kirim file jika ada
-        if (file) {
-            formData.append("file", file);
-        }
-
-        dispatch(updateProfile({ id: addressDetails.id, data: formData }));
-        onClose();
+        dispatch(updateProfile({ id: address?.data?.id, data: formData }));
     };
 
-    if (!isOpen) return null;
+    useEffect(() => {
+        if(statusEdit === 'success'){
+            dispatch(resetUpdateProfile())
+            dispatch(seeAddress(user?.id_buyer))
+            dispatch(seeProfile(user?.id_buyer))
+            navigate('/setting/profile')
+        }
+    },[statusEdit])
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-            <div className="bg-white max-w-2xl w-full rounded-xl p-6 relative shadow-xl">
-                <button
-                    className="absolute top-3 right-3 text-gray-600 hover:text-red-500"
-                    onClick={onClose}
-                >
-                    ✕
-                </button>
-
-                <h2 className="text-xl font-semibold mb-5">Edit Profil</h2>
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-
-                    <div className="flex flex-col items-center gap-3">
+        <div className="flex lg:p-4 md:p-3 p-1 overflow-x-auto w-full flex-col gap-10 min-h-screen">
+            <div className='flex items-center gap-10 lg:py-5 md:py-3'>
+                <FaArrowLeft 
+                    className='text-gray-700 sm:hidden block'
+                    onClick={() => navigate('/setting')}
+                />
+                <p className='lg:text-h3 md:text-h4 text-h5 font-medium'>Edit Profil</p>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-5 max-w-xl">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="relative group">
                         <img
                             src={preview}
-                            className="w-24 h-24 rounded-full object-cover border shadow"
+                            className="w-32 h-32 rounded-full object-cover border-2 border-gray-200 shadow-md"
                             alt="Preview"
                         />
-                        <input type="file" accept="image/*" onChange={handleFileChange} />
+                        <label 
+                            htmlFor="file-upload" 
+                            className="absolute bottom-0 right-0 bg-primary text-white p-2.5 rounded-full cursor-pointer hover:bg-opacity-90 transition-all shadow-lg"
+                        >
+                            <FaCamera size={16} />
+                        </label>
+                        <input 
+                            id="file-upload"
+                            type="file" 
+                            accept="image/*" 
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
                     </div>
+                    <p className="text-sm text-gray-500">Klik ikon kamera untuk mengubah foto</p>
+                </div>
 
+                <InputForm
+                    label="Nama Lengkap"
+                    type="text"
+                    value={fullname}
+                    onChange={(e) => setFullname(e.target.value)}
+                />
+
+                <InputForm
+                    label="Alamat Lengkap"
+                    type="text"
+                    value={alamat}
+                    onChange={(e) => setAlamat(e.target.value)}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputForm
-                        label="Nama Lengkap"
+                        label="Provinsi"
                         type="text"
-                        value={fullname}
-                        onChange={(e) => setFullname(e.target.value)}
+                        value={provinsi}
+                        onChange={(e) => setProvinsi(e.target.value)}
                     />
 
                     <InputForm
-                        label="Alamat Lengkap"
+                        label="Kota/Kabupaten"
                         type="text"
-                        value={alamat}
-                        onChange={(e) => setAlamat(e.target.value)}
+                        value={kota}
+                        onChange={(e) => setKota(e.target.value)}
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <InputForm
+                        label="Kecamatan"
+                        type="text"
+                        value={kecamatan}
+                        onChange={(e) => setKecamatan(e.target.value)}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <InputForm
-                            label="Provinsi"
-                            type="text"
-                            value={provinsi}
-                            onChange={(e) => setProvinsi(e.target.value)}
-                        />
+                    <InputForm
+                        label="Kode Pos"
+                        type="number"
+                        value={kode_pos}
+                        onChange={(e) => setKode_Pos(e.target.value)}
+                    />
+                </div>
 
-                        <InputForm
-                            label="Kota/Kabupaten"
-                            type="text"
-                            value={kota}
-                            onChange={(e) => setKota(e.target.value)}
-                        />
-                    </div>
+                <button
+                    type="submit"
+                    className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 transition-opacity cursor-pointer"
+                    disabled={statusEdit === 'loading'}
+                >
+                    {statusEdit === 'loading' ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </button>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <InputForm
-                            label="Kecamatan"
-                            type="text"
-                            value={kecamatan}
-                            onChange={(e) => setKecamatan(e.target.value)}
-                        />
-
-                        <InputForm
-                            label="Kode Pos"
-                            type="number"
-                            value={kode_pos}
-                            onChange={(e) => setKode_Pos(e.target.value)}
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="w-full bg-primary text-white py-3 rounded-lg hover:opacity-90 transition-opacity"
-                        disabled={statusEdit === 'loading'}
-                    >
-                        {statusEdit === 'loading' ? 'Menyimpan...' : 'Simpan Perubahan'}
-                    </button>
-
-                    {statusEdit === 'error' && statusMessage && (
-                        <p className="text-red-500 text-sm mt-2 text-center">Gagal: {statusMessage}</p>
-                    )}
-                </form>
-            </div>
+                {statusEdit === 'error' && statusMessage && (
+                    <p className="text-red-500 text-sm mt-2 text-center">Gagal: {statusMessage}</p>
+                )}
+            </form>
         </div>
     );
 };

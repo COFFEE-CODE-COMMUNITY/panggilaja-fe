@@ -1,8 +1,10 @@
+import { Link } from "react-router-dom"
+
 const combineClass = ((baseClass, customClass) => {
     return `${baseClass} ${customClass}`.trim()
 })
 
-const Button = ({className, onClick = (() => ''), children, variant}) => {
+const Button = ({className, onClick = (() => ''), children, variant, to}) => {
     let baseColor = ''
     if(variant === 'primary'){
         baseColor = ' bg-primary'
@@ -14,7 +16,18 @@ const Button = ({className, onClick = (() => ''), children, variant}) => {
     const finalClass = combineClass(baseClass, className);
 
   return (
-    <button className={finalClass} onClick={onClick}>{children}</button>
+    <>
+      {!to ? (
+        <button className={finalClass} onClick={onClick}>{children}</button>
+      ) : (
+        <Link 
+          className={finalClass} onClick={onClick}
+          to={to}
+        >
+          {children}
+        </Link>
+      )}
+    </>
   )
 }
 

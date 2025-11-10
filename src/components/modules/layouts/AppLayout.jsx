@@ -14,21 +14,23 @@ const AppLayout = () => {
   const user = useSelector(selectCurrentUser)
   const token = useSelector(selectAccessToken)
   const address = useSelector(selectSeeAddress)
-
-  useEffect(() => {
-    if(user?.id_buyer && token && (address === null || address?.data?.alamat === null)){
-      dispatch(seeAddress(user?.id_buyer))
-    }
-  },[dispatch, user?.id_buyer, token, address?.data?.alamat])
   
   const addressStatus = useSelector(selectSeeAddressStatus); 
 
   const addressData = address?.data;
   const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
 
-  if(isAddressMissing && token && addressStatus === 'success'){
-    navigate('/form-detail-profile', { replace: true });
-  }
+  useEffect(() => {
+    if(user?.id_buyer && token && (address === null || address?.data?.alamat === null)){
+      dispatch(seeAddress(user.id_buyer))
+    }
+  }, [dispatch, user?.id_buyer, token]);
+
+  useEffect(() => {
+    if (isAddressMissing && token && addressStatus === 'success') {
+      navigate('/form-detail-profile', { replace: true });
+    }
+  }, [isAddressMissing, token, addressStatus, navigate]);
 
   const noFooterPaths = [
     '/chat', '/service'
@@ -51,7 +53,7 @@ const AppLayout = () => {
   return (
     <div className={`${containerClasses} overflow-hidden`}>
       <Header/>
-      <div className={mainContentClasses}> 
+      <div className={`${mainContentClasses} lg:mt-20 md:mt-19 mt-18`}> 
         <Outlet/>
       </div>
       {!shouldHideFooter && <Footer/>}

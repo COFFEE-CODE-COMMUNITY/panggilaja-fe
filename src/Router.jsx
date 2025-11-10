@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./page/LandingPage/Index";
 import PartnerPage from "./page/Partner/Index";
 import LoginPage from "./page/Login/Index";
@@ -24,7 +24,6 @@ import SettingLayout from "./components/modules/layouts/SettingLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import ServiceMitraLayout from "./components/modules/layouts/ServiceMitraLayout";
 import TambahJasaForm from "./page/MitraForm/sections/TambahJasaForm";
-import EditProfile from "./page/Setting/EditProfile";
 import SearchAllService from "./page/Search/SearchAllService";
 import EditService from "./page/Dashboard/EditService";
 import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
@@ -39,233 +38,124 @@ import TableDoneOrder from "./page/Dashboard/sections/TableDoneOrder";
 import FavoriteMobile from "./page/Favorite/Index";
 import TableIncomingOrder from "./page/Dashboard/sections/TableIncomingOrder";
 import FilterByCategory from "./page/Search/FilterByCategory";
+import EditProfile from "./page/Setting/EditProfile";
 
-const Router = createBrowserRouter([
-  {
-    path: "/",
-    element: <AppLayout />,
-    errorElement: <NotFound />,
-    children: [
-      {
-        index: true,
-        element: <LandingPage />,
-      },
-      {
-        path: "about",
-        element: <PartnerPage />,
-      },
-      {
-        path: "/favorites",
-        element: <FavoriteMobile />,
-      },
-      {
-        path: "partner",
-        element: <PartnerPage />,
-      },
-      {
-        path: "service/:id",
-        element: <DetailService />,
-      },
-      {
-        path: "search-result",
-        element: <SearchPage />,
-      },
-      {
-        path: "category/:id",
-        element: <FilterByCategory />,
-      },
-      {
-        path: "all-service-result",
-        element: <SearchAllService />,
-      },
-      {
-        path: "profile-service/:id",
-        element: <ProfileLayout />,
-        children: [
-          {
-            index: true,
-            element: <ProfileIndex />,
-          },
-          {
-            path: "services",
-            element: <ProfileServices />,
-          },
-          {
-            path: "reviews",
-            element: <ProfileReviews />,
-          },
-          {
-            path: "photos",
-            element: <ProfilePhotos />,
-          },
-        ],
-      },
-      {
-        path: "profile-setting",
-        element: (
-          <ProtectedRoute>
-            <SettingLayout />
-          </ProtectedRoute>
-        ),
-        children: [
-          {
-            index: true,
-            element: <ProfileSetting />,
-          },
-          {
-            path: "edit",
-            element: <EditProfile />,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    path: "/chat",
-    element: (
-      <ProtectedRoute>
-        <ChatLayout />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/chat/:partnerId",
-    element: (
-      <ProtectedRoute>
-        <ChatLayout />
-      </ProtectedRoute>
-    ),
-  },
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
 
-  {
-    path: "partner/mitra-form",
-    element: (
-      <ProtectedRoute>
-        <ServiceMitraLayout />
-      </ProtectedRoute>
-    ),
-    children: [
-      {
-        index: true,
-        element: <ProfileMitraForm />,
-      },
-      {
-        path: "add-service",
-        element: <TambahJasaForm />,
-      },
-    ],
-  },
+        {/* ====== MAIN LAYOUT ====== */}
+        <Route path="/" element={<AppLayout />}>
+          <Route index element={<LandingPage />} />
+          <Route path="about" element={<PartnerPage />} />
+          <Route path="favorites" element={<FavoriteMobile />} />
+          <Route path="partner" element={<PartnerPage />} />
+          <Route path="service/:id" element={<DetailService />} />
+          <Route path="search-result" element={<SearchPage />} />
+          <Route path="category/:id" element={<FilterByCategory />} />
+          <Route path="all-service-result" element={<SearchAllService />} />
 
-  {
-    path: "dashboard",
-    element: (
-      <ProtectedRoute>
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
-    children: [
-      {
-        path: "manage-order",
-        element: <ManageOrderLayout />,
-        children: [
-          {
-            index: true,
-            element: <TableAllOrder />,
-          },
-          {
-            path: "incoming-order",
-            element: <TableIncomingOrder />,
-          },
-          {
-            path: "process-order",
-            element: <TableProgressOrder />,
-          },
-          {
-            path: "done-order",
-            element: <TableDoneOrder />,
-          },
-        ],
-      },
-      {
-        path: "manage-services",
-        element: <ManageServices />,
-      },
-      {
-        path: "manage-profile/:id",
-        element: <ProfileLayout />,
-        children: [
-          {
-            index: true,
-            element: <ProfileIndex />,
-          },
-          {
-            path: "services",
-            element: <ProfileServices />,
-          },
-          {
-            path: "reviews",
-            element: <ProfileReviews />,
-          },
-          {
-            path: "photos",
-            element: <ProfilePhotos />,
-          },
-        ],
-      },
-      {
-        path: "chat",
-        element: <ChatLayout />,
-      },
-      {
-        path: "chat/:partnerId",
-        element: <ChatLayout />,
-      },
-      {
-        path: "manage-services/add-service",
-        element: <AddService />,
-      },
-      {
-        path: "manage-services/edit-service/:id",
-        element: <EditService />,
-      },
-    ],
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/test",
-    element: <Test />,
-  },
-  {
-    path: "/register",
-    element: <RegisterPage />,
-  },
-  {
-    path: "/auth/google/callback",
-    element: <GoogleCallback />,
-  },
-  {
-    path: "/form-detail-profile",
-    element: (
-      <ProtectedRoute>
-        <FormAfterRegist />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/request-forget-password",
-    element: <RequestReset />,
-  },
-  {
-    path: "/verify-forget-password",
-    element: <VerifyReset />,
-  },
-  {
-    path: "/reset-forget-password",
-    element: <PassReset />,
-  },
-]);
+          {/* ====== PROFILE SERVICE ====== */}
+          <Route path="profile-service/:id" element={<ProfileLayout />}>
+            <Route index element={<ProfileIndex />} />
+            <Route path="services" element={<ProfileServices />} />
+            <Route path="reviews" element={<ProfileReviews />} />
+            <Route path="photos" element={<ProfilePhotos />} />
+          </Route>
 
-export default Router;
+          <Route
+            path="setting"
+            element={
+              <ProtectedRoute>
+                <SettingLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="profile" element={<ProfileSetting />} />
+            <Route path="edit" element={<EditProfile />} />
+          </Route>
+        </Route>
+
+        {/* ====== CHAT SYSTEM ====== */}
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <ChatLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat/:partnerId"
+          element={
+            <ProtectedRoute>
+              <ChatLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ====== MITRA FORM ====== */}
+        <Route
+          path="partner/mitra-form"
+          element={
+            <ProtectedRoute>
+              <ServiceMitraLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ProfileMitraForm />} />
+          <Route path="add-service" element={<TambahJasaForm />} />
+        </Route>
+
+        {/* ====== DASHBOARD ====== */}
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="manage-order" element={<ManageOrderLayout />}>
+            <Route index element={<TableAllOrder />} />
+            <Route path="incoming-order" element={<TableIncomingOrder />} />
+            <Route path="process-order" element={<TableProgressOrder />} />
+            <Route path="done-order" element={<TableDoneOrder />} />
+          </Route>
+
+          <Route path="manage-services" element={<ManageServices />} />
+          <Route path="manage-services/add-service" element={<AddService />} />
+          <Route path="manage-services/edit-service/:id" element={<EditService />} />
+
+          <Route path="chat" element={<ChatLayout />} />
+          <Route path="chat/:partnerId" element={<ChatLayout />} />
+
+          <Route path="manage-profile/:id" element={<ProfileLayout />}>
+            <Route index element={<ProfileIndex />} />
+            <Route path="services" element={<ProfileServices />} />
+            <Route path="reviews" element={<ProfileReviews />} />
+            <Route path="photos" element={<ProfilePhotos />} />
+          </Route>
+
+        </Route>
+
+        {/* ====== AUTH ====== */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/auth/google/callback" element={<GoogleCallback />} />
+        <Route path="/form-detail-profile" element={<ProtectedRoute><FormAfterRegist /></ProtectedRoute>} />
+
+        {/* ====== FORGET PASSWORD ====== */}
+        <Route path="/request-forget-password" element={<RequestReset />} />
+        <Route path="/verify-forget-password" element={<VerifyReset />} />
+        <Route path="/reset-forget-password" element={<PassReset />} />
+
+        {/* ====== OTHER ====== */}
+        <Route path="/test" element={<Test />} />
+        <Route path="*" element={<NotFound />} />
+
+      </Routes>
+    </BrowserRouter>
+  );
+}

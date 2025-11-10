@@ -165,7 +165,7 @@ const Header = () => {
   return (
     <>
       {header && (
-        <header className="sticky top-0 z-110 bg-white shadow-sm border-b border-gray-100">
+        <header className="fixed top-0 right-0 left-0 z-110 bg-white shadow-sm border-b border-gray-100">
           <div className="xl:px-[150px] lg:px-[100px] md:px-[40px] px-[25px] lg:py-5 md:py-4 py-3">
             <div className="flex items-center justify-between gap-4">
               {/* Mobile Menu Toggle - For Logged In Users */}
@@ -436,7 +436,7 @@ const Header = () => {
           {/* Main Profile Menu */}
           <div className="w-64 bg-white shadow-2xl rounded-sm border border-gray-100 overflow-hidden">
             {/* Profile Header */}
-            <Link to="profile-setting" onClick={() => setSidebarProfile(false)}>
+            <Link to="/setting/profile" onClick={() => setSidebarProfile(false)}>
               <div className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
                 {profile?.foto_buyer ? (
                   <img
@@ -529,7 +529,7 @@ const Header = () => {
         <div className="sm:hidden fixed inset-0 z-50 overflow-y-auto pt-16 bg-white">
           <div className="p-6">
             <Link
-              to="profile-setting"
+              to="/setting/profile"
               onClick={() => {
                 setSidebarMobile(false);
               }}
