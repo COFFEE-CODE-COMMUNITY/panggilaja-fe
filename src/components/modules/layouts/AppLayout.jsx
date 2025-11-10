@@ -42,7 +42,7 @@ const AppLayout = () => {
   let mainContentClasses = '';
 
   if (shouldHideFooter) {
-    containerClasses = 'relative h-screen flex flex-col'
+    containerClasses = 'relative flex flex-col'
     mainContentClasses = 'flex-grow'
   }
 

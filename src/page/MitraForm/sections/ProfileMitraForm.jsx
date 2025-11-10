@@ -29,6 +29,11 @@ function ProfileMitraForm() {
     const [kecamatan, setKecamatan] = useState('')
     const [kode_pos, setKode_Pos] = useState('')
 
+    const provinces = useSelector(selectAllProvinces)
+    const regencies = useSelector(selectAllRegencies)
+    const districts = useSelector(selectAllDistricts)
+    const alamatStatus = useSelector(selectAlamatStatus)
+
     useEffect(() => {
         if(!categorys){
             dispatch(getCategoryService())
@@ -87,11 +92,6 @@ function ProfileMitraForm() {
             navigate('add-service')
         }
     },[statusChange])
-    
-    const provinces = useSelector(selectAllProvinces)
-    const regencies = useSelector(selectAllRegencies)
-    const districts = useSelector(selectAllDistricts)
-    const alamatStatus = useSelector(selectAlamatStatus)
 
     useEffect(() => {
         if (provinces.length === 0 && alamatStatus === 'idle') {
