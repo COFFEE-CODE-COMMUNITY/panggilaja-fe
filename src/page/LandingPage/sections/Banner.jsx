@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Bannerr from "../../../assets/Bannerr.jpeg";
+import { MdLocationOn } from "react-icons/md";
+import { selectSeeAddress } from "../../../features/userSlice";
+import { useSelector } from "react-redux";
+import { selectAccessToken } from "../../../features/authSlice";
 
 const Banner = () => {
   // Sample banner data - you can replace these with your actual images
@@ -31,6 +35,9 @@ const Banner = () => {
   const [touchEnd, setTouchEnd] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const sliderRef = useRef(null);
+
+  const address = useSelector(selectSeeAddress)
+  const token = useSelector(selectAccessToken)
 
   // Auto slide function
   const nextSlide = useCallback(() => {
@@ -144,7 +151,15 @@ const Banner = () => {
   }, [isAutoPlay, nextSlide]);
 
   return (
-    <div className="w-full mt-5 mb-2 md:mt-10 md:mb-0 relative group">
+    <div className="w-full md:mb-0 relative group">
+      {token && (
+        <div className='w-full flex justify-end mb-2'>
+          <div className='flex items-center gap-1'>
+              <MdLocationOn className='text-gray-500'/>
+              <p className='font-light sm:text-h5 text-h6'>{address?.data?.kecamatan}</p>
+          </div>
+        </div>
+      )}
       {/* Main Banner Container */}
       <div
         ref={sliderRef}

@@ -30,6 +30,8 @@ const EditProfile = () => {
     const districts = useSelector(selectAllDistricts)
     const alamatStatus = useSelector(selectAlamatStatus)
 
+    console.log(provinces)
+
     const [fullname, setFullname] = useState('');
     const [alamat, setAlamat] = useState('');
     const [provinsi, setProvinsi] = useState('');
@@ -190,12 +192,18 @@ const EditProfile = () => {
             return;
         }
 
+        // Ambil nama dari data referensi yang sudah di-load
+        const provinsiName = provinces.find(p => p.code === provinsi)?.name || '';
+        const kotaName = regencies.find(r => r.code === kota)?.name || '';
+        const kecamatanName = districts.find(d => d.code === kecamatan)?.name || '';
+
+        // Kirim nama wilayah, bukan kode
         const dataJson = {
             fullname,
             alamat,
-            provinsi,
-            kota,
-            kecamatan,
+            provinsi: provinsiName.toLowerCase(),
+            kota: kotaName.toLowerCase(),
+            kecamatan: kecamatanName.toLowerCase(),
             kode_pos,
         };
 
@@ -205,6 +213,7 @@ const EditProfile = () => {
 
         dispatch(updateProfile({ id: address?.data?.id, data: formData }));
     };
+
 
     useEffect(() => {
         if (!address?.data && !profile) {
@@ -224,7 +233,7 @@ const EditProfile = () => {
 
     return (
         <div className="flex lg:p-4 md:p-3 p-1 overflow-x-auto w-full flex-col gap-10 min-h-screen">
-            <div className='flex items-center gap-10 lg:py-5 md:py-3'>
+            <div className='flex items-center gap-10'>
                 <FaArrowLeft 
                     className='text-gray-700 sm:hidden block cursor-pointer'
                     onClick={() => navigate('/setting/profile')}

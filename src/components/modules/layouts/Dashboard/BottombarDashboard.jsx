@@ -209,7 +209,7 @@ const BottombarDashboard = () => {
         </li>
         <li>
             {modal && (
-              <div className='absolute bottom-17 p-2 right-3 bg-amber-100'>
+              <div className='absolute bottom-17 p-2 right-3 bg-gray-50 rounded-lg'>
                 <Button
                 className="w-full py-1 rounded-xl"
                 onClick={() => dispatch(deleteSellerById(user?.id_seller))}

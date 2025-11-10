@@ -398,7 +398,7 @@ const Header = () => {
                           <img
                             src={favorite?.foto_product}
                             alt={favorite.nama_jasa}
-                            className="w-20 h-20 object-cover rounded-lg"
+                            className="w-20 aspect-square object-cover rounded-lg"
                           />
                           <div className="flex flex-col w-full">
                             <Link
@@ -534,7 +534,7 @@ const Header = () => {
                 setSidebarMobile(false);
               }}
             >
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl mb-6">
+              <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl mb-6">
                 {profile?.foto_buyer ? (
                   <img
                     src={profile?.foto_buyer || null}

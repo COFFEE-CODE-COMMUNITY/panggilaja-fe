@@ -53,7 +53,7 @@ const AppLayout = () => {
   return (
     <div className={`${containerClasses} overflow-hidden`}>
       <Header/>
-      <div className={`${mainContentClasses} lg:mt-20 md:mt-19 mt-18`}> 
+      <div className={`${mainContentClasses} xl:mt-30 lg:mt-25 md:mt-23 mt-16`}> 
         <Outlet/>
       </div>
       {!shouldHideFooter && <Footer/>}
