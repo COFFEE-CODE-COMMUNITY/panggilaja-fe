@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "../../../../config/socket";
+import { API_BASE_URL } from "../../../../api/api";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
 import { useContactRealtime } from "../../../../hooks/contactRealtime";
@@ -149,7 +150,6 @@ const ChatLayout = () => {
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
-  const API_BASE_URL = "http://localhost:5000/api";
 
   // ===== USEEFFECT #1: LOAD CONTACTS =====
   useEffect(() => {
@@ -423,7 +423,7 @@ const ChatLayout = () => {
         </div>
       </div>
 
-      {/* Chat Area - Same as before */}
+      {/* Chat Area */}
       <div
         className={`flex-1 flex flex-col ${
           chatMobile ? "flex" : "hidden sm:flex"

@@ -1,9 +1,7 @@
 import io from "socket.io-client";
 
-// Deteksi environment
 const isDevelopment = import.meta.env.MODE === "development";
 
-// Socket URL berdasarkan environment
 const SOCKET_URL = isDevelopment
   ? "http://localhost:5000" // Development
   : import.meta.env.VITE_SOCKET_URL || "https://panggilaja.space"; // Production
@@ -11,10 +9,9 @@ const SOCKET_URL = isDevelopment
 console.log("🔌 Socket connecting to:", SOCKET_URL);
 console.log("🌍 Environment:", import.meta.env.MODE);
 
-// Inisialisasi socket dengan config yang benar
 export const socket = io(SOCKET_URL, {
   // Config penting untuk production
-  transports: ["websocket", "polling"], // Fallback ke polling jika websocket gagal
+  transports: ["websocket", "polling"],
   reconnection: true,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
