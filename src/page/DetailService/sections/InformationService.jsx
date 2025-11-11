@@ -163,7 +163,7 @@ const InformationService = ({
   }, []);
 
   return (
-    <div className="lg:h-full h-1/2 lg:w-[40%] w-full flex flex-col gap-[30px] lg:py-7 md:py-6 py-5 px-[15px]">
+    <div className="h-full lg:w-[40%] w-full flex flex-col gap-[30px] lg:py-7 md:py-6 py-5 px-[15px]">
       <div className="flex flex-col gap-[10px]">
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-col leading-8">
@@ -230,8 +230,7 @@ const InformationService = ({
             <Button
               variant="secondary"
               className="flex-1 rounded-lg text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]"
-              onClick={handleStartChat}
-              disabled={isStartingChat}
+              to={`/service/nego/${idService}`}
             >
               {isStartingChat ? "Memuat..." : "Negoin aja"}
             </Button>

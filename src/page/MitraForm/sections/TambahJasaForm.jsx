@@ -133,7 +133,7 @@ function TambahJasaForm() {
 
     return (
         <>
-            <form onSubmit={handleSubmit} className='flex gap-6 p-6 w-full xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px]'>
+            <form onSubmit={handleSubmit} className='flex sm:flex-row flex-col gap-6 p-6 w-full xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px]'>
                 <div className='w-full lg:w-1/2 flex flex-col gap-4'>
                     <div className='relative aspect-square w-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden hover:border-primary transition-colors'>
                         {preview ? (

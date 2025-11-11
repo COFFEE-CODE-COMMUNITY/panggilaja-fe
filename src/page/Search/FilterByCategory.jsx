@@ -20,8 +20,8 @@ const FilterByCategory = () => {
     const servicesAroundStatus = useSelector(selectServiceAroundStatus)
 
     useEffect(() => {
-        if(user.id_buyer && token){
-            dispatch(seeAddress(user.id_buyer))
+        if(user?.id_buyer && token){
+            dispatch(seeAddress(user?.id_buyer))
         }
     }, [user?.id_buyer, token]);
 

@@ -18,6 +18,7 @@ function ProfileMitraForm() {
     const statusAdd = useSelector(selectAddSellerStatus)
 
     const [file, setFile] = useState(null)
+    const [previewUrl, setPreviewUrl] = useState(null)
 
     const [deskripsi_toko, setDeskripsi_Toko] = useState('')
     const [kategori_toko, setKategori] = useState('')
@@ -29,6 +30,11 @@ function ProfileMitraForm() {
     const [kecamatan, setKecamatan] = useState('')
     const [kode_pos, setKode_Pos] = useState('')
 
+    const provinces = useSelector(selectAllProvinces)
+    const regencies = useSelector(selectAllRegencies)
+    const districts = useSelector(selectAllDistricts)
+    const alamatStatus = useSelector(selectAlamatStatus)
+
     useEffect(() => {
         if(!categorys){
             dispatch(getCategoryService())
@@ -36,7 +42,16 @@ function ProfileMitraForm() {
     },[dispatch])
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            // Buat preview URL
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result);
+            };
+            reader.readAsDataURL(selectedFile);
+        }
     };
 
     const statusChange = useSelector(selectChangeAccountStatus)
@@ -87,11 +102,6 @@ function ProfileMitraForm() {
             navigate('add-service')
         }
     },[statusChange])
-    
-    const provinces = useSelector(selectAllProvinces)
-    const regencies = useSelector(selectAllRegencies)
-    const districts = useSelector(selectAllDistricts)
-    const alamatStatus = useSelector(selectAlamatStatus)
 
     useEffect(() => {
         if (provinces.length === 0 && alamatStatus === 'idle') {
@@ -142,18 +152,90 @@ function ProfileMitraForm() {
                 </div>
 
                 {/* Grid Form Utama */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-x-6 md:gap-x-6 lg:gap-x-8 gap-y-8 md:gap-y-8 lg:gap-y-10"> {/* pakai border = border border-gray-200 rounded-lg p-6 md:p-8 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-x-6 md:gap-x-6 lg:gap-x-8 gap-y-8 md:gap-y-8 lg:gap-y-10">
 
-                    {/* Upload Profil */}
+                    {/* Upload Profil - IMPROVED */}
                     <div>
-                        <label className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Unggah Profil</label>
-                        <div className="mt-2 flex items-center gap-4 md:gap-4 lg:gap-5">
-                            <input 
-                                type='file' 
-                                className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-gray-100 border flex items-center justify-center text-gray-400 text-sm md:text-sm lg:text-base hover:bg-gray-200 cursor-pointer"
-                                onChange={handleFileChange}
-                            />
-                            <span className="text-sm md:text-sm lg:text-base text-gray-500">(jpg/png)</span>
+                        <label className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700 mb-3">Unggah Profil</label>
+                        <div className="flex items-center gap-4">
+                            {/* Preview Area */}
+                            <div className="relative">
+                                <div className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-50 flex items-center justify-center">
+                                    {previewUrl ? (
+                                        <img 
+                                            src={previewUrl} 
+                                            alt="Preview" 
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <svg 
+                                            className="w-10 h-10 md:w-12 md:h-12 text-gray-400" 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round" 
+                                                strokeWidth="2" 
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                            />
+                                        </svg>
+                                    )}
+                                </div>
+                                
+                                {/* Camera Icon Button */}
+                                <label 
+                                    htmlFor="file-upload" 
+                                    className="absolute bottom-0 right-0 w-8 h-8 md:w-9 md:h-9 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-green-800 transition-colors shadow-lg"
+                                >
+                                    <svg 
+                                        className="w-4 h-4 md:w-5 md:h-5 text-white" 
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path 
+                                            strokeLinecap="round" 
+                                            strokeLinejoin="round" 
+                                            strokeWidth="2" 
+                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                                        />
+                                        <path 
+                                            strokeLinecap="round" 
+                                            strokeLinejoin="round" 
+                                            strokeWidth="2" 
+                                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                    </svg>
+                                </label>
+                                
+                                <input 
+                                    id="file-upload"
+                                    type="file" 
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                />
+                            </div>
+                            
+                            {/* Info Text */}
+                            <div className="flex flex-col gap-1">
+                                <p className="text-sm md:text-base font-medium text-gray-700">
+                                    {file ? file.name : 'Pilih foto profil'}
+                                </p>
+                                <p className="text-xs md:text-sm text-gray-500">
+                                    Format: JPG, PNG (Maks. 2MB)
+                                </p>
+                                {!file && (
+                                    <label 
+                                        htmlFor="file-upload"
+                                        className="text-xs md:text-sm text-primary hover:text-green-800 font-medium cursor-pointer underline"
+                                    >
+                                        Pilih File
+                                    </label>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -232,7 +314,7 @@ function ProfileMitraForm() {
                     <div className="md:col-span-2"> 
                         <label className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Domisili</label>
                         <div className="mt-2"> 
-                            <div className='grid grid-cols-4 gap-3'>
+                            <div className='grid md:grid-cols-4 grid-cols-2 gap-3'>
                                 <select 
                                     className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
                                     onChange={handleProvinceChange}
@@ -250,7 +332,7 @@ function ProfileMitraForm() {
 
                                 <select 
                                     className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                    onChange={handleRegencyChange}  
+                                    onChange={handleRegencyChange}  
                                     value={kota} 
                                     required
                                     disabled={!provinsi || (alamatStatus === 'loading' && regencies.length === 0)}
@@ -295,8 +377,8 @@ function ProfileMitraForm() {
                 <div className="flex justify-end pt-4"> 
                     <Button 
                         type="submit" 
-                        variant="secondary" 
-                        className="px-6 py-2 rounded-[20px] text-white"
+                        variant="primary" 
+                        className="px-6 py-2 rounded-lg text-white"
                     > 
                         Selanjutnya
                     </Button>

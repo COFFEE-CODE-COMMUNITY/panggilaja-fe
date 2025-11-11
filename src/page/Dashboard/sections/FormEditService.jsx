@@ -30,7 +30,7 @@ const FormEditService = ({serviceName, basePrice, topPrice, description, categor
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         const serviceData = {
             nama_jasa: nama_jasa,
             deskripsi: deskripsi,

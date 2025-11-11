@@ -14,6 +14,7 @@ import {
 } from "../../features/userSlice";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaCamera } from "react-icons/fa";
+import { fetchDistricts, fetchProvinces, fetchRegencies, resetDistricts, resetRegencies, selectAlamatStatus, selectAllDistricts, selectAllProvinces, selectAllRegencies } from "../../features/addressSlice";
 
 const EditProfile = () => {
     const dispatch = useDispatch();
@@ -24,18 +25,99 @@ const EditProfile = () => {
     const address = useSelector(selectSeeAddress)
     const profile = useSelector(selectSeeProfile)
 
-    const [fullname, setFullname] = useState(profile?.fullname );
-    const [alamat, setAlamat] = useState(address?.data?.alamat );
-    const [provinsi, setProvinsi] = useState(address?.data?.provinsi );
-    const [kota, setKota] = useState(address?.data?.kota );
-    const [kecamatan, setKecamatan] = useState(address?.data?.kecamatan );
-    const [kode_pos, setKode_Pos] = useState(address?.data?.kode_pos );
+    const provinces = useSelector(selectAllProvinces)
+    const regencies = useSelector(selectAllRegencies)
+    const districts = useSelector(selectAllDistricts)
+    const alamatStatus = useSelector(selectAlamatStatus)
+
+    console.log(provinces)
+
+    const [fullname, setFullname] = useState('');
+    const [alamat, setAlamat] = useState('');
+    const [provinsi, setProvinsi] = useState('');
+    const [kota, setKota] = useState('');
+    const [kecamatan, setKecamatan] = useState('');
+    const [kode_pos, setKode_Pos] = useState('');
 
     const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState(profile?.foto_buyer);
+    const [preview, setPreview] = useState('');
     const [isFileChanged, setIsFileChanged] = useState(false);
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const [shouldLoadKota, setShouldLoadKota] = useState(false);
+    const [shouldLoadKecamatan, setShouldLoadKecamatan] = useState(false);
 
-    // Convert URL foto yang sudah ada ke File object
+    const normalizeString = (str) => {
+        return str ? str.toLowerCase().trim() : '';
+    };
+
+    useEffect(() => {
+        if (profile && address?.data && provinces.length > 0 && !isDataLoaded) {
+            setFullname(profile.fullname || '');
+            setAlamat(address.data.alamat || '');
+            setKode_Pos(address.data.kode_pos || '');
+            setPreview(profile.foto_buyer || '');
+
+            const provinsiFromDB = normalizeString(address.data.provinsi);
+            const foundProvinsi = provinces.find(p => 
+                normalizeString(p.name) === provinsiFromDB
+            );
+            
+            if (foundProvinsi) {
+                setProvinsi(foundProvinsi.code);
+                setShouldLoadKota(true); 
+            }
+
+            setIsDataLoaded(true);
+        }
+    }, [profile, address, provinces, isDataLoaded]);
+
+    useEffect(() => {
+        if (provinces.length === 0 && alamatStatus === 'idle') {
+            dispatch(fetchProvinces());
+        }
+    }, [dispatch, provinces.length, alamatStatus]);
+
+    useEffect(() => {
+        if (provinsi && shouldLoadKota) {
+            dispatch(fetchRegencies(provinsi));
+            setShouldLoadKota(false); 
+        }
+    }, [provinsi, shouldLoadKota, dispatch]);
+
+    useEffect(() => {
+        if (regencies.length > 0 && address?.data?.kota && isDataLoaded && !kota) {
+            const kotaFromDB = normalizeString(address.data.kota);
+            const foundKota = regencies.find(r => 
+                normalizeString(r.name) === kotaFromDB
+            );
+            
+            if (foundKota) {
+                setKota(foundKota.code);
+                setShouldLoadKecamatan(true); 
+            }
+        }
+    }, [regencies, address?.data?.kota, isDataLoaded, kota]);
+
+    useEffect(() => {
+        if (kota && shouldLoadKecamatan) {
+            dispatch(fetchDistricts(kota));
+            setShouldLoadKecamatan(false); 
+        }
+    }, [kota, shouldLoadKecamatan, dispatch]);
+
+    useEffect(() => {
+        if (districts.length > 0 && address?.data?.kecamatan && isDataLoaded && !kecamatan) {
+            const kecamatanFromDB = normalizeString(address.data.kecamatan);
+            const foundKecamatan = districts.find(d => 
+                normalizeString(d.name) === kecamatanFromDB
+            );
+            
+            if (foundKecamatan) {
+                setKecamatan(foundKecamatan.code);
+            }
+        }
+    }, [districts, address?.data?.kecamatan, isDataLoaded, kecamatan]);
+
     useEffect(() => {
         const fetchExistingImage = async () => {
             if (profile?.foto_buyer && !isFileChanged) {
@@ -73,6 +155,35 @@ const EditProfile = () => {
         setIsFileChanged(true);
     };
 
+    const handleProvinceChange = (e) => {
+        const code = e.target.value;
+        setProvinsi(code);
+        setKota('');
+        setKecamatan('');
+        dispatch(resetRegencies());
+        dispatch(resetDistricts());
+
+        if (code) {
+            dispatch(fetchRegencies(code));
+        }
+    };
+
+    const handleRegencyChange = (e) => {
+        const code = e.target.value;
+        setKota(code);
+        setKecamatan('');
+        dispatch(resetDistricts());
+
+        if (code) {
+            dispatch(fetchDistricts(code));
+        }
+    };
+
+    const handleDistrictChange = (e) => {
+        const code = e.target.value;
+        setKecamatan(code);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -81,37 +192,51 @@ const EditProfile = () => {
             return;
         }
 
+        // Ambil nama dari data referensi yang sudah di-load
+        const provinsiName = provinces.find(p => p.code === provinsi)?.name || '';
+        const kotaName = regencies.find(r => r.code === kota)?.name || '';
+        const kecamatanName = districts.find(d => d.code === kecamatan)?.name || '';
+
+        // Kirim nama wilayah, bukan kode
         const dataJson = {
             fullname,
             alamat,
-            provinsi,
-            kota,
-            kecamatan,
+            provinsi: provinsiName.toLowerCase(),
+            kota: kotaName.toLowerCase(),
+            kecamatan: kecamatanName.toLowerCase(),
             kode_pos,
         };
 
         const formData = new FormData();
         formData.append("data", JSON.stringify(dataJson));
-        formData.append("file", file); // Selalu kirim file (foto lama atau baru)
+        formData.append("file", file);
 
         dispatch(updateProfile({ id: address?.data?.id, data: formData }));
     };
 
+
     useEffect(() => {
-        if(statusEdit === 'success'){
-            dispatch(resetUpdateProfile())
-            dispatch(seeAddress(user?.id_buyer))
-            dispatch(seeProfile(user?.id_buyer))
-            navigate('/setting/profile')
+        if (!address?.data && !profile) {
+            dispatch(seeAddress(user?.id_buyer));
+            dispatch(seeProfile(user?.id_buyer));
         }
-    },[statusEdit])
+    }, [dispatch, address?.data, profile, user?.id_buyer]);
+
+    useEffect(() => {
+        if (statusEdit === 'success') {
+            dispatch(resetUpdateProfile());
+            dispatch(seeAddress(user?.id_buyer));
+            dispatch(seeProfile(user?.id_buyer));
+            navigate('/setting/profile');
+        }
+    }, [statusEdit, dispatch, user?.id_buyer, navigate]);
 
     return (
         <div className="flex lg:p-4 md:p-3 p-1 overflow-x-auto w-full flex-col gap-10 min-h-screen">
-            <div className='flex items-center gap-10 lg:py-5 md:py-3'>
+            <div className='flex items-center gap-10'>
                 <FaArrowLeft 
-                    className='text-gray-700 sm:hidden block'
-                    onClick={() => navigate('/setting')}
+                    className='text-gray-700 sm:hidden block cursor-pointer'
+                    onClick={() => navigate('/setting/profile')}
                 />
                 <p className='lg:text-h3 md:text-h4 text-h5 font-medium'>Edit Profil</p>
             </div>
@@ -145,6 +270,7 @@ const EditProfile = () => {
                     type="text"
                     value={fullname}
                     onChange={(e) => setFullname(e.target.value)}
+                    required
                 />
 
                 <InputForm
@@ -152,37 +278,75 @@ const EditProfile = () => {
                     type="text"
                     value={alamat}
                     onChange={(e) => setAlamat(e.target.value)}
+                    required
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InputForm
-                        label="Provinsi"
-                        type="text"
-                        value={provinsi}
-                        onChange={(e) => setProvinsi(e.target.value)}
-                    />
+                    <div>
+                        <label htmlFor="province" className="block text-sm font-medium mb-2">Provinsi</label>
+                        <select 
+                            className='border border-gray-300 px-4 py-3 rounded-lg bg-white w-full focus:border-primary focus:outline-none'
+                            onChange={handleProvinceChange}
+                            value={provinsi} 
+                            required
+                            disabled={alamatStatus === 'loading' && provinces.length === 0}
+                            id="province"
+                        >
+                            <option value="">
+                                {provinces.length === 0 && alamatStatus === 'loading' ? 'Memuat Provinsi...' : 'Pilih Provinsi'}
+                            </option>
+                            {provinces.map((p) => (
+                                <option key={p.code} value={p.code}>{p.name}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <InputForm
-                        label="Kota/Kabupaten"
-                        type="text"
-                        value={kota}
-                        onChange={(e) => setKota(e.target.value)}
-                    />
+                    <div>
+                        <label htmlFor="regency" className="block text-sm font-medium mb-2">Kota/Kabupaten</label>
+                        <select 
+                            className='border border-gray-300 px-4 py-3 rounded-lg bg-white w-full focus:border-primary focus:outline-none'
+                            onChange={handleRegencyChange}
+                            value={kota} 
+                            required
+                            disabled={!provinsi || (alamatStatus === 'loading' && regencies.length === 0)}
+                            id="regency"
+                        >
+                            <option value="">
+                                {!provinsi ? 'Pilih Provinsi Dulu' : regencies.length === 0 && alamatStatus === 'loading' ? 'Memuat Kota...' : 'Pilih Kota/Kabupaten'}
+                            </option>
+                            {regencies.map((r) => (
+                                <option key={r.code} value={r.code}>{r.name}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InputForm
-                        label="Kecamatan"
-                        type="text"
-                        value={kecamatan}
-                        onChange={(e) => setKecamatan(e.target.value)}
-                    />
+                    <div>
+                        <label htmlFor="district" className="block text-sm font-medium mb-2">Kecamatan</label>
+                        <select 
+                            className='border border-gray-300 px-4 py-3 rounded-lg bg-white w-full focus:border-primary focus:outline-none'
+                            onChange={handleDistrictChange}
+                            value={kecamatan} 
+                            required
+                            disabled={!kota || (alamatStatus === 'loading' && districts.length === 0)}
+                            id="district"
+                        >
+                            <option value="">
+                                {!kota ? 'Pilih Kota Dulu' : districts.length === 0 && alamatStatus === 'loading' ? 'Memuat Kecamatan...' : 'Pilih Kecamatan'}
+                            </option>
+                            {districts.map((d) => (
+                                <option key={d.code} value={d.code}>{d.name}</option>
+                            ))}
+                        </select>
+                    </div>
 
                     <InputForm
                         label="Kode Pos"
                         type="number"
                         value={kode_pos}
                         onChange={(e) => setKode_Pos(e.target.value)}
+                        required
                     />
                 </div>
 

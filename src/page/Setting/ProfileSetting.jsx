@@ -34,16 +34,15 @@ const ProfileSetting = () => {
     }, [dispatch, user?.id_buyer, statusAddress, address?.data])
     
     return (
-        <div className='lg:p-6 md:p-4 p-3 max-w-xl'>
+        <div className='lg:p-4 md:p-3 p-1 max-w-xl'>
             <div className='max-w-2xl mx-auto'>
                 {/* Header */}
                 <div className='flex items-center gap-4 mb-6'>
                     <FaArrowLeft 
-                        className='text-gray-700 sm:hidden block cursor-pointer hover:text-gray-900'
+                        className='text-gray-500 sm:hidden block cursor-pointer hover:text-gray-900 text-sm'
                         onClick={() => navigate('/setting')}
-                        size={20}
                     />
-                    <h1 className='lg:text-3xl md:text-2xl text-xl font-semibold'>Profil Saya</h1>
+                    <h1 className='lg:text-h3 md:text-h4 text-h5 font-medium'>Profil Saya</h1>
                 </div>
 
                 {/* Card */}
