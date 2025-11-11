@@ -33,13 +33,14 @@ const AppLayout = () => {
   }, [isAddressMissing, token, addressStatus, navigate]);
 
   const noFooterPaths = [
-    '/chat', '/service'
+    '/chat'
   ];
 
   const shouldHideFooter = noFooterPaths.some(path => location.pathname.startsWith(path));
 
   let containerClasses = 'h-full'
   let mainContentClasses = '';
+  let margin = ''
 
   if (shouldHideFooter) {
     containerClasses = 'relative flex flex-col'
@@ -50,10 +51,16 @@ const AppLayout = () => {
     containerClasses = 'h-screen relative flex flex-col'
   }
 
+  if (location.pathname.includes('nego')){
+    margin = ''
+  } else {
+    margin = 'xl:mt-30 lg:mt-25 md:mt-23 mt-16'
+  }
+
   return (
     <div className={`${containerClasses} overflow-hidden`}>
       <Header/>
-      <div className={`${mainContentClasses} xl:mt-30 lg:mt-25 md:mt-23 mt-16`}> 
+      <div className={`${mainContentClasses} ${margin} ${location.pathname.includes('nego') ? '' : 'mb-40'}`}> 
         <Outlet/>
       </div>
       {!shouldHideFooter && <Footer/>}

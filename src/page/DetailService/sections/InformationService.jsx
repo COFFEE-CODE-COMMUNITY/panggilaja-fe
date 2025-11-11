@@ -230,8 +230,7 @@ const InformationService = ({
             <Button
               variant="secondary"
               className="flex-1 rounded-lg text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]"
-              onClick={handleStartChat}
-              disabled={isStartingChat}
+              to={`/service/nego/${idService}`}
             >
               {isStartingChat ? "Memuat..." : "Negoin aja"}
             </Button>
