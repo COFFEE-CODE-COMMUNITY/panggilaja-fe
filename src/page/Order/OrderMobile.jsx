@@ -102,10 +102,26 @@ const OrderMobile = () => {
             </div>
 
             {/* button */}
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="secondary"
+                className={`px-4 py-2 rounded-full text-[15px] ${
+                  order.status === "selesai"
+                    ? "bg-green-600 text-white"
+                    : "border border-gray-300 text-gray-400 bg-transparent cursor-not-allowed"
+                }`}
+                disabled={order.status !== "selesai"}
+                onClick={() =>
+                  order.status === "selesai" &&
+                  alert(`Ulas penyedia: ${order.seller_id}`)
+                }
+              >
+                Review
+              </Button>
+
               <Button
                 variant="primary"
-                className="px-4 py-2 text-white rounded-full"
+                className="px-4 py-2 text-white rounded-full text-[15px]"
                 onClick={() => alert(`Hubungi ${order.seller_id}`)}
               >
                 Hubungi Penyedia
