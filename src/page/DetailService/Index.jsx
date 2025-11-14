@@ -36,7 +36,7 @@ const DetailService = () => {
   }
   console.log(service)
   return (
-    <div className="lg:flex h-full w-full lg:gap-[30px] md:gap-[20px] gap-[10px] mb-[50px] sm:pt-[20px] xl:px-[150px] lg:px-[70px] md:px-[55px] sm:px-[35px] mx-auto transition-all duration-150">
+    <div className="mt-20 lg:flex h-full w-full lg:gap-[30px] md:gap-[20px] gap-[10px] mb-[50px] sm:pt-[20px] xl:px-[150px] lg:px-[70px] md:px-[55px] sm:px-[35px] mx-auto transition-all duration-150">
       {status === "loading" && <div className="w-full h-screen">loading</div>}
       {status === "success" && (
         <>

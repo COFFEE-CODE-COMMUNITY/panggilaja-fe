@@ -55,6 +55,18 @@ export const updateProfile = createAsyncThunk(
     }
 );
 
+export const getOrders = createAsyncThunk(
+    'user/getOrders',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.get(`/users/${id}/orders`)
+            return res.data.data
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan')
+        }
+    }
+)
+
 const userSlice = createSlice({
     name : 'user',
     initialState : {
@@ -73,6 +85,10 @@ const userSlice = createSlice({
         updateProfile : null,
         updateProfileStatus : 'idle',
         updateProfileError : null,
+
+        orders : null,
+        ordersStatus : 'idle',
+        ordersError : null,
     },
     reducers : {
         resetUpdateProfile : (state) => {
@@ -138,6 +154,20 @@ const userSlice = createSlice({
                 state.seeProfileStatus = 'error'
                 state.seeProfileError = action.payload || action.error.message
             })
+
+            //get orders
+            .addCase(getOrders.pending, (state) => {
+                state.ordersStatus = 'loading'
+                state.ordersError = null
+            })
+            .addCase(getOrders.fulfilled, (state, action) => {
+                state.ordersStatus = 'success'
+                state.orders = action.payload 
+            })
+            .addCase(getOrders.rejected, (state, action) => {
+                state.ordersStatus = 'error'
+                state.ordersError = action.payload || action.error.message
+            })
     }
 })
 
@@ -158,5 +188,9 @@ export const selectSeeProfileError = (state) => state.user.seeProfileError
 export const selectUpdateProfile = (state) => state.user.updateProfile 
 export const selectUpdateProfileStatus = (state) => state.user.updateProfileStatus 
 export const selectUpdateProfileError = (state) => state.user.updateProfileError 
+
+export const selectOrders = (state) => state.user.orders 
+export const selectOrdersStatus = (state) => state.user.ordersStatus 
+export const selectOrdersError = (state) => state.user.ordersError 
 
 export default userSlice.reducer

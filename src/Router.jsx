@@ -41,12 +41,13 @@ import FilterByCategory from "./page/Search/FilterByCategory";
 import EditProfile from "./page/Setting/EditProfile";
 import OrderMobile from "./page/Order/OrderMobile";
 import NegoPage from "./page/Nego/NegoPage";
+import ReviewPage from "./page/Review/Index";
+import ChatSeller from "./page/Dashboard/Chat";
 
 export default function Router() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* ====== MAIN LAYOUT ====== */}
         <Route path="/" element={<AppLayout />}>
           <Route index element={<LandingPage />} />
@@ -54,7 +55,7 @@ export default function Router() {
           <Route path="favorites" element={<FavoriteMobile />} />
           <Route path="order" element={<OrderMobile />} />
           <Route path="partner" element={<PartnerPage />} />
-          <Route path="service/:id" element={<DetailService />}/>            
+          <Route path="service/:id" element={<DetailService />} />
           <Route path="service/nego/:id" element={<NegoPage />} />
           <Route path="search-result" element={<SearchPage />} />
           <Route path="category/:id" element={<FilterByCategory />} />
@@ -67,6 +68,8 @@ export default function Router() {
             <Route path="reviews" element={<ProfileReviews />} />
             <Route path="photos" element={<ProfilePhotos />} />
           </Route>
+
+          <Route path="service/:productId/review" element={<ReviewPage />} />
 
           <Route
             path="setting"
@@ -130,10 +133,13 @@ export default function Router() {
 
           <Route path="manage-services" element={<ManageServices />} />
           <Route path="manage-services/add-service" element={<AddService />} />
-          <Route path="manage-services/edit-service/:id" element={<EditService />} />
+          <Route
+            path="manage-services/edit-service/:id"
+            element={<EditService />}
+          />
 
-          <Route path="chat" element={<ChatLayout />} />
-          <Route path="chat/:partnerId" element={<ChatLayout />} />
+          <Route path="chat" element={<ChatSeller />} />
+          <Route path="chat/:partnerId" element={<ChatSeller />} />
 
           <Route path="manage-profile/:id" element={<ProfileLayout />}>
             <Route index element={<ProfileIndex />} />
@@ -141,14 +147,20 @@ export default function Router() {
             <Route path="reviews" element={<ProfileReviews />} />
             <Route path="photos" element={<ProfilePhotos />} />
           </Route>
-
         </Route>
 
         {/* ====== AUTH ====== */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/auth/google/callback" element={<GoogleCallback />} />
-        <Route path="/form-detail-profile" element={<ProtectedRoute><FormAfterRegist /></ProtectedRoute>} />
+        <Route
+          path="/form-detail-profile"
+          element={
+            <ProtectedRoute>
+              <FormAfterRegist />
+            </ProtectedRoute>
+          }
+        />
 
         {/* ====== FORGET PASSWORD ====== */}
         <Route path="/request-forget-password" element={<RequestReset />} />
@@ -158,7 +170,6 @@ export default function Router() {
         {/* ====== OTHER ====== */}
         <Route path="/test" element={<Test />} />
         <Route path="*" element={<NotFound />} />
-
       </Routes>
     </BrowserRouter>
   );

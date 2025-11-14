@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import socket from "../../../../config/socket";
-import { API_BASE_URL } from "../../../../api/api";
-import Input from "../../../common/Input";
-import Button from "../../../common/Button";
-import { useContactRealtime } from "../../../../hooks/contactRealtime";
+import socket from "../../config/socket";
+import { API_BASE_URL } from "../../api/api";
+import Input from "../../components/common/Input";
+import Button from "../../components/common/Button";
+import { useContactRealtime } from "../../hooks/contactRealtime";
 import {
   FaSearch,
   FaArrowLeft,
@@ -16,13 +16,13 @@ import {
   FaTimes,
   FaExchangeAlt,
 } from "react-icons/fa";
-import axiosInstance from "../../../utils/axios";
+import axiosInstance from "../../components/utils/axios";
 import {
   getContactForBuyer,
   getContactForSeller,
   selectContactBuyerStatus,
   selectContactSellerStatus,
-} from "../../../../features/chatSlice";
+} from "../../features/chatSlice";
 
 const formatTime = (timestamp) => {
   if (!timestamp) return "";
@@ -320,7 +320,7 @@ const ServiceCard = ({ data }) => {
   );
 };
 
-const ChatLayout = () => {
+const ChatSeller = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { partnerId } = useParams();
@@ -525,10 +525,8 @@ const ChatLayout = () => {
 
   const handleSelectChat = (conversation) => {
     setChatMobile(true);
-    navigate(`/chat/${conversation.id}`);
+    navigate(`/dashboard/chat/${conversation.id}`);
   };
-
-  const handleBackToHome = () => navigate("/");
 
   // 🆕 HANDLER CREATE ORDER
   const handleCreateOrder = async (orderData) => {
@@ -582,18 +580,12 @@ const ChatLayout = () => {
     <div className="h-screen w-full flex bg-gray-50">
       {/* Sidebar - Chat List */}
       <div
-        className={`h-full sm:w-80 w-full bg-white border-r border-gray-200 flex flex-col ${
+        className={`h-full sm:w-80 w-114 border-r border-gray-200 flex flex-col ${
           chatMobile ? "hidden sm:flex" : "flex"
         }`}
       >
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-3 mb-4">
-            <button
-              onClick={handleBackToHome}
-              className="p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-primary/10 transition-colors flex-shrink-0"
-            >
-              <FaArrowLeft size={18} />
-            </button>
             <h2 className="text-xl font-bold text-gray-800 flex-1 text-center">
               Pesan
             </h2>
@@ -974,7 +966,7 @@ const ChatLayout = () => {
             </div>
 
             {/* Input Area */}
-            <div className="bg-white border-t border-gray-200 p-4">
+            <div className="bg-white border-t border-gray-200 p-4 sm:mb-0 mb-13">
               <form
                 onSubmit={handleSendMessage}
                 className="flex items-center gap-3"
@@ -1022,4 +1014,4 @@ const ChatLayout = () => {
   );
 };
 
-export default ChatLayout;
+export default ChatSeller;

@@ -7,11 +7,6 @@ import { selectCurrentUser } from "./features/authSlice";
 export function ProtectedRoute({ children }) {
   const user = useSelector(selectCurrentUser);
 
-  // ❌ Tidak ada user → lempar ke login
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
   // ✅ User ada → render layout & halaman
   return children;
 }
