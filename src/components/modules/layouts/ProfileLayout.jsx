@@ -55,7 +55,7 @@ const ProfileLayout = () => {
                 <p className='lg:text-h3 md:text-h4 text-h5 font-medium w-full'>{seller?.nama_toko}</p>
                 <p className='md:text-h5 text-h6 font-light w-50'>{`${seller?.address?.alamat}, ${seller?.address?.kecamatan}, ${seller?.address?.kota}, ${seller?.address?.provinsi}`}</p>
               </div>
-              <Button variant='primary' className='sm:block hidden md:text-h5 text-h6 text-white rounded-lg lg:w-[220px] md:w-[180px] w-[100px] py-[10px]'>Kontak Saya</Button>
+              <Button variant='primary' className='sm:block hidden md:text-h5 text-h6 text-white rounded-lg lg:w-[220px] md:w-[180px] w-[100px] py-[10px] text-center' to={`/chat/${seller?.id}`}>Kontak Saya</Button>
               <div className='sm:flex hidden flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]'>
                 <p className='text-left md:text=h5 text-h6'>Ahli Dalam</p>
                 <div className='w-full flex'>
@@ -72,7 +72,7 @@ const ProfileLayout = () => {
                     <p className='px-[10px] py-[5px] border-2 border-gray-200 rounded-[20px] text-h6 w-fit'>{skill}</p>
                   ))}
                 </div>
-                <Button variant='primary' className='md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] py-[10px] w-full'>Kontak Saya</Button>
+                <Button variant='primary' className='md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] py-[10px] w-full' to={`/chat/${seller?.id_seller}`}>Kontak Saya</Button>
               </div>
             </div>
             <div className='flex flex-col sm:w-5/7 w-full sm:my-0 my-[10px]'>
