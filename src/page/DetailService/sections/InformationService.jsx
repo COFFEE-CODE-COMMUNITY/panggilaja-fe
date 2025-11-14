@@ -58,8 +58,7 @@ const InformationService = ({
   const sellerProfile = useSelector(selectSelectedSeller);
 
   const [showMoreDesc, setShowMoreDesc] = useState(false);
-
-  // 🆕 Get buyer ID
+  console.log(user)
   const myId = user?.id_buyer;
   const isBuyer = user?.active_role?.toUpperCase() === "BUYER";
 

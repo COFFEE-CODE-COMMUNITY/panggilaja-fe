@@ -14,19 +14,26 @@ const FormEditService = ({serviceName, basePrice, topPrice, description, categor
     const navigate = useNavigate()
 
     const categories = useSelector(selectCategoryService)
-
+    
     const [preview, setPreview] = useState(image);
-    const [kategori_id, setKategori_Id] = useState(image);
+    const [kategori_id, setKategori_Id] = useState(category);
     const [nama_jasa, setNama_Jasa] = useState(serviceName);
     const [base_price, setBase_Price] = useState(basePrice);
     const [top_price, setTop_Price] = useState(topPrice);
     const [deskripsi, setDeskripsi] = useState(description);
-
+    
     useEffect(() => {
         if(!categories?.data){
             dispatch(getCategoryService())
         }
     },[dispatch, categories])
+
+    useEffect(() => {
+        if (category) {
+            setKategori_Id(category);
+        }
+    }, [category, categories]);
+
 
     const handleSubmit = (e) => {
         e.preventDefault();

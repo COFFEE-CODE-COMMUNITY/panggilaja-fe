@@ -26,9 +26,13 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+// ==========================
+// REQUEST INTERCEPTOR
+// ==========================
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -48,6 +52,9 @@ api.interceptors.request.use(
   }
 );
 
+// ==========================
+// RESPONSE INTERCEPTOR
+// ==========================
 api.interceptors.response.use(
   (response) => {
     console.log("✅ API Response:", {
@@ -56,6 +63,10 @@ api.interceptors.response.use(
     });
     return response;
   },
+
+  // ================
+  // HANDLING ERROR
+  // ================
   async (error) => {
     const originalRequest = error.config;
 
@@ -65,6 +76,7 @@ api.interceptors.response.use(
       retry: originalRequest?._retry,
       message: error.message,
     });
+
 
     const publicEndpoints = [
       "/auth/login",
@@ -82,6 +94,9 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // ========================================
+    // HANDLE 401 → REFRESH TOKEN
+    // ========================================
     if (error.response?.status === 401 && !originalRequest?._retry) {
       if (isRefreshing) {
         console.log("⏳ Request queued while refreshing token");
@@ -102,6 +117,7 @@ api.interceptors.response.use(
         console.log("🔄 Attempting to refresh token...");
 
         const response = await api.post("/auth/refresh");
+
         console.log("✅ Refresh response:", response.data);
 
         const newAccessToken =
@@ -111,37 +127,37 @@ api.interceptors.response.use(
           throw new Error("No access token found in refresh response");
         }
 
+        // ================================
+        // 🔥 PERBAIKAN PENTING
+        // Decode token untuk ambil role BARU
+        // ================================
+        let decodedUser = null;
         try {
-          const decodedToken = jwtDecode(newAccessToken);
-          console.log("🔑 Decoded new token payload:", {
-            id: decodedToken.id,
-            email: decodedToken.email,
-            role: decodedToken.active_role,
-            exp: new Date(decodedToken.exp * 1000).toISOString(),
-          });
+          const decoded = jwtDecode(newAccessToken);
+          decodedUser = decoded.user;
+          console.log("🔑 Decoded new token user:", decodedUser);
         } catch (decodeError) {
-          console.warn("⚠️ Gagal decode token baru:", decodeError);
+          console.warn("⚠️ Gagal decode access token:", decodeError);
         }
 
+        // ================================
+        // SIMPAN TOKEN + USER YANG TERUPDATE
+        // ================================
         localStorage.setItem("accessToken", newAccessToken);
 
-        const existingUser = JSON.parse(localStorage.getItem("user") || "null");
-        if (existingUser) {
-          console.log("✅ Preserving existing user data");
-          localStorage.setItem("user", JSON.stringify(existingUser));
+        if (decodedUser) {
+          localStorage.setItem("user", JSON.stringify(decodedUser));
         }
 
-        api.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${newAccessToken}`;
+        // Update header Default
+        api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
+        // Update header untuk request yg gagal
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
         processQueue(null, newAccessToken);
         isRefreshing = false;
 
-        console.log("✅ Token refreshed successfully");
-        console.log("🔁 Retrying original request:", originalRequest?.url);
-
+        console.log("🔁 Retrying original request...");
         return api(originalRequest);
       } catch (refreshError) {
         console.error("❌ Refresh token failed:", {
@@ -165,6 +181,9 @@ api.interceptors.response.use(
       }
     }
 
+    // ================================
+    // NETWORK ERROR HANDLING
+    // ================================
     if (!error.response) {
       console.error("❌ Network error: gagal terhubung ke server");
       console.error("❌ Full error:", {

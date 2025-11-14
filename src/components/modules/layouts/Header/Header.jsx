@@ -37,7 +37,11 @@ import {
   selectFavoriteServiceStatus,
 } from "../../../../features/serviceSlice";
 import {
+  getOrders,
   seeProfile,
+  selectOrders,
+  selectOrdersError,
+  selectOrdersStatus,
   selectSeeProfile,
   selectSeeProfileStatus,
 } from "../../../../features/userSlice";
@@ -83,6 +87,60 @@ const Header = () => {
   const [orderActiveTab, setOrderActiveTab] = useState("proses");
   {/* state order end */}
 
+  
+    const orders = useSelector(selectOrders)
+    const orderStatus = useSelector(selectOrdersStatus)
+    const orderMessage = useSelector(selectOrdersError)
+    const allService = useSelector(selectAllService)
+  
+    useEffect(() => {
+      if (user && user.id_buyer) {
+        if (orderStatus === 'idle') {
+          dispatch(getOrders(user.id_buyer));
+        }
+      }
+    }, [dispatch, orderStatus, user]);
+  
+    let ordersService = []; // Hasil akhirnya akan disimpan di sini
+  
+    if (orderStatus === 'success') {
+      const serviceMap = new Map(
+          allService.map(service => [service.id, service])
+      );
+
+      // 2. Kita loop (map) array 'order'
+      // Untuk setiap item 'order', kita akan buat objek baru
+      ordersService = orders.map((itemOrder) => {
+          
+          // 3. Ambil detail service yang cocok dari 'peta'
+          // (menggunakan service_id dari order saat ini)
+          const serviceDetail = serviceMap.get(itemOrder.service_id);
+
+          // Pengaman jika service-nya tidak ditemukan
+          if (!serviceDetail) {
+              return null; // Nanti kita filter
+          }
+
+          // 4. GABUNGKAN data yang kamu mau di sini
+          return {
+              order_id: itemOrder.id,
+              status: itemOrder.status,
+              tanggal: itemOrder.created_at, // atau itemOrder.tanggal
+              total_harga: itemOrder.total_harga,
+              pesan_tambahan: itemOrder.pesan_tambahan,
+
+              // Data dari 'service' (serviceDetail)
+              seller_id : serviceDetail.seller_id,
+              service_id : serviceDetail.id,
+              service_name: serviceDetail.nama_jasa,
+              service_image: serviceDetail.foto_product,
+              seller_name: serviceDetail.seller_name
+          };
+      
+      }).filter(Boolean); // Trik simpel untuk menghapus 'null' dari array
+    }
+
+    console.log(ordersService)
   useEffect(() => {
     if (statusChange === "success") {
       dispatch(resetChangeAccountStatus());
@@ -183,7 +241,7 @@ const Header = () => {
       ? Orderan
       : Orderan.filter((order) => order.status === orderActiveTab);
   {/* logic order end */}
-
+    console.log(ordersService)
   return (
     <>
       {header && (
@@ -430,8 +488,8 @@ const Header = () => {
 
               {/*card */}
               <div className="p-3 space-y-3 overflow-y-auto max-h-[calc(100%-92px)] flex-1">
-                {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order) => (
+                {ordersService.length > 0 ? (
+                  ordersService.map((order) => (
                     <div
                       key={order.id}
                       className="bg-white rounded-xl border border-gray-100 p-3 flex flex-col gap-2" 
@@ -442,7 +500,7 @@ const Header = () => {
                         
                         <span
                           className={`text-sm font-semibold capitalize ${
-                            order.status === "selesai"
+                            order.status === "completed"
                               ? "text-green-600"
                               : "text-yellow-600"
                           }`}
@@ -456,7 +514,7 @@ const Header = () => {
                       {/* gambar */}
                       <div className="flex gap-3 items-center">
                         <img
-                          src={order.image}
+                          src={order.service_image}
                           alt={order.service_id}
                           className="w-16 h-16 rounded-lg object-cover border flex-shrink-0"
                         />
@@ -464,7 +522,7 @@ const Header = () => {
                         <div className="flex-1 text-sm text-gray-700 min-w-0">
                           {/* detail jasa */}
                           <p className="font-semibold text-gray-900 truncate">
-                            {order.service_id}
+                            {order.service_name}
                           </p>
 
                           <p className="text-xs text-gray-600">
@@ -486,15 +544,12 @@ const Header = () => {
                         <Button
                           variant="secondary"
                           className={`px-4 py-1.5 text-sm rounded-full ${ 
-                            order.status === "selesai"
+                            order.status === "completed"
                               ? "bg-green-600 text-white"
                               : "border border-gray-300 text-gray-400 bg-transparent cursor-not-allowed"
                         }`}
-                        disabled={order.status !== "selesai"}
-                        onClick={() =>
-                          order.status === "selesai" &&
-                          alert(`Ulas penyedia: ${order.seller_id}`)
-                        }
+                        disabled={order.status !== "completed"}
+                        to={`/service/${order.service_id}/review`}
                         >
                           Review
                         </Button>

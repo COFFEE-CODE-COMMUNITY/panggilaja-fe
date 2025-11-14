@@ -60,7 +60,7 @@ const StatCardService = () => {
               Jasa Non Aktif
             </p>
             <p class="font-semibold text-xl md:text-3xl">
-              {lengthService}
+              0
             </p>
           </div>
           <p class="text-gray-500 font-thin">-3.2%</p>

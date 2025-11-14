@@ -12,7 +12,7 @@ const BottombarDashboard = () => {
 
     const [modal, setModal] = useState(false)
   return (
-    <div className='fixed bottom-0 md:hidden w-full py-2 bg-white'>
+    <div className='fixed bottom-0 md:hidden w-full py-2 bg-white z-100'>
       <ul className='flex justify-evenly items-center'>
         <li>
           <NavLink

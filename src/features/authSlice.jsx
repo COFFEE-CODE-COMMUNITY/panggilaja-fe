@@ -371,23 +371,45 @@ const authSlice = createSlice({
             .addCase(changeAccount.fulfilled, (state, action) => {
                 const { status, message, data } = action.payload
 
-                const { accessToken, user } = data 
-                const finalUserData = user        
+                // ✅ PENTING: Decode token untuk dapat role yang BARU
+                const accessToken = data.accessToken
+                
+                if (!accessToken) {
+                    console.error("❌ Access token tidak ditemukan")
+                    state.changeAccountStatus = 'failed'
+                    state.changeAccountMessage = 'Token tidak valid'
+                    return
+                }
 
-                console.log(action.payload)
+                // ✅ Decode token baru untuk ambil user data dengan role TERBARU
+                let finalUserData
+                try {
+                    const decoded = jwtDecode(accessToken)
+                    finalUserData = decoded.user
+                    console.log("✅ User data dari token baru:", finalUserData)
+                } catch (error) {
+                    console.error("❌ Gagal decode token:", error)
+                    state.changeAccountStatus = 'failed'
+                    state.changeAccountMessage = 'Gagal decode token'
+                    return
+                }
 
                 state.changeAccountStatus = status
                 state.changeAccountMessage = message
                 state.accessToken = accessToken
-                state.user = finalUserData 
+                state.user = finalUserData  // ✅ Gunakan data dari decode, bukan dari response.data.user
 
+                // ✅ Simpan ke localStorage
                 localStorage.setItem('accessToken', accessToken)
                 localStorage.setItem('user', JSON.stringify(finalUserData))
+
+                console.log("✅ Change account berhasil, role baru:", finalUserData.role)
             })
 
             .addCase(changeAccount.rejected, (state, action) => {
                 state.changeAccountStatus = 'failed'
-                state.changeAccountMessage = action.payload
+                state.changeAccountMessage = action.payload?.message || 'Gagal ganti akun'
+                state.changeAccountError = action.payload
             })
     }})
 

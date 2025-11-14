@@ -70,8 +70,6 @@ const OrderMobile = () => {
 
   }
 
-  console.log(orderService);
-
   const filteredOrders =
     activeTab === "semua"
       ? orders

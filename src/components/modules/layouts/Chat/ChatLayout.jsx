@@ -386,8 +386,7 @@ const ChatLayout = () => {
     const fetchData = async () => {
       if (!partnerId || !token) return;
       setMessagesLoading(true);
-      setMessages([]);
-
+      // don't clear messages here to avoid flicker / empty UI
       try {
         const messagesResponse = await axiosInstance.get(
           `${API_BASE_URL}/chat/${partnerId}`,
@@ -397,17 +396,18 @@ const ChatLayout = () => {
         console.log("📩 Messages Response:", messagesResponse.data);
 
         if (messagesResponse.data.success) {
-          const formattedMessages = messagesResponse.data.data.map((msg) => ({
+          const formattedMessages = messagesResponse.data.data.map((msg) => {
+          const isMyMessage = msg.sender_role.toUpperCase() === user?.active_role?.toUpperCase();
+          
+          return {
             id: msg.id,
             type: "text",
             text: msg.text,
             timestamp: formatTime(msg.created_at),
-            sender:
-              (isBuyer && msg.sender_role.toUpperCase() === "BUYER") ||
-              (!isBuyer && msg.sender_role.toUpperCase() === "SELLER")
-                ? "user"
-                : "seller",
-          }));
+            sender: isMyMessage ? "user" : "seller",
+          };
+        });
+
           setMessages(formattedMessages);
         }
       } catch (error) {
@@ -418,13 +418,13 @@ const ChatLayout = () => {
     };
 
     fetchData();
-  }, [partnerId, token, isBuyer]);
+  }, [partnerId, token, isBuyer, user?.active_role]);
 
   // ===== USEEFFECT #3: UPDATE SELECTED CHAT =====
   useEffect(() => {
     if (partnerId && conversations.length > 0) {
       const selected = conversations.find(
-        (c) => c.id.trim() === partnerId.trim()
+        (c) => String(c.id).trim() === String(partnerId).trim()
       );
       setSelectedChat(selected);
     } else if (!partnerId) {
@@ -459,17 +459,17 @@ const ChatLayout = () => {
         ? newMessage.id_seller
         : newMessage.id_buyer;
 
-      if (messagePartnerId !== partnerId) {
+      // compare as string to avoid type mismatch
+      if (String(messagePartnerId) !== String(partnerId)) {
         console.log("⏭️ Message not for this chat, skipping");
         return;
       }
 
-      const isMyMessage =
-        (isBuyer && newMessage.sender_role?.toUpperCase() === "BUYER") ||
-        (!isBuyer && newMessage.sender_role?.toUpperCase() === "SELLER");
+      // determine if the message was sent by me using id_sender
+      const isMyMessage = newMessage.sender_role?.toUpperCase() === user?.active_role?.toUpperCase();
 
       setMessages((prevMessages) => {
-        const exists = prevMessages.some((msg) => msg.id === newMessage.id);
+        const exists = prevMessages.some((msg) => String(msg.id) === String(newMessage.id));
         if (exists) {
           console.log("⚠️ Message already exists, skipping");
           return prevMessages;
@@ -482,7 +482,7 @@ const ChatLayout = () => {
             type: "text",
             text: newMessage.text,
             timestamp: formatTime(newMessage.created_at),
-            sender: isMyMessage ? "user" : "seller",
+            sender: isMyMessage ? "me" : "partner",
           },
         ];
       });
@@ -675,9 +675,7 @@ const ChatLayout = () => {
 
       {/* Chat Area */}
       <div
-        className={`flex-1 flex flex-col ${
-          chatMobile ? "flex" : "hidden sm:flex"
-        }`}
+        className={`flex-1 flex flex-col ${chatMobile ? "flex" : "hidden sm:flex"}`}
       >
         {selectedChat ? (
           <>
@@ -757,20 +755,14 @@ const ChatLayout = () => {
                         console.log("📦 Creating order:", orderData);
                         handleCreateOrder(orderData);
                       } else {
-                        alert(
-                          "Data layanan tidak ditemukan. Silakan coba lagi."
-                        );
+                        alert("Data layanan tidak ditemukan. Silakan coba lagi.");
                       }
                     };
 
                     return (
                       <div
                         key={msg.id}
-                        className={`flex ${
-                          msg.sender === "user"
-                            ? "justify-end"
-                            : "justify-start"
-                        }`}
+                        className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}
                       >
                         <div className="max-w-xs lg:max-w-md">
                           <AcceptNegoCard
@@ -778,11 +770,7 @@ const ChatLayout = () => {
                             agreedPrice={agreedPrice}
                             onConfirm={handleConfirmOrder}
                           />
-                          <p
-                            className={`text-xs mt-1 text-gray-500 ${
-                              msg.sender === "user" ? "text-right" : "text-left"
-                            }`}
-                          >
+                          <p className={`text-xs mt-1 text-gray-500 ${msg.sender === "me" ? "text-right" : "text-left"}`}>
                             {msg.timestamp}
                           </p>
                         </div>
@@ -811,15 +799,8 @@ const ChatLayout = () => {
                       rating: 4.5,
                     };
 
-                    // ✅ Tentukan siapa pengirim pesan ini
-                    const messageSenderRole =
-                      msg.sender === "user"
-                        ? isBuyer
-                          ? "BUYER"
-                          : "SELLER"
-                        : isBuyer
-                        ? "SELLER"
-                        : "BUYER";
+                    // ✅ Tentukan siapa pengirim pesan ini (role BUYER/SELLER)
+                    const messageSenderRole = msg.sender === "me" ? (isBuyer ? "BUYER" : "SELLER") : (isBuyer ? "SELLER" : "BUYER");
 
                     const currentUserRole = isBuyer ? "BUYER" : "SELLER";
 
@@ -849,14 +830,10 @@ const ChatLayout = () => {
                     const handleCounterOffer = (newPrice) => {
                       console.log("🔄 Counter offer:", newPrice);
 
-                      const formattedOriginalPrice = originalPrice.replace(
-                        /\./g,
-                        ""
-                      );
-                      const formattedNewPrice =
-                        newPrice.toLocaleString("id-ID");
+                      const formattedOriginalPrice = originalPrice.replace(/\./g, "");
+                      const formattedNewPrice = newPrice.toLocaleString("id-ID");
 
-                      // 🆕 Include ServiceID in counter offer
+                      // Include ServiceID in counter offer
                       const counterNegoMessage = `Halo, saya tertarik dengan layanan "${serviceName}". (ServiceID: ${serviceId}) (Harga: Rp ${formattedOriginalPrice}) (Nego: Rp ${formattedNewPrice}) (Deskripsi: ${description}) (Gambar: ${imageUrl})`;
 
                       socket.emit("send_message", {
@@ -868,14 +845,7 @@ const ChatLayout = () => {
                     };
 
                     return (
-                      <div
-                        key={msg.id}
-                        className={`flex ${
-                          msg.sender === "user"
-                            ? "justify-end"
-                            : "justify-start"
-                        }`}
-                      >
+                      <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}>
                         <div className="max-w-xs lg:max-w-md">
                           <ServiceNegoCard
                             data={negoCardData}
@@ -886,11 +856,7 @@ const ChatLayout = () => {
                             senderRole={messageSenderRole}
                             myRole={currentUserRole}
                           />
-                          <p
-                            className={`text-xs mt-1 text-gray-500 ${
-                              msg.sender === "user" ? "text-right" : "text-left"
-                            }`}
-                          >
+                          <p className={`text-xs mt-1 text-gray-500 ${msg.sender === "me" ? "text-right" : "text-left"}`}>
                             {msg.timestamp}
                           </p>
                         </div>
@@ -919,21 +885,10 @@ const ChatLayout = () => {
                     };
 
                     return (
-                      <div
-                        key={msg.id}
-                        className={`flex ${
-                          msg.sender === "user"
-                            ? "justify-end"
-                            : "justify-start"
-                        }`}
-                      >
+                      <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}>
                         <div className="max-w-xs lg:max-w-md">
                           <ServiceCard data={cardData} />
-                          <p
-                            className={`text-xs mt-1 text-gray-500 ${
-                              msg.sender === "user" ? "text-right" : "text-left"
-                            }`}
-                          >
+                          <p className={`text-xs mt-1 text-gray-500 ${msg.sender === "me" ? "text-right" : "text-left"}`}>
                             {msg.timestamp}
                           </p>
                         </div>
@@ -943,27 +898,10 @@ const ChatLayout = () => {
 
                   // ✅ 4️⃣ TEXT MESSAGE BIASA
                   return (
-                    <div
-                      key={msg.id}
-                      className={`flex ${
-                        msg.sender === "user" ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-xs lg:max-w-md xl:max-w-lg ${
-                          msg.sender === "user"
-                            ? "bg-primary text-white"
-                            : "bg-white text-gray-800"
-                        } rounded-2xl px-4 py-3 shadow-sm`}
-                      >
+                    <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${msg.sender === "me" ? "bg-primary text-white" : "bg-white text-gray-800"} rounded-2xl px-4 py-3 shadow-sm`}>
                         <p className="text-sm md:text-base">{msg.text}</p>
-                        <p
-                          className={`text-xs mt-1 ${
-                            msg.sender === "user"
-                              ? "text-white/70"
-                              : "text-gray-500"
-                          }`}
-                        >
+                        <p className={`text-xs mt-1 ${msg.sender === "me" ? "text-white/70" : "text-gray-500"}`}>
                           {msg.timestamp}
                         </p>
                       </div>
@@ -975,10 +913,7 @@ const ChatLayout = () => {
 
             {/* Input Area */}
             <div className="bg-white border-t border-gray-200 p-4">
-              <form
-                onSubmit={handleSendMessage}
-                className="flex items-center gap-3"
-              >
+              <form onSubmit={handleSendMessage} className="flex items-center gap-3">
                 <Input
                   placeholder="Ketik pesan..."
                   className="flex-1 rounded-xl border-2 border-gray-200 px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
@@ -997,24 +932,12 @@ const ChatLayout = () => {
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <svg
-                className="w-12 h-12"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
             <p className="text-lg font-semibold mb-2">Pilih Percakapan</p>
-            <p className="text-sm">
-              Pilih chat dari daftar untuk memulai percakapan
-            </p>
+            <p className="text-sm">Pilih chat dari daftar untuk memulai percakapan</p>
           </div>
         )}
       </div>

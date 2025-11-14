@@ -56,7 +56,7 @@ const TableServices = () => {
     }
 
     return (
-        <div className="flex flex-col gap-2">    
+        <div className="flex flex-col gap-2 sm:mb-0 mb-20">    
             <div className='flex gap-5 items-center'>
                 <Input
                     placeholder="Cari jasa sekarang"

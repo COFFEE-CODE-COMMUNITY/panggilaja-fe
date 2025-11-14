@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ServiceCard from '../../components/modules/Cards/ServiceCard'
-import { useSelector } from 'react-redux'
-import { selectAllService } from '../../features/serviceSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { getServices, selectAllService } from '../../features/serviceSlice'
 import { selectSelectedSeller } from '../../features/sellerSlice'
 
 const ProfileServices = () => {
@@ -9,7 +9,7 @@ const ProfileServices = () => {
   const seller = useSelector(selectSelectedSeller)
 
   const servicesSeller = services?.filter((service) => service.seller_id === seller?.id)
-  console.log(servicesSeller)
+  console.log(services)
   return (
     <div className='min-h-screen'>
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
