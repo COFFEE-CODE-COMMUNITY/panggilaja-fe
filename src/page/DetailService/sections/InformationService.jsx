@@ -104,7 +104,6 @@ const InformationService = ({
     }
   }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
-  // ✅ HANDLER BARU: Kirim via Socket (BUKAN HTTP!)
   const handleStartChat = () => {
     if (isStartingChat || !idProvider || !nameService || !myId) {
       console.error("Missing required data:", {
@@ -123,7 +122,7 @@ const InformationService = ({
     const shortDescription = description.substring(0, 50) + "...";
 
     // Format pesan otomatis
-    const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (Harga: Rp ${basePrice.toLocaleString(
+    const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (ServiceID: ${idService}) (Harga: Rp ${basePrice.toLocaleString(
       "id-ID"
     )}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
 
