@@ -85,6 +85,9 @@ const orderSlice = createSlice({
     error: null,
     createStatus: "idle",
     createError: null,
+
+    updateOrderStatus : 'idle',
+    updateOrderError : 'idle'
   },
   reducers: {
     clearOrderStatus: (state) => {
@@ -154,16 +157,41 @@ const orderSlice = createSlice({
         state.error = action.payload?.message || "Failed to fetch orders";
       })
 
+      .addCase(updateOrderStatus.pending, (state, action) => {
+        // state.currentOrder = action.payload.data;
+        // // Update order di list juga
+        // const updatedOrder = action.payload.data;
+        // state.buyerOrders = state.buyerOrders.map((order) =>
+        //   order.id === updatedOrder.id ? updatedOrder : order
+        // );
+        // state.sellerOrders = state.sellerOrders.map((order) =>
+        //   order.id === updatedOrder.id ? updatedOrder : order
+        // );
+        state.updateOrderStatus = 'loading'
+      })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
-        state.currentOrder = action.payload.data;
-        // Update order di list juga
-        const updatedOrder = action.payload.data;
-        state.buyerOrders = state.buyerOrders.map((order) =>
-          order.id === updatedOrder.id ? updatedOrder : order
-        );
-        state.sellerOrders = state.sellerOrders.map((order) =>
-          order.id === updatedOrder.id ? updatedOrder : order
-        );
+        // state.currentOrder = action.payload.data;
+        // // Update order di list juga
+        // const updatedOrder = action.payload.data;
+        // state.buyerOrders = state.buyerOrders.map((order) =>
+        //   order.id === updatedOrder.id ? updatedOrder : order
+        // );
+        // state.sellerOrders = state.sellerOrders.map((order) =>
+        //   order.id === updatedOrder.id ? updatedOrder : order
+        // );
+        state.updateOrderStatus = 'success'
+      })
+      .addCase(updateOrderStatus.rejected, (state, action) => {
+        // state.currentOrder = action.payload.data;
+        // // Update order di list juga
+        // const updatedOrder = action.payload.data;
+        // state.buyerOrders = state.buyerOrders.map((order) =>
+        //   order.id === updatedOrder.id ? updatedOrder : order
+        // );
+        // state.sellerOrders = state.sellerOrders.map((order) =>
+        //   order.id === updatedOrder.id ? updatedOrder : order
+        // );
+        state.updateOrderStatus = 'error'
       })
 
       .addCase(deleteOrder.fulfilled, (state, action) => {
@@ -195,5 +223,8 @@ export const selectOrderStatus = (state) => state.order.status;
 export const selectOrderError = (state) => state.order.error;
 export const selectCreateStatus = (state) => state.order.createStatus;
 export const selectCreateError = (state) => state.order.createError;
+
+export const selectUpdateOrderError = (state) => state.order.updateOrderStatusError;
+export const selectUpdateOrderStatus = (state) => state.order.updateOrderStatus;
 
 export default orderSlice.reducer;

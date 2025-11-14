@@ -23,7 +23,6 @@ const TableServices = () => {
 
     const findServiceSeller = servicesSeller?.data?.filter((service) => service?.nama_jasa?.toLowerCase().includes(search.toLowerCase()))
 
-    console.log(findServiceSeller)
     const toggleModal = (serviceId) => {
         setActiveServiceId(activeServiceId === serviceId ? null : serviceId);
     };
