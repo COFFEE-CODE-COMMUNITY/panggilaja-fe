@@ -46,6 +46,10 @@ import {
   setSearchText,
 } from "../../../../features/searchSlice";
 
+{/* import dummy orderan start */}
+import Orderan from "../../../../page/Order/dummy/Orderan";
+{/* import dummy orderan end */}
+
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -74,6 +78,10 @@ const Header = () => {
   const [order, setOrder] = useState(false);
   const [header, setHeader] = useState(true);
   const [search, setSearch] = useState(urlSearchText || searchText);
+
+  {/* state order start */}
+  const [orderActiveTab, setOrderActiveTab] = useState("proses");
+  {/* state order end */}
 
   useEffect(() => {
     if (statusChange === "success") {
@@ -161,6 +169,20 @@ const Header = () => {
   }
 
   const haveSellerAccount = user?.available_roles?.length > 1;
+
+  {/* logic order start */}
+  const formatHarga = (num) =>
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(num);
+
+  const filteredOrders =
+    orderActiveTab === "semua"
+      ? Orderan
+      : Orderan.filter((order) => order.status === orderActiveTab);
+  {/* logic order end */}
 
   return (
     <>
@@ -380,107 +402,118 @@ const Header = () => {
         <div className="hidden sm:flex fixed xl:right-[150px] lg:right-[100px] md:right-[40px] right-[25px] lg:top-[90px] md:top-[80px] top-[75px] gap-4 z-100">
           {/* Order Panel */}
           {order && (
-            <div className="w-100 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+            <div className="w-96 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col absolute top-0 right-[100%] mr-4">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
                 <h3 className="text-h5 font-semibold text-gray-800">
                   Pesanan
                 </h3>
               </div>
-              <div className="overflow-y-auto max-h-80">
-                <div className="min-h-screen pb-24">
-      {/* 🔽 Filter Tabs */}
-      <div className="flex justify-center bg-white sticky top-0 z-20 border-b">
-        <div className="flex gap-6 py-2">
-          {["semua", "proses", "selesai"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`relative pb-2 font-medium capitalize transition-all ${
-                activeTab === tab
-                  ? "text-green-700 after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-green-700"
-                  : "text-gray-500"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 🧾 List Pesanan */}
-      <div className="p-3 space-y-3">
-        {filteredOrders.map((order) => (
-          <div
-            key={order.id}
-            className="bg-white rounded-2xl shadow-md p-4 flex flex-col gap-3"
-          >
-            {/* Header: Nama Penyedia & Status */}
-            <div className="flex justify-between items-center">
-              <p className="text-gray-800 font-semibold">{order.seller_id}</p>
-              <span
-                className={`text-sm font-semibold capitalize ${
-                  order.status === "selesai"
-                    ? "text-green-600"
-                    : "text-yellow-600"
-                }`}
-              >
-                {order.status}
-              </span>
-            </div>
-
-            <hr className="border-gray-200" />
-
-            {/* Detail dengan gambar di kiri */}
-            <div className="flex gap-3">
-              <img
-                src={order.image}
-                alt={order.service_id}
-                className="w-16 h-16 rounded-xl object-cover border flex-shrink-0"
-              />
-
-              <div className="flex-1 text-sm text-gray-700">
-                {/* Nama jasa */}
-                <p className="font-semibold text-gray-900 mb-1">
-                  {order.service_id}
-                </p>
-                <p>
-                  Tanggal:{" "}
-                  <span className="font-medium text-gray-800">
-                    {new Date(order.tanggal).toLocaleDateString("id-ID")}
-                  </span>
-                </p>
-                <p>
-                  Catatan:{" "}
-                  <span className="text-gray-600">
-                    {order.pesan_tambahan || "Tidak ada catatan"}
-                  </span>
-                </p>
-                <p className="font-semibold text-gray-800 mt-1">
-                  Total: {formatHarga(order.total_harga)}
-                </p>
+              
+              {/* filter tab */}
+              <div className="flex justify-start sticky top-0 z-20 border-b bg-white px-3"> 
+                <div className="flex gap-4 py-2">
+                  {["semua", "proses", "selesai"].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setOrderActiveTab(tab)}
+                      className={`relative pb-2 font-medium capitalize transition-all text-sm ${
+                        orderActiveTab === tab
+                          ? "text-green-700 after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-green-700"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Tombol Hubungi */}
-            <div className="flex justify-end">
-              <Button
-                variant="primary"
-                className="px-4 py-2 text-white rounded-full"
-                onClick={() => alert(`Hubungi ${order.seller_id}`)}
-              >
-                Hubungi Penyedia
-              </Button>
-            </div>
-          </div>
-        ))}
+              {/*card */}
+              <div className="p-3 space-y-3 overflow-y-auto max-h-[calc(100%-92px)] flex-1">
+                {filteredOrders.length > 0 ? (
+                  filteredOrders.map((order) => (
+                    <div
+                      key={order.id}
+                      className="bg-white rounded-xl border border-gray-100 p-3 flex flex-col gap-2" 
+                    >
+                      {/* header */}
+                      <div className="flex justify-between items-center text-sm">
+                        <p className="text-gray-800 font-semibold truncate max-w-[60%]">{order.seller_id}</p>
+                        
+                        <span
+                          className={`text-sm font-semibold capitalize ${
+                            order.status === "selesai"
+                              ? "text-green-600"
+                              : "text-yellow-600"
+                          }`}
+                        >
+                          {order.status}
+                        </span>
+                      </div>
 
-        {filteredOrders.length === 0 && (
-          <p className="text-center text-gray-500 mt-10">
-            Belum ada pesanan {activeTab}.
-          </p>
-        )}
-      </div>
-    </div>
+                      <hr className="border-gray-100" />
+
+                      {/* gambar */}
+                      <div className="flex gap-3 items-center">
+                        <img
+                          src={order.image}
+                          alt={order.service_id}
+                          className="w-16 h-16 rounded-lg object-cover border flex-shrink-0"
+                        />
+
+                        <div className="flex-1 text-sm text-gray-700 min-w-0">
+                          {/* detail jasa */}
+                          <p className="font-semibold text-gray-900 truncate">
+                            {order.service_id}
+                          </p>
+
+                          <p className="text-xs text-gray-600">
+                            Tanggal: {new Date(order.tanggal).toLocaleDateString("id-ID")}
+                          </p>
+                          
+                          <p className="text-xs text-gray-600 truncate">
+                            Catatan: {order.pesan_tambahan || "Tidak ada catatan"}
+                          </p>
+
+                          <p className="font-medium text-gray-800 mt-1 text-sm">
+                            {formatHarga(order.total_harga)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* button */}
+                      <div className="flex justify-end gap-2 pt-2">
+                        <Button
+                          variant="secondary"
+                          className={`px-4 py-1.5 text-sm rounded-full ${ 
+                            order.status === "selesai"
+                              ? "bg-green-600 text-white"
+                              : "border border-gray-300 text-gray-400 bg-transparent cursor-not-allowed"
+                        }`}
+                        disabled={order.status !== "selesai"}
+                        onClick={() =>
+                          order.status === "selesai" &&
+                          alert(`Ulas penyedia: ${order.seller_id}`)
+                        }
+                        >
+                          Review
+                        </Button>
+
+                        <Button
+                          variant="primary"
+                          className="px-4 py-1.5 text-sm rounded-full text-white"
+                          onClick={() => alert(`Hubungi ${order.seller_id}`)}
+                        >
+                          Hubungi Penyedia
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 mt-10 p-4">
+                    Belum ada pesanan {orderActiveTab}.
+                  </p>
+                )}
               </div>
             </div>
           )}
