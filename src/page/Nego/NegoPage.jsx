@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getServicesById, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
@@ -6,6 +7,26 @@ import { selectCurrentUser } from '../../features/authSlice'
 import { FaComments, FaExclamationCircle, FaTimes, FaCheckCircle } from 'react-icons/fa'
 import Button from '../../components/common/Button'
 import { selectSeeAddress } from '../../features/userSlice'
+=======
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import socket from "../../config/socket";
+import {
+  getServicesById,
+  selectSelectedService,
+  selectSelectedServiceStatus,
+} from "../../features/serviceSlice";
+import { useEffect, useState } from "react";
+import { selectCurrentUser } from "../../features/authSlice";
+import {
+  FaComments,
+  FaExclamationCircle,
+  FaTimes,
+  FaCheckCircle,
+} from "react-icons/fa";
+import Button from "../../components/common/Button";
+import { selectSeeAddress } from "../../features/userSlice";
+>>>>>>> cc706d464aa23b0bfd33d2a8a9f75eed6a96621f
 
 const NegoPage = () => {
     const {id} = useParams()
@@ -61,9 +82,41 @@ const NegoPage = () => {
         navigate(`/chat/${service?.seller_id}?negoSent=true`)
     }
 
+<<<<<<< HEAD
     const handleChatSeller = () => {
         navigate(`/chat/${service?.seller_id}`)
     }
+=======
+  const handleConfirmNego = () => {
+    setShowModal(false);
+
+    const imageUrl =
+      service?.foto_product ||
+      "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400";
+    const shortDescription =
+      (service?.deskripsi || "").substring(0, 50) + "...";
+
+    const formattedBasePrice = (service?.base_price || 0).toLocaleString(
+      "id-ID"
+    );
+    const formattedNegoPrice = parseInt(harga).toLocaleString("id-ID");
+
+    // 🆕 TAMBAHKAN ServiceID di message
+    const autoMessage = `Halo, saya tertarik dengan layanan "${service?.nama_jasa}". (ServiceID: ${service?.id}) (Harga: Rp ${formattedBasePrice}) (Nego: Rp ${formattedNegoPrice}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
+
+    const messageData = {
+      id_buyer: user.id_buyer,
+      id_seller: service.seller_id,
+      text: autoMessage,
+      sender_role: "BUYER",
+    };
+
+    console.log("📤 Mengirim penawaran via socket:", messageData);
+    socket.emit("send_message", messageData);
+
+    navigate(`/chat/${service.seller_id}`);
+  };
+>>>>>>> cc706d464aa23b0bfd33d2a8a9f75eed6a96621f
 
     if(status === 'loading') {
         return (
