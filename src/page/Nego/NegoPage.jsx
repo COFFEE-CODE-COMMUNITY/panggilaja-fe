@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { getServicesById, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
-import { useEffect, useState } from 'react'
-import { selectCurrentUser } from '../../features/authSlice'
-import { FaComments, FaExclamationCircle, FaTimes, FaCheckCircle } from 'react-icons/fa'
-import Button from '../../components/common/Button'
-import { selectSeeAddress } from '../../features/userSlice'
-=======
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import socket from "../../config/socket";
@@ -26,7 +16,6 @@ import {
 } from "react-icons/fa";
 import Button from "../../components/common/Button";
 import { selectSeeAddress } from "../../features/userSlice";
->>>>>>> cc706d464aa23b0bfd33d2a8a9f75eed6a96621f
 
 const NegoPage = () => {
     const {id} = useParams()
@@ -75,18 +64,9 @@ const NegoPage = () => {
         }
     }
 
-    const handleConfirmNego = () => {
-        console.log('Nego dikirim:', { harga, pesan, serviceId: id })
-        setShowModal(false)
-        //navigate to chat page (ubah ini)
-        navigate(`/chat/${service?.seller_id}?negoSent=true`)
-    }
-
-<<<<<<< HEAD
     const handleChatSeller = () => {
         navigate(`/chat/${service?.seller_id}`)
     }
-=======
   const handleConfirmNego = () => {
     setShowModal(false);
 
@@ -116,7 +96,6 @@ const NegoPage = () => {
 
     navigate(`/chat/${service.seller_id}`);
   };
->>>>>>> cc706d464aa23b0bfd33d2a8a9f75eed6a96621f
 
     if(status === 'loading') {
         return (
