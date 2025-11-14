@@ -51,9 +51,9 @@ const ReviewPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br py-8 sm:px-4 lg:mt-15 mt-10">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-white sm:rounded-2xl sm:shadow-xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] p-6 text-white">
             <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -129,7 +129,7 @@ const ReviewPage = () => {
                       className="transition-transform hover:scale-110 focus:outline-none"
                     >
                       <Star
-                        className={`w-12 h-12 ${
+                        className={`w-12 h-12 cursor-pointer ${
                           star <= (hoverRating || selectedRating)
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-gray-300"
@@ -198,7 +198,7 @@ const ReviewPage = () => {
           )}
 
           {/* Footer */}
-          <div className="bg-green-50 px-6 py-4 text-center text-sm text-gray-600 border-t">
+          <div className="bg-green-50 px-6 py-4 text-center text-sm text-gray-600 sm:border-t">
             <p>
               Penilaian Anda sangat berharga untuk membantu kami meningkatkan
               kualitas jasa dan layanan.

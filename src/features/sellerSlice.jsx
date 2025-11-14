@@ -93,7 +93,7 @@ export const getOrderBySellerId = createAsyncThunk(
   'seller/getOrderBySellerId',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/sellers/${id}/orders`)
+      const res = await api.get(`/orders/${id}`)
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -119,7 +119,11 @@ const initialState = {
 
   sellers : null,
 
-  messageDeleteSeller : ''
+  messageDeleteSeller : '',
+
+  orders : null,
+  ordersStatus : 'idle',
+  ordersError : ''
 };
 
 const seller = createSlice({
@@ -216,16 +220,16 @@ const seller = createSlice({
 
             //get order by seller id
             .addCase(getOrderBySellerId.pending, (state) => {
-                state.status = 'loading';
+                state.ordersStatus = 'loading';
             })
             .addCase(getOrderBySellerId.fulfilled, (state, action) => {
-                state.status = 'success';
-                state.message = action.payload;
-                state.sellerOrders = action.payload;
+                state.ordersStatus = 'success';
+                state.ordersError = action.payload;
+                state.orders = action.payload;
             })
             .addCase(getOrderBySellerId.rejected, (state, action) => {
-                state.status = 'error';
-                state.message = action.payload;
+                state.ordersStatus = 'error';
+                state.ordersError = action.payload;
             })
     },
 });
@@ -241,6 +245,11 @@ export const selectAddSellerStatus = (state) => state.seller.statusAdd;
 export const selectDeleteSellerStatus = (state) => state.seller.statusDelete;
 export const selectServiceSellerStatus = (state) => state.seller.statusGetServiceSeller;
 export const selectDeleteSellerMessage = (state) => state.seller.messageDeleteSeller;
+
+export const selectOrderSeller = (state) => state.seller.orders;
+export const selectOrderSellerStatus = (state) => state.seller.ordersStatus;
+export const selectOrderSellerMessage = (state) => state.seller.ordersError;
+
 
 
 

@@ -44,7 +44,7 @@ const ProfileLayout = () => {
       const skills = seller?.kategori_toko.split(' & ')
       return(
         <div className='flex flex-col h-full '>
-          <div className='w-full h-[12vh]' style={{
+          <div className='w-full h-50' style={{
               backgroundImage : `url(${Bannerr})`,
               backgroundSize : 'cover' 
           }}></div>

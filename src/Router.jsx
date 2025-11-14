@@ -42,6 +42,7 @@ import EditProfile from "./page/Setting/EditProfile";
 import OrderMobile from "./page/Order/OrderMobile";
 import NegoPage from "./page/Nego/NegoPage";
 import ReviewPage from "./page/Review/Index";
+import ChatSeller from "./page/Dashboard/Chat";
 
 export default function Router() {
   return (
@@ -137,8 +138,8 @@ export default function Router() {
             element={<EditService />}
           />
 
-          <Route path="chat" element={<ChatLayout />} />
-          <Route path="chat/:partnerId" element={<ChatLayout />} />
+          <Route path="chat" element={<ChatSeller />} />
+          <Route path="chat/:partnerId" element={<ChatSeller />} />
 
           <Route path="manage-profile/:id" element={<ProfileLayout />}>
             <Route index element={<ProfileIndex />} />
