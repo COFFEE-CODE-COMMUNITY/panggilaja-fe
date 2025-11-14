@@ -34,7 +34,7 @@ const FilterByCategory = () => {
     const servicesByCategory = servicesAround?.filter((service) => service?.kategori_id === id )
 
     return (
-        <div className='min-h-screen xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>
+        <div className='min-h-screen xl:px-[150px] sm:mt-20 lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>
             {servicesByCategory.length === 0 ? (
                 <NoServiceNearby/>
             ) : (

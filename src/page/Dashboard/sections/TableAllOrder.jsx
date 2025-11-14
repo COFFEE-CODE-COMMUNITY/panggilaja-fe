@@ -19,20 +19,16 @@ const TableAllOrder = () => {
     const updateStatus = useSelector(selectUpdateOrderStatus)
     const updateError = useSelector(selectUpdateOrderError)
     
-    console.log(orders)
-
     useEffect(() => {
-        if (user && user.id_seller) {
-            if (ordersStatus === 'idle') {
-                dispatch(getOrderBySellerId(user.id_seller));
-            }
+        if (user && user?.id_seller) {
+            dispatch(getOrderBySellerId(user?.id_seller));
         }
     }, [dispatch, ordersStatus, user, orders?.data?.status, orders?.data]);
 
     // Close dropdown ketika klik di luar
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (!event.target.closest('.dropdown-container')) {
+            if (!event?.target?.closest('?.dropdown-container')) {
                 setOpenDropdown(null)
             }
         }
@@ -44,24 +40,23 @@ const TableAllOrder = () => {
     let dashboardData = [];
     // Pastikan kedua data sudah ada
     if (orders && allService) {
-        // 1. Buat 'peta' dari allService agar pencarian cepat
+        // 1?. Buat 'peta' dari allService agar pencarian cepat
         const serviceMap = new Map(
-            allService.data.map(service => [service.id, service])
+            allService?.data?.map(service => [service?.id, service])
         );
 
-        // 2. Loop (map) data order kamu
-        dashboardData = orders.data.map((order) => {
-            // 3. Cari detail service yang cocok pakai serviceMap
-            const serviceDetail = serviceMap.get(order.service_id);
+        // 2?. Loop (map) data order kamu
+        dashboardData = orders?.data?.map((order) => {
+            // 3?. Cari detail service yang cocok pakai serviceMap
+            const serviceDetail = serviceMap?.get(order?.service_id);
 
-            // 4. Gabungkan datanya jadi objek baru
             return {
-                order_id: order.id, 
-                nama_jasa: serviceDetail ? serviceDetail.nama_jasa : 'Jasa Tidak Ditemukan',
-                id_buyer : order.buyer_id,
-                tanggal: order.tanggal,
-                status: order.status,
-                nama_buyer : order.buyer.fullname
+                order_id: order?.id, 
+                nama_jasa: serviceDetail ? serviceDetail?.nama_jasa : 'Jasa Tidak Ditemukan',
+                id_buyer : order?.buyer_id,
+                tanggal: order?.tanggal,
+                status: order?.status,
+                nama_buyer : order?.buyer?.fullname
             };
         });
 
@@ -72,13 +67,13 @@ const TableAllOrder = () => {
     }
 
     const handleHubungiPembeli = async (buyerId) => {
-        console.log('Hubungi pembeli untuk order:', buyerId)
+        console?.log('Hubungi pembeli untuk order:', buyerId)
         
         try {
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken')
+            const token = localStorage?.getItem('accessToken') || sessionStorage?.getItem('accessToken')
             
             // ✅ Buat/ambil room chat
-            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/chat/room`, {
+            const response = await fetch(`${process?.env?.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/chat/room`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,14 +81,14 @@ const TableAllOrder = () => {
                 },
                 body: JSON.stringify({
                     id_buyer: buyerId,
-                    id_seller: user.id_seller
+                    id_seller: user?.id_seller
                 })
             })
             
-            const data = await response.json()
+            const data = await response?.json()
             
-            if (data.success) {
-                console.log('✅ Room chat berhasil dibuat/diambil')
+            if (data?.success) {
+                console?.log('✅ Room chat berhasil dibuat/diambil')
             }
             
             // ✅ PENTING: Navigate dengan state shouldRefreshList
@@ -102,7 +97,7 @@ const TableAllOrder = () => {
             })
             
         } catch (error) {
-            console.error('Error saat membuat room chat:', error)
+            console?.error('Error saat membuat room chat:', error)
             // Tetap navigate dengan refresh flag
             navigate('/dashboard/chat/' + buyerId, {
                 state: { shouldRefreshList: true }
@@ -113,7 +108,7 @@ const TableAllOrder = () => {
     }
 
     const handleOrderanSelesai = (orderId) => {
-        console.log('Menandai orderan selesai:', orderId)
+        console?.log('Menandai orderan selesai:', orderId)
         // Tambahkan logic untuk menandai orderan selesai
         dispatch(updateOrderStatus({
             orderId: orderId,
@@ -138,8 +133,8 @@ const TableAllOrder = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {dashboardData.map((order) => (
-                            <tr key={order.order_id} className="border-t border-gray-400">
+                        {dashboardData?.map((order) => (
+                            <tr key={order?.order_id} className="border-t border-gray-400">
                                 <td className="px-4 py-3 w-[20%]">
                                     <p>{order?.nama_buyer}</p>
                                 </td>
@@ -151,7 +146,7 @@ const TableAllOrder = () => {
                                 <td className="px-4 py-3 w-[10%]">
                                     <div className="flex w-full justify-end relative dropdown-container">
                                         <button 
-                                            onClick={() => toggleDropdown(order.order_id)}
+                                            onClick={() => toggleDropdown(order?.order_id)}
                                             className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5 p-2"
                                         >
                                             <span className="bg-black h-1 w-1 rounded-full"></span>
@@ -159,16 +154,16 @@ const TableAllOrder = () => {
                                             <span className="bg-black h-1 w-1 rounded-full"></span>
                                         </button>
 
-                                        {openDropdown === order.order_id && (
+                                        {openDropdown === order?.order_id && (
                                             <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                                                 <button
-                                                    onClick={() => handleHubungiPembeli(order.id_buyer)}
+                                                    onClick={() => handleHubungiPembeli(order?.id_buyer)}
                                                     className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700 border-b border-gray-200 hover:bg-primary hover:text-white"
                                                 >
                                                     Hubungi Pembeli
                                                 </button>
                                                 <button
-                                                    onClick={() => handleOrderanSelesai(order.order_id)}
+                                                    onClick={() => handleOrderanSelesai(order?.order_id)}
                                                     className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-primary hover:text-white"
                                                 >
                                                     Orderan Selesai
@@ -185,21 +180,21 @@ const TableAllOrder = () => {
 
             {/* Mobile View - Card Layout */}
             <div className="md:hidden space-y-3">
-                {dashboardData.map((order) => (
-                    <div key={order.order_id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
+                {dashboardData?.map((order) => (
+                    <div key={order?.order_id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
                         {/* Header Card */}
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center space-x-3">
                                 <div>
                                     <p className="text-xs text-gray-500">Nama Pemesan</p>
-                                    <p className="font-medium text-sm">{order.nama_buyer}</p>
+                                    <p className="font-medium text-sm">{order?.nama_buyer}</p>
                                 </div>
                             </div>
                             
                             {/* Dropdown Button */}
                             <div className="relative dropdown-container">
                                 <button 
-                                    onClick={() => toggleDropdown(order.order_id)}
+                                    onClick={() => toggleDropdown(order?.order_id)}
                                     className="flex flex-col gap-y-1 text-black hover:text-gray-600 p-2"
                                 >
                                     <span className="bg-black h-1 w-1 rounded-full"></span>
@@ -207,16 +202,16 @@ const TableAllOrder = () => {
                                     <span className="bg-black h-1 w-1 rounded-full"></span>
                                 </button>
 
-                                {openDropdown === order.order_id && (
+                                {openDropdown === order?.order_id && (
                                     <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                                         <button
-                                            onClick={() => handleHubungiPembeli(order.id_buyer)}
+                                            onClick={() => handleHubungiPembeli(order?.id_buyer)}
                                             className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700 border-b border-gray-200"
                                         >
                                             Hubungi Pembeli
                                         </button>
                                         <button
-                                            onClick={() => handleOrderanSelesai(order.order_id)}
+                                            onClick={() => handleOrderanSelesai(order?.order_id)}
                                             className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700"
                                         >
                                             Orderan Selesai

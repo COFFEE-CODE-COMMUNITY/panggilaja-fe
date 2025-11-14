@@ -42,20 +42,20 @@ const SearchAllService = () => {
   }
 
   return (
-      <div className='min-h-screen py-[15px] flex flex-col gap-[15px] xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] mx-auto'>
-            {servicesAround.length === 0 ? (
+      <div className='min-h-screen py-[15px] sm:mt-20 flex flex-col gap-[15px] xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] mx-auto'>
+            {servicesAround?.length === 0 ? (
                 <NoServiceNearby/>
             ) : (
             <div className='grid gap-y-10 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 md:gap-x-6 gap-x-4'>
-                {servicesAround.map((service) => (
+                {servicesAround?.map((service) => (
                     <ServiceCard
-                        idService={service.id}
-                        image={service.foto_product}
-                        serviceName={service.nama_jasa}
-                        key={service.id}
-                        basePrice={service.base_price}
-                        topPrice={service.top_price}
-                        desc={service.deskripsi}
+                        idService={service?.id}
+                        image={service?.foto_product}
+                        serviceName={service?.nama_jasa}
+                        key={service?.id}
+                        basePrice={service?.base_price}
+                        topPrice={service?.top_price}
+                        desc={service?.deskripsi}
                         guest={token ? false : true}
                     />
                 ))}

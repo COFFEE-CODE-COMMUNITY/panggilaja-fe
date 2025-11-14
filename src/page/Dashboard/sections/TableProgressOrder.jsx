@@ -19,57 +19,57 @@ const TableProgressOrder = () => {
     const updateError = useSelector(selectUpdateOrderError)
     
     useEffect(() => {
-        if (user && user.id_seller) {
+        if (user && user?.id_seller) {
             if (ordersStatus === 'idle') {
-                dispatch(getOrderBySellerId(user.id_seller));
+                dispatch(getOrderBySellerId(user?.id_seller));
             }
         }
     }, [dispatch, ordersStatus, user]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (!event.target.closest('.dropdown-container')) {
+            if (!event?.target?.closest('?.dropdown-container')) {
                 setOpenDropdown(null)
             }
         }
         
-        document.addEventListener('click', handleClickOutside)
-        return () => document.removeEventListener('click', handleClickOutside)
+        document?.addEventListener('click', handleClickOutside)
+        return () => document?.removeEventListener('click', handleClickOutside)
     }, [])
     
     let dashboardData = [];
     if (orders && allService) {
         const serviceMap = new Map(
-            allService.data.map(service => [service.id, service])
+            allService?.data?.map(service => [service?.id, service])
         );
 
-        dashboardData = orders.data.map((order) => {
-            const serviceDetail = serviceMap.get(order.service_id);
+        dashboardData = orders?.data?.map((order) => {
+            const serviceDetail = serviceMap?.get(order?.service_id);
 
             return {
-                order_id: order.id, 
-                nama_jasa: serviceDetail ? serviceDetail.nama_jasa : 'Jasa Tidak Ditemukan',
-                id_buyer : order.buyer_id,
-                tanggal: order.tanggal,
-                status: order.status,
-                nama_buyer : order.buyer.fullname
+                order_id: order?.id, 
+                nama_jasa: serviceDetail ? serviceDetail?.nama_jasa : 'Jasa Tidak Ditemukan',
+                id_buyer : order?.buyer_id,
+                tanggal: order?.tanggal,
+                status: order?.status,
+                nama_buyer : order?.buyer?.fullname
             };
         });
     }
 
-    const dashboardDataFilterProgress = dashboardData.filter((data) => data.status === 'in_progress')
+    const dashboardDataFilterProgress = dashboardData?.filter((data) => data?.status === 'in_progress')
     const toggleDropdown = (orderId) => {
         setOpenDropdown(openDropdown === orderId ? null : orderId)
     }
 
     const handleHubungiPembeli = (orderId) => {
-        console.log('Hubungi pembeli untuk order:', orderId)
+        console?.log('Hubungi pembeli untuk order:', orderId)
         navigate('/dashboard/chat/'+orderId)
         setOpenDropdown(null)
     }
 
     const handleOrderanSelesai = (orderId) => {
-        console.log('Menandai orderan selesai:', orderId)
+        console?.log('Menandai orderan selesai:', orderId)
         dispatch(updateOrderStatus({
             orderId: orderId,
             status: 'selesai'
@@ -80,7 +80,7 @@ const TableProgressOrder = () => {
     
     return (
         <div className="w-full sm:mb-0 mb-20">
-            <div className="hidden md:block border border-gray-400 rounded-lg overflow-x-auto">
+            <div className="hidden md:block border border-gray-400 rounded-lg">
                 <table className="w-full text-left">
                     <thead className="bg-primary text-white font-bold rounded-lg">
                         <tr>
@@ -92,7 +92,7 @@ const TableProgressOrder = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {dashboardDataFilterProgress.length === 0 && (
+                        {dashboardDataFilterProgress?.length === 0 && (
                             <tr>
                             <td colSpan="100%" className="px-4 py-16">
                                 <div className="flex flex-col items-center justify-center text-center">
@@ -108,7 +108,7 @@ const TableProgressOrder = () => {
                                         strokeLinecap="round" 
                                         strokeLinejoin="round" 
                                         strokeWidth={2} 
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5?.586a1 1 0 01?.707?.293l5?.414 5?.414a1 1 0 01?.293?.707V19a2 2 0 01-2 2z" 
                                     />
                                     </svg>
                                 </div>
@@ -118,14 +118,14 @@ const TableProgressOrder = () => {
                                     Belum Ada Pesanan
                                 </h3>
                                 <p className="text-sm text-gray-500 max-w-md">
-                                    Pesanan yang sedang dalam proses akan muncul di sini. Mulai terima pesanan pertama Anda!
+                                    Pesanan yang sedang dalam proses akan muncul di sini?. Mulai terima pesanan pertama Anda!
                                 </p>
                                 </div>
                             </td>
                             </tr>
                         )}
-                        {dashboardDataFilterProgress.map((order) => (
-                            <tr key={order.order_id} className="border-t border-gray-400">
+                        {dashboardDataFilterProgress?.map((order) => (
+                            <tr key={order?.order_id} className="border-t border-gray-400">
                                 <td className="px-4 py-3 w-[20%]">
                                     <div className="flex items-center space-x-2 w-full">
                                         <input type="checkbox" className="w-5 h-5 rounded-lg" />
@@ -139,7 +139,7 @@ const TableProgressOrder = () => {
                                 <td className="px-4 py-3 w-[10%]">
                                     <div className="flex w-full justify-end relative dropdown-container">
                                         <button 
-                                            onClick={() => toggleDropdown(order.order_id)}
+                                            onClick={() => toggleDropdown(order?.order_id)}
                                             className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5 p-2"
                                         >
                                             <span className="bg-black h-1 w-1 rounded-full"></span>
@@ -147,16 +147,16 @@ const TableProgressOrder = () => {
                                             <span className="bg-black h-1 w-1 rounded-full"></span>
                                         </button>
 
-                                        {openDropdown === order.order_id && (
+                                        {openDropdown === order?.order_id && (
                                             <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                                                 <button
-                                                    onClick={() => handleHubungiPembeli(order.id_buyer)}
+                                                    onClick={() => handleHubungiPembeli(order?.id_buyer)}
                                                     className="hover:bg-primary hover:text-white w-full text-left px-4 py-3 text-sm text-gray-700 border-b border-gray-200"
                                                 >
                                                     Hubungi Pembeli
                                                 </button>
                                                 <button
-                                                    onClick={() => handleOrderanSelesai(order.order_id)}
+                                                    onClick={() => handleOrderanSelesai(order?.order_id)}
                                                     className="hover:bg-primary hover:text-white w-full text-left px-4 py-3 text-sm text-gray-700"
                                                 >
                                                     Orderan Selesai
@@ -173,7 +173,7 @@ const TableProgressOrder = () => {
 
             {/* Mobile View - Card Layout */}
             <div className="md:hidden space-y-3">
-                {dashboardDataFilterProgress.length === 0 && (
+                {dashboardDataFilterProgress?.length === 0 && (
                 <tr>
                 <td colSpan="100%" className="px-4 py-16">
                     <div className="flex flex-col items-center justify-center text-center">
@@ -189,7 +189,7 @@ const TableProgressOrder = () => {
                             strokeLinecap="round" 
                             strokeLinejoin="round" 
                             strokeWidth={2} 
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5?.586a1 1 0 01?.707?.293l5?.414 5?.414a1 1 0 01?.293?.707V19a2 2 0 01-2 2z" 
                         />
                         </svg>
                     </div>
@@ -199,14 +199,14 @@ const TableProgressOrder = () => {
                         Belum Ada Pesanan
                     </h3>
                     <p className="text-sm text-gray-500 max-w-md">
-                        Pesanan yang telah selesai akan muncul di sini. Mulai terima pesanan pertama Anda!
+                        Pesanan yang telah selesai akan muncul di sini?. Mulai terima pesanan pertama Anda!
                     </p>
                     </div>
                 </td>
                 </tr>
             )}
-                {dashboardDataFilterProgress.map((order) => (
-                    <div key={order.order_id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
+                {dashboardDataFilterProgress?.map((order) => (
+                    <div key={order?.order_id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
                         {/* Header Card */}
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center space-x-3">
@@ -219,7 +219,7 @@ const TableProgressOrder = () => {
                             {/* Dropdown Button */}
                             <div className="relative dropdown-container">
                                 <button 
-                                    onClick={() => toggleDropdown(order.order_id)}
+                                    onClick={() => toggleDropdown(order?.order_id)}
                                     className="flex flex-col gap-y-1 text-black hover:text-gray-600 p-2"
                                 >
                                     <span className="bg-black h-1 w-1 rounded-full"></span>
@@ -227,16 +227,16 @@ const TableProgressOrder = () => {
                                     <span className="bg-black h-1 w-1 rounded-full"></span>
                                 </button>
 
-                                {openDropdown === order.order_id && (
+                                {openDropdown === order?.order_id && (
                                     <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                                         <button
-                                            onClick={() => handleHubungiPembeli(order.id_buyer)}
+                                            onClick={() => handleHubungiPembeli(order?.id_buyer)}
                                             className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700 border-b border-gray-200"
                                         >
                                             📞 Hubungi Pembeli
                                         </button>
                                         <button
-                                            onClick={() => handleOrderanSelesai(order.order_id)}
+                                            onClick={() => handleOrderanSelesai(order?.order_id)}
                                             className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700"
                                         >
                                             ✅ Orderan Selesai
