@@ -51,7 +51,7 @@ const AppLayout = () => {
     containerClasses = 'h-screen relative flex flex-col'
   }
 
-  if (location.pathname.includes('nego')){
+  if (location.pathname.includes('nego') || location.pathname.includes('profile-service') || location.pathname.includes('service')){
     margin = ''
   } else {
     margin = 'xl:mt-30 lg:mt-25 md:mt-23 mt-16'
