@@ -492,7 +492,7 @@ const Header = () => {
                   ordersService.map((order) => (
                     <div
                       key={order.id}
-                      className="bg-white rounded-xl border border-gray-100 p-3 flex flex-col gap-2" 
+                      className="bg-white rounded-xl border border-gray-200 p-3 flex flex-col gap-2 hover:bg-gray-50 transition-colors" 
                     >
                       {/* header */}
                       <div className="flex justify-between items-center text-sm">
@@ -575,20 +575,20 @@ const Header = () => {
 
           {/* Favorites Panel */}
           {favorite && (
-            <div className="w-100 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+            <div className="w-96 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden absolute top-0 right-[100%] mr-4">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
                 <h3 className="text-h5 font-semibold text-gray-800">
                   Jasa Favorit
                 </h3>
               </div>
-              <div className="overflow-y-auto max-h-80">
+              <div className="overflow-y-auto max-h-80 p-2 space-y-3">
                 {favoritesService.length > 0 ? (
                   favoritesService.map((favorite) => {
                     const idDelFav = favorites.data.find(
                       (service) => service.service_id === favorite.id
                     );
                     return (
-                      <div key={favorite.id} className="w-full">
+                      <div key={favorite.id} className="bg-white rounded-lg border border-gray-200">
                         <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors ">
                           <img
                             src={favorite?.foto_product}
