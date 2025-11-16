@@ -12,9 +12,6 @@ import {
   FaPaperPlane,
   FaStar,
   FaEllipsisV,
-  FaCheck,
-  FaTimes,
-  FaExchangeAlt,
 } from "react-icons/fa";
 import axiosInstance from "../../../utils/axios";
 import {
@@ -73,252 +70,49 @@ const formatTime = (timestamp) => {
   return date.toLocaleDateString("id-ID", dateOptions);
 };
 
-// 🔥 REGEX PATTERNS - UPDATED WITH ServiceID
 const autoMessageRegex =
-  /Halo, saya tertarik dengan layanan "(.+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Deskripsi: ([^\)]+)\) \(Gambar: (.+?)\)/;
+  /Halo, saya tertarik dengan layanan "(.+?)". \(Harga: Rp (.+?)\) \(Deskripsi: (.*?)\) \(Gambar: (.*?)\)/;
 
-const negoMessageRegex =
-  /Halo, saya tertarik dengan layanan "(.+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Nego: Rp ([^\)]+)\) \(Deskripsi: ([^\)]+)\) \(Gambar: (.+?)\)/;
-
-const acceptNegoRegex =
-  /Penawaran Anda sebesar Rp (.+?) untuk layanan "(.+?)" DITERIMA! 🎉/;
-
-// 🆕 ACCEPT NEGO CONFIRMATION CARD
-const AcceptNegoCard = ({ serviceName, agreedPrice, onConfirm }) => {
-  return (
-    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border-2 border-green-200 overflow-hidden shadow-lg max-w-sm">
-      <div className="p-5">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="bg-green-500 p-3 rounded-full">
-            <FaCheck className="text-white text-xl" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-lg text-green-800">
-              🎉 Penawaran Diterima!
-            </h3>
-            <p className="text-sm text-green-600">Selamat, nego berhasil!</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl p-4 mb-4 border border-green-200">
-          <p className="text-xs text-gray-500 mb-1">Layanan</p>
-          <p className="font-semibold text-gray-800 mb-3">{serviceName}</p>
-
-          <p className="text-xs text-gray-500 mb-1">Harga yang Disepakati</p>
-          <p className="text-2xl font-bold text-green-600">Rp {agreedPrice}</p>
-        </div>
-
-        <button
-          onClick={onConfirm}
-          className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-md flex items-center justify-center gap-2"
-        >
-          <FaCheck size={16} />
-          Konfirmasi & Lanjutkan Pemesanan
-        </button>
-
-        <p className="text-xs text-center text-gray-500 mt-3">
-          💡 Klik untuk melanjutkan ke halaman pemesanan
-        </p>
+// Service Card Component
+const ServiceCard = ({ data }) => (
+  <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
+    <div className="relative">
+      <img
+        src={data.image}
+        alt={data.serviceName}
+        className="w-full h-48 object-cover"
+      />
+      <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
+        <FaStar className="text-yellow-400" size={14} />
+        <span className="text-sm font-semibold">{data.rating}</span>
       </div>
     </div>
-  );
-};
-
-// 🆕 SERVICE NEGO CARD COMPONENT (DENGAN isSeller SUPPORT)
-const ServiceNegoCard = ({
-  data,
-  onAccept,
-  onReject,
-  onCounterOffer,
-  isSeller,
-  senderRole,
-  myRole,
-}) => {
-  const [showNegoInput, setShowNegoInput] = useState(false);
-  const [counterPrice, setCounterPrice] = useState("");
-
-  // ✅ Tentukan apakah user ini yang punya kontrol tombol
-  // Jika sender = BUYER dan saya = SELLER → saya bisa aksi
-  // Jika sender = SELLER dan saya = BUYER → saya bisa aksi
-  const canTakeAction = senderRole !== myRole;
-
-  const handleCounterOffer = () => {
-    if (counterPrice && parseInt(counterPrice) > 0) {
-      onCounterOffer(parseInt(counterPrice));
-      setShowNegoInput(false);
-      setCounterPrice("");
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
-      {/* Image Section */}
-      <div className="relative">
-        <img
-          src={data.image}
-          alt={data.serviceName}
-          className="w-full h-48 object-cover"
-        />
-        <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
-          <FaStar className="text-yellow-400" size={14} />
-          <span className="text-sm font-semibold">{data.rating || 4.5}</span>
-        </div>
-        <div className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-          💰 PENAWARAN NEGO
-        </div>
-      </div>
-
-      {/* Content Section */}
-      <div className="p-4">
-        <h3 className="font-bold text-lg text-gray-800 mb-2">
-          {data.serviceName}
-        </h3>
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {data.description}
-        </p>
-
-        {/* Price Section with Strike-through */}
-        <div className="mb-4 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <p className="text-xs text-gray-500 mb-1">Harga Normal</p>
-              <p className="text-lg text-gray-400 line-through font-semibold">
-                {data.originalPrice}
-              </p>
-            </div>
-            <div className="bg-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
-              NEGO!
-            </div>
-          </div>
-          <div className="pt-2 border-t border-orange-200">
-            <p className="text-xs text-gray-600 mb-1">Harga Penawaran</p>
-            <p className="text-2xl font-bold text-orange-600">
-              {data.negoPrice}
-            </p>
-          </div>
-        </div>
-
-        {/* ✅ Action Buttons - SELALU TAMPIL, tapi disabled jika bukan giliran user */}
-        {canTakeAction ? (
-          !showNegoInput ? (
-            <div className="flex gap-2">
-              <button
-                onClick={onAccept}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 flex items-center justify-center gap-1 shadow-md"
-              >
-                <FaCheck size={14} />
-                Terima
-              </button>
-              <button
-                onClick={onReject}
-                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 flex items-center justify-center gap-1 shadow-md"
-              >
-                <FaTimes size={14} />
-                Tolak
-              </button>
-              <button
-                onClick={() => setShowNegoInput(true)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 flex items-center justify-center gap-1 shadow-md"
-              >
-                <FaExchangeAlt size={14} />
-                Nego
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
-                  Rp
-                </span>
-                <input
-                  type="number"
-                  value={counterPrice}
-                  onChange={(e) => setCounterPrice(e.target.value)}
-                  placeholder="Masukkan harga balasan"
-                  className="w-full pl-10 pr-4 py-2.5 border-2 border-blue-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleCounterOffer}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-sm font-bold transition-all"
-                >
-                  Kirim Nego
-                </button>
-                <button
-                  onClick={() => {
-                    setShowNegoInput(false);
-                    setCounterPrice("");
-                  }}
-                  className="px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-xl text-sm font-bold transition-all"
-                >
-                  Batal
-                </button>
-              </div>
-            </div>
-          )
-        ) : (
-          // ✅ Tampilan untuk pengirim pesan (read-only)
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
-            <p className="text-sm text-gray-600 font-medium flex items-center justify-center gap-2">
-              <span className="animate-pulse">⏳</span>
-              Menunggu respons {isSeller ? "buyer" : "penjual"}
-            </p>
-          </div>
-        )}
-
-        {/* Info Footer */}
-        <div className="mt-3 pt-3 border-t border-gray-100">
-          <p className="text-xs text-gray-500 text-center">
-            {canTakeAction
-              ? "💡 Giliran Anda untuk merespons penawaran"
-              : "💡 Menunggu respons dari pihak lain"}
+    <div className="p-4">
+      <h3 className="font-bold text-lg text-gray-800 mb-2">
+        {data.serviceName}
+      </h3>
+      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+        {data.description}
+      </p>
+      {data.status && (
+        <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-xs font-bold text-blue-700 text-center">
+            📦 {data.status}
           </p>
         </div>
+      )}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs text-gray-500">Harga</p>
+          <p className="text-xl font-bold text-primary">{data.price}</p>
+        </div>
+        <Button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
+          Lihat Detail
+        </Button>
       </div>
     </div>
-  );
-};
-
-// Service Card Component (untuk pesan biasa)
-const ServiceCard = ({ data }) => {
-  return (
-    <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
-      <div className="relative">
-        <img
-          src={data.image}
-          alt={data.serviceName}
-          className="w-full h-48 object-cover"
-        />
-        <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
-          <FaStar className="text-yellow-400" size={14} />
-          <span className="text-sm font-semibold">{data.rating}</span>
-        </div>
-      </div>
-
-      <div className="p-4">
-        <h3 className="font-bold text-lg text-gray-800 mb-2">
-          {data.serviceName}
-        </h3>
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {data.description}
-        </p>
-
-        <div className="flex flex-col gap-3">
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Harga</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-xl font-bold text-primary">{data.price}</p>
-            </div>
-          </div>
-          <Button className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-semibold">
-            Lihat Detail
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
+  </div>
+);
 
 const ChatLayout = () => {
   const navigate = useNavigate();
@@ -334,6 +128,7 @@ const ChatLayout = () => {
   const myId = isBuyer ? user?.id_buyer : user?.id_seller;
   const role = user?.active_role?.toLowerCase();
 
+  // 🔥 AKTIFKAN REAL-TIME CONTACT UPDATE
   useContactRealtime(socket, myId, role, isBuyer);
 
   const buyerStatus = useSelector(selectContactBuyerStatus);
@@ -352,7 +147,6 @@ const ChatLayout = () => {
   const [messages, setMessages] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [messagesLoading, setMessagesLoading] = useState(false);
-  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
@@ -386,7 +180,8 @@ const ChatLayout = () => {
     const fetchData = async () => {
       if (!partnerId || !token) return;
       setMessagesLoading(true);
-      // don't clear messages here to avoid flicker / empty UI
+      setMessages([]);
+
       try {
         const messagesResponse = await axiosInstance.get(
           `${API_BASE_URL}/chat/${partnerId}`,
@@ -396,18 +191,17 @@ const ChatLayout = () => {
         console.log("📩 Messages Response:", messagesResponse.data);
 
         if (messagesResponse.data.success) {
-          const formattedMessages = messagesResponse.data.data.map((msg) => {
-          const isMyMessage = msg.sender_role.toUpperCase() === user?.active_role?.toUpperCase();
-          
-          return {
+          const formattedMessages = messagesResponse.data.data.map((msg) => ({
             id: msg.id,
             type: "text",
             text: msg.text,
             timestamp: formatTime(msg.created_at),
-            sender: isMyMessage ? "user" : "seller",
-          };
-        });
-
+            sender:
+              (isBuyer && msg.sender_role.toUpperCase() === "BUYER") ||
+              (!isBuyer && msg.sender_role.toUpperCase() === "SELLER")
+                ? "user"
+                : "seller",
+          }));
           setMessages(formattedMessages);
         }
       } catch (error) {
@@ -418,13 +212,13 @@ const ChatLayout = () => {
     };
 
     fetchData();
-  }, [partnerId, token, isBuyer, user?.active_role]);
+  }, [partnerId, token, isBuyer]);
 
   // ===== USEEFFECT #3: UPDATE SELECTED CHAT =====
   useEffect(() => {
     if (partnerId && conversations.length > 0) {
       const selected = conversations.find(
-        (c) => String(c.id).trim() === String(partnerId).trim()
+        (c) => c.id.trim() === partnerId.trim()
       );
       setSelectedChat(selected);
     } else if (!partnerId) {
@@ -455,21 +249,24 @@ const ChatLayout = () => {
     const handleNewMessage = (newMessage) => {
       console.log("💬 New message in active chat:", newMessage);
 
+      // Cek apakah pesan untuk chat yang sedang dibuka
       const messagePartnerId = isBuyer
         ? newMessage.id_seller
         : newMessage.id_buyer;
 
-      // compare as string to avoid type mismatch
-      if (String(messagePartnerId) !== String(partnerId)) {
+      if (messagePartnerId !== partnerId) {
         console.log("⏭️ Message not for this chat, skipping");
         return;
       }
 
-      // determine if the message was sent by me using id_sender
-      const isMyMessage = newMessage.sender_role?.toUpperCase() === user?.active_role?.toUpperCase();
+      // Tentukan apakah ini pesan dari saya
+      const isMyMessage =
+        (isBuyer && newMessage.sender_role?.toUpperCase() === "BUYER") ||
+        (!isBuyer && newMessage.sender_role?.toUpperCase() === "SELLER");
 
+      // Update messages state
       setMessages((prevMessages) => {
-        const exists = prevMessages.some((msg) => String(msg.id) === String(newMessage.id));
+        const exists = prevMessages.some((msg) => msg.id === newMessage.id);
         if (exists) {
           console.log("⚠️ Message already exists, skipping");
           return prevMessages;
@@ -482,7 +279,7 @@ const ChatLayout = () => {
             type: "text",
             text: newMessage.text,
             timestamp: formatTime(newMessage.created_at),
-            sender: isMyMessage ? "me" : "partner",
+            sender: isMyMessage ? "user" : "seller",
           },
         ];
       });
@@ -503,6 +300,7 @@ const ChatLayout = () => {
     }
   }, [messages]);
 
+  // Filter conversations
   const filteredConversations = conversations.filter((conv) =>
     conv.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -533,54 +331,6 @@ const ChatLayout = () => {
   };
 
   const handleBackToHome = () => navigate("/");
-
-  // 🆕 HANDLER CREATE ORDER
-  const handleCreateOrder = async (orderData) => {
-    setIsCreatingOrder(true);
-
-    try {
-      console.log("📦 Creating order with data:", orderData);
-
-      // 🔥 Format harga untuk pesan_tambahan
-      const agreedPriceFormatted =
-        orderData.agreedPrice.toLocaleString("id-ID");
-
-      const response = await axiosInstance.post(
-        `${API_BASE_URL}/orders`,
-        {
-          id_service: orderData.serviceId,
-          pesan_tambahan: `Negosiasi melalui chat. Harga disepakati: Rp ${agreedPriceFormatted}`,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      console.log("✅ Order created successfully:", response.data);
-
-      if (response.data.status === "success") {
-        const orderId = response.data.data.id;
-
-        // Kirim konfirmasi ke chat
-        const confirmMessage = `✅ Pesanan telah dibuat! Order ID: #${orderId}`;
-        socket.emit("send_message", {
-          id_buyer: myId,
-          id_seller: partnerId,
-          text: confirmMessage,
-          sender_role: "BUYER",
-        });
-
-        // Navigate ke halaman order detail
-        alert("Pesanan berhasil dibuat!");
-        // navigate(`/buyer/orders/${orderId}`);
-      }
-    } catch (error) {
-      console.error("❌ Error creating order:", error);
-      alert(error.response?.data?.message || "Gagal membuat pesanan");
-    } finally {
-      setIsCreatingOrder(false);
-    }
-  };
 
   return (
     <div className="h-screen w-full flex bg-gray-50">
@@ -681,7 +431,9 @@ const ChatLayout = () => {
 
       {/* Chat Area */}
       <div
-        className={`flex-1 flex flex-col ${chatMobile ? "flex" : "hidden sm:flex"}`}
+        className={`flex-1 flex flex-col ${
+          chatMobile ? "flex" : "hidden sm:flex"
+        }`}
       >
         {selectedChat ? (
           <>
@@ -729,172 +481,39 @@ const ChatLayout = () => {
                 </div>
               ) : (
                 messages.map((msg) => {
-                  // ✅ 1️⃣ CEK ACCEPT NEGO MESSAGE (Konfirmasi untuk Buyer)
-                  const acceptNegoMatch = acceptNegoRegex.exec(msg.text);
+                  const autoMessageMatch = autoMessageRegex.exec(msg.text);
 
-                  if (acceptNegoMatch && isBuyer) {
-                    const agreedPrice = acceptNegoMatch[1];
-                    const serviceName = acceptNegoMatch[2];
+                  if (autoMessageMatch) {
+                    const serviceName = autoMessageMatch[1];
+                    const price = autoMessageMatch[2];
+                    const description = autoMessageMatch[3];
+                    const imageUrl = autoMessageMatch[4];
 
-                    const handleConfirmOrder = () => {
-                      console.log("✅ Buyer mengkonfirmasi pesanan");
-
-                      const lastNegoMessage = [...messages]
-                        .reverse()
-                        .find((m) => {
-                          const match = negoMessageRegex.exec(m.text);
-                          return match && match[1] === serviceName;
-                        });
-
-                      if (lastNegoMessage) {
-                        const negoMatch = negoMessageRegex.exec(
-                          lastNegoMessage.text
-                        );
-
-                        const orderData = {
-                          serviceId: negoMatch[2], // 🆕 ServiceID dari regex
-                          agreedPrice: parseFloat(
-                            agreedPrice.replace(/\./g, "").replace(",", ".")
-                          ),
-                        };
-
-                        console.log("📦 Creating order:", orderData);
-                        handleCreateOrder(orderData);
-                      } else {
-                        alert("Data layanan tidak ditemukan. Silakan coba lagi.");
-                      }
+                    const cardData = {
+                      image: imageUrl,
+                      serviceName: serviceName,
+                      description: description,
+                      status: "Orderan Masuk!",
+                      price: `Rp ${price}`,
+                      rating: 0,
                     };
 
                     return (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}
+                        className={`flex ${
+                          msg.sender === "user"
+                            ? "justify-end"
+                            : "justify-start"
+                        }`}
                       >
                         <div className="max-w-xs lg:max-w-md">
-                          <AcceptNegoCard
-                            serviceName={serviceName}
-                            agreedPrice={agreedPrice}
-                            onConfirm={handleConfirmOrder}
-                          />
-                          <p className={`text-xs mt-1 text-gray-500 ${msg.sender === "me" ? "text-right" : "text-left"}`}>
-                            {msg.timestamp}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // ✅ 2️⃣ CEK NEGO MESSAGE (untuk Buyer & Seller)
-                  const negoMessageMatch = negoMessageRegex.exec(msg.text);
-
-                  if (negoMessageMatch) {
-                    const serviceName = negoMessageMatch[1];
-                    const serviceId = negoMessageMatch[2];
-                    const originalPrice = negoMessageMatch[3];
-                    const negoPrice = negoMessageMatch[4];
-                    const description = negoMessageMatch[5];
-                    const imageUrl = negoMessageMatch[6];
-
-                    const negoCardData = {
-                      image: imageUrl,
-                      serviceName: serviceName,
-                      serviceId: serviceId,
-                      description: description,
-                      originalPrice: `Rp ${originalPrice}`,
-                      negoPrice: `Rp ${negoPrice}`,
-                      rating: 4.5,
-                    };
-
-                    // ✅ Tentukan siapa pengirim pesan ini (role BUYER/SELLER)
-                    const messageSenderRole = msg.sender === "me" ? (isBuyer ? "BUYER" : "SELLER") : (isBuyer ? "SELLER" : "BUYER");
-
-                    const currentUserRole = isBuyer ? "BUYER" : "SELLER";
-
-                    // ✅ Handler untuk aksi nego
-                    const handleAcceptNego = () => {
-                      console.log("✅ Nego diterima");
-                      const acceptMessage = `Penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" DITERIMA! 🎉 Silakan lanjutkan untuk pembayaran.`;
-                      socket.emit("send_message", {
-                        id_buyer: isBuyer ? myId : partnerId,
-                        id_seller: isBuyer ? partnerId : myId,
-                        text: acceptMessage,
-                        sender_role: currentUserRole,
-                      });
-                    };
-
-                    const handleRejectNego = () => {
-                      console.log("❌ Nego ditolak");
-                      const rejectMessage = `Maaf, penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" tidak dapat kami terima. Terima kasih atas pengertiannya.`;
-                      socket.emit("send_message", {
-                        id_buyer: isBuyer ? myId : partnerId,
-                        id_seller: isBuyer ? partnerId : myId,
-                        text: rejectMessage,
-                        sender_role: currentUserRole,
-                      });
-                    };
-
-                    const handleCounterOffer = (newPrice) => {
-                      console.log("🔄 Counter offer:", newPrice);
-
-                      const formattedOriginalPrice = originalPrice.replace(/\./g, "");
-                      const formattedNewPrice = newPrice.toLocaleString("id-ID");
-
-                      // Include ServiceID in counter offer
-                      const counterNegoMessage = `Halo, saya tertarik dengan layanan "${serviceName}". (ServiceID: ${serviceId}) (Harga: Rp ${formattedOriginalPrice}) (Nego: Rp ${formattedNewPrice}) (Deskripsi: ${description}) (Gambar: ${imageUrl})`;
-
-                      socket.emit("send_message", {
-                        id_buyer: isBuyer ? myId : partnerId,
-                        id_seller: isBuyer ? partnerId : myId,
-                        text: counterNegoMessage,
-                        sender_role: currentUserRole,
-                      });
-                    };
-
-                    return (
-                      <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}>
-                        <div className="max-w-xs lg:max-w-md">
-                          <ServiceNegoCard
-                            data={negoCardData}
-                            onAccept={handleAcceptNego}
-                            onReject={handleRejectNego}
-                            onCounterOffer={handleCounterOffer}
-                            isSeller={!isBuyer}
-                            senderRole={messageSenderRole}
-                            myRole={currentUserRole}
-                          />
-                          <p className={`text-xs mt-1 text-gray-500 ${msg.sender === "me" ? "text-right" : "text-left"}`}>
-                            {msg.timestamp}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // ✅ 3️⃣ CEK AUTO MESSAGE (tanpa nego)
-                  const autoMessageMatch = autoMessageRegex.exec(msg.text);
-
-                  if (autoMessageMatch) {
-                    const serviceName = autoMessageMatch[1];
-                    const serviceId = autoMessageMatch[2];
-                    const price = autoMessageMatch[3];
-                    const description = autoMessageMatch[4];
-                    const imageUrl = autoMessageMatch[5];
-
-                    const cardData = {
-                      image: imageUrl,
-                      serviceName: serviceName,
-                      serviceId: serviceId,
-                      description: description,
-                      status: "Orderan Masuk!",
-                      price: `Rp ${price}`,
-                      rating: 4.5,
-                    };
-
-                    return (
-                      <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}>
-                        <div className="max-w-xs lg:max-w-md">
                           <ServiceCard data={cardData} />
-                          <p className={`text-xs mt-1 text-gray-500 ${msg.sender === "me" ? "text-right" : "text-left"}`}>
+                          <p
+                            className={`text-xs mt-1 text-gray-500 ${
+                              msg.sender === "user" ? "text-right" : "text-left"
+                            }`}
+                          >
                             {msg.timestamp}
                           </p>
                         </div>
@@ -902,12 +521,28 @@ const ChatLayout = () => {
                     );
                   }
 
-                  // ✅ 4️⃣ TEXT MESSAGE BIASA
                   return (
-                    <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${msg.sender === "me" ? "bg-primary text-white" : "bg-white text-gray-800"} rounded-2xl px-4 py-3 shadow-sm`}>
+                    <div
+                      key={msg.id}
+                      className={`flex ${
+                        msg.sender === "user" ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`max-w-xs lg:max-w-md xl:max-w-lg ${
+                          msg.sender === "user"
+                            ? "bg-primary text-white"
+                            : "bg-white text-gray-800"
+                        } rounded-2xl px-4 py-3 shadow-sm`}
+                      >
                         <p className="text-sm md:text-base">{msg.text}</p>
-                        <p className={`text-xs mt-1 ${msg.sender === "me" ? "text-white/70" : "text-gray-500"}`}>
+                        <p
+                          className={`text-xs mt-1 ${
+                            msg.sender === "user"
+                              ? "text-white/70"
+                              : "text-gray-500"
+                          }`}
+                        >
                           {msg.timestamp}
                         </p>
                       </div>
@@ -919,7 +554,10 @@ const ChatLayout = () => {
 
             {/* Input Area */}
             <div className="bg-white border-t border-gray-200 p-4">
-              <form onSubmit={handleSendMessage} className="flex items-center gap-3">
+              <form
+                onSubmit={handleSendMessage}
+                className="flex items-center gap-3"
+              >
                 <Input
                   placeholder="Ketik pesan..."
                   className="flex-1 rounded-xl border-2 border-gray-200 px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
@@ -938,12 +576,24 @@ const ChatLayout = () => {
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              <svg
+                className="w-12 h-12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
               </svg>
             </div>
             <p className="text-lg font-semibold mb-2">Pilih Percakapan</p>
-            <p className="text-sm">Pilih chat dari daftar untuk memulai percakapan</p>
+            <p className="text-sm">
+              Pilih chat dari daftar untuk memulai percakapan
+            </p>
           </div>
         )}
       </div>
