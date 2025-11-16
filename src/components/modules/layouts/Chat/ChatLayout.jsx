@@ -525,7 +525,11 @@ const ChatLayout = () => {
 
   const handleSelectChat = (conversation) => {
     setChatMobile(true);
-    navigate(`/chat/${conversation.id}`);
+    {user?.active_role === 'buyer' ? (
+      navigate(`/chat/${conversation.id}`)
+    ) : (
+      navigate(`/dashboard/chat/${conversation.id}`)
+    )}
   };
 
   const handleBackToHome = () => navigate("/");
@@ -588,12 +592,14 @@ const ChatLayout = () => {
       >
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-3 mb-4">
-            <button
-              onClick={handleBackToHome}
-              className="p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-primary/10 transition-colors flex-shrink-0"
-            >
-              <FaArrowLeft size={18} />
-            </button>
+            {user?.active_role === 'buyer' && (
+              <button
+                onClick={handleBackToHome}
+                className="p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-primary/10 transition-colors flex-shrink-0"
+              >
+                <FaArrowLeft size={18} />
+              </button>
+            )}
             <h2 className="text-xl font-bold text-gray-800 flex-1 text-center">
               Pesan
             </h2>

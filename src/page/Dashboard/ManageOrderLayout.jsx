@@ -9,7 +9,7 @@ import { selectAllService } from "../../features/serviceSlice";
 const ManageOrderLayout = () => {
   return (
     <div className="w-full px-[15px] flex flex-col gap-[10px] min-h-screen sm:mb-20">
-      <div className="h-full flex flex-col max-w-7xl xl:gap-8 lg:gap-7 md:gap-5 gap-3">
+      <div className="h-full flex flex-col w-full xl:gap-8 lg:gap-7 md:gap-5 gap-3">
         <StatCardOrder />
         <div>
           <ul className="flex justify-start lg:gap-5 md:gap-4 gap-3">

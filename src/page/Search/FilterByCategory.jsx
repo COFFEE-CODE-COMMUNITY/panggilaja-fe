@@ -18,6 +18,9 @@ const FilterByCategory = () => {
 
     const servicesAround = useSelector(selectServiceAround)
     const servicesAroundStatus = useSelector(selectServiceAroundStatus)
+    const allService = useSelector(selectAllService)
+
+    console.log(allService)
 
     useEffect(() => {
         if(user?.id_buyer && token){
@@ -31,11 +34,17 @@ const FilterByCategory = () => {
         }
     },[address?.data?.kecamatan])
 
-    const servicesByCategory = servicesAround?.filter((service) => service?.kategori_id === id )
+    let servicesByCategory = []
 
+    if(token){
+        servicesByCategory = servicesAround?.filter((service) => service?.kategori_id === id )
+    } else {
+        servicesByCategory = allService?.filter((service) => service?.kategori_id === id )
+    }
+    console.log(servicesAround)
     return (
         <div className='min-h-screen xl:px-[150px] sm:mt-20 lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>
-            {servicesByCategory.length === 0 ? (
+            {servicesByCategory?.length === 0 ? (
                 <NoServiceNearby/>
             ) : (
                 <div className='grid md:grid-cols-4 grid-cols-2 gap-x-1 gap-y-4 md:gap-x-2 md:gap-y-5 lg:gap-x-3 lg:gap-y-6'>

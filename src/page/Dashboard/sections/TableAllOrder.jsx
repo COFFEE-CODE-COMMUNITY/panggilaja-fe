@@ -19,6 +19,8 @@ const TableAllOrder = () => {
     const updateStatus = useSelector(selectUpdateOrderStatus)
     const updateError = useSelector(selectUpdateOrderError)
     
+    console.log(orders)
+
     useEffect(() => {
         if (user && user?.id_seller) {
             dispatch(getOrderBySellerId(user?.id_seller));

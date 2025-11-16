@@ -144,7 +144,7 @@ const Header = () => {
   useEffect(() => {
     if (statusChange === "success") {
       dispatch(resetChangeAccountStatus());
-      navigate("/dashboard/manage-order");
+      navigate("/dashboard");
     }
   }, [statusChange, dispatch, navigate]);
 
@@ -557,7 +557,7 @@ const Header = () => {
                         <Button
                           variant="primary"
                           className="px-4 py-1.5 text-sm rounded-full text-white"
-                          onClick={() => alert(`Hubungi ${order.seller_id}`)}
+                          onClick={() => navigate(`/chat/${order?.seller_id}`)}
                         >
                           Hubungi Penyedia
                         </Button>

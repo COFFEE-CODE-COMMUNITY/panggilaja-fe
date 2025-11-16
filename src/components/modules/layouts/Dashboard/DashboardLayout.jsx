@@ -27,10 +27,10 @@ const DashboardLayout = () => {
   }, [dispatch, user]); 
 
   return (
-    <div className='flex relative'>
+    <div className='flex relative h-screen'>
       <SidebarDashboard/>
       <BottombarDashboard/>
-      <main className={`md:ml-[280px] flex-1`}>
+      <main className={`flex-1 overflow-y-auto px-7 py-5`}>
         <Outlet />
       </main>
     </div>
