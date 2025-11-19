@@ -137,9 +137,6 @@ const ServiceNegoCard = ({
   const [showNegoInput, setShowNegoInput] = useState(false);
   const [counterPrice, setCounterPrice] = useState("");
 
-  // ✅ Tentukan apakah user ini yang punya kontrol tombol
-  // Jika sender = BUYER dan saya = SELLER → saya bisa aksi
-  // Jika sender = SELLER dan saya = BUYER → saya bisa aksi
   const canTakeAction = senderRole !== myRole;
 
   const handleCounterOffer = () => {
@@ -282,8 +279,6 @@ const ServiceNegoCard = ({
 
 // Service Card Component (untuk pesan biasa)
 const ServiceCard = ({ data }) => {
-  const isNegoCard = data.status === "Orderan Masuk!";
-
   return (
     <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
       <div className="relative">
@@ -309,35 +304,21 @@ const ServiceCard = ({ data }) => {
         {data.status && (
           <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-xs font-bold text-blue-700 text-center">
-              📦 {data.status}
+              💬 {data.status}
             </p>
           </div>
         )}
 
         <div className="flex flex-col gap-3">
           <div>
-            <p className="text-xs text-gray-500 mb-1">Harga Penawaran</p>
+            <p className="text-xs text-gray-500 mb-1">Harga</p>
             <div className="flex items-baseline gap-2">
               <p className="text-xl font-bold text-primary">{data.price}</p>
             </div>
           </div>
-          {isNegoCard ? (
-            <div className="flex gap-2 mt-2">
-              <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs font-bold">
-                Terima
-              </Button>
-              <Button className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-xs font-bold">
-                Tolak
-              </Button>
-              <Button className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg text-xs font-bold">
-                Nego
-              </Button>
-            </div>
-          ) : (
-            <Button className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-semibold">
-              Lihat Detail
-            </Button>
-          )}
+          <Button className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-semibold">
+            Lihat Detail
+          </Button>
         </div>
       </div>
     </div>
@@ -937,7 +918,7 @@ const ChatLayout = () => {
                       serviceName: serviceName,
                       serviceId: serviceId,
                       description: description,
-                      status: "Orderan Masuk!",
+                      status: "Tanya produk ini!",
                       price: `Rp ${price}`,
                       rating: 4.5,
                     };
