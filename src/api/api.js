@@ -127,10 +127,7 @@ api.interceptors.response.use(
           throw new Error("No access token found in refresh response");
         }
 
-        // ================================
-        // 🔥 PERBAIKAN PENTING
         // Decode token untuk ambil role BARU
-        // ================================
         let decodedUser = null;
         try {
           const decoded = jwtDecode(newAccessToken);
@@ -140,18 +137,15 @@ api.interceptors.response.use(
           console.warn("⚠️ Gagal decode access token:", decodeError);
         }
 
-        // ================================
         // SIMPAN TOKEN + USER YANG TERUPDATE
-        // ================================
         localStorage.setItem("accessToken", newAccessToken);
 
         if (decodedUser) {
           localStorage.setItem("user", JSON.stringify(decodedUser));
         }
 
-        // Update header Default
+        // Update header
         api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
-        // Update header untuk request yg gagal
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
         processQueue(null, newAccessToken);
@@ -160,21 +154,27 @@ api.interceptors.response.use(
         console.log("🔁 Retrying original request...");
         return api(originalRequest);
       } catch (refreshError) {
-        console.error("❌ Refresh token failed:", {
-          message: refreshError.message,
-          response: refreshError.response?.data,
-          status: refreshError.response?.status,
-        });
+        console.error("❌ Refresh token failed:", refreshError);
 
         processQueue(refreshError, null);
         isRefreshing = false;
 
+        // ✅ PERBAIKAN: Clear storage
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
 
+        // ✅ PERBAIKAN: Redirect berdasarkan current path
         if (typeof window !== "undefined") {
-          console.log("🔄 Redirecting to login...");
-          window.location.href = "/login";
+          const currentPath = window.location.pathname;
+          
+          // Jangan redirect kalau sudah di login page
+          if (!currentPath.includes('/login')) {
+            console.log("🔄 Redirecting to login...");
+            
+            // Redirect ke login dengan return URL
+            const returnUrl = encodeURIComponent(currentPath);
+            window.location.href = `/login?returnUrl=${returnUrl}`;
+          }
         }
 
         return Promise.reject(refreshError);

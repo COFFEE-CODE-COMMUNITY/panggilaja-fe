@@ -52,6 +52,7 @@ import {
 
 {/* import dummy orderan start */}
 import Orderan from "../../../../page/Order/dummy/Orderan";
+import ModalSwitchAccount from "../../Modal/ModalSwitchAccount";
 {/* import dummy orderan end */}
 
 const Header = () => {
@@ -82,6 +83,7 @@ const Header = () => {
   const [order, setOrder] = useState(false);
   const [header, setHeader] = useState(true);
   const [search, setSearch] = useState(urlSearchText || searchText);
+  const [statusChanges, setStatusChanges] = useState(false)
 
   {/* state order start */}
   const [orderActiveTab, setOrderActiveTab] = useState("proses");
@@ -144,7 +146,7 @@ const Header = () => {
   useEffect(() => {
     if (statusChange === "success") {
       dispatch(resetChangeAccountStatus());
-      navigate("/dashboard");
+      navigate('/dashboard')
     }
   }, [statusChange, dispatch, navigate]);
 
@@ -691,8 +693,9 @@ const Header = () => {
               {haveSellerAccount && (
                 <button
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() =>
-                    dispatch(changeAccount({ targetRole: "seller" }))
+                  onClick={() =>{
+                    setStatusChanges(true)
+                    setSidebarProfile(false)}
                   }
                 >
                   <FaUser className="text-gray-400 text-base" />
@@ -777,7 +780,7 @@ const Header = () => {
                 <button
                   className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors cursor-pointer"
                   onClick={() =>
-                    dispatch(changeAccount({ targetRole: "seller" }))
+                    setStatusChanges(true)
                   }
                 >
                   <FaUser className="text-gray-400 text-base" />
@@ -810,6 +813,16 @@ const Header = () => {
             </Button>
           </div>
         </div>
+      )}
+      {statusChanges && (
+        <ModalSwitchAccount 
+          onRedirect={() => {
+            dispatch(changeAccount({ targetRole: "seller" }))
+            setStatusChanges(false)
+          }}
+          destinationName={'seller dashboard'}
+          textSwitch={'Your account has been successfully switched to a seller account. You can now start managing your services.'}
+        />
       )}
     </>
   );

@@ -26,46 +26,46 @@ const StatCardOrder = () => {
     }
   })
   return (
-    <div class="grid grid-cols-3 gap-4 w-full">
-      <div class="bg-white p-8 rounded-lg shadow-md w-full">
-        <div class="flex justify-between w-full md:items-end">
-          <div class="flex flex-col">
-            <p class=" text-h5 font-bold text-gray-500 mb-3 md:mb-6">
+    <div className="grid grid-cols-3 gap-4 w-full">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full">
+        <div className="flex justify-between w-full md:items-end">
+          <div className="flex flex-col">
+            <p className=" text-h5 font-bold text-gray-500 mb-3 md:mb-6">
               Total Pesanan
             </p>
-            <p class="font-semibold text-xl md:text-3xl">
+            <p className="font-semibold text-xl md:text-3xl">
               {lengthAllOrder}
             </p>
           </div>
-          <p class="text-gray-500 font-thin">+122</p>
+          <p className="text-gray-500 font-thin">+122</p>
         </div>
       </div>
 
-      <div class="bg-white p-8 rounded-lg shadow-md w-full">
-        <div class="flex justify-between w-full md:items-end">
-          <div class="flex flex-col">
-            <p class="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full">
+        <div className="flex justify-between w-full md:items-end">
+          <div className="flex flex-col">
+            <p className="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
               Pesanan Diproses
             </p>
-            <p class="font-semibold text-xl md:text-3xl">
+            <p className="font-semibold text-xl md:text-3xl">
               {lengthProggressOrder}
             </p>
           </div>
-          <p class="text-gray-500 font-thin">-3.2%</p>
+          <p className="text-gray-500 font-thin">-3.2%</p>
         </div>
       </div>
 
-      <div class="bg-white p-8 rounded-lg shadow-md w-full">
-        <div class="flex justify-between w-full md:items-end">
-          <div class="flex flex-col">
-            <p class="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full">
+        <div className="flex justify-between w-full md:items-end">
+          <div className="flex flex-col">
+            <p className="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
               Pesanan Selesai
             </p>
-            <p class="font-semibold text-xl md:text-3xl">
+            <p className="font-semibold text-xl md:text-3xl">
               {lengthDoneOrder}
             </p>
           </div>
-          <p class="text-gray-500 font-thin">-3.2%</p>
+          <p className="text-gray-500 font-thin">-3.2%</p>
         </div>
       </div>
     </div>

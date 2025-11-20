@@ -18,12 +18,13 @@ import {
   selectDeleteSellerStatus,
   selectSelectedSeller,
 } from "../../../../features/sellerSlice";
+import ModalSwitchAccount from "../../Modal/ModalSwitchAccount";
 
 export const SidebarDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
+      
   const user = useSelector(selectCurrentUser);
   const sellerProfile = useSelector(selectSelectedSeller);
   const statusChange = useSelector(selectChangeAccountStatus);
@@ -32,6 +33,7 @@ export const SidebarDashboard = () => {
   const [modalProfile, setModalProfile] = useState(false);
   const [sidebar, setSidebar] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [statusChanges, setStatusChanges] = useState(false)
 
   const deleteSellerStatus = useSelector(selectDeleteSellerStatus);
   const deleteSellerMessage = useSelector(selectDeleteSellerMessage);
@@ -73,7 +75,7 @@ export const SidebarDashboard = () => {
 
   if (statusChange === "loading") {
     return (
-      <div className="z-100 bg-white justify-center items-center min-h-screen fixed w-full">
+      <div className="z-100 bg-white justify-center items-center h-screen fixed w-full flex">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
           <p className="mt-4 text-gray-600">Memuat data...</p>
@@ -83,6 +85,7 @@ export const SidebarDashboard = () => {
   }
 
   return (
+    <>
     <aside
       className={`bg-white md:flex hidden flex-col justify-between h-screen border-r border-gray-100 shadow-sm transition-all duration-300 ${
         isCollapsed ? "w-20" : "w-70 px-10"
@@ -396,7 +399,7 @@ export const SidebarDashboard = () => {
               <Button
                 variant="primary"
                 className="w-full text-white py-1 rounded-xl"
-                onClick={() => dispatch(changeAccount({ targetRole: "buyer" }))}
+                onClick={() => setStatusChanges(true)}
               >
                 Pindah Akun
               </Button>
@@ -452,5 +455,16 @@ export const SidebarDashboard = () => {
         </div>
       </div>
     </aside>
-  );
+    {statusChanges && (
+      <ModalSwitchAccount 
+        onRedirect={() => {
+          dispatch(changeAccount({ targetRole: "buyer" }))
+          setStatusChanges(false)
+        }}
+        destinationName={'home'}
+        textSwitch={'Your account has been successfully switched to a buyer account. You can now start search your favorite services.'}
+      />
+    )}
+    </>
+);
 };

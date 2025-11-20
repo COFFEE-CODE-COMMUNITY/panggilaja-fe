@@ -6,7 +6,7 @@ import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
 import { addService, getCategoryService, resetAddStatus, selectAddServiceError, selectAddServiceStatus, selectCategoryService, selectCategoryServiceStatus } from '../../../features/serviceSlice';
 import { useNavigate } from 'react-router-dom';
-import AddServiceStatusModal from '../../../components/modules/Modal/AddServiceStatusModal';
+import AddServiceStatusModal from '../../../components/modules/Modal/ModalAddService';
 
 const FormAddService = () => {
     const dispatch = useDispatch();
@@ -28,6 +28,7 @@ const FormAddService = () => {
     const [deskripsi, setDeskripsi] = useState(''); //  
     const [kategori_id, setKategori_Id] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [statusAdd, setStatusAdd] = useState(false)
 
     useEffect(() => {
         console.log('👤 Current User:', user)
@@ -112,8 +113,6 @@ const FormAddService = () => {
 
     useEffect(() => {
         if(status === 'success') {
-            alert('Jasa berhasil ditambahkan!')
-            
             setFile(null)
             setPreview(null)
             setNama_Jasa('')
@@ -123,11 +122,7 @@ const FormAddService = () => {
             setKategori_Id('')
             
             dispatch(resetAddStatus())
-            
-            // Navigate
-            setTimeout(() => {
-                navigate('/dashboard/manage-services')
-            }, 500)
+        
         }
         
         if(status === 'error') {
@@ -268,7 +263,10 @@ const FormAddService = () => {
                 </div>
             </form>
             
-            {status === 'success' && <AddServiceStatusModal/>}
+            {statusAdd && <AddServiceStatusModal onBack={() => {
+                navigate('/dashboard/manage-services')
+                setStatusAdd(false)
+            }}/>}
         </>
     )
 }

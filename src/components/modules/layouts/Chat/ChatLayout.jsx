@@ -12,6 +12,7 @@ import {
   FaPaperPlane,
   FaStar,
   FaEllipsisV,
+  FaUser,
 } from "react-icons/fa";
 import axiosInstance from "../../../utils/axios";
 import {
@@ -323,11 +324,9 @@ const ChatLayout = () => {
 
   const handleSelectChat = (conversation) => {
     setChatMobile(true);
-    {user?.active_role === 'buyer' ? (
-      navigate(`/chat/${conversation.id}`)
-    ) : (
-      navigate(`/dashboard/chat/${conversation.id}`)
-    )}
+    user?.active_role === 'buyer' 
+    ? navigate(`/chat/${conversation.id}`)
+    : navigate(`/dashboard/chat/${conversation.id}`);
   };
 
   const handleBackToHome = () => navigate("/");
@@ -381,7 +380,7 @@ const ChatLayout = () => {
               <button
                 key={conv.id}
                 onClick={() => handleSelectChat(conv)}
-                className={`w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 ${
+                className={`cursor-pointer w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 ${
                   selectedChat?.id === conv.id ? "bg-primary/5" : ""
                 }`}
               >
@@ -447,13 +446,22 @@ const ChatLayout = () => {
                   <FaArrowLeft className="text-gray-600" />
                 </button>
                 <div className="relative">
-                  <img
-                    src={selectedChat.avatar}
-                    alt={selectedChat.name}
-                    className="w-10 h-10 rounded-full"
-                  />
-                  {selectedChat.isOnline && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                  {setSelectedChat.avatar ? (
+                    <>
+                      <img
+                        src={selectedChat.avatar}
+                        className="w-10 h-10 rounded-full bg-amber-500"
+                      />
+                      {selectedChat.isOnline && (
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                      )}
+                    </>
+                  ) : (
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center border-1 border-gray-200"
+                    >
+                      <FaUser size={25}/>
+                    </div>
                   )}
                 </div>
                 <div>

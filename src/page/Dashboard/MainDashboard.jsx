@@ -25,10 +25,15 @@ const DashboardUtama = () => {
     totalServices: 0,
   });
 
+  let lengthService = 0
+  services?.data?.map(() => {
+    lengthService += 1
+  })
+
   useEffect(() => {
     if (user?.id_seller) {
-      dispatch(getOrderBySellerId(user.id_seller));
-      dispatch(getAllServicesByIdSeller(user.id_seller));
+      dispatch(getOrderBySellerId(user?.id_seller));
+      dispatch(getAllServicesByIdSeller(user?.id_seller));
     }
   }, [dispatch, user?.id_seller]);
 
@@ -42,20 +47,20 @@ const DashboardUtama = () => {
       ).length;
 
       setStats({
-        totalOrders: orders.data.length || 0,
+        totalOrders: orders.data.length,
         inProgressOrders: inProgress,
         completedOrders: completed,
-        totalServices: services.data.length || 0,
+        totalServices: services.data.length,
       });
     }
-  }, [orders, services]);
+  }, [orders?.data, services?.data]);
 
   const latestOrders = orders?.data?.slice(0, 5) || [];
 
   const serviceMap = new Map(
     services?.data?.map((service) => [service.id, service]) || []
   );
-  console.log(user)
+  console.log(stats)
   return (
     <div className="w-full px-[15px] py-[10px] flex flex-col gap-6 min-h-screen sm:mb-0 mb-20">
       {/* Welcome Section */}
@@ -174,7 +179,7 @@ const DashboardUtama = () => {
             Total Layanan
           </h3>
           <p className="text-3xl font-bold text-gray-800">
-            {stats.totalServices}
+            {lengthService}
           </p>
         </div>
       </div>
