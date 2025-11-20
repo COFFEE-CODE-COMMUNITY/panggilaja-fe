@@ -73,7 +73,7 @@ const formatTime = (timestamp) => {
   return date.toLocaleDateString("id-ID", dateOptions);
 };
 
-// 🔥 REGEX PATTERNS - UPDATED WITH ServiceID
+// REGEX PATTERNS
 const autoMessageRegex =
   /Halo, saya tertarik dengan layanan "(.+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Deskripsi: ([^\)]+)\) \(Gambar: (.+?)\)/;
 
@@ -83,8 +83,13 @@ const negoMessageRegex =
 const acceptNegoRegex =
   /Penawaran Anda sebesar Rp (.+?) untuk layanan "(.+?)" DITERIMA! 🎉/;
 
-// 🆕 ACCEPT NEGO CONFIRMATION CARD
-const AcceptNegoCard = ({ serviceName, agreedPrice, onConfirm }) => {
+// ACCEPT NEGO CONFIRMATION CARD
+const AcceptNegoCard = ({
+  serviceName,
+  agreedPrice,
+  onConfirm,
+  isConfirmed,
+}) => {
   return (
     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border-2 border-green-200 overflow-hidden shadow-lg max-w-sm">
       <div className="p-5">
@@ -108,23 +113,34 @@ const AcceptNegoCard = ({ serviceName, agreedPrice, onConfirm }) => {
           <p className="text-2xl font-bold text-green-600">Rp {agreedPrice}</p>
         </div>
 
-        <button
-          onClick={onConfirm}
-          className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-md flex items-center justify-center gap-2"
-        >
-          <FaCheck size={16} />
-          Konfirmasi & Lanjutkan Pemesanan
-        </button>
+        {!isConfirmed ? (
+          <>
+            <button
+              onClick={onConfirm}
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-md flex items-center justify-center gap-2"
+            >
+              <FaCheck size={16} />
+              Konfirmasi & Lanjutkan Pemesanan
+            </button>
 
-        <p className="text-xs text-center text-gray-500 mt-3">
-          💡 Klik untuk melanjutkan ke halaman pemesanan
-        </p>
+            <p className="text-xs text-center text-gray-500 mt-3">
+              💡 Klik untuk melanjutkan ke halaman pemesanan
+            </p>
+          </>
+        ) : (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
+            <p className="text-sm text-gray-600 font-medium flex items-center justify-center gap-2">
+              <FaCheck className="text-green-600" />
+              Pesanan telah dibuat
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-// 🆕 SERVICE NEGO CARD COMPONENT (DENGAN isSeller SUPPORT)
+// SERVICE NEGO CARD COMPONENT
 const ServiceNegoCard = ({
   data,
   onAccept,
@@ -195,7 +211,7 @@ const ServiceNegoCard = ({
           </div>
         </div>
 
-        {/* ✅ Action Buttons - SELALU TAMPIL, tapi disabled jika bukan giliran user */}
+        {/* Action Buttons */}
         {canTakeAction ? (
           !showNegoInput ? (
             <div className="flex gap-2">
@@ -255,7 +271,6 @@ const ServiceNegoCard = ({
             </div>
           )
         ) : (
-          // ✅ Tampilan untuk pengirim pesan (read-only)
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
             <p className="text-sm text-gray-600 font-medium flex items-center justify-center gap-2">
               <span className="animate-pulse">⏳</span>
@@ -277,7 +292,7 @@ const ServiceNegoCard = ({
   );
 };
 
-// Service Card Component (untuk pesan biasa)
+// Service Card Component
 const ServiceCard = ({ data }) => {
   return (
     <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
@@ -358,11 +373,12 @@ const ChatLayout = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [confirmedMessageIds, setConfirmedMessageIds] = useState([]);
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
 
-  // ===== USEEFFECT #1: LOAD CONTACTS =====
+  // USEEFFECT #1: LOAD CONTACTS
   useEffect(() => {
     if (!myId) return;
 
@@ -386,7 +402,7 @@ const ChatLayout = () => {
     location.pathname,
   ]);
 
-  // ===== USEEFFECT #2: FETCH MESSAGES =====
+  // USEEFFECT #2: FETCH MESSAGES
   useEffect(() => {
     const fetchData = async () => {
       if (!partnerId || !token) return;
@@ -425,7 +441,7 @@ const ChatLayout = () => {
     fetchData();
   }, [partnerId, token, isBuyer]);
 
-  // ===== USEEFFECT #3: UPDATE SELECTED CHAT =====
+  // USEEFFECT #3: UPDATE SELECTED CHAT
   useEffect(() => {
     if (partnerId && conversations.length > 0) {
       const selected = conversations.find(
@@ -437,7 +453,7 @@ const ChatLayout = () => {
     }
   }, [partnerId, conversations]);
 
-  // ===== USEEFFECT #4: JOIN CHAT ROOM =====
+  // USEEFFECT #4: JOIN CHAT ROOM
   useEffect(() => {
     if (!partnerId || !myId) return;
 
@@ -453,7 +469,7 @@ const ChatLayout = () => {
     };
   }, [partnerId, myId, isBuyer]);
 
-  // ===== USEEFFECT #5: LISTEN TO MESSAGES IN ACTIVE CHAT =====
+  // USEEFFECT #5: LISTEN TO MESSAGES IN ACTIVE CHAT
   useEffect(() => {
     if (!partnerId || !myId) return;
 
@@ -500,7 +516,7 @@ const ChatLayout = () => {
     };
   }, [partnerId, myId, isBuyer]);
 
-  // ===== USEEFFECT #6: AUTO SCROLL =====
+  // USEEFFECT #6: AUTO SCROLL
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -535,13 +551,15 @@ const ChatLayout = () => {
 
   const handleBackToHome = () => navigate("/");
 
-  const handleCreateOrder = async (orderData) => {
+  const handleCreateOrder = async (orderData, messageId) => {
     setIsCreatingOrder(true);
+
+    // Mark as confirmed immediately for better UX
+    setConfirmedMessageIds((prev) => [...prev, messageId]);
 
     try {
       console.log("📦 Creating order with data:", orderData);
 
-      // 🔥 Format harga untuk pesan_tambahan
       const agreedPriceFormatted =
         orderData.agreedPrice.toLocaleString("id-ID");
 
@@ -561,22 +579,22 @@ const ChatLayout = () => {
       if (response.data.status === "success") {
         const orderId = response.data.data.id;
 
-        // Kirim konfirmasi ke chat
+        // Send confirmation to chat
         const confirmMessage = `✅ Pesanan telah dibuat! Order ID: #${orderId}`;
         socket.emit("send_message", {
-          id_buyer: myId,
-          id_seller: partnerId,
+          id_buyer: isBuyer ? myId : partnerId,
+          id_seller: isBuyer ? partnerId : myId,
           text: confirmMessage,
           sender_role: "BUYER",
         });
 
-        // Navigate ke halaman order detail
         alert("Pesanan berhasil dibuat!");
-        // navigate(`/buyer/orders/${orderId}`);
       }
     } catch (error) {
       console.error("❌ Error creating order:", error);
       alert(error.response?.data?.message || "Gagal membuat pesanan");
+      // Remove from confirmed on error
+      setConfirmedMessageIds((prev) => prev.filter((id) => id !== messageId));
     } finally {
       setIsCreatingOrder(false);
     }
@@ -727,16 +745,36 @@ const ChatLayout = () => {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
-                messages.map((msg) => {
+                messages.map((msg, index) => {
+                  // Check for Accept Nego message
                   const acceptNegoMatch = acceptNegoRegex.exec(msg.text);
 
                   if (acceptNegoMatch && isBuyer) {
                     const agreedPrice = acceptNegoMatch[1];
                     const serviceName = acceptNegoMatch[2];
 
+                    // Check if already confirmed
+                    let isAlreadyConfirmed = false;
+                    for (let i = index + 1; i < messages.length; i++) {
+                      const nextMsg = messages[i];
+                      if (
+                        nextMsg.sender === "user" &&
+                        nextMsg.text.includes("✅ Pesanan telah dibuat!")
+                      ) {
+                        isAlreadyConfirmed = true;
+                        break;
+                      }
+                    }
+
+                    // Also check confirmedMessageIds state
+                    if (confirmedMessageIds.includes(msg.id)) {
+                      isAlreadyConfirmed = true;
+                    }
+
                     const handleConfirmOrder = () => {
                       console.log("✅ Buyer mengkonfirmasi pesanan");
 
+                      // Find the last nego message for this service
                       const lastNegoMessage = [...messages]
                         .reverse()
                         .find((m) => {
@@ -757,7 +795,7 @@ const ChatLayout = () => {
                         };
 
                         console.log("📦 Creating order:", orderData);
-                        handleCreateOrder(orderData);
+                        handleCreateOrder(orderData, msg.id);
                       } else {
                         alert(
                           "Data layanan tidak ditemukan. Silakan coba lagi."
@@ -779,6 +817,7 @@ const ChatLayout = () => {
                             serviceName={serviceName}
                             agreedPrice={agreedPrice}
                             onConfirm={handleConfirmOrder}
+                            isConfirmed={isAlreadyConfirmed}
                           />
                           <p
                             className={`text-xs mt-1 text-gray-500 ${
@@ -792,6 +831,7 @@ const ChatLayout = () => {
                     );
                   }
 
+                  // Check for Nego message
                   const negoMessageMatch = negoMessageRegex.exec(msg.text);
 
                   if (negoMessageMatch) {
@@ -826,7 +866,7 @@ const ChatLayout = () => {
 
                     const handleAcceptNego = () => {
                       console.log("✅ Nego diterima");
-                      const acceptMessage = `Penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" DITERIMA! 🎉 Silakan lanjutkan untuk pembayaran.`;
+                      const acceptMessage = `Penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" DITERIMA! 🎉`;
                       socket.emit("send_message", {
                         id_buyer: isBuyer ? myId : partnerId,
                         id_seller: isBuyer ? partnerId : myId,
@@ -899,7 +939,7 @@ const ChatLayout = () => {
                     );
                   }
 
-                  // ✅ 3️⃣ CEK AUTO MESSAGE (tanpa nego)
+                  // Check for Auto message
                   const autoMessageMatch = autoMessageRegex.exec(msg.text);
 
                   if (autoMessageMatch) {
@@ -942,7 +982,7 @@ const ChatLayout = () => {
                     );
                   }
 
-                  // ✅ 4️⃣ TEXT MESSAGE BIASA
+                  // Regular text message
                   return (
                     <div
                       key={msg.id}
