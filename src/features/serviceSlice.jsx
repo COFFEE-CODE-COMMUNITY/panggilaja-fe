@@ -51,9 +51,12 @@ export const getReviewServicesById = createAsyncThunk(
   "services/getReviewServicesById",
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/reviews/seller/${id}`);
+      console.log(`Fetching reviews for ID: "${id}"`);
+      const res = await api.get(`/review/service/${id}`);
+      console.log("Review fetch response data:", res.data);
       return res.data || res.data;
     } catch (err) {
+      console.error("Review fetch error:", err);
       return rejectWithValue(
         err.response?.data?.message || "Gagal mengambil review"
       );

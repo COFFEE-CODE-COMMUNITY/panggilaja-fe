@@ -68,11 +68,7 @@ const InformationService = ({
     }
   }, [idSeller]);
 
-  useEffect(() => {
-    if (idProvider && token) {
-      dispatch(getReviewServicesById(idProvider));
-    }
-  }, [dispatch, idProvider]);
+
 
   const handleAddFavorite = () => {
     dispatch(addFavoriteService(idService));
@@ -235,7 +231,7 @@ const InformationService = ({
           </div>
         </div>
       </div>
-      <ReviewService />
+
     </div>
   );
 };

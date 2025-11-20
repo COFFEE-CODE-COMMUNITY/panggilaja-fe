@@ -43,6 +43,7 @@ import OrderMobile from "./page/Order/OrderMobile";
 import NegoPage from "./page/Nego/NegoPage";
 import ReviewPage from "./page/Review/Index";
 import DashboardUtama from "./page/Dashboard/MainDashboard";
+import TestingPage from "./page/TestingPage";
 
 export default function Router() {
   return (
@@ -69,7 +70,9 @@ export default function Router() {
             <Route path="photos" element={<ProfilePhotos />} />
           </Route>
 
-          <Route path="service/:productId/review" element={<ReviewPage />} />
+          <Route path="testing" element={<TestingPage />} />
+
+          <Route path="/service/review/:orderId" element={<ReviewPage />} />
 
           <Route
             path="setting"
@@ -124,7 +127,7 @@ export default function Router() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<DashboardUtama/>}/>
+          <Route index element={<DashboardUtama />} />
 
           <Route path="manage-order" element={<ManageOrderLayout />}>
             <Route index element={<TableAllOrder />} />
