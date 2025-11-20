@@ -9,7 +9,6 @@ const ReviewCard = ({profileImage, name, date, rating, reviewText}) => {
         <div>
             <img 
                 src={profileImage || "/default-avatar.png"} 
-                alt={name}
                 className='lg:w-20 md:w-30 w-40 aspect-square rounded-full bg-gray-200 object-cover'
             />
         </div>
