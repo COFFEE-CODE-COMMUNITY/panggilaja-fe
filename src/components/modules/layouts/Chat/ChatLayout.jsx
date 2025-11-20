@@ -78,7 +78,7 @@ const autoMessageRegex =
   /Halo, saya tertarik dengan layanan "(.+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Deskripsi: ([^\)]+)\) \(Gambar: (.+?)\)/;
 
 const negoMessageRegex =
-  /Halo, saya tertarik dengan layanan "(.+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Nego: Rp ([^\)]+)\) \(Deskripsi: ([^\)]+)\) \(Gambar: (.+?)\)/;
+  /Halo, saya tertarik dengan layanan "(.+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Nego: Rp ([^\)]+)\) \(Pesan: (.*?)\) \(Deskripsi: ([^\)]+)\) \(Gambar: (.+?)\)/;
 
 const acceptNegoRegex =
   /Penawaran Anda sebesar Rp (.+?) untuk layanan "(.+?)" DITERIMA! 🎉/;
@@ -171,7 +171,7 @@ const ServiceNegoCard = ({
           {data.serviceName}
         </h3>
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {data.description}
+          Ket: {data.description || "Tidak ada detail kebutuhan"}
         </p>
 
         {/* Price Section with Strike-through */}
@@ -357,7 +357,7 @@ const ChatLayout = () => {
   const [messages, setMessages] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [messagesLoading, setMessagesLoading] = useState(false);
-  const [setIsCreatingOrder] = useState(false);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
@@ -535,7 +535,6 @@ const ChatLayout = () => {
 
   const handleBackToHome = () => navigate("/");
 
-  // 🆕 HANDLER CREATE ORDER
   const handleCreateOrder = async (orderData) => {
     setIsCreatingOrder(true);
 
@@ -585,7 +584,6 @@ const ChatLayout = () => {
 
   return (
     <div className="h-screen w-full flex bg-gray-50">
-      {/* Sidebar - Chat List */}
       <div
         className={`h-full sm:w-80 w-full bg-white border-r border-gray-200 flex flex-col ${
           chatMobile ? "hidden sm:flex" : "flex"
@@ -730,7 +728,6 @@ const ChatLayout = () => {
                 </div>
               ) : (
                 messages.map((msg) => {
-                  // ✅ 1️⃣ CEK ACCEPT NEGO MESSAGE (Konfirmasi untuk Buyer)
                   const acceptNegoMatch = acceptNegoRegex.exec(msg.text);
 
                   if (acceptNegoMatch && isBuyer) {
@@ -753,7 +750,7 @@ const ChatLayout = () => {
                         );
 
                         const orderData = {
-                          serviceId: negoMatch[2], // 🆕 ServiceID dari regex
+                          serviceId: negoMatch[2],
                           agreedPrice: parseFloat(
                             agreedPrice.replace(/\./g, "").replace(",", ".")
                           ),
@@ -795,7 +792,6 @@ const ChatLayout = () => {
                     );
                   }
 
-                  // ✅ 2️⃣ CEK NEGO MESSAGE (untuk Buyer & Seller)
                   const negoMessageMatch = negoMessageRegex.exec(msg.text);
 
                   if (negoMessageMatch) {
@@ -803,20 +799,20 @@ const ChatLayout = () => {
                     const serviceId = negoMessageMatch[2];
                     const originalPrice = negoMessageMatch[3];
                     const negoPrice = negoMessageMatch[4];
-                    const description = negoMessageMatch[5];
-                    const imageUrl = negoMessageMatch[6];
+                    const pesanBuyer = negoMessageMatch[5];
+                    const description = negoMessageMatch[6];
+                    const imageUrl = negoMessageMatch[7];
 
                     const negoCardData = {
                       image: imageUrl,
                       serviceName: serviceName,
                       serviceId: serviceId,
-                      description: description,
+                      description: pesanBuyer || description,
                       originalPrice: `Rp ${originalPrice}`,
                       negoPrice: `Rp ${negoPrice}`,
                       rating: 4.5,
                     };
 
-                    // ✅ Tentukan siapa pengirim pesan ini
                     const messageSenderRole =
                       msg.sender === "user"
                         ? isBuyer
@@ -828,7 +824,6 @@ const ChatLayout = () => {
 
                     const currentUserRole = isBuyer ? "BUYER" : "SELLER";
 
-                    // ✅ Handler untuk aksi nego
                     const handleAcceptNego = () => {
                       console.log("✅ Nego diterima");
                       const acceptMessage = `Penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" DITERIMA! 🎉 Silakan lanjutkan untuk pembayaran.`;
@@ -861,8 +856,9 @@ const ChatLayout = () => {
                       const formattedNewPrice =
                         newPrice.toLocaleString("id-ID");
 
-                      // 🆕 Include ServiceID in counter offer
-                      const counterNegoMessage = `Halo, saya tertarik dengan layanan "${serviceName}". (ServiceID: ${serviceId}) (Harga: Rp ${formattedOriginalPrice}) (Nego: Rp ${formattedNewPrice}) (Deskripsi: ${description}) (Gambar: ${imageUrl})`;
+                      const counterNegoMessage = `Halo, saya tertarik dengan layanan "${serviceName}". (ServiceID: ${serviceId}) (Harga: Rp ${formattedOriginalPrice}) (Nego: Rp ${formattedNewPrice}) (Pesan: ${
+                        pesanBuyer || description
+                      }) (Deskripsi: ${description}) (Gambar: ${imageUrl})`;
 
                       socket.emit("send_message", {
                         id_buyer: isBuyer ? myId : partnerId,
