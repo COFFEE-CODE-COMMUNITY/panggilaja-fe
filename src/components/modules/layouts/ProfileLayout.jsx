@@ -72,7 +72,7 @@ const ProfileLayout = () => {
                     <p className='px-[10px] py-[5px] border-2 border-gray-200 rounded-[20px] text-h6 w-fit'>{skill}</p>
                   ))}
                 </div>
-                <Button variant='primary' className='md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] py-[10px] w-full' to={`/chat/${seller?.id_seller}`}>Kontak Saya</Button>
+                <Button variant='primary' className='md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] py-[10px] w-full flex justify-center' to={`/chat/${seller?.id_seller}`}>Kontak Saya</Button>
               </div>
             </div>
             <div className='flex flex-col sm:w-5/7 w-full sm:my-0 my-[10px]'>

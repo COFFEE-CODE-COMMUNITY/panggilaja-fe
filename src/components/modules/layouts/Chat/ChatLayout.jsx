@@ -481,7 +481,7 @@ const ChatLayout = () => {
             {/* Messages Area */}
             <div
               ref={chatContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"
+              className={`flex-1 overflow-hidden p-4 space-y-4 bg-gray-50`}
             >
               {messagesLoading ? (
                 <div className="flex items-center justify-center h-full">
@@ -561,7 +561,7 @@ const ChatLayout = () => {
             </div>
 
             {/* Input Area */}
-            <div className="bg-white border-t border-gray-200 p-4">
+            <div className={`bg-white border-t border-gray-200 p-4 ${location.pathname.includes('dashboard') ? 'mb-15' : ''}`}>
               <form
                 onSubmit={handleSendMessage}
                 className="flex items-center gap-3"

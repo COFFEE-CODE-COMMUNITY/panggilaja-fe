@@ -7,6 +7,7 @@ import Input from '../../../components/common/Input';
 import { addService, getCategoryService, resetAddStatus, selectAddServiceError, selectAddServiceStatus, selectCategoryService, selectCategoryServiceStatus } from '../../../features/serviceSlice';
 import { useNavigate } from 'react-router-dom';
 import AddServiceStatusModal from '../../../components/modules/Modal/ModalAddService';
+import ModalServiceAdded from '../../../components/modules/Modal/ModalAddService';
 
 const FormAddService = () => {
     const dispatch = useDispatch();
@@ -29,6 +30,7 @@ const FormAddService = () => {
     const [kategori_id, setKategori_Id] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [statusAdd, setStatusAdd] = useState(false)
+    const [modalAdd, setModalAdd] = useState(false)
 
     useEffect(() => {
         console.log('👤 Current User:', user)
@@ -122,7 +124,7 @@ const FormAddService = () => {
             setKategori_Id('')
             
             dispatch(resetAddStatus())
-        
+            setModalAdd(true)
         }
         
         if(status === 'error') {
@@ -251,18 +253,13 @@ const FormAddService = () => {
                         className='w-full text-white py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90'
                         disabled={status === 'loading' || isSubmitting}
                     >
-                        {status === 'loading' ? (
-                            <span className='flex items-center justify-center gap-2'>
-                                <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
-                                Menambahkan...
-                            </span>
-                        ) : (
-                            'Tambahkan Jasa'
-                        )}
+                        Tambahkan Jasa
                     </Button>
                 </div>
             </form>
-            
+            {modalAdd && (
+                <ModalServiceAdded onBack={() => navigate('/dashboard/manage-services')}/>
+            )}
             {statusAdd && <AddServiceStatusModal onBack={() => {
                 navigate('/dashboard/manage-services')
                 setStatusAdd(false)

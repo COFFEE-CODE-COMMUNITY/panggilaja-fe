@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import InputForm from "../../../components/modules/form/InputForm";
 import Input from "../../../components/common/Input";
 import Button from "../../../components/common/Button";
+import ModalServiceAdded from "../../../components/modules/Modal/ModalAddService";
 
 
 function TambahJasaForm() { 
@@ -28,6 +29,7 @@ function TambahJasaForm() {
     const [deskripsi, setDeskripsi] = useState(''); //  
     const [kategori_id, setKategori_Id] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [modalAdd, setModalAdd] = useState(false)
 
     useEffect(() => {
         if(!categories?.data){
@@ -101,6 +103,7 @@ function TambahJasaForm() {
         formData.append('data', JSON.stringify(serviceData));
         
         setIsSubmitting(true)
+        setModalAdd(true)
         dispatch(addService(formData));
     };  
 
@@ -117,10 +120,7 @@ function TambahJasaForm() {
             setKategori_Id('')
                         
             // Navigate
-            setTimeout(() => {
-                navigate('/dashboard/manage-services') 
-            }, 50)
-
+            setModalAdd(false)
             dispatch(resetAddStatus())
 
         }
@@ -259,6 +259,9 @@ function TambahJasaForm() {
                         )}
                     </Button>
                 </div>
+                {modalAdd && (
+                    <ModalServiceAdded onBack={() => navigate('/dashboard')}/>
+                )}
             </form>
             
         </>

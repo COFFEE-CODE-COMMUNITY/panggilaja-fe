@@ -1,19 +1,75 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom'
-import { changeAccount, selectCurrentUser } from '../../../../features/authSlice';
+import { changeAccount, selectChangeAccountStatus, selectCurrentUser } from '../../../../features/authSlice';
 import { deleteSellerById, selectSelectedSeller } from '../../../../features/sellerSlice';
 import Button from '../../../common/Button';
+import ModalSwitchAccount from '../../Modal/ModalSwitchAccount';
 
 const BottombarDashboard = () => {
     const user = useSelector(selectCurrentUser);
     const dispatch = useDispatch();
     const sellerProfile = useSelector(selectSelectedSeller);
-
+    const statusChange = useSelector(selectChangeAccountStatus);
+    const [statusChanges, setStatusChanges] = useState(false)
     const [modal, setModal] = useState(false)
   return (
     <div className='fixed bottom-0 md:hidden w-full py-2 bg-white z-100'>
       <ul className='flex justify-evenly items-center'>
+        <li>
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
+                  ${
+                    isActive
+                      ? "text-primary font-semibold"
+                      : "text-gray-500 hover:text-primary"
+                  }`
+            }
+          >
+            <span className="flex flex-col items-center">
+              <svg
+                className="stroke-gray-500 group-hover:stroke-white"
+                width="24"
+                height="25"
+                viewBox="0 0 24 25"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M21 4.77246H3C2.58579 4.77246 2.25 5.14556 2.25 5.60579V18.9391C2.25 19.3994 2.58579 19.7725 3 19.7725H21C21.4142 19.7725 21.75 19.3994 21.75 18.9391V5.60579C21.75 5.14556 21.4142 4.77246 21 4.77246Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M15.75 16.0225H18.75"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M11.25 16.0225H12.75"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M2.25 9.35645H21.75"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Dashboard
+            </span>
+          </NavLink>
+        </li>
         <li>
           <NavLink
             to="manage-order"
@@ -219,7 +275,8 @@ const BottombarDashboard = () => {
                 <Button
                   variant="primary"
                   className="w-full text-white py-1 rounded-xl"
-                  onClick={() => dispatch(changeAccount({ targetRole: "buyer" }))}
+                  // onClick={() => dispatch(changeAccount({ targetRole: "buyer" }))}
+                  onClick={() => setStatusChanges(true)}
                 >
                   Pindah Akun
                 </Button>
@@ -233,6 +290,16 @@ const BottombarDashboard = () => {
             />
         </li>
       </ul>
+      {statusChanges && (
+        <ModalSwitchAccount 
+          onRedirect={() => {
+            dispatch(changeAccount({ targetRole: "buyer" }))
+            setStatusChanges(false)
+          }}
+          destinationName={'home'}
+          textSwitch={'Your account has been successfully switched to a buyer account. You can now start search your favorite services.'}
+        />
+      )}
     </div>
   )
 }

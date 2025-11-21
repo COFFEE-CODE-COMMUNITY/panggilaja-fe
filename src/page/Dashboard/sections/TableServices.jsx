@@ -22,7 +22,6 @@ const TableServices = () => {
 
     const statusDelete = useSelector(selectDeleteServiceStatus)
 
-    console.log(deleteModal)
     const findServiceSeller = servicesSeller?.data?.filter((service) => service?.nama_jasa?.toLowerCase().includes(search.toLowerCase()))
 
     const toggleModal = (serviceId) => {
@@ -41,6 +40,7 @@ const TableServices = () => {
                 dispatch(getAllServicesByIdSeller(user?.id_seller)); 
                 dispatch(resetDeleteStatus())
             }
+            setDeleteModal(false)
         }
     }, [dispatch, statusDelete, user?.id_seller]) 
 
@@ -143,6 +143,8 @@ const TableServices = () => {
                             ))
                         ) : (
                             servicesSeller?.data.map((service) => (
+                                <>
+                                
                                 <tr key={service.id} className="border-t border-gray-400 ">
                                     <td className="px-4 py-3 w-[20%]">
                                         <div className="flex items-center space-x-2 w-full">
@@ -202,14 +204,18 @@ const TableServices = () => {
                                         </div>
                                     </td>
                                 </tr>                
+                                {deleteModal && (
+                                    <ModalDeleteService 
+                                        onSubmit={() => dispatch(deleteService(service.id))}
+                                        onCancel={() => setDeleteModal(false)}
+                                    />
+                                )}
+                                </>
                             ))
                         )}
                     </tbody>
                 </table>
             </div>
-            {deleteModal && (
-                <ModalDeleteService/>
-            )}
         </>
     )
 }

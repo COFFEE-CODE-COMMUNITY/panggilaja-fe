@@ -17,14 +17,7 @@ const TableIncomingOrder = () => {
     const [openDropdown, setOpenDropdown] = useState(null)
     const updateStatus = useSelector(selectUpdateOrderStatus)
     const updateError = useSelector(selectUpdateOrderError)
-    
-    useEffect(() => {
-        if (user && user.id_seller) {
-            if (ordersStatus === 'idle') {
-                dispatch(getOrderBySellerId(user.id_seller));
-            }
-        }
-    }, [dispatch, ordersStatus, user]);
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {

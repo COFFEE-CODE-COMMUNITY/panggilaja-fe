@@ -14,7 +14,7 @@ const ModalServiceAdded = ({ onBack }) => {
                   <button 
                     onClick={onBack}
                     type="button" 
-                    className="bg-primary text-white box-border border border-transparent hover:bg-primary-strong focus:ring-4 focus:ring-primary-medium shadow-xs font-medium leading-5 rounded-base text-sm px-6 py-2.5 focus:outline-none">
+                    className="hover:bg-primary/80 cursor-pointer bg-primary text-white box-border border border-transparent hover:bg-primary-strong focus:ring-4 focus:ring-primary-medium shadow-xs font-medium leading-5 rounded-base text-sm px-6 py-2.5 focus:outline-none">
                     Back to Manage Services
                   </button>
               </div>

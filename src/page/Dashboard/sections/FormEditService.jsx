@@ -6,6 +6,7 @@ import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
 import { addService, editService, getCategoryService, resetEditStatus, selectAddServiceStatus, selectCategoryService, selectEditServicesServiceError, selectEditServicesServiceStatus } from '../../../features/serviceSlice';
 import { useNavigate } from 'react-router-dom';
+import ModalEditService from '../../../components/modules/Modal/ModalEditService';
 
 const FormEditService = ({serviceName, basePrice, topPrice, description, category, id, image}) => {
     const dispatch = useDispatch();
@@ -21,6 +22,7 @@ const FormEditService = ({serviceName, basePrice, topPrice, description, categor
     const [base_price, setBase_Price] = useState(basePrice);
     const [top_price, setTop_Price] = useState(topPrice);
     const [deskripsi, setDeskripsi] = useState(description);
+    const [modalEdit, setModalEdit] = useState(false);
     
     useEffect(() => {
         if(!categories?.data){
@@ -47,13 +49,11 @@ const FormEditService = ({serviceName, basePrice, topPrice, description, categor
         };
                 
         dispatch(editService({id, data : serviceData}));
-        
+        setModalEdit(true)
     };
 
     useEffect(() => {
         if(status === 'success'){
-            alert('Data berhasil masuk')
-            navigate('/dashboard/manage-services')
             dispatch(resetEditStatus())
         }
     },[status])
@@ -167,6 +167,9 @@ const FormEditService = ({serviceName, basePrice, topPrice, description, categor
                     )}
                 </Button>
             </div>
+            {modalEdit && (
+                <ModalEditService onBack={() => navigate('/dashboard/manage-services')}/>
+            )}
         </form>
     )
 }

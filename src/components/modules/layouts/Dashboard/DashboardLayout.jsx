@@ -34,7 +34,7 @@ const DashboardLayout = () => {
     <div className='flex relative h-screen'>
       <SidebarDashboard/>
       <BottombarDashboard/>
-      <main className={`flex-1 overflow-y-auto lg:px-[15px] lg:py-[10px] md:px-[10px] md:py-[5px] px-[5px] py-[5px]`}>
+      <main className={`flex-1 overflow-y-auto`}>
         <Outlet />
       </main>
     </div>

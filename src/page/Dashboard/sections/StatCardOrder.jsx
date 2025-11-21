@@ -27,7 +27,7 @@ const StatCardOrder = () => {
   })
   return (
     <div className="grid grid-cols-3 gap-4 w-full">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full">
+      <div className="bg-white lg:p-8 md:p-6 p-4 rounded-lg shadow-md w-full">
         <div className="flex justify-between w-full md:items-end">
           <div className="flex flex-col">
             <p className=" text-h5 font-bold text-gray-500 mb-3 md:mb-6">
@@ -37,11 +37,10 @@ const StatCardOrder = () => {
               {lengthAllOrder}
             </p>
           </div>
-          <p className="text-gray-500 font-thin">+122</p>
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-lg shadow-md w-full">
+      <div className="bg-white lg:p-8 md:p-6 p-4 rounded-lg shadow-md w-full">
         <div className="flex justify-between w-full md:items-end">
           <div className="flex flex-col">
             <p className="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
@@ -51,11 +50,10 @@ const StatCardOrder = () => {
               {lengthProggressOrder}
             </p>
           </div>
-          <p className="text-gray-500 font-thin">-3.2%</p>
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-lg shadow-md w-full">
+      <div className="bg-white lg:p-8 md:p-6 p-4 rounded-lg shadow-md w-full">
         <div className="flex justify-between w-full md:items-end">
           <div className="flex flex-col">
             <p className="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
@@ -65,7 +63,6 @@ const StatCardOrder = () => {
               {lengthDoneOrder}
             </p>
           </div>
-          <p className="text-gray-500 font-thin">-3.2%</p>
         </div>
       </div>
     </div>
