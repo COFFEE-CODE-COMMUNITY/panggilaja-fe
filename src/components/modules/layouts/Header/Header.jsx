@@ -49,14 +49,11 @@ import {
   setSearchText,
 } from "../../../../features/searchSlice";
 
-<<<<<<< HEAD
 {/* import dummy orderan start */}
 import Orderan from "../../../../page/Order/dummy/Orderan";
 import ModalSwitchAccount from "../../Modal/ModalSwitchAccount";
 {/* import dummy orderan end */}
 
-=======
->>>>>>> 00219ff0f9628996cfbed26eed1827fd2e4ba181
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();

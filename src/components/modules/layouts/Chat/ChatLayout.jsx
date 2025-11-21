@@ -12,13 +12,10 @@ import {
   FaPaperPlane,
   FaStar,
   FaEllipsisV,
-<<<<<<< HEAD
   FaUser,
-=======
   FaCheck,
   FaTimes,
   FaExchangeAlt,
->>>>>>> 00219ff0f9628996cfbed26eed1827fd2e4ba181
 } from "react-icons/fa";
 import axiosInstance from "../../../utils/axios";
 import {
@@ -550,13 +547,9 @@ const ChatLayout = () => {
 
   const handleSelectChat = (conversation) => {
     setChatMobile(true);
-<<<<<<< HEAD
     user?.active_role === 'buyer' 
     ? navigate(`/chat/${conversation.id}`)
     : navigate(`/dashboard/chat/${conversation.id}`);
-=======
-    navigate(`/chat/${conversation.id}`);
->>>>>>> 00219ff0f9628996cfbed26eed1827fd2e4ba181
   };
 
   const handleBackToHome = () => navigate("/");
