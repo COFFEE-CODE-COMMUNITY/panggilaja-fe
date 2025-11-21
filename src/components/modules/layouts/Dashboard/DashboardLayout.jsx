@@ -12,11 +12,18 @@ const DashboardLayout = () => {
   const location = useLocation()
   const dispatch = useDispatch()
   const user = useSelector(selectCurrentUser)
+  const navigate = useNavigate()
 
   let style = ''
   if(location.pathname.includes('manage-profile')){
     style = 'p-0'
   }
+
+  useEffect(() => {
+    if(user?.active_role === 'buyer'){
+      navigate('/')
+    }
+  },[user?.active_role])
 
   useEffect(() => {
       if (user && user.id_seller) { 

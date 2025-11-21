@@ -21,6 +21,12 @@ const AppLayout = () => {
   const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
 
   useEffect(() => {
+    if(user?.active_role === 'seller'){
+      navigate('/dashboard')
+    }
+  },[user?.active_role])
+
+  useEffect(() => {
     if(user?.id_buyer && token && (address === null || address?.data?.alamat === null)){
       dispatch(seeAddress(user.id_buyer))
     }

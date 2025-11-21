@@ -59,7 +59,7 @@ const DetailService = () => {
         <>
           <div className="flex flex-col lg:w-[60%] gap-10">
             <ImageService image={service.foto_product} />
-            <ReviewService reviews={reviews?.data || []} />
+            <ReviewService reviews={reviews?.data || []} className={'lg:block hidden'}/>
           </div>
           <InformationService
             description={service.deskripsi}
@@ -73,6 +73,7 @@ const DetailService = () => {
             idSeller={service.seller_id}
             foto_product={service.foto_product}
           />
+          <ReviewService reviews={reviews?.data || []} className={'lg:hidden block'}/>
         </>
       )}
     </div>
