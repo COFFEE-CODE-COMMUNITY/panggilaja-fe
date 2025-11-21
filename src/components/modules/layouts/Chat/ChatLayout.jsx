@@ -12,7 +12,13 @@ import {
   FaPaperPlane,
   FaStar,
   FaEllipsisV,
+<<<<<<< HEAD
   FaUser,
+=======
+  FaCheck,
+  FaTimes,
+  FaExchangeAlt,
+>>>>>>> 00219ff0f9628996cfbed26eed1827fd2e4ba181
 } from "react-icons/fa";
 import axiosInstance from "../../../utils/axios";
 import {
@@ -71,49 +77,272 @@ const formatTime = (timestamp) => {
   return date.toLocaleDateString("id-ID", dateOptions);
 };
 
+// REGEX PATTERNS
 const autoMessageRegex =
-  /Halo, saya tertarik dengan layanan "(.+?)". \(Harga: Rp (.+?)\) \(Deskripsi: (.*?)\) \(Gambar: (.*?)\)/;
+  /Halo, saya tertarik dengan layanan "(.+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Deskripsi: ([^\)]+)\) \(Gambar: (.+?)\)/;
 
-// Service Card Component
-const ServiceCard = ({ data }) => (
-  <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
-    <div className="relative">
-      <img
-        src={data.image}
-        alt={data.serviceName}
-        className="w-full h-48 object-cover"
-      />
-      <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
-        <FaStar className="text-yellow-400" size={14} />
-        <span className="text-sm font-semibold">{data.rating}</span>
+const negoMessageRegex =
+  /Halo, saya tertarik dengan layanan "(.+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Nego: Rp ([^\)]+)\) \(Pesan: (.*?)\) \(Deskripsi: ([^\)]+)\) \(Gambar: (.+?)\)/;
+
+const acceptNegoRegex =
+  /Penawaran Anda sebesar Rp (.+?) untuk layanan "(.+?)" DITERIMA! 🎉/;
+
+// ACCEPT NEGO CONFIRMATION CARD
+const AcceptNegoCard = ({
+  serviceName,
+  agreedPrice,
+  onConfirm,
+  isConfirmed,
+}) => {
+  return (
+    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border-2 border-green-200 overflow-hidden shadow-lg max-w-sm">
+      <div className="p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-green-500 p-3 rounded-full">
+            <FaCheck className="text-white text-xl" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-lg text-green-800">
+              🎉 Penawaran Diterima!
+            </h3>
+            <p className="text-sm text-green-600">Selamat, nego berhasil!</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-4 mb-4 border border-green-200">
+          <p className="text-xs text-gray-500 mb-1">Layanan</p>
+          <p className="font-semibold text-gray-800 mb-3">{serviceName}</p>
+
+          <p className="text-xs text-gray-500 mb-1">Harga yang Disepakati</p>
+          <p className="text-2xl font-bold text-green-600">Rp {agreedPrice}</p>
+        </div>
+
+        {!isConfirmed ? (
+          <>
+            <button
+              onClick={onConfirm}
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-md flex items-center justify-center gap-2"
+            >
+              <FaCheck size={16} />
+              Konfirmasi & Lanjutkan Pemesanan
+            </button>
+
+            <p className="text-xs text-center text-gray-500 mt-3">
+              💡 Klik untuk melanjutkan ke halaman pemesanan
+            </p>
+          </>
+        ) : (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
+            <p className="text-sm text-gray-600 font-medium flex items-center justify-center gap-2">
+              <FaCheck className="text-green-600" />
+              Pesanan telah dibuat
+            </p>
+          </div>
+        )}
       </div>
     </div>
-    <div className="p-4">
-      <h3 className="font-bold text-lg text-gray-800 mb-2">
-        {data.serviceName}
-      </h3>
-      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-        {data.description}
-      </p>
-      {data.status && (
-        <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs font-bold text-blue-700 text-center">
-            📦 {data.status}
+  );
+};
+
+// SERVICE NEGO CARD COMPONENT
+const ServiceNegoCard = ({
+  data,
+  onAccept,
+  onReject,
+  onCounterOffer,
+  isSeller,
+  senderRole,
+  myRole,
+}) => {
+  const [showNegoInput, setShowNegoInput] = useState(false);
+  const [counterPrice, setCounterPrice] = useState("");
+
+  const canTakeAction = senderRole !== myRole;
+
+  const handleCounterOffer = () => {
+    if (counterPrice && parseInt(counterPrice) > 0) {
+      onCounterOffer(parseInt(counterPrice));
+      setShowNegoInput(false);
+      setCounterPrice("");
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
+      {/* Image Section */}
+      <div className="relative">
+        <img
+          src={data.image}
+          alt={data.serviceName}
+          className="w-full h-48 object-cover"
+        />
+        <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
+          <FaStar className="text-yellow-400" size={14} />
+          <span className="text-sm font-semibold">{data.rating || 4.5}</span>
+        </div>
+        <div className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+          💰 PENAWARAN NEGO
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="p-4">
+        <h3 className="font-bold text-lg text-gray-800 mb-2">
+          {data.serviceName}
+        </h3>
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+          Ket: {data.description || "Tidak ada detail kebutuhan"}
+        </p>
+
+        {/* Price Section with Strike-through */}
+        <div className="mb-4 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Harga Normal</p>
+              <p className="text-lg text-gray-400 line-through font-semibold">
+                {data.originalPrice}
+              </p>
+            </div>
+            <div className="bg-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
+              NEGO!
+            </div>
+          </div>
+          <div className="pt-2 border-t border-orange-200">
+            <p className="text-xs text-gray-600 mb-1">Harga Penawaran</p>
+            <p className="text-2xl font-bold text-orange-600">
+              {data.negoPrice}
+            </p>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        {canTakeAction ? (
+          !showNegoInput ? (
+            <div className="flex gap-2">
+              <button
+                onClick={onAccept}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 flex items-center justify-center gap-1 shadow-md"
+              >
+                <FaCheck size={14} />
+                Terima
+              </button>
+              <button
+                onClick={onReject}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 flex items-center justify-center gap-1 shadow-md"
+              >
+                <FaTimes size={14} />
+                Tolak
+              </button>
+              <button
+                onClick={() => setShowNegoInput(true)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 flex items-center justify-center gap-1 shadow-md"
+              >
+                <FaExchangeAlt size={14} />
+                Nego
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                  Rp
+                </span>
+                <input
+                  type="number"
+                  value={counterPrice}
+                  onChange={(e) => setCounterPrice(e.target.value)}
+                  placeholder="Masukkan harga balasan"
+                  className="w-full pl-10 pr-4 py-2.5 border-2 border-blue-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCounterOffer}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-sm font-bold transition-all"
+                >
+                  Kirim Nego
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNegoInput(false);
+                    setCounterPrice("");
+                  }}
+                  className="px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-xl text-sm font-bold transition-all"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          )
+        ) : (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
+            <p className="text-sm text-gray-600 font-medium flex items-center justify-center gap-2">
+              <span className="animate-pulse">⏳</span>
+              Menunggu respons {isSeller ? "buyer" : "penjual"}
+            </p>
+          </div>
+        )}
+
+        {/* Info Footer */}
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <p className="text-xs text-gray-500 text-center">
+            {canTakeAction
+              ? "💡 Giliran Anda untuk merespons penawaran"
+              : "💡 Menunggu respons dari pihak lain"}
           </p>
         </div>
-      )}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs text-gray-500">Harga</p>
-          <p className="text-xl font-bold text-primary">{data.price}</p>
-        </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
-          Lihat Detail
-        </Button>
       </div>
     </div>
-  </div>
-);
+  );
+};
+
+// Service Card Component
+const ServiceCard = ({ data }) => {
+  return (
+    <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
+      <div className="relative">
+        <img
+          src={data.image}
+          alt={data.serviceName}
+          className="w-full h-48 object-cover"
+        />
+        <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
+          <FaStar className="text-yellow-400" size={14} />
+          <span className="text-sm font-semibold">{data.rating}</span>
+        </div>
+      </div>
+
+      <div className="p-4">
+        <h3 className="font-bold text-lg text-gray-800 mb-2">
+          {data.serviceName}
+        </h3>
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+          {data.description}
+        </p>
+
+        {data.status && (
+          <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-xs font-bold text-blue-700 text-center">
+              💬 {data.status}
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3">
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Harga</p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-xl font-bold text-primary">{data.price}</p>
+            </div>
+          </div>
+          <Button className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-semibold">
+            Lihat Detail
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ChatLayout = () => {
   const navigate = useNavigate();
@@ -129,7 +358,6 @@ const ChatLayout = () => {
   const myId = isBuyer ? user?.id_buyer : user?.id_seller;
   const role = user?.active_role?.toLowerCase();
 
-  // 🔥 AKTIFKAN REAL-TIME CONTACT UPDATE
   useContactRealtime(socket, myId, role, isBuyer);
 
   const buyerStatus = useSelector(selectContactBuyerStatus);
@@ -148,11 +376,13 @@ const ChatLayout = () => {
   const [messages, setMessages] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [confirmedMessageIds, setConfirmedMessageIds] = useState([]);
   const chatContainerRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
 
-  // ===== USEEFFECT #1: LOAD CONTACTS =====
+  // USEEFFECT #1: LOAD CONTACTS
   useEffect(() => {
     if (!myId) return;
 
@@ -176,7 +406,7 @@ const ChatLayout = () => {
     location.pathname,
   ]);
 
-  // ===== USEEFFECT #2: FETCH MESSAGES =====
+  // USEEFFECT #2: FETCH MESSAGES
   useEffect(() => {
     const fetchData = async () => {
       if (!partnerId || !token) return;
@@ -215,7 +445,7 @@ const ChatLayout = () => {
     fetchData();
   }, [partnerId, token, isBuyer]);
 
-  // ===== USEEFFECT #3: UPDATE SELECTED CHAT =====
+  // USEEFFECT #3: UPDATE SELECTED CHAT
   useEffect(() => {
     if (partnerId && conversations.length > 0) {
       const selected = conversations.find(
@@ -227,7 +457,7 @@ const ChatLayout = () => {
     }
   }, [partnerId, conversations]);
 
-  // ===== USEEFFECT #4: JOIN CHAT ROOM =====
+  // USEEFFECT #4: JOIN CHAT ROOM
   useEffect(() => {
     if (!partnerId || !myId) return;
 
@@ -243,14 +473,13 @@ const ChatLayout = () => {
     };
   }, [partnerId, myId, isBuyer]);
 
-  // ===== USEEFFECT #5: LISTEN TO MESSAGES IN ACTIVE CHAT =====
+  // USEEFFECT #5: LISTEN TO MESSAGES IN ACTIVE CHAT
   useEffect(() => {
     if (!partnerId || !myId) return;
 
     const handleNewMessage = (newMessage) => {
       console.log("💬 New message in active chat:", newMessage);
 
-      // Cek apakah pesan untuk chat yang sedang dibuka
       const messagePartnerId = isBuyer
         ? newMessage.id_seller
         : newMessage.id_buyer;
@@ -260,12 +489,10 @@ const ChatLayout = () => {
         return;
       }
 
-      // Tentukan apakah ini pesan dari saya
       const isMyMessage =
         (isBuyer && newMessage.sender_role?.toUpperCase() === "BUYER") ||
         (!isBuyer && newMessage.sender_role?.toUpperCase() === "SELLER");
 
-      // Update messages state
       setMessages((prevMessages) => {
         const exists = prevMessages.some((msg) => msg.id === newMessage.id);
         if (exists) {
@@ -293,7 +520,7 @@ const ChatLayout = () => {
     };
   }, [partnerId, myId, isBuyer]);
 
-  // ===== USEEFFECT #6: AUTO SCROLL =====
+  // USEEFFECT #6: AUTO SCROLL
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
@@ -301,7 +528,6 @@ const ChatLayout = () => {
     }
   }, [messages]);
 
-  // Filter conversations
   const filteredConversations = conversations.filter((conv) =>
     conv.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -324,16 +550,68 @@ const ChatLayout = () => {
 
   const handleSelectChat = (conversation) => {
     setChatMobile(true);
+<<<<<<< HEAD
     user?.active_role === 'buyer' 
     ? navigate(`/chat/${conversation.id}`)
     : navigate(`/dashboard/chat/${conversation.id}`);
+=======
+    navigate(`/chat/${conversation.id}`);
+>>>>>>> 00219ff0f9628996cfbed26eed1827fd2e4ba181
   };
 
   const handleBackToHome = () => navigate("/");
 
+  const handleCreateOrder = async (orderData, messageId) => {
+    setIsCreatingOrder(true);
+
+    // Mark as confirmed immediately for better UX
+    setConfirmedMessageIds((prev) => [...prev, messageId]);
+
+    try {
+      console.log("📦 Creating order with data:", orderData);
+
+      const agreedPriceFormatted =
+        orderData.agreedPrice.toLocaleString("id-ID");
+
+      const response = await axiosInstance.post(
+        `${API_BASE_URL}/orders`,
+        {
+          id_service: orderData.serviceId,
+          pesan_tambahan: `Negosiasi melalui chat. Harga disepakati: Rp ${agreedPriceFormatted}`,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("✅ Order created successfully:", response.data);
+
+      if (response.data.status === "success") {
+        const orderId = response.data.data.id;
+
+        // Send confirmation to chat
+        const confirmMessage = `✅ Pesanan telah dibuat! Order ID: #${orderId}`;
+        socket.emit("send_message", {
+          id_buyer: isBuyer ? myId : partnerId,
+          id_seller: isBuyer ? partnerId : myId,
+          text: confirmMessage,
+          sender_role: "BUYER",
+        });
+
+        alert("Pesanan berhasil dibuat!");
+      }
+    } catch (error) {
+      console.error("❌ Error creating order:", error);
+      alert(error.response?.data?.message || "Gagal membuat pesanan");
+      // Remove from confirmed on error
+      setConfirmedMessageIds((prev) => prev.filter((id) => id !== messageId));
+    } finally {
+      setIsCreatingOrder(false);
+    }
+  };
+
   return (
     <div className="h-screen w-full flex bg-gray-50">
-      {/* Sidebar - Chat List */}
       <div
         className={`h-full sm:w-80 w-full bg-white border-r border-gray-200 flex flex-col ${
           chatMobile ? "hidden sm:flex" : "flex"
@@ -341,14 +619,12 @@ const ChatLayout = () => {
       >
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-3 mb-4">
-            {user?.active_role === 'buyer' && (
-              <button
-                onClick={handleBackToHome}
-                className="p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-primary/10 transition-colors flex-shrink-0"
-              >
-                <FaArrowLeft size={18} />
-              </button>
-            )}
+            <button
+              onClick={handleBackToHome}
+              className="p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-primary/10 transition-colors flex-shrink-0"
+            >
+              <FaArrowLeft size={18} />
+            </button>
             <h2 className="text-xl font-bold text-gray-800 flex-1 text-center">
               Pesan
             </h2>
@@ -488,22 +764,218 @@ const ChatLayout = () => {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
-                messages.map((msg) => {
+                messages.map((msg, index) => {
+                  // Check for Accept Nego message
+                  const acceptNegoMatch = acceptNegoRegex.exec(msg.text);
+
+                  if (acceptNegoMatch && isBuyer) {
+                    const agreedPrice = acceptNegoMatch[1];
+                    const serviceName = acceptNegoMatch[2];
+
+                    // Check if already confirmed
+                    let isAlreadyConfirmed = false;
+                    for (let i = index + 1; i < messages.length; i++) {
+                      const nextMsg = messages[i];
+                      if (
+                        nextMsg.sender === "user" &&
+                        nextMsg.text.includes("✅ Pesanan telah dibuat!")
+                      ) {
+                        isAlreadyConfirmed = true;
+                        break;
+                      }
+                    }
+
+                    // Also check confirmedMessageIds state
+                    if (confirmedMessageIds.includes(msg.id)) {
+                      isAlreadyConfirmed = true;
+                    }
+
+                    const handleConfirmOrder = () => {
+                      console.log("✅ Buyer mengkonfirmasi pesanan");
+
+                      // Find the last nego message for this service
+                      const lastNegoMessage = [...messages]
+                        .reverse()
+                        .find((m) => {
+                          const match = negoMessageRegex.exec(m.text);
+                          return match && match[1] === serviceName;
+                        });
+
+                      if (lastNegoMessage) {
+                        const negoMatch = negoMessageRegex.exec(
+                          lastNegoMessage.text
+                        );
+
+                        const orderData = {
+                          serviceId: negoMatch[2],
+                          agreedPrice: parseFloat(
+                            agreedPrice.replace(/\./g, "").replace(",", ".")
+                          ),
+                        };
+
+                        console.log("📦 Creating order:", orderData);
+                        handleCreateOrder(orderData, msg.id);
+                      } else {
+                        alert(
+                          "Data layanan tidak ditemukan. Silakan coba lagi."
+                        );
+                      }
+                    };
+
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`flex ${
+                          msg.sender === "user"
+                            ? "justify-end"
+                            : "justify-start"
+                        }`}
+                      >
+                        <div className="max-w-xs lg:max-w-md">
+                          <AcceptNegoCard
+                            serviceName={serviceName}
+                            agreedPrice={agreedPrice}
+                            onConfirm={handleConfirmOrder}
+                            isConfirmed={isAlreadyConfirmed}
+                          />
+                          <p
+                            className={`text-xs mt-1 text-gray-500 ${
+                              msg.sender === "user" ? "text-right" : "text-left"
+                            }`}
+                          >
+                            {msg.timestamp}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // Check for Nego message
+                  const negoMessageMatch = negoMessageRegex.exec(msg.text);
+
+                  if (negoMessageMatch) {
+                    const serviceName = negoMessageMatch[1];
+                    const serviceId = negoMessageMatch[2];
+                    const originalPrice = negoMessageMatch[3];
+                    const negoPrice = negoMessageMatch[4];
+                    const pesanBuyer = negoMessageMatch[5];
+                    const description = negoMessageMatch[6];
+                    const imageUrl = negoMessageMatch[7];
+
+                    const negoCardData = {
+                      image: imageUrl,
+                      serviceName: serviceName,
+                      serviceId: serviceId,
+                      description: pesanBuyer || description,
+                      originalPrice: `Rp ${originalPrice}`,
+                      negoPrice: `Rp ${negoPrice}`,
+                      rating: 4.5,
+                    };
+
+                    const messageSenderRole =
+                      msg.sender === "user"
+                        ? isBuyer
+                          ? "BUYER"
+                          : "SELLER"
+                        : isBuyer
+                        ? "SELLER"
+                        : "BUYER";
+
+                    const currentUserRole = isBuyer ? "BUYER" : "SELLER";
+
+                    const handleAcceptNego = () => {
+                      console.log("✅ Nego diterima");
+                      const acceptMessage = `Penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" DITERIMA! 🎉`;
+                      socket.emit("send_message", {
+                        id_buyer: isBuyer ? myId : partnerId,
+                        id_seller: isBuyer ? partnerId : myId,
+                        text: acceptMessage,
+                        sender_role: currentUserRole,
+                      });
+                    };
+
+                    const handleRejectNego = () => {
+                      console.log("❌ Nego ditolak");
+                      const rejectMessage = `Maaf, penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" tidak dapat kami terima. Terima kasih atas pengertiannya.`;
+                      socket.emit("send_message", {
+                        id_buyer: isBuyer ? myId : partnerId,
+                        id_seller: isBuyer ? partnerId : myId,
+                        text: rejectMessage,
+                        sender_role: currentUserRole,
+                      });
+                    };
+
+                    const handleCounterOffer = (newPrice) => {
+                      console.log("🔄 Counter offer:", newPrice);
+
+                      const formattedOriginalPrice = originalPrice.replace(
+                        /\./g,
+                        ""
+                      );
+                      const formattedNewPrice =
+                        newPrice.toLocaleString("id-ID");
+
+                      const counterNegoMessage = `Halo, saya tertarik dengan layanan "${serviceName}". (ServiceID: ${serviceId}) (Harga: Rp ${formattedOriginalPrice}) (Nego: Rp ${formattedNewPrice}) (Pesan: ${
+                        pesanBuyer || description
+                      }) (Deskripsi: ${description}) (Gambar: ${imageUrl})`;
+
+                      socket.emit("send_message", {
+                        id_buyer: isBuyer ? myId : partnerId,
+                        id_seller: isBuyer ? partnerId : myId,
+                        text: counterNegoMessage,
+                        sender_role: currentUserRole,
+                      });
+                    };
+
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`flex ${
+                          msg.sender === "user"
+                            ? "justify-end"
+                            : "justify-start"
+                        }`}
+                      >
+                        <div className="max-w-xs lg:max-w-md">
+                          <ServiceNegoCard
+                            data={negoCardData}
+                            onAccept={handleAcceptNego}
+                            onReject={handleRejectNego}
+                            onCounterOffer={handleCounterOffer}
+                            isSeller={!isBuyer}
+                            senderRole={messageSenderRole}
+                            myRole={currentUserRole}
+                          />
+                          <p
+                            className={`text-xs mt-1 text-gray-500 ${
+                              msg.sender === "user" ? "text-right" : "text-left"
+                            }`}
+                          >
+                            {msg.timestamp}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // Check for Auto message
                   const autoMessageMatch = autoMessageRegex.exec(msg.text);
 
                   if (autoMessageMatch) {
                     const serviceName = autoMessageMatch[1];
-                    const price = autoMessageMatch[2];
-                    const description = autoMessageMatch[3];
-                    const imageUrl = autoMessageMatch[4];
+                    const serviceId = autoMessageMatch[2];
+                    const price = autoMessageMatch[3];
+                    const description = autoMessageMatch[4];
+                    const imageUrl = autoMessageMatch[5];
 
                     const cardData = {
                       image: imageUrl,
                       serviceName: serviceName,
+                      serviceId: serviceId,
                       description: description,
-                      status: "Orderan Masuk!",
+                      status: "Tanya produk ini!",
                       price: `Rp ${price}`,
-                      rating: 0,
+                      rating: 4.5,
                     };
 
                     return (
@@ -529,6 +1001,7 @@ const ChatLayout = () => {
                     );
                   }
 
+                  // Regular text message
                   return (
                     <div
                       key={msg.id}

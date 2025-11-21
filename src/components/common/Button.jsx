@@ -4,7 +4,7 @@ const combineClass = ((baseClass, customClass) => {
     return `${baseClass} ${customClass}`.trim()
 })
 
-const Button = ({className, onClick = (() => ''), children, variant, to}) => {
+const Button = ({className, onClick = (() => ''), children, variant, to, ...props}) => {
     let baseColor = ''
     if(variant === 'primary'){
         baseColor = ' bg-primary'
@@ -18,11 +18,12 @@ const Button = ({className, onClick = (() => ''), children, variant, to}) => {
   return (
     <>
       {!to ? (
-        <button className={finalClass} onClick={onClick}>{children}</button>
+        <button className={finalClass} onClick={onClick} {...props}>{children}</button>
       ) : (
         <Link 
           className={finalClass} onClick={onClick}
           to={to}
+          {...props}
         >
           {children}
         </Link>

@@ -11,7 +11,6 @@ import {
   selectAccessToken,
   selectChangeAccountStatus,
   selectCurrentUser,
-  updateProfile,
 } from "../../../../features/authSlice";
 import {
   FaBars,
@@ -50,11 +49,14 @@ import {
   setSearchText,
 } from "../../../../features/searchSlice";
 
+<<<<<<< HEAD
 {/* import dummy orderan start */}
 import Orderan from "../../../../page/Order/dummy/Orderan";
 import ModalSwitchAccount from "../../Modal/ModalSwitchAccount";
 {/* import dummy orderan end */}
 
+=======
+>>>>>>> 00219ff0f9628996cfbed26eed1827fd2e4ba181
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -85,64 +87,60 @@ const Header = () => {
   const [search, setSearch] = useState(urlSearchText || searchText);
   const [statusChanges, setStatusChanges] = useState(false)
 
-  {/* state order start */}
+  {
+    /* state order start */
+  }
   const [orderActiveTab, setOrderActiveTab] = useState("proses");
-  {/* state order end */}
+  {
+    /* state order end */
+  }
 
-  
-    const orders = useSelector(selectOrders)
-    const orderStatus = useSelector(selectOrdersStatus)
-    const orderMessage = useSelector(selectOrdersError)
-    const allService = useSelector(selectAllService)
-  
-    useEffect(() => {
-      if (user && user.id_buyer) {
-        if (orderStatus === 'idle') {
-          dispatch(getOrders(user.id_buyer));
-        }
+  const orders = useSelector(selectOrders);
+  const orderStatus = useSelector(selectOrdersStatus);
+  const orderMessage = useSelector(selectOrdersError);
+  const allService = useSelector(selectAllService);
+
+  useEffect(() => {
+    if (user && user.id_buyer) {
+      if (orderStatus === "idle") {
+        dispatch(getOrders(user.id_buyer));
       }
-    }, [dispatch, orderStatus, user]);
-  
-    let ordersService = []; // Hasil akhirnya akan disimpan di sini
-  
-    if (orderStatus === 'success') {
-      const serviceMap = new Map(
-          allService.map(service => [service.id, service])
-      );
-
-      // 2. Kita loop (map) array 'order'
-      // Untuk setiap item 'order', kita akan buat objek baru
-      ordersService = orders.map((itemOrder) => {
-          
-          // 3. Ambil detail service yang cocok dari 'peta'
-          // (menggunakan service_id dari order saat ini)
-          const serviceDetail = serviceMap.get(itemOrder.service_id);
-
-          // Pengaman jika service-nya tidak ditemukan
-          if (!serviceDetail) {
-              return null; // Nanti kita filter
-          }
-
-          // 4. GABUNGKAN data yang kamu mau di sini
-          return {
-              order_id: itemOrder.id,
-              status: itemOrder.status,
-              tanggal: itemOrder.created_at, // atau itemOrder.tanggal
-              total_harga: itemOrder.total_harga,
-              pesan_tambahan: itemOrder.pesan_tambahan,
-
-              // Data dari 'service' (serviceDetail)
-              seller_id : serviceDetail.seller_id,
-              service_id : serviceDetail.id,
-              service_name: serviceDetail.nama_jasa,
-              service_image: serviceDetail.foto_product,
-              seller_name: serviceDetail.seller_name
-          };
-      
-      }).filter(Boolean); // Trik simpel untuk menghapus 'null' dari array
     }
+  }, [dispatch, orderStatus, user]);
 
-    console.log(ordersService)
+  // Process orders data from API response
+  let ordersService = []; // Hasil akhirnya akan disimpan di sini
+
+  if (orderStatus === "success" && orders) {
+    // Process orders directly from API response which already includes seller and service data
+    ordersService = orders.map((itemOrder) => {
+      // Extract seller and service data from nested objects
+      const sellerData = itemOrder.seller || {};
+      const serviceData = itemOrder.service || {};
+
+      return {
+        order_id: itemOrder.id,
+        status: itemOrder.status,
+        tanggal: itemOrder.created_at,
+        total_harga: itemOrder.total_harga,
+        pesan_tambahan: itemOrder.pesan_tambahan,
+
+        // Data dari seller
+        seller_id: sellerData.id || "",
+        seller_name: sellerData.nama_toko || "",
+        seller_image: sellerData.foto_toko || "",
+
+        // Data dari service
+        service_id: serviceData.id || "",
+        service_name: serviceData.nama_jasa || "",
+        service_image: serviceData.foto_product || "",
+        
+        // Review status
+        is_reviewed: itemOrder.is_reviewed,
+      };
+    });
+  }
+
   useEffect(() => {
     if (statusChange === "success") {
       dispatch(resetChangeAccountStatus());
@@ -230,7 +228,9 @@ const Header = () => {
 
   const haveSellerAccount = user?.available_roles?.length > 1;
 
-  {/* logic order start */}
+  {
+    /* logic order start */
+  }
   const formatHarga = (num) =>
     new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -238,12 +238,30 @@ const Header = () => {
       minimumFractionDigits: 0,
     }).format(num);
 
+  const translateStatus = (status) => {
+    switch (status) {
+      case "pending":
+        return "Menunggu";
+      case "in_progress":
+        return "Proses";
+      case "completed":
+        return "Selesai";
+      default:
+        return status;
+    }
+  };
+
   const filteredOrders =
     orderActiveTab === "semua"
-      ? Orderan
-      : Orderan.filter((order) => order.status === orderActiveTab);
-  {/* logic order end */}
-    console.log(ordersService)
+      ? ordersService
+      : orderActiveTab === "proses"
+      ? ordersService.filter((order) => order.status === "in_progress")
+      : orderActiveTab === "selesai"
+      ? ordersService.filter((order) => order.status === "completed")
+      : ordersService;
+
+  console.log("INI SEMUA ORDERNYA : ", ordersService);
+
   return (
     <>
       {header && (
@@ -464,13 +482,11 @@ const Header = () => {
           {order && (
             <div className="w-96 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col absolute top-0 right-[100%] mr-4">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                <h3 className="text-h5 font-semibold text-gray-800">
-                  Pesanan
-                </h3>
+                <h3 className="text-h5 font-semibold text-gray-800">Pesanan</h3>
               </div>
-              
+
               {/* filter tab */}
-              <div className="flex justify-start sticky top-0 z-20 border-b bg-white px-3"> 
+              <div className="flex justify-start sticky top-0 z-20 border-b bg-white px-3">
                 <div className="flex gap-4 py-2">
                   {["semua", "proses", "selesai"].map((tab) => (
                     <button
@@ -488,26 +504,30 @@ const Header = () => {
                 </div>
               </div>
 
-              {/*card */}
+              {/*card*/}
               <div className="p-3 space-y-3 overflow-y-auto max-h-[calc(100%-92px)] flex-1">
-                {ordersService.length > 0 ? (
-                  ordersService.map((order) => (
+                {filteredOrders.length > 0 ? (
+                  filteredOrders.map((order) => (
                     <div
-                      key={order.id}
-                      className="bg-white rounded-xl border border-gray-200 p-3 flex flex-col gap-2 hover:bg-gray-50 transition-colors" 
+                      key={order.order_id}
+                      className="bg-white rounded-xl border border-gray-200 p-3 flex flex-col gap-2 hover:bg-gray-50 transition-colors"
                     >
                       {/* header */}
                       <div className="flex justify-between items-center text-sm">
-                        <p className="text-gray-800 font-semibold truncate max-w-[60%]">{order.seller_id}</p>
-                        
+                        <p className="text-gray-800 font-semibold truncate max-w-[60%]">
+                          {order.seller_name}
+                        </p>
+
                         <span
                           className={`text-sm font-semibold capitalize ${
                             order.status === "completed"
                               ? "text-green-600"
-                              : "text-yellow-600"
+                              : order.status === "in_progress"
+                              ? "text-yellow-600"
+                              : "text-gray-600"
                           }`}
                         >
-                          {order.status}
+                          {translateStatus(order.status)}
                         </span>
                       </div>
 
@@ -517,7 +537,7 @@ const Header = () => {
                       <div className="flex gap-3 items-center">
                         <img
                           src={order.service_image}
-                          alt={order.service_id}
+                          alt={order.service_name}
                           className="w-16 h-16 rounded-lg object-cover border flex-shrink-0"
                         />
 
@@ -528,11 +548,15 @@ const Header = () => {
                           </p>
 
                           <p className="text-xs text-gray-600">
-                            Tanggal: {new Date(order.tanggal).toLocaleDateString("id-ID")}
+                            Tanggal:{" "}
+                            {new Date(order.tanggal).toLocaleDateString(
+                              "id-ID"
+                            )}
                           </p>
-                          
+
                           <p className="text-xs text-gray-600 truncate">
-                            Catatan: {order.pesan_tambahan || "Tidak ada catatan"}
+                            Catatan:{" "}
+                            {order.pesan_tambahan || "Tidak ada catatan"}
                           </p>
 
                           <p className="font-medium text-gray-800 mt-1 text-sm">
@@ -545,15 +569,21 @@ const Header = () => {
                       <div className="flex justify-end gap-2 pt-2">
                         <Button
                           variant="secondary"
-                          className={`px-4 py-1.5 text-sm rounded-full ${ 
-                            order.status === "completed"
+                          className={`px-4 py-1.5 text-sm rounded-full ${
+                            order.status === "completed" && !order.is_reviewed
                               ? "bg-green-600 text-white"
                               : "border border-gray-300 text-gray-400 bg-transparent cursor-not-allowed"
-                        }`}
-                        disabled={order.status !== "completed"}
-                        to={`/service/${order.service_id}/review`}
+                          }`}
+                          disabled={
+                            order.status !== "completed" || order.is_reviewed
+                          }
+                          to={
+                            order.status === "completed" && !order.is_reviewed
+                              ? `/service/review/${order.order_id}`
+                              : undefined
+                          }
                         >
-                          Review
+                          {order.is_reviewed ? "Sudah di review" : "Review"}
                         </Button>
 
                         <Button
@@ -590,7 +620,10 @@ const Header = () => {
                       (service) => service.service_id === favorite.id
                     );
                     return (
-                      <div key={favorite.id} className="bg-white rounded-lg border border-gray-200">
+                      <div
+                        key={favorite.id}
+                        className="bg-white rounded-lg border border-gray-200"
+                      >
                         <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors ">
                           <img
                             src={favorite?.foto_product}
@@ -633,7 +666,10 @@ const Header = () => {
           {/* Main Profile Menu */}
           <div className="w-64 bg-white shadow-2xl rounded-sm border border-gray-100 overflow-hidden">
             {/* Profile Header */}
-            <Link to="/setting/profile" onClick={() => setSidebarProfile(false)}>
+            <Link
+              to="/setting/profile"
+              onClick={() => setSidebarProfile(false)}
+            >
               <div className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
                 {profile?.foto_buyer ? (
                   <img
@@ -768,7 +804,7 @@ const Header = () => {
                   <span className="text-base text-gray-700">Pesanan</span>
                 </div>
               </Link>
-              
+
               <Link to="/chat" onClick={() => setSidebarMobile(false)}>
                 <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                   <FaRegComment className="text-gray-400 text-xl" />
