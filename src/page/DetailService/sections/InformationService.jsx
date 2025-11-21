@@ -157,81 +157,102 @@ const InformationService = ({
   }, []);
 
   return (
-    <div className="h-full lg:w-[40%] w-full flex flex-col gap-[30px] lg:py-7 md:py-6 py-5 px-[15px]">
-      <div className="flex flex-col gap-[10px]">
-        <div className="flex flex-col gap-[10px]">
-          <div className="flex flex-col leading-8">
-            <div className="flex">
+    <div className="h-full lg:w-[40%] w-full flex flex-col gap-6 lg:py-0 py-6">
+      <div className="flex flex-col gap-6">
+        {/* Header Section */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-start gap-4">
+            <div className="space-y-1">
               <Link
-                className="flex-1 text-h5 font-light"
                 to={`/profile-service/${idSeller}`}
+                className="text-sm font-medium text-primary hover:underline flex items-center gap-2"
               >
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs">
+                  {sellerProfile?.nama_toko?.charAt(0) || 'S'}
+                </div>
                 {sellerProfile?.nama_toko}
               </Link>
-              {token &&
-                (isServiceFavorite ? (
-                  <Button
-                    onClick={() =>
-                      dispatch(deleteFavoriteService(isServiceFavorite.id))
-                    }
-                  >
-                    <FaHeart className={`text-gray-700 text-xl`} />
-                  </Button>
-                ) : (
-                  <Button onClick={token ? handleAddFavorite : ""}>
-                    <FaRegHeart className={`text-gray-700 text-xl`} />
-                  </Button>
-                ))}
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                {nameService}
+              </h1>
             </div>
-            <h2 className="text-h2">{nameService}</h2>
-          </div>
-          <div className="flex items-center gap-[5px]">
-            <div className="flex gap-[5px]">
-              <Stars many={4} variant="star" />
-            </div>
-            <p className="text-h5 font-light">{totalReview} ulasan</p>
-          </div>
-          <h2 className="text-h3">
-            Rp. {basePrice} - {topPrice}
-          </h2>
-          <p className="text-h5 font-light">
-            {!showMoreDesc && description.slice(0, 200)}
-            {!showMoreDesc && (
-              <>
-                <span>...</span>
-                <span
-                  onClick={() => setShowMoreDesc(!showMoreDesc)}
-                  className="font-medium cursor-pointer"
-                >
-                  selengkapnya
-                </span>
-              </>
-            )}
-            {showMoreDesc && description}
-          </p>
-        </div>
-        <div className="flex flex-1">
-          <div className="w-full flex gap-1.5">
-            <Button
-              variant="primary"
-              className="flex-2 rounded-lg text-white font-medium h-[50px] flex items-center justify-center w-full"
-              onClick={handleStartChat}
-              disabled={isStartingChat}
-            >
-              {isStartingChat ? "Memuat..." : "Hubungi sekarang"}
-            </Button>
 
-            <Button
-              variant="secondary"
-              className="flex-1 rounded-lg text-white font-medium h-[50px] flex items-center justify-center w-[150px] px-[10px]"
-              to={`/service/nego/${idService}`}
-            >
-              {isStartingChat ? "Memuat..." : "Negoin aja"}
-            </Button>
+            {token && (
+              <button
+                onClick={isServiceFavorite ? () => dispatch(deleteFavoriteService(isServiceFavorite.id)) : handleAddFavorite}
+                className="p-2 rounded-full hover:bg-gray-50 transition-colors"
+              >
+                {isServiceFavorite ? (
+                  <FaHeart className="text-red-500 text-xl" />
+                ) : (
+                  <FaRegHeart className="text-gray-400 text-xl" />
+                )}
+              </button>
+            )}
           </div>
+
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex items-center gap-1">
+              <FaStar className="text-yellow-400" />
+              <span className="font-medium text-gray-900">{totalReview || 0}</span>
+              <span>({totalReview || 0} ulasan)</span>
+            </div>
+            <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+            <div>{totalReviewSeller || 0} Pesanan selesai</div>
+          </div>
+        </div>
+
+        <div className="h-px bg-gray-100"></div>
+
+        {/* Price Section */}
+        <div>
+          <p className="text-sm text-gray-500 mb-1">Mulai dari</p>
+          <h2 className="text-3xl font-bold text-primary">
+            Rp {parseInt(basePrice).toLocaleString('id-ID')}
+            {topPrice && topPrice > basePrice && (
+              <span className="text-lg text-gray-400 font-normal ml-2">
+                - Rp {parseInt(topPrice).toLocaleString('id-ID')}
+              </span>
+            )}
+          </h2>
+        </div>
+
+        {/* Description Section */}
+        <div className="bg-gray-50 rounded-xl p-4">
+          <h3 className="font-semibold text-gray-900 mb-2">Deskripsi Layanan</h3>
+          <div className={`text-gray-600 text-sm leading-relaxed ${!showMoreDesc ? 'line-clamp-4' : ''}`}>
+            {description}
+          </div>
+          {description.length > 200 && (
+            <button
+              onClick={() => setShowMoreDesc(!showMoreDesc)}
+              className="text-primary text-sm font-medium mt-2 hover:underline"
+            >
+              {showMoreDesc ? "Sembunyikan" : "Baca selengkapnya"}
+            </button>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 mt-2">
+          <Button
+            variant="primary"
+            className="flex-2 rounded-lg text-white font-medium h-[50px] hover:bg-primary/90 flex items-center justify-center w-full"
+            onClick={handleStartChat}
+            disabled={isStartingChat}
+          >
+            Hubungi sekarang
+          </Button>
+
+          <Button
+            variant="secondary"
+            className="flex-1 rounded-lg text-white font-medium h-[50px] hover:bg-secondary/90 flex items-center justify-center w-[150px] px-[10px]"
+            to={`/service/nego/${idService}`}
+          >
+            Negoin aja
+          </Button>
         </div>
       </div>
-
     </div>
   );
 };

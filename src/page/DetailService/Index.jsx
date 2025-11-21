@@ -19,7 +19,7 @@ const DetailService = () => {
 
   const service = useSelector(selectSelectedService);
   const status = useSelector(selectSelectedServiceStatus);
-  
+
   const reviews = useSelector(selectReviewService);
   const reviewStatus = useSelector(selectReviewServiceStatus);
 
@@ -51,9 +51,9 @@ const DetailService = () => {
       </div>
     );
   }
-  
+
   return (
-    <div className="mt-20 lg:flex h-full w-full lg:gap-[30px] md:gap-[20px] gap-[10px] mb-[50px] sm:pt-[20px] xl:px-[150px] lg:px-[70px] md:px-[55px] sm:px-[35px] mx-auto transition-all duration-150">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-12 lg:flex lg:gap-12 min-h-[calc(100vh-100px)]">
       {status === "loading" && <div className="w-full h-screen">loading</div>}
       {status === "success" && (
         <>

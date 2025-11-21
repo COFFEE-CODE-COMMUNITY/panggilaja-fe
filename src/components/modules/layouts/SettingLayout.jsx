@@ -1,44 +1,49 @@
-import React, { useState } from 'react'
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
+import React from 'react'
+import { FaArrowRight, FaUser } from 'react-icons/fa'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 const SettingLayout = () => {
   const location = useLocation()
-  return (
-    <div className='min-h-screen xl:px-[300px] lg:px-[200px] md:px-[100px] px-[10px] flex'>
-        {/* mobile version */}
-        {location.pathname === '/setting' && (
-          <div className={`w-full h-screen flex-col gap-[15px] sm:hidden`}>
-              <p className='lg:text-h2 md:text-h3 text-h4 font-medium'>Pengaturan</p>
-              <div className='w-full h-full flex flex-col'>
-                  <NavLink 
-                    to='profile'
-                    className='py-2 flex items-center group hover:bg-gray-50'
-                  >
-                    <p className='w-full'>Profile</p>
-                    <FaArrowRight className='text-gray-400 group-hover:text-primary'/>
-                  </NavLink>
-              </div>
-          </div>
-        )}
+  const isRootSetting = location.pathname === '/setting'
 
-        {/* dekstop version */}
-        <div className='sm:w-1/3 w-full h-screen flex-col px-[15px] py-[10px] gap-[15px] hidden sm:flex'>
-            <p className='lg:text-h2 md:text-h3 text-h4 font-medium'>Settings</p>
-            <div className='w-full h-full flex flex-col'>
-                <NavLink 
+  return (
+    <div className='min-h-screen'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+        <div className='flex flex-col md:flex-row gap-8'>
+          {/* sidebar */}
+          <div className={`md:w-64 flex-shrink-0 ${!isRootSetting ? 'hidden md:block' : 'block'}`}>
+            <div className='bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-24'>
+              <div className='p-4 border-b border-gray-100'>
+                <h1 className='text-xl font-bold text-gray-900'>Pengaturan</h1>
+              </div>
+              <nav className='flex flex-col p-2'>
+                <NavLink
                   to='profile'
-                  className='border-l border-gray-200 lg:px-[10px] px-[5px]'
+                  className={({ isActive }) => `
+                                    flex items-center justify-between p-3 rounded-lg transition-all duration-200
+                                    ${isActive
+                      ? 'bg-primary/10 text-primary font-medium'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }
+                                `}
                 >
-                  Profile
+                  <div className='flex items-center gap-3'>
+                    <FaUser size={18} />
+                    <span>Profil Saya</span>
+                  </div>
+                  <FaArrowRight size={14} className='opacity-50' />
                 </NavLink>
+                {/* nambah fitur jika ada */}
+              </nav>
             </div>
-        </div>
-        {location.pathname != '/setting' && (
-          <div className='w-full h-screen relative'>
-              <Outlet/>
           </div>
-        )}
+
+          {/* isi placeholder */}
+          <div className={`flex-1 ${isRootSetting ? 'hidden md:block' : 'block'}`}>
+            <Outlet />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
