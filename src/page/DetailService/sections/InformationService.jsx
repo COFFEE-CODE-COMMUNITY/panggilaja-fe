@@ -157,15 +157,15 @@ const InformationService = ({
   }, []);
 
   return (
-    <div className="h-full lg:w-[40%] w-full flex flex-col gap-6 lg:py-0 py-6">
+    <div className="h-full flex-1 w-full flex flex-col gap-6 lg:py-0 py-6">
       <div className="flex flex-col gap-6">
-        {/* Header Section */}
+        {/* header */}
         <div className="space-y-4">
           <div className="flex justify-between items-start gap-4">
             <div className="space-y-1">
               <Link
                 to={`/profile-service/${idSeller}`}
-                className="text-sm font-medium text-primary hover:underline flex items-center gap-2"
+                className="text-sm font-medium text-primary flex items-center gap-2"
               >
                 <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs">
                   {sellerProfile?.nama_toko?.charAt(0) || 'S'}
@@ -204,7 +204,7 @@ const InformationService = ({
 
         <div className="h-px bg-gray-100"></div>
 
-        {/* Price Section */}
+        {/* harga selction */}
         <div>
           <p className="text-sm text-gray-500 mb-1">Mulai dari</p>
           <h2 className="text-3xl font-bold text-primary">
@@ -217,7 +217,7 @@ const InformationService = ({
           </h2>
         </div>
 
-        {/* Description Section */}
+        {/* deskripsi selection */}
         <div className="bg-gray-50 rounded-xl p-4">
           <h3 className="font-semibold text-gray-900 mb-2">Deskripsi Layanan</h3>
           <div className={`text-gray-600 text-sm leading-relaxed ${!showMoreDesc ? 'line-clamp-4' : ''}`}>
@@ -233,7 +233,7 @@ const InformationService = ({
           )}
         </div>
 
-        {/* Action Buttons */}
+        {/* button */}
         <div className="flex gap-3 mt-2">
           <Button
             variant="primary"
