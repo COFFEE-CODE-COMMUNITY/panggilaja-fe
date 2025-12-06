@@ -57,9 +57,9 @@ const DetailService = () => {
       {status === "loading" && <div className="w-full h-screen">loading</div>}
       {status === "success" && (
         <>
-          <div className="flex flex-col lg:w-[60%] gap-10">
+          <div className="flex flex-col lg:w-auto gap-6">
             <ImageService image={service.foto_product} />
-            <ReviewService reviews={reviews?.data || []} className={'lg:block hidden'}/>
+            <ReviewService reviews={reviews?.data || []} className={'lg:block hidden'} />
           </div>
           <InformationService
             description={service.deskripsi}
@@ -73,7 +73,7 @@ const DetailService = () => {
             idSeller={service.seller_id}
             foto_product={service.foto_product}
           />
-          <ReviewService reviews={reviews?.data || []} className={'lg:hidden block'}/>
+          <ReviewService reviews={reviews?.data || []} className={'lg:hidden block'} />
         </>
       )}
     </div>
