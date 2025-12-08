@@ -3,77 +3,64 @@ import Orderan from "./dummy/Orderan";
 import Button from "../../components/common/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentUser } from "../../features/authSlice";
-import { getOrders, selectOrders, selectOrdersError, selectOrdersStatus } from "../../features/userSlice";
+import {
+  getOrders,
+  selectOrders,
+  selectOrdersError,
+  selectOrdersStatus,
+} from "../../features/userSlice";
 import { selectAllService } from "../../features/serviceSlice";
+import { Link } from "react-router-dom";
 
 const OrderMobile = () => {
   const [activeTab, setActiveTab] = useState("semua");
-  const [orders, setOrders] = useState([]);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const user = useSelector(selectCurrentUser)
-  const order = useSelector(selectOrders)
-  const orderStatus = useSelector(selectOrdersStatus)
-  const orderMessage = useSelector(selectOrdersError)
-  const allService = useSelector(selectAllService)
+  const user = useSelector(selectCurrentUser);
+  const order = useSelector(selectOrders);
+  const orderStatus = useSelector(selectOrdersStatus);
+  const orderMessage = useSelector(selectOrdersError);
+  const allService = useSelector(selectAllService);
 
   useEffect(() => {
     if (user && user.id_buyer) {
-      if (orderStatus === 'idle') {
+      if (orderStatus === "idle") {
         dispatch(getOrders(user.id_buyer));
       }
     }
   }, [dispatch, orderStatus, user]);
 
-  useEffect(() => {
-    setOrders(Orderan);
-  }, []);
+  let orderService = [];
 
-  let orderService = []; // Hasil akhirnya akan disimpan di sini
+  if (orderStatus === "success" && order) {
+    orderService = order.map((itemOrder) => {
+      const sellerData = itemOrder.seller || {};
+      const serviceData = itemOrder.service || {};
 
-  if (orderStatus === 'success' && order && allService) {
-      const serviceMap = new Map(
-          allService.map(service => [service.id, service])
-      );
+      return {
+        order_id: itemOrder.id,
+        status: itemOrder.status,
+        tanggal: itemOrder.created_at,
+        total_harga: itemOrder.total_harga,
+        pesan_tambahan: itemOrder.pesan_tambahan,
 
-      // 2. Kita loop (map) array 'order'
-      // Untuk setiap item 'order', kita akan buat objek baru
-      orderService = order.map((itemOrder) => {
-          
-          // 3. Ambil detail service yang cocok dari 'peta'
-          // (menggunakan service_id dari order saat ini)
-          const serviceDetail = serviceMap.get(itemOrder.service_id);
+        seller_id: sellerData.id || "",
+        seller_name: sellerData.nama_toko || "",
 
-          // Pengaman jika service-nya tidak ditemukan
-          if (!serviceDetail) {
-              return null; // Nanti kita filter
-          }
-
-          // 4. GABUNGKAN data yang kamu mau di sini
-          return {
-              order_id: itemOrder.id,
-              status: itemOrder.status,
-              tanggal: itemOrder.created_at, // atau itemOrder.tanggal
-              total_harga: itemOrder.total_harga,
-              pesan_tambahan: itemOrder.pesan_tambahan,
-
-              // Data dari 'service' (serviceDetail)
-              seller_id : serviceDetail.seller_id,
-              service_id : serviceDetail.id,
-              service_name: serviceDetail.nama_jasa,
-              service_image: serviceDetail.foto_product,
-              seller_name: serviceDetail.seller_name
-          };
-      
-      }).filter(Boolean); // Trik simpel untuk menghapus 'null' dari array
-
+        service_id: serviceData.id || "",
+        service_name: serviceData.nama_jasa || "",
+        service_image: serviceData.foto_product || "",
+      };
+    });
   }
 
-  const filteredOrders =
-    activeTab === "semua"
-      ? orders
-      : orders.filter((order) => order.status === activeTab);
+  const filteredOrders = orderService.filter((item) => {
+    if (activeTab === "semua") return true;
+    if (activeTab === "proses") return item.status === "in_progress" || item.status === "pending";
+    if (activeTab === "selesai") return item.status === "completed";
+    return true;
+  });
 
   const formatHarga = (num) =>
     new Intl.NumberFormat("id-ID", {
@@ -82,120 +69,141 @@ const OrderMobile = () => {
       minimumFractionDigits: 0,
     }).format(num);
 
+  const translateStatus = (status) => {
+    switch (status) {
+      case "pending": return "Menunggu";
+      case "in_progress": return "Proses";
+      case "completed": return "Selesai";
+      default: return status;
+    }
+  };
+
   return (
-    <div className="min-h-screen pb-24">
-      
-      {/* filter tab */}
-      <div className="flex justify-center sticky top-0 z-20 border-b">
-        <div className="flex gap-6 py-2">
-          {["semua", "proses", "selesai"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`relative pb-2 font-medium capitalize transition-all ${
-                activeTab === tab
-                  ? "text-green-700 after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-green-700"
-                  : "text-gray-500"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="min-h-screen bg-white pb-24">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
 
-      {/* card */}
-      <div className="p-3 space-y-3">
-        {orderService.map((order) => (
-          <div
-            key={order.id}
-            className="bg-white rounded-2xl shadow-md p-4 flex flex-col gap-3"
-          >
-            {/* header */}
-            <div className="flex justify-between items-center">
-              <p className="text-gray-800 font-semibold">{order.seller_name}</p>
-              <span
-                className={`text-sm font-semibold capitalize ${
-                  order.status === "selesai"
-                    ? "text-green-600"
-                    : "text-yellow-600"
-                }`}
-              >
-                {order.status}
-              </span>
-            </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Daftar Pesanan</h1>
 
-            <hr className="border-gray-200" />
+        <div className="w-full">
 
-            {/* gambar jasa */}
-            <div className="flex gap-3">
-              <img
-                src={order.service_image}
-                alt={order.service_id}
-                className="w-16 h-16 rounded-xl object-cover border flex-shrink-0"
-              />
-
-              <div className="flex-1 text-sm text-gray-700">
-                {/* detail jasa */}
-                <p className="font-semibold text-gray-900 mb-1">
-                  {order.service_name}
-                </p>
-                
-                <p>
-                  Tanggal:{" "}
-                  <span className="font-medium text-gray-800">
-                    {new Date(order.tanggal).toLocaleDateString("id-ID")}
-                  </span>
-                </p>
-
-                <p>
-                  Catatan:{" "}
-                  <span className="text-gray-600">
-                    {order.pesan_tambahan || "Tidak ada catatan"}
-                  </span>
-                </p>
-
-                <p className="font-semibold text-gray-800 mt-1">
-                  Total: {formatHarga(order.total_harga)}
-                </p>
-              </div>
-            </div>
-
-            {/* button */}
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="secondary"
-                className={`px-4 py-2 rounded-full text-[15px] ${
-                  order.status === "completed"
-                    ? "bg-green-600 text-white"
-                    : "border border-gray-300 text-gray-400 bg-transparent cursor-not-allowed"
-                }`}
-                disabled={order.status !== "completed"}
-                onClick={() =>
-                  order.status === "selesai" &&
-                  alert(`Ulas penyedia: ${order.seller_id}`)
-                }
-                to={`/service/${order.service_id}/review`}
-              >
-                Review
-              </Button>
-
-              <Button
-                variant="primary"
-                className="px-4 py-2 text-white rounded-full text-[15px]"
-                to={`/chat/${order.seller_id}`}
-              >
-                Hubungi Penyedia
-              </Button>
+          {/* filter tab */}
+          <div className="bg-white border-b border-gray-200 mb-6 sticky top-20 z-10">
+            <div className="flex gap-8">
+              {["semua", "proses", "selesai"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`py-4 font-medium capitalize text-sm transition-all relative ${activeTab === tab
+                    ? "text-primary font-bold after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-primary after:rounded-t-full"
+                    : "text-gray-500 hover:text-gray-700"
+                    }`}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
-        ))}
 
-        {filteredOrders.length === 0 && (
-          <p className="text-center text-gray-500 mt-10">
-            Belum ada pesanan {activeTab}.
-          </p>
-        )}
+          {/* order card */}
+          <div className="space-y-4">
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map((item) => (
+                <div
+                  key={item.order_id}
+                  className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 transition-all hover:border-primary/50"
+                >
+                  {/* header */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-600">
+                        {item.seller_name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{item.seller_name}</p>
+                        <p className="text-xs text-gray-500">{new Date(item.tanggal).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                      </div>
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${item.status === "completed"
+                        ? "bg-green-50 text-green-700"
+                        : item.status === "in_progress"
+                          ? "bg-blue-50 text-blue-700"
+                          : "bg-yellow-50 text-yellow-700"
+                        }`}
+                    >
+                      {translateStatus(item.status)}
+                    </span>
+                  </div>
+
+                  <hr className="border-gray-100 mb-4" />
+
+                  {/* contentt */}
+                  <div className="flex gap-4">
+                    <img
+                      src={item.service_image}
+                      alt={item.service_name}
+                      className="w-24 h-24 rounded-lg object-cover border border-gray-100 flex-shrink-0"
+                    />
+
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-bold text-gray-900 mb-1 truncate text-lg">{item.service_name}</h3>
+                        <p className="text-sm text-gray-500 line-clamp-2">
+                          {item.pesan_tambahan || "Tidak ada catatan tambahan"}
+                        </p>
+                      </div>
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-500">Total Harga</p>
+                        <p className="text-base font-bold text-primary">{formatHarga(item.total_harga)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* button*/}
+                  <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-50">
+                    <Button
+                      variant={item.status === "completed" ? "secondary" : "secondary"}
+                      className={`px-6 py-2 text-sm rounded-full font-medium ${item.status === "completed"
+                        ? "bg-secondary text-white hover:bg-secondary/90"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                        }`}
+                      disabled={item.status !== "completed"}
+                      to={item.status === "completed" ? `/service/review/${item.order_id}` : undefined}
+                    >
+                      Beri Ulasan
+                    </Button>
+
+                    <Button
+                      variant="primary"
+                      className="px-6 py-2 text-sm rounded-full font-medium text-white shadow-sm hover:shadow hover:bg-primary/90"
+                      to={`/chat/${item.seller_id}`}
+                    >
+                      Hubungi
+                    </Button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20">
+                <img
+                  src="https://illustrations.popsy.co/gray/surr-list-is-empty.svg"
+                  alt="Empty"
+                  className="w-64 h-64 mb-6 opacity-75"
+                />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Belum ada pesanan</h3>
+                <p className="text-gray-500 mb-8 text-center max-w-md">
+                  Sepertinya kamu belum pernah memesan jasa apapun. Yuk cari jasa yang kamu butuhkan sekarang!
+                </p>
+                <Link
+                  to="/search-result"
+                  className="px-8 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  Cari Jasa
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

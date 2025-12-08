@@ -23,7 +23,6 @@ import {
   FaUser,
 } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
-import { IoMdLogOut } from "react-icons/io";
 import {
   deleteFavoriteService,
   getFavoriteService,
@@ -36,11 +35,7 @@ import {
   selectFavoriteServiceStatus,
 } from "../../../../features/serviceSlice";
 import {
-  getOrders,
   seeProfile,
-  selectOrders,
-  selectOrdersError,
-  selectOrdersStatus,
   selectSeeProfile,
   selectSeeProfileStatus,
 } from "../../../../features/userSlice";
@@ -49,10 +44,7 @@ import {
   setSearchText,
 } from "../../../../features/searchSlice";
 
-{/* import dummy orderan start */}
-import Orderan from "../../../../page/Order/dummy/Orderan";
 import ModalSwitchAccount from "../../Modal/ModalSwitchAccount";
-{/* import dummy orderan end */}
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -79,64 +71,10 @@ const Header = () => {
   const [chat, setChat] = useState(false);
   const [searchMobile, setSearchMobile] = useState(false);
   const [iconSearch, setIconSearch] = useState(true);
-  const [order, setOrder] = useState(false);
+
   const [header, setHeader] = useState(true);
   const [search, setSearch] = useState(urlSearchText || searchText);
   const [statusChanges, setStatusChanges] = useState(false)
-
-  {
-    /* state order start */
-  }
-  const [orderActiveTab, setOrderActiveTab] = useState("proses");
-  {
-    /* state order end */
-  }
-
-  const orders = useSelector(selectOrders);
-  const orderStatus = useSelector(selectOrdersStatus);
-  const orderMessage = useSelector(selectOrdersError);
-  const allService = useSelector(selectAllService);
-
-  useEffect(() => {
-    if (user && user.id_buyer) {
-      if (orderStatus === "idle") {
-        dispatch(getOrders(user.id_buyer));
-      }
-    }
-  }, [dispatch, orderStatus, user]);
-
-  // Process orders data from API response
-  let ordersService = []; // Hasil akhirnya akan disimpan di sini
-
-  if (orderStatus === "success" && orders) {
-    // Process orders directly from API response which already includes seller and service data
-    ordersService = orders.map((itemOrder) => {
-      // Extract seller and service data from nested objects
-      const sellerData = itemOrder.seller || {};
-      const serviceData = itemOrder.service || {};
-
-      return {
-        order_id: itemOrder.id,
-        status: itemOrder.status,
-        tanggal: itemOrder.created_at,
-        total_harga: itemOrder.total_harga,
-        pesan_tambahan: itemOrder.pesan_tambahan,
-
-        // Data dari seller
-        seller_id: sellerData.id || "",
-        seller_name: sellerData.nama_toko || "",
-        seller_image: sellerData.foto_toko || "",
-
-        // Data dari service
-        service_id: serviceData.id || "",
-        service_name: serviceData.nama_jasa || "",
-        service_image: serviceData.foto_product || "",
-        
-        // Review status
-        is_reviewed: itemOrder.is_reviewed,
-      };
-    });
-  }
 
   useEffect(() => {
     if (statusChange === "success") {
@@ -224,40 +162,6 @@ const Header = () => {
   }
 
   const haveSellerAccount = user?.available_roles?.length > 1;
-
-  {
-    /* logic order start */
-  }
-  const formatHarga = (num) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(num);
-
-  const translateStatus = (status) => {
-    switch (status) {
-      case "pending":
-        return "Menunggu";
-      case "in_progress":
-        return "Proses";
-      case "completed":
-        return "Selesai";
-      default:
-        return status;
-    }
-  };
-
-  const filteredOrders =
-    orderActiveTab === "semua"
-      ? ordersService
-      : orderActiveTab === "proses"
-      ? ordersService.filter((order) => order.status === "in_progress")
-      : orderActiveTab === "selesai"
-      ? ordersService.filter((order) => order.status === "completed")
-      : ordersService;
-
-  console.log("INI SEMUA ORDERNYA : ", ordersService);
 
   return (
     <>
@@ -357,7 +261,6 @@ const Header = () => {
                             setSidebarProfile(!sidebarProfile);
                             setFavorite(false);
                             setChat(false);
-                            setOrder(false);
                           }}
                         >
                           <img
@@ -374,7 +277,6 @@ const Header = () => {
                           setSidebarProfile(!sidebarProfile);
                           setFavorite(false);
                           setChat(false);
-                          setOrder(false);
                         }}
                       >
                         <FaUser className="group-hover:text-primary text-white text-4xl p-1 rounded-full transition-all duration-500" />
@@ -475,132 +377,6 @@ const Header = () => {
       {/* Desktop Profile Sidebar */}
       {sidebarProfile && (
         <div className="hidden sm:flex fixed xl:right-[150px] lg:right-[100px] md:right-[40px] right-[25px] lg:top-[90px] md:top-[80px] top-[75px] gap-4 z-100">
-          {/* Order Panel */}
-          {order && (
-            <div className="w-96 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col absolute top-0 right-[100%] mr-4">
-              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                <h3 className="text-h5 font-semibold text-gray-800">Pesanan</h3>
-              </div>
-
-              {/* filter tab */}
-              <div className="flex justify-start sticky top-0 z-20 border-b bg-white px-3">
-                <div className="flex gap-4 py-2">
-                  {["semua", "proses", "selesai"].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setOrderActiveTab(tab)}
-                      className={`relative pb-2 font-medium capitalize transition-all text-sm ${
-                        orderActiveTab === tab
-                          ? "text-green-700 after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-green-700"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/*card*/}
-              <div className="p-3 space-y-3 overflow-y-auto max-h-[calc(100%-92px)] flex-1">
-                {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order) => (
-                    <div
-                      key={order.order_id}
-                      className="bg-white rounded-xl border border-gray-200 p-3 flex flex-col gap-2 hover:bg-gray-50 transition-colors"
-                    >
-                      {/* header */}
-                      <div className="flex justify-between items-center text-sm">
-                        <p className="text-gray-800 font-semibold truncate max-w-[60%]">
-                          {order.seller_name}
-                        </p>
-
-                        <span
-                          className={`text-sm font-semibold capitalize ${
-                            order.status === "completed"
-                              ? "text-green-600"
-                              : order.status === "in_progress"
-                              ? "text-yellow-600"
-                              : "text-gray-600"
-                          }`}
-                        >
-                          {translateStatus(order.status)}
-                        </span>
-                      </div>
-
-                      <hr className="border-gray-100" />
-
-                      {/* gambar */}
-                      <div className="flex gap-3 items-center">
-                        <img
-                          src={order.service_image}
-                          alt={order.service_name}
-                          className="w-16 h-16 rounded-lg object-cover border flex-shrink-0"
-                        />
-
-                        <div className="flex-1 text-sm text-gray-700 min-w-0">
-                          {/* detail jasa */}
-                          <p className="font-semibold text-gray-900 truncate">
-                            {order.service_name}
-                          </p>
-
-                          <p className="text-xs text-gray-600">
-                            Tanggal:{" "}
-                            {new Date(order.tanggal).toLocaleDateString(
-                              "id-ID"
-                            )}
-                          </p>
-
-                          <p className="text-xs text-gray-600 truncate">
-                            Catatan:{" "}
-                            {order.pesan_tambahan || "Tidak ada catatan"}
-                          </p>
-
-                          <p className="font-medium text-gray-800 mt-1 text-sm">
-                            {formatHarga(order.total_harga)}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* button */}
-                      <div className="flex justify-end gap-2 pt-2">
-                        <Button
-                          variant="secondary"
-                          className={`px-4 py-1.5 text-sm rounded-full ${
-                            order.status === "completed" && !order.is_reviewed
-                              ? "bg-green-600 text-white"
-                              : "border border-gray-300 text-gray-400 bg-transparent cursor-not-allowed"
-                          }`}
-                          disabled={
-                            order.status !== "completed" || order.is_reviewed
-                          }
-                          to={
-                            order.status === "completed" && !order.is_reviewed
-                              ? `/service/review/${order.order_id}`
-                              : undefined
-                          }
-                        >
-                          {order.is_reviewed ? "Sudah di review" : "Review"}
-                        </Button>
-
-                        <Button
-                          variant="primary"
-                          className="px-4 py-1.5 text-sm rounded-full text-white"
-                          onClick={() => navigate(`/chat/${order?.seller_id}`)}
-                        >
-                          Hubungi Penyedia
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center text-gray-500 mt-10 p-4">
-                    Belum ada pesanan {orderActiveTab}.
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Favorites Panel */}
           {favorite && (
@@ -694,23 +470,23 @@ const Header = () => {
                 className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                 onClick={() => {
                   setFavorite(!favorite);
-                  setOrder(false);
                 }}
               >
                 <FaRegHeart className="text-gray-400 text-base" />
                 <span className="text-h5 text-gray-700">Favorit</span>
               </button>
 
-              <button
+              <Link
+                to="/order"
                 className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                 onClick={() => {
                   setFavorite(false);
-                  setOrder(!order);
+                  setSidebarProfile(false);
                 }}
               >
                 <FaShoppingBag className="text-gray-400 text-base" />
                 <span className="text-h5 text-gray-700">Pesanan</span>
-              </button>
+              </Link>
 
               <Link
                 to="/chat"
@@ -726,9 +502,10 @@ const Header = () => {
               {haveSellerAccount && (
                 <button
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() =>{
+                  onClick={() => {
                     setStatusChanges(true)
-                    setSidebarProfile(false)}
+                    setSidebarProfile(false)
+                  }
                   }
                 >
                   <FaUser className="text-gray-400 text-base" />
@@ -848,7 +625,7 @@ const Header = () => {
         </div>
       )}
       {statusChanges && (
-        <ModalSwitchAccount 
+        <ModalSwitchAccount
           onRedirect={() => {
             dispatch(changeAccount({ targetRole: "seller" }))
             setStatusChanges(false)
