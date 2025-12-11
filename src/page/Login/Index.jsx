@@ -5,10 +5,8 @@ import LoginForm from "./sections/LoginForm";
 
 const LoginPage = () => {
   return (
-    <AuthLayout
-      type="Masuk"
-    >
-      <LoginForm/>
+    <AuthLayout type="Masuk">
+      <LoginForm />
     </AuthLayout>
   );
 };

@@ -15,11 +15,9 @@ import {
   loginUser,
   selectAccessToken,
   selectCurrentUser,
-  selectLoginError,
   selectLoginMessage,
   selectLoginStatus,
 } from "../../../features/authSlice";
-import { seeAddress, selectSeeAddress } from "../../../features/userSlice";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
@@ -30,7 +28,7 @@ const LoginForm = () => {
 
   const status = useSelector(selectLoginStatus);
   const message = useSelector(selectLoginMessage);
-  const error = useSelector(selectLoginError);
+
   const currentUser = useSelector(selectCurrentUser);
   const token = useSelector(selectAccessToken);
 
@@ -38,7 +36,7 @@ const LoginForm = () => {
     if (token) {
       navigate("/");
     }
-  }, [token]);
+  }, [token, navigate]);
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value);
@@ -83,23 +81,34 @@ const LoginForm = () => {
       </div>
 
       {/* Error Message */}
-      {status !== "success" && message && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg animate-shake">
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0">
+      {status === "failed" && message && (
+        <div className="bg-red-50/50 border border-red-200 p-4 rounded-xl animate-shake shadow-sm mb-2">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 p-1 bg-red-100 rounded-full mt-0.5">
               <svg
-                className="w-5 h-5 text-red-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
+                className="w-4 h-4 text-red-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
                 <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
             </div>
-            <p className="text-sm text-red-700 font-medium">{message}</p>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-red-800 mb-1">
+                Login Gagal
+              </h3>
+              <p className="text-sm text-red-600 leading-relaxed">
+                {message === "Wrong email or password"
+                  ? "Email atau password yang Anda masukkan salah. Silakan coba lagi."
+                  : message}
+              </p>
+            </div>
           </div>
         </div>
       )}
