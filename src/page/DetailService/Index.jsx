@@ -1,87 +1,83 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { getDetailServicesById, getReviewByServicesById, getServicesById, selectAllServiceReview, selectDetailService, selectDetailServiceStatus, selectReviewServiceStatus, selectSelectedService, selectSelectedServiceStatus } from '../../features/serviceSlice'
-import ImageService from './sections/ImageService'
-import InformationService from './sections/InformationService'
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import ImageService from "./sections/ImageService";
+import {
+  getReviewServicesById,
+  getServicesById,
+  selectReviewService,
+  selectReviewServiceStatus,
+  selectSelectedService,
+  selectSelectedServiceStatus,
+} from "../../features/serviceSlice";
+import { useEffect } from "react";
+import InformationService from "./sections/InformationService";
+import ReviewService from "./sections/ReviewService";
 
 const DetailService = () => {
-    const {id} = useParams()
-    const dispatch = useDispatch()
+  const { id } = useParams();
+  const dispatch = useDispatch();
 
-    const service = useSelector(selectSelectedService)
-    const serviceStatus = useSelector(selectSelectedServiceStatus)
-    const review = useSelector(selectAllServiceReview)
-    const reviewStatus = useSelector(selectReviewServiceStatus)
-    const detailService = useSelector(selectDetailService)
-    const detailServiceStatus = useSelector(selectDetailServiceStatus)
+  const service = useSelector(selectSelectedService);
+  const status = useSelector(selectSelectedServiceStatus);
 
+  const reviews = useSelector(selectReviewService);
+  const reviewStatus = useSelector(selectReviewServiceStatus);
 
-    useEffect(() => {
-      if(id){
-        dispatch(getServicesById(id))
-        dispatch(getReviewByServicesById(id))
-      }
-    }, [id, dispatch])
-
-    useEffect(() => {
-      if(service){
-        dispatch(getDetailServicesById(service.provider_id))
-      }
-    },[dispatch, service])
-
-    if(serviceStatus === 'loading'){
-      return (
-        <div>Sedang memuat...</div>
-      )
+  useEffect(() => {
+    if (id) {
+      dispatch(getServicesById(id));
     }
+  }, [dispatch, id]);
 
-    if(serviceStatus === 'error'){
-      return (
-        <div>terjadi kesalahan</div>
-      )
+  useEffect(() => {
+    console.log("Service loaded:", service);
+    if (service?.id) {
+      console.log("Dispatching getReviewServicesById with ID:", service.id);
+      dispatch(getReviewServicesById(service.id));
+    } else {
+      console.log("Service ID not available yet");
     }
+  }, [dispatch, service?.id]);
 
-    if(!service){
-      return (
-        <div>data tidak ada</div>
-      )
-    }
+  console.log("Current reviews state:", { reviews, reviewStatus });
 
-    if(detailServiceStatus == 'loading'){
-      return (
-        <div>Sedang memuat...</div>
-      )
-    }
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Memuat data...</p>
+        </div>
+      </div>
+    );
+  }
 
-    if(detailServiceStatus == 'error'){
-      return (
-        <div>data tidak ada</div>
-      )
-    }
-
-    if(!detailService){
-      return (
-        <div>Sedang memuat...</div>
-      )
-    }
-    
-    console.log(review)
   return (
-    <div className='md:flex min-h-screen gap-[35px]'>
-        <ImageService/>
-        <InformationService
-          name={service.name}
-          title={service.role}
-          totalReview={service.review_count}
-          description={service.description}
-          rangePrice={service.price_range}
-          overalRating={detailService.overal_rating}
-          allTotalReview={detailService.total_reviews_count}
-          review={review}
-        />
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-12 lg:flex lg:gap-12 min-h-[calc(100vh-100px)] py-3">
+      {status === "loading" && <div className="w-full h-screen">loading</div>}
+      {status === "success" && (
+        <>
+          <div className="flex flex-col lg:w-auto gap-6">
+            <ImageService image={service.foto_product} />
+            <ReviewService reviews={reviews?.data || []} className={'lg:block hidden'} />
+          </div>
+          <InformationService
+            description={service.deskripsi}
+            idProvider={service.seller_id}
+            idService={service.id}
+            nameService={service.nama_jasa}
+            totalReviewSeller={service.jumlah_rating}
+            totalReview={service.jumlah_rating}
+            basePrice={service.base_price}
+            topPrice={service.top_price}
+            idSeller={service.seller_id}
+            foto_product={service.foto_product}
+          />
+          <ReviewService reviews={reviews?.data || []} className={'lg:hidden block'} />
+        </>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default DetailService
+export default DetailService;

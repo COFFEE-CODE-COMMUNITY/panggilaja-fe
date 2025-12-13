@@ -1,19 +1,32 @@
 import React from 'react'
 import Card from '../../common/Card'
+import Stars from '../../common/Stars'
 
-const ReviewCard = ({profileImage, name, date, rating, reviewText}) => {
+const ReviewCard = ({ profileImage, name, date, rating, reviewText }) => {
 
     return (
-    <Card className='px-[20px] py-[15px] bg-slate-50 rounded-[20px]'>
-        <div className='flex gap-[10px] items-center'>
-            <img className='bg-amber-100 h-[20px] w-[20px] rounded-full' />
-            <p className='text-h4'>{name}</p>
-            <p className='flex-1 text-h6'>{date}</p>
-            <div className='flex-1 text-right text-h6'>{rating}</div>
-        </div>
-        <p className='font-light'>{reviewText}</p> 
-    </Card>
-  )
+        <Card to={false} className='flex lg:gap-5 md:gap-4 gap-3 bg-gray-50/40 py-3 rounded-xl'>
+            <div>
+                <img
+                    src={profileImage || "/default-avatar.png"}
+                    className='lg:w-20 md:w-30 w-40 aspect-square rounded-full bg-gray-200 object-cover'
+                />
+            </div>
+            <div className='flex flex-col lg:gap-3 md:gap-2 gap-1 w-full'>
+                <div>
+                    <p className='font-semibold'>{name}</p>
+                    <p className='font-light text-sm text-gray-500'>{date}</p>
+                </div>
+                <Stars
+                    many={rating}
+                    variant='star'
+                />
+                <p className='font-light text-gray-700'>
+                    {reviewText}
+                </p>
+            </div>
+        </Card>
+    )
 }
 
 export default ReviewCard

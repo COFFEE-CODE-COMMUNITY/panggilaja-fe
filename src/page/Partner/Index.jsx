@@ -1,9 +1,14 @@
-import React from 'react'
+import React from "react";
+import Hero from "./sections/Hero";
+import Faq from "./sections/Faq";
 
 const PartnerPage = () => {
   return (
-    <div>PartnerPage</div>
-  )
-}
+    <>
+      <Hero />
+      <Faq />
+    </>
+  );
+};
 
-export default PartnerPage
+export default PartnerPage;

@@ -1,8 +1,14 @@
 import React from 'react'
 
-const ImageService = () => {
+const ImageService = ({ image }) => {
   return (
-    <div className='md:min-h-screen h-[50vh] lg:w-1/2 w-full bg-amber-100 rounded-tr-[15px] rounded-br-[15px]'>s</div>
+    <div className="w-full lg:w-[40rem] xl:w-[42rem] overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
+      <img
+        src={image}
+        alt="Service"
+        className='w-full h-full object-cover aspect-square'
+      />
+    </div>
   )
 }
 
