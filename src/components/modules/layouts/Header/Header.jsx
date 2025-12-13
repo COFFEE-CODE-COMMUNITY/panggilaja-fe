@@ -422,7 +422,7 @@ const Header = () => {
               </Link>
 
               <Link
-                to="/order"
+                to="/setting/order"
                 className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                 onClick={() => {
                   setFavorite(false);
@@ -517,7 +517,7 @@ const Header = () => {
                 </div>
               </Link>
 
-              <Link to="/order" onClick={() => setSidebarMobile(false)}>
+              <Link to="/setting/order" onClick={() => setSidebarMobile(false)}>
                 <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                   <FaShoppingBag className="text-gray-400 text-xl" />
                   <span className="text-base text-gray-700">Pesanan</span>
