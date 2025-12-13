@@ -40,12 +40,12 @@ import FavoriteMobile from "./page/Favorite/Index";
 import TableIncomingOrder from "./page/Dashboard/sections/TableIncomingOrder";
 import FilterByCategory from "./page/Search/FilterByCategory";
 import EditProfile from "./page/Setting/EditProfile";
-import OrderMobile from "./page/Order/OrderMobile";
 import NegoPage from "./page/Nego/NegoPage";
 import ReviewPage from "./page/Review/Index";
 import DashboardUtama from "./page/Dashboard/MainDashboard";
 import TestingPage from "./page/TestingPage";
 import FavoritePage from "./page/Setting/FavoritePage";
+import OrderPage from "./page/Setting/OrderPage";
 
 export default function Router() {
   return (
@@ -56,7 +56,6 @@ export default function Router() {
           <Route index element={<LandingPage />} />
           <Route path="about" element={<PartnerPage />} />
           <Route path="favorites" element={<FavoriteMobile />} />
-          <Route path="order" element={<OrderMobile />} />
           <Route path="partner" element={<PartnerPage />} />
           <Route path="service/:id" element={<DetailService />} />
           <Route path="service/nego/:id" element={<NegoPage />} />
@@ -86,6 +85,7 @@ export default function Router() {
           >
             <Route path="profile" element={<ProfileSetting />} />
             <Route path="favorite" element={<FavoritePage />} />
+            <Route path="order" element={<OrderPage />} />
             <Route path="edit" element={<EditProfile />} />
           </Route>
         </Route>
