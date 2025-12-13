@@ -2,17 +2,25 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom'
 import { changeAccount, selectChangeAccountStatus, selectCurrentUser } from '../../../../features/authSlice';
-import { deleteSellerById, selectSelectedSeller } from '../../../../features/sellerSlice';
+import { deleteSellerById, selectDeleteSellerStatus, selectSelectedSeller } from '../../../../features/sellerSlice';
 import Button from '../../../common/Button';
 import ModalSwitchAccount from '../../Modal/ModalSwitchAccount';
+import ModalConfirmDeleteSeller from '../../Modal/ModalConfirmDeleteSeller';
 
 const BottombarDashboard = () => {
-    const user = useSelector(selectCurrentUser);
-    const dispatch = useDispatch();
-    const sellerProfile = useSelector(selectSelectedSeller);
-    const statusChange = useSelector(selectChangeAccountStatus);
-    const [statusChanges, setStatusChanges] = useState(false)
-    const [modal, setModal] = useState(false)
+  const user = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
+  const sellerProfile = useSelector(selectSelectedSeller);
+  const statusChange = useSelector(selectChangeAccountStatus);
+  const [statusChanges, setStatusChanges] = useState(false)
+  const [modal, setModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const deleteSellerStatus = useSelector(selectDeleteSellerStatus);
+
+  const handleDeleteAccount = () => {
+    dispatch(deleteSellerById(user?.id_seller));
+  }
+
   return (
     <div className='fixed bottom-0 md:hidden w-full py-2 bg-white z-100'>
       <ul className='flex justify-evenly items-center'>
@@ -21,11 +29,10 @@ const BottombarDashboard = () => {
             to="/dashboard"
             className={({ isActive }) =>
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
-                  ${
-                    isActive
-                      ? "text-primary font-semibold"
-                      : "text-gray-500 hover:text-primary"
-                  }`
+                  ${isActive
+                ? "text-primary font-semibold"
+                : "text-gray-500 hover:text-primary"
+              }`
             }
           >
             <span className="flex flex-col items-center">
@@ -75,11 +82,10 @@ const BottombarDashboard = () => {
             to="manage-order"
             className={({ isActive }) =>
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
-                  ${
-                    isActive
-                      ? "text-primary font-semibold"
-                      : "text-gray-500 hover:text-primary"
-                  }`
+                  ${isActive
+                ? "text-primary font-semibold"
+                : "text-gray-500 hover:text-primary"
+              }`
             }
           >
             <span className="flex flex-col items-center">
@@ -129,11 +135,10 @@ const BottombarDashboard = () => {
             to="manage-services"
             className={({ isActive }) =>
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
-                  ${
-                    isActive
-                      ? "text-primary font-semibold"
-                      : "text-gray-500 hover:text-primary"
-                  }`
+                  ${isActive
+                ? "text-primary font-semibold"
+                : "text-gray-500 hover:text-primary"
+              }`
             }
           >
             <span className="flex flex-col items-center">
@@ -183,11 +188,10 @@ const BottombarDashboard = () => {
             to={"chat"}
             className={({ isActive }) =>
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
-                  ${
-                    isActive
-                      ? "text-primary font-semibold"
-                      : "text-gray-500 hover:text-primary"
-                  }`
+                  ${isActive
+                ? "text-primary font-semibold"
+                : "text-gray-500 hover:text-primary"
+              }`
             }
           >
             <span className="flex flex-col items-center">
@@ -228,11 +232,10 @@ const BottombarDashboard = () => {
             to={`manage-profile/${user?.id_seller}`}
             className={({ isActive }) =>
               `group flex items-center text-sm rounded-lg justify-between cursor-pointer transition-colors duration-300
-                  ${
-                    isActive
-                      ? "text-primary font-semibold"
-                      : "text-gray-500 hover:text-primary"
-                  }`
+                  ${isActive
+                ? "text-primary font-semibold"
+                : "text-gray-500 hover:text-primary"
+              }`
             }
           >
             <span className="flex flex-col items-center">
@@ -264,40 +267,47 @@ const BottombarDashboard = () => {
           </NavLink>
         </li>
         <li>
-            {modal && (
-              <div className='absolute bottom-17 p-2 right-3 bg-gray-50 rounded-lg'>
-                <Button
+          {modal && (
+            <div className='absolute bottom-17 p-2 right-3 bg-gray-50 rounded-lg'>
+              <Button
                 className="w-full py-1 rounded-xl"
-                onClick={() => dispatch(deleteSellerById(user?.id_seller))}
-                >
-                  Hapus Akun Mitra
-                </Button>
-                <Button
-                  variant="primary"
-                  className="w-full text-white py-1 rounded-xl"
-                  // onClick={() => dispatch(changeAccount({ targetRole: "buyer" }))}
-                  onClick={() => setStatusChanges(true)}
-                >
-                  Pindah Akun
-                </Button>
-              </div>
-            )}
-            <img
-              className="w-10 h-10 object-cover rounded-full border-1 border-gray-200 hover:border-primary/30 cursor-pointer"
-              src={sellerProfile?.foto_toko}
-              alt=""
-              onClick={() => setModal(!modal)}
-            />
+                onClick={() => setShowDeleteModal(true)}
+              >
+                Hapus Akun Mitra
+              </Button>
+              <Button
+                variant="primary"
+                className="w-full text-white py-1 rounded-xl"
+                // onClick={() => dispatch(changeAccount({ targetRole: "buyer" }))}
+                onClick={() => setStatusChanges(true)}
+              >
+                Pindah Akun
+              </Button>
+            </div>
+          )}
+          <img
+            className="w-10 h-10 object-cover rounded-full border-1 border-gray-200 hover:border-primary/30 cursor-pointer"
+            src={sellerProfile?.foto_toko}
+            alt=""
+            onClick={() => setModal(!modal)}
+          />
         </li>
       </ul>
       {statusChanges && (
-        <ModalSwitchAccount 
+        <ModalSwitchAccount
           onRedirect={() => {
             dispatch(changeAccount({ targetRole: "buyer" }))
             setStatusChanges(false)
           }}
           destinationName={'home'}
           textSwitch={'Your account has been successfully switched to a buyer account. You can now start search your favorite services.'}
+        />
+      )}
+      {showDeleteModal && (
+        <ModalConfirmDeleteSeller
+          onConfirm={handleDeleteAccount}
+          onCancel={() => setShowDeleteModal(false)}
+          isDeleting={deleteSellerStatus === 'loading'}
         />
       )}
     </div>

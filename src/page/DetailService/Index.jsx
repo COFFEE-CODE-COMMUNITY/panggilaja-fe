@@ -53,7 +53,7 @@ const DetailService = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-12 lg:flex lg:gap-12 min-h-[calc(100vh-100px)]">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-12 lg:flex lg:gap-12 min-h-[calc(100vh-100px)] py-3">
       {status === "loading" && <div className="w-full h-screen">loading</div>}
       {status === "success" && (
         <>
