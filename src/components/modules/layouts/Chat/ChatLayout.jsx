@@ -547,9 +547,9 @@ const ChatLayout = () => {
 
   const handleSelectChat = (conversation) => {
     setChatMobile(true);
-    user?.active_role === 'buyer' 
-    ? navigate(`/chat/${conversation.id}`)
-    : navigate(`/dashboard/chat/${conversation.id}`);
+    user?.active_role === "buyer"
+      ? navigate(`/chat/${conversation.id}`)
+      : navigate(`/dashboard/chat/${conversation.id}`);
   };
 
   const handleBackToHome = () => navigate("/");
@@ -726,10 +726,8 @@ const ChatLayout = () => {
                       )}
                     </>
                   ) : (
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center border-1 border-gray-200"
-                    >
-                      <FaUser size={25}/>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center border-1 border-gray-200">
+                      <FaUser size={25} />
                     </div>
                   )}
                 </div>
@@ -750,7 +748,7 @@ const ChatLayout = () => {
             {/* Messages Area */}
             <div
               ref={chatContainerRef}
-              className={`flex-1 overflow-hidden p-4 space-y-4 bg-gray-50`}
+              className={`flex-1 overflow-auto p-4 space-y-4 bg-gray-50`}
             >
               {messagesLoading ? (
                 <div className="flex items-center justify-center h-full">
@@ -1027,7 +1025,11 @@ const ChatLayout = () => {
             </div>
 
             {/* Input Area */}
-            <div className={`bg-white border-t border-gray-200 p-4 ${location.pathname.includes('dashboard') ? 'mb-15' : ''}`}>
+            <div
+              className={`bg-white border-t border-gray-200 p-4 ${
+                location.pathname.includes("dashboard") ? "" : ""
+              }`}
+            >
               <form
                 onSubmit={handleSendMessage}
                 className="flex items-center gap-3"

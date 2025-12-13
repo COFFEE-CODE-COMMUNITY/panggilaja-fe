@@ -29,6 +29,7 @@ import EditService from "./page/Dashboard/EditService";
 import ProfileMitraForm from "./page/MitraForm/sections/ProfileMitraForm";
 import GoogleCallback from "./page/Auth/GoogleCallback";
 import ManageProfile from "./page/Dashboard/ManageProfile";
+import AddDocs from "./page/Dashboard/AddDocs";
 import ChatLayout from "./components/modules/layouts/Chat/ChatLayout";
 import Test from "./page/Search/Test";
 import ManageOrderLayout from "./page/Dashboard/ManageOrderLayout";
@@ -44,6 +45,7 @@ import NegoPage from "./page/Nego/NegoPage";
 import ReviewPage from "./page/Review/Index";
 import DashboardUtama from "./page/Dashboard/MainDashboard";
 import TestingPage from "./page/TestingPage";
+import FavoritePage from "./page/Setting/FavoritePage";
 
 export default function Router() {
   return (
@@ -83,6 +85,7 @@ export default function Router() {
             }
           >
             <Route path="profile" element={<ProfileSetting />} />
+            <Route path="favorite" element={<FavoritePage />} />
             <Route path="edit" element={<EditProfile />} />
           </Route>
         </Route>
@@ -138,6 +141,8 @@ export default function Router() {
 
           <Route path="manage-services" element={<ManageServices />} />
           <Route path="manage-services/add-service" element={<AddService />} />
+          <Route path="add-docs" element={<AddDocs />} />
+          <Route path="add-docs" element={<AddDocs />} />
           <Route
             path="manage-services/edit-service/:id"
             element={<EditService />}

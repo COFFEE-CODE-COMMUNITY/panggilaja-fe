@@ -3,7 +3,6 @@ import ReviewCard from '../../../components/modules/Cards/ReviewCard'
 import { MessageSquare } from 'lucide-react'
 
 const ReviewService = ({ className, reviews = [] }) => {
-  console.log("ReviewService received reviews:", reviews);
   return (
     <div className={`flex flex-col gap-5 ${className} px-3`}>
       <p className='font-semibold mb-2'>Ulasan Warga ({reviews.length})</p>

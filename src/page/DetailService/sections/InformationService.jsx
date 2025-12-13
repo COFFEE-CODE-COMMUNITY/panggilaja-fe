@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaStar, FaRegHeart, FaHeart } from "react-icons/fa";
+import { FaStar, FaRegHeart, FaHeart, FaCommentDots, FaHandshake } from "react-icons/fa";
 import Button from "../../../components/common/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -180,7 +180,7 @@ const InformationService = ({
             {token && (
               <button
                 onClick={isServiceFavorite ? () => dispatch(deleteFavoriteService(isServiceFavorite.id)) : handleAddFavorite}
-                className="p-2 rounded-full hover:bg-gray-50 transition-colors"
+                className="cursor-pointer p-2 rounded-full hover:bg-gray-50 transition-colors"
               >
                 {isServiceFavorite ? (
                   <FaHeart className="text-red-500 text-xl" />
@@ -237,18 +237,20 @@ const InformationService = ({
         <div className="flex gap-3 mt-2">
           <Button
             variant="primary"
-            className="flex-2 rounded-lg text-white font-medium h-[50px] hover:bg-primary/90 flex items-center justify-center w-full"
+            className="flex-2 gap-3 rounded-lg text-white font-medium h-[50px] hover:bg-primary/90 flex items-center justify-center w-full"
             onClick={handleStartChat}
             disabled={isStartingChat}
           >
+            <FaCommentDots />
             Hubungi sekarang
           </Button>
 
           <Button
             variant="secondary"
-            className="flex-1 rounded-lg text-white font-medium h-[50px] hover:bg-secondary/90 flex items-center justify-center w-[150px] px-[10px]"
+            className="flex-1 gap-3 rounded-lg text-white font-medium h-[50px] hover:bg-secondary/90 flex items-center justify-center w-[150px] px-[10px]"
             to={`/service/nego/${idService}`}
           >
+            <FaHandshake />
             Negoin aja
           </Button>
         </div>

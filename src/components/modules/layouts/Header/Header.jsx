@@ -378,63 +378,7 @@ const Header = () => {
       {sidebarProfile && (
         <div className="hidden sm:flex fixed xl:right-[150px] lg:right-[100px] md:right-[40px] right-[25px] lg:top-[90px] md:top-[80px] top-[75px] gap-4 z-100">
 
-          {/* Favorites Panel */}
-          {favorite && (
-            <div className="w-96 max-h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden absolute top-0 right-[100%] mr-4">
-              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                <h3 className="text-h5 font-semibold text-gray-800">
-                  Jasa Favorit
-                </h3>
-              </div>
-              <div className="overflow-y-auto max-h-80 p-2 space-y-3">
-                {favoritesService.length > 0 ? (
-                  favoritesService.map((favorite) => {
-                    const idDelFav = favorites.data.find(
-                      (service) => service.service_id === favorite.id
-                    );
-                    return (
-                      <div
-                        key={favorite.id}
-                        className="bg-white rounded-lg border border-gray-200"
-                      >
-                        <div className="flex gap-4 p-3 hover:bg-gray-50 transition-colors ">
-                          <img
-                            src={favorite?.foto_product}
-                            alt={favorite.nama_jasa}
-                            className="w-20 aspect-square object-cover rounded-lg"
-                          />
-                          <div className="flex flex-col w-full">
-                            <Link
-                              className="text-h5 font-medium text-gray-800 line-clamLink-2 cursor-pointer"
-                              to={`service/${favorite.id}`}
-                            >
-                              {favorite.nama_jasa}
-                            </Link>
-                            <p className="font-light w-50">
-                              {favorite.deskripsi.slice(0, 20)}...
-                            </p>
-                          </div>
-                          <div>
-                            <FaHeart
-                              className="cursor-pointer"
-                              onClick={() =>
-                                dispatch(deleteFavoriteService(idDelFav.id))
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="p-8 text-center text-gray-500">
-                    <FaRegHeart className="mx-auto text-4xl mb-2 text-gray-300" />
-                    <p className="text-h5">Belum ada favorit</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+
 
           {/* Main Profile Menu */}
           <div className="w-64 bg-white shadow-2xl rounded-sm border border-gray-100 overflow-hidden">
@@ -466,15 +410,16 @@ const Header = () => {
 
             {/* Menu Items */}
             <div className="py-2">
-              <button
-                className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                onClick={() => {
-                  setFavorite(!favorite);
-                }}
+              <Link
+                to="/setting/favorite"
+                onClick={() => setSidebarProfile(false)}
+                className="cursor-pointer"
               >
-                <FaRegHeart className="text-gray-400 text-base" />
-                <span className="text-h5 text-gray-700">Favorit</span>
-              </button>
+                <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                  <FaRegHeart className="text-gray-400 text-base" />
+                  <span className="text-h5 text-gray-700">Favorit</span>
+                </div>
+              </Link>
 
               <Link
                 to="/order"
@@ -565,7 +510,7 @@ const Header = () => {
 
             {/* Menu Items */}
             <div className="space-y-2 mb-6">
-              <Link to="/favorites" onClick={() => setSidebarMobile(false)}>
+              <Link to="/setting/favorite" onClick={() => setSidebarMobile(false)}>
                 <div className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                   <FaRegHeart className="text-gray-400 text-xl" />
                   <span className="text-base text-gray-700">Favorit</span>

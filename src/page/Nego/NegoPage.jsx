@@ -15,6 +15,7 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import Button from "../../components/common/Button";
+import Modal from "../../components/common/Modal";
 import { selectSeeAddress } from "../../features/userSlice";
 
 const NegoPage = () => {
@@ -44,13 +45,11 @@ const NegoPage = () => {
     if (!harga || harga <= 0) {
       newErrors.harga = "Harga harus diisi dan lebih dari 0";
     } else if (service?.base_price && harga < service.base_price * 0.5) {
-      newErrors.harga = `Harga terlalu rendah. Minimal sekitar ${
-        service.base_price * 0.5
-      }`;
+      newErrors.harga = `Harga terlalu rendah. Minimal sekitar ${service.base_price * 0.5
+        }`;
     } else if (service?.top_price && harga > service.top_price * 1.5) {
-      newErrors.harga = `Harga terlalu tinggi. Maksimal sekitar ${
-        service.top_price * 1.5
-      }`;
+      newErrors.harga = `Harga terlalu tinggi. Maksimal sekitar ${service.top_price * 1.5
+        }`;
     }
 
     if (!pesan || pesan.trim().length < 10) {
@@ -204,9 +203,8 @@ const NegoPage = () => {
                       value={harga}
                       onChange={(e) => setHarga(e.target.value)}
                       placeholder="Masukkan penawaran harga"
-                      className={`w-full pl-12 pr-4 py-3 focus:outline-0 focus:ring-2 focus:ring-primary rounded-[15px] border-2 ${
-                        errors.harga ? "border-red-500" : "border-gray-200"
-                      } transition-all`}
+                      className={`w-full pl-12 pr-4 py-3 focus:outline-0 focus:ring-2 focus:ring-primary rounded-[15px] border-2 ${errors.harga ? "border-red-500" : "border-gray-200"
+                        } transition-all`}
                     />
                   </div>
                   {errors.harga && (
@@ -231,9 +229,8 @@ const NegoPage = () => {
                     value={pesan}
                     onChange={(e) => setPesan(e.target.value)}
                     placeholder="Jelaskan detail kebutuhan Anda, timeline, dan hal penting lainnya..."
-                    className={`h-[200px] border-2 ${
-                      errors.pesan ? "border-red-500" : "border-gray-200"
-                    } p-[15px] rounded-[15px] focus:outline-0 focus:ring-2 focus:ring-primary transition-all resize-none`}
+                    className={`h-[200px] border-2 ${errors.pesan ? "border-red-500" : "border-gray-200"
+                      } p-[15px] rounded-[15px] focus:outline-0 focus:ring-2 focus:ring-primary transition-all resize-none`}
                   />
                   {errors.pesan && (
                     <p className="text-red-500 text-sm flex items-center gap-1">
@@ -296,78 +293,70 @@ const NegoPage = () => {
       </div>
 
       {/* Modal Konfirmasi */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl animate-slideUp">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-100 p-3 rounded-full">
-                  <FaCheckCircle className="text-primary text-2xl" />
-                </div>
-                <h3 className="font-bold text-xl text-gray-800">
-                  Konfirmasi Penawaran
-                </h3>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} width="max-w-md">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-100 p-3 rounded-full">
+                <FaCheckCircle className="text-primary text-2xl" />
               </div>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <FaTimes className="text-xl cursor-pointer" />
-              </button>
-            </div>
-
-            <div className="mb-6 space-y-3">
-              <p className="text-gray-600">
-                Apakah Anda yakin ingin mengirim penawaran ini?
-              </p>
-
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Jasa:</span>
-                  <span className="font-semibold text-gray-800">
-                    {service?.nama_jasa}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Harga Penawaran:</span>
-                  <span className="font-semibold text-green-600">
-                    Rp {parseInt(harga).toLocaleString()}
-                  </span>
-                </div>
-                {/* 🆕 Tampilkan preview pesan */}
-                <div className="pt-2 border-t border-gray-200">
-                  <span className="text-gray-600 text-sm">
-                    Detail Kebutuhan:
-                  </span>
-                  <p className="text-sm text-gray-700 mt-1 line-clamp-3">
-                    {pesan}
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-500 bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
-                Penawaran akan dikirim ke penjual melalui chat. Anda dapat
-                melanjutkan negosiasi di sana.
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleConfirmNego}
-                className="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-md cursor-pointer"
-              >
-                Ya, Kirim
-              </button>
+              <h3 className="font-bold text-xl text-gray-800">
+                Konfirmasi Penawaran
+              </h3>
             </div>
           </div>
+
+          <div className="mb-6 space-y-3">
+            <p className="text-gray-600">
+              Apakah Anda yakin ingin mengirim penawaran ini?
+            </p>
+
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Jasa:</span>
+                <span className="font-semibold text-gray-800">
+                  {service?.nama_jasa}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Harga Penawaran:</span>
+                <span className="font-semibold text-green-600">
+                  Rp {parseInt(harga).toLocaleString()}
+                </span>
+              </div>
+              {/* 🆕 Tampilkan preview pesan */}
+              <div className="pt-2 border-t border-gray-200">
+                <span className="text-gray-600 text-sm">
+                  Detail Kebutuhan:
+                </span>
+                <p className="text-sm text-gray-700 mt-1 line-clamp-3">
+                  {pesan}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-500 bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
+              Penawaran akan dikirim ke penjual melalui chat. Anda dapat
+              melanjutkan negosiasi di sana.
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowModal(false)}
+              className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleConfirmNego}
+              className="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-md cursor-pointer"
+            >
+              Ya, Kirim
+            </button>
+          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

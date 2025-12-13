@@ -1,5 +1,5 @@
 import React from 'react'
-import { FaArrowRight, FaUser } from 'react-icons/fa'
+import { FaArrowRight, FaUser, FaRegHeart } from 'react-icons/fa'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 const SettingLayout = () => {
@@ -30,6 +30,22 @@ const SettingLayout = () => {
                   <div className='flex items-center gap-3'>
                     <FaUser size={18} />
                     <span>Profil Saya</span>
+                  </div>
+                  <FaArrowRight size={14} className='opacity-50' />
+                </NavLink>
+                <NavLink
+                  to='favorite'
+                  className={({ isActive }) => `
+                                    flex items-center justify-between p-3 rounded-lg transition-all duration-200
+                                    ${isActive
+                      ? 'bg-primary/10 text-primary font-medium'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }
+                                `}
+                >
+                  <div className='flex items-center gap-3'>
+                    <FaRegHeart size={18} />
+                    <span>Favorit</span>
                   </div>
                   <FaArrowRight size={14} className='opacity-50' />
                 </NavLink>
