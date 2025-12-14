@@ -256,13 +256,16 @@ const Header = () => {
                     {profile?.foto_buyer ? (
                       <>
                         <button
-                          className="hidden sm:block relative group cursor-pointer"
+                          className="hidden sm:flex items-center gap-3 relative group cursor-pointer"
                           onClick={() => {
                             setSidebarProfile(!sidebarProfile);
                             setFavorite(false);
                             setChat(false);
                           }}
                         >
+                          <span className="text-gray-700 font-medium group-hover:text-primary transition-colors">
+                            {user?.username}
+                          </span>
                           <img
                             className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-1 border-gray-50 group-hover:border-primary transition-all cursor-pointer"
                             src={profile?.foto_buyer || "/default-avatar.png"}
@@ -272,14 +275,19 @@ const Header = () => {
                       </>
                     ) : (
                       <button
-                        className="hover:bg-white hover:border-gray-100 group hidden sm:block relative group cursor-pointer h-10 w-10 bg-gray-200 rounded-full hover:scale-105 transition-all"
+                        className="hidden sm:flex items-center gap-3 relative group cursor-pointer"
                         onClick={() => {
                           setSidebarProfile(!sidebarProfile);
                           setFavorite(false);
                           setChat(false);
                         }}
                       >
-                        <FaUser className="group-hover:text-primary text-white text-4xl p-1 rounded-full transition-all duration-500" />
+                        <span className="text-gray-700 font-medium group-hover:text-primary transition-colors">
+                          {user?.username}
+                        </span>
+                        <div className="h-10 w-10 md:w-11 md:h-11 bg-gray-200 rounded-full flex items-center justify-center group-hover:border-primary border-1 border-transparent transition-all">
+                          <FaUser className="text-white text-xl" />
+                        </div>
                       </button>
                     )}
                   </>
