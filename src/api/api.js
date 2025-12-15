@@ -1,5 +1,6 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { updateProfile, logout } from "../features/authSlice";
 
 const isDevelopment = import.meta.env.MODE === "development";
 const API_BASE_URL = isDevelopment
@@ -17,6 +18,11 @@ const api = axios.create({
 
 let isRefreshing = false;
 let failedQueue = [];
+
+let store = null;
+export const injectStore = (_store) => {
+  store = _store;
+};
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
@@ -144,6 +150,11 @@ api.interceptors.response.use(
           localStorage.setItem("user", JSON.stringify(decodedUser));
         }
 
+        // ✅ SYNC REDUX: Update state agar aplikasi tahu token baru
+        if (store) {
+          store.dispatch(updateProfile());
+        }
+
         // Update header
         api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
@@ -159,18 +170,22 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         isRefreshing = false;
 
-        // ✅ PERBAIKAN: Clear storage
+        // ✅ PERBAIKAN: Clear storage & Redux
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
+
+        if (store) {
+          store.dispatch(logout());
+        }
 
         // ✅ PERBAIKAN: Redirect berdasarkan current path
         if (typeof window !== "undefined") {
           const currentPath = window.location.pathname;
-          
+
           // Jangan redirect kalau sudah di login page
           if (!currentPath.includes('/login')) {
             console.log("🔄 Redirecting to login...");
-            
+
             // Redirect ke login dengan return URL
             const returnUrl = encodeURIComponent(currentPath);
             window.location.href = `/login?returnUrl=${returnUrl}`;

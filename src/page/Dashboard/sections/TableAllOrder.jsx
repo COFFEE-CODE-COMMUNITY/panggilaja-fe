@@ -18,8 +18,8 @@ const TableAllOrder = () => {
     const [openDropdown, setOpenDropdown] = useState(null)
     const updateStatus = useSelector(selectUpdateOrderStatus)
     const updateError = useSelector(selectUpdateOrderError)
-    
-    console.log(user)
+
+    console.log(orders)
 
     // useEffect(() => {
     //     if (user && user?.id_seller && ordersStatus === 'idle') {
@@ -34,11 +34,11 @@ const TableAllOrder = () => {
                 setOpenDropdown(null)
             }
         }
-        
+
         document.addEventListener('click', handleClickOutside)
         return () => document.removeEventListener('click', handleClickOutside)
     }, [])
-    
+
     let dashboardData = [];
     // Pastikan kedua data sudah ada
     if (orders && allService) {
@@ -52,13 +52,19 @@ const TableAllOrder = () => {
             // 3?. Cari detail service yang cocok pakai serviceMap
             const serviceDetail = serviceMap?.get(order?.service_id);
 
+            const addr = order?.buyer?.alamat?.[0];
+            const fullAddress = addr ?
+                [addr.alamat, addr.kecamatan, addr.kota, addr.provinsi, addr.kode_pos].filter(Boolean).join(', ')
+                : 'Alamat tidak tersedia';
+
             return {
-                order_id: order?.id, 
+                order_id: order?.id,
                 nama_jasa: serviceDetail ? serviceDetail?.nama_jasa : 'Jasa Tidak Ditemukan',
-                id_buyer : order?.buyer_id,
+                id_buyer: order?.buyer_id,
                 tanggal: order?.tanggal,
                 status: order?.status,
-                nama_buyer : order?.buyer?.fullname
+                nama_buyer: order?.buyer?.fullname,
+                alamat: fullAddress
             };
         });
 
@@ -70,10 +76,10 @@ const TableAllOrder = () => {
 
     const handleHubungiPembeli = async (buyerId) => {
         console?.log('Hubungi pembeli untuk order:', buyerId)
-        
+
         try {
             const token = localStorage?.getItem('accessToken') || sessionStorage?.getItem('accessToken')
-            
+
             // ✅ Buat/ambil room chat
             const response = await fetch(`${process?.env?.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/chat/room`, {
                 method: 'POST',
@@ -86,18 +92,18 @@ const TableAllOrder = () => {
                     id_seller: user?.id_seller
                 })
             })
-            
+
             const data = await response?.json()
-            
+
             if (data?.success) {
                 console?.log('✅ Room chat berhasil dibuat/diambil')
             }
-            
+
             // ✅ PENTING: Navigate dengan state shouldRefreshList
             navigate('/dashboard/chat/' + buyerId, {
                 state: { shouldRefreshList: true } // ← Force refresh contact list
             })
-            
+
         } catch (error) {
             console?.error('Error saat membuat room chat:', error)
             // Tetap navigate dengan refresh flag
@@ -105,7 +111,7 @@ const TableAllOrder = () => {
                 state: { shouldRefreshList: true }
             })
         }
-        
+
         setOpenDropdown(null)
     }
 
@@ -118,8 +124,8 @@ const TableAllOrder = () => {
         }))
         setOpenDropdown(null)
     }
-    
-    
+
+
     return (
         <div className="w-full">
             {/* Desktop View - Hidden on mobile */}
@@ -128,6 +134,7 @@ const TableAllOrder = () => {
                     <thead className="bg-primary text-white font-bold rounded-lg">
                         <tr>
                             <th className="p-4 w-[20%]">Nama Pemesan</th>
+                            <th className="px-4 py-3 w-[20%]">Alamat</th>
                             <th className="px-4 py-3 w-[15%]">Jasa</th>
                             <th className="px-4 py-3 w-[18%]">Tanggal</th>
                             <th className="px-4 py-3 w-[18%]">Status</th>
@@ -137,40 +144,45 @@ const TableAllOrder = () => {
                     <tbody>
                         {dashboardData?.length === 0 && (
                             <tr>
-                            <td colSpan="100%" className="px-4 py-16">
-                                <div className="flex flex-col items-center justify-center text-center">
-                                {/* Icon */}
-                                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                    <svg 
-                                    className="w-10 h-10 text-gray-400" 
-                                    fill="none" 
-                                    stroke="currentColor" 
-                                    viewBox="0 0 24 24"
-                                    >
-                                    <path 
-                                        strokeLinecap="round" 
-                                        strokeLinejoin="round" 
-                                        strokeWidth={2} 
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5?.586a1 1 0 01?.707?.293l5?.414 5?.414a1 1 0 01?.293?.707V19a2 2 0 01-2 2z" 
-                                    />
-                                    </svg>
-                                </div>
-                                
-                                {/* Text */}
-                                <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                                    Belum Ada Pesanan
-                                </h3>
-                                <p className="text-sm text-gray-500 max-w-md">
-                                    Pesanan yang telah selesai akan muncul di sini?. Mulai terima pesanan pertama Anda!
-                                </p>
-                                </div>
-                            </td>
+                                <td colSpan="100%" className="px-4 py-16">
+                                    <div className="flex flex-col items-center justify-center text-center">
+                                        {/* Icon */}
+                                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                            <svg
+                                                className="w-10 h-10 text-gray-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5?.586a1 1 0 01?.707?.293l5?.414 5?.414a1 1 0 01?.293?.707V19a2 2 0 01-2 2z"
+                                                />
+                                            </svg>
+                                        </div>
+
+                                        {/* Text */}
+                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                            Belum Ada Pesanan
+                                        </h3>
+                                        <p className="text-sm text-gray-500 max-w-md">
+                                            Pesanan yang telah selesai akan muncul di sini?. Mulai terima pesanan pertama Anda!
+                                        </p>
+                                    </div>
+                                </td>
                             </tr>
                         )}
                         {dashboardData?.map((order) => (
                             <tr key={order?.order_id} className="border-t border-gray-400">
                                 <td className="px-4 py-3 w-[20%]">
-                                    <p>{order?.nama_buyer}</p>
+                                    <div className="flex items-center space-x-2 w-full">
+                                        <p>{order?.nama_buyer}</p>
+                                    </div>
+                                </td>
+                                <td className="px-4 py-3 whitespace-normal break-words min-w-[200px]">
+                                    {order?.alamat}
                                 </td>
                                 <td className="px-4 py-3 w-[15%]">
                                     {order?.nama_jasa}
@@ -179,7 +191,7 @@ const TableAllOrder = () => {
                                 <td className="px-4 py-3 w-[18%]">{order?.status}</td>
                                 <td className="px-4 py-3 w-[10%]">
                                     <div className="flex w-full justify-end relative dropdown-container">
-                                        <button 
+                                        <button
                                             onClick={() => toggleDropdown(order?.order_id)}
                                             className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5 p-2"
                                         >
@@ -216,34 +228,34 @@ const TableAllOrder = () => {
             <div className="md:hidden space-y-3">
                 {dashboardData?.length === 0 && (
                     <tr>
-                    <td colSpan="100%" className="px-4 py-16">
-                        <div className="flex flex-col items-center justify-center text-center">
-                        {/* Icon */}
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                            <svg 
-                            className="w-10 h-10 text-gray-400" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                            >
-                            <path 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round" 
-                                strokeWidth={2} 
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5?.586a1 1 0 01?.707?.293l5?.414 5?.414a1 1 0 01?.293?.707V19a2 2 0 01-2 2z" 
-                            />
-                            </svg>
-                        </div>
-                        
-                        {/* Text */}
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                            Belum Ada Pesanan
-                        </h3>
-                        <p className="text-sm text-gray-500 max-w-md">
-                            Pesanan yang telah selesai akan muncul di sini?. Mulai terima pesanan pertama Anda!
-                        </p>
-                        </div>
-                    </td>
+                        <td colSpan="100%" className="px-4 py-16">
+                            <div className="flex flex-col items-center justify-center text-center">
+                                {/* Icon */}
+                                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                    <svg
+                                        className="w-10 h-10 text-gray-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5?.586a1 1 0 01?.707?.293l5?.414 5?.414a1 1 0 01?.293?.707V19a2 2 0 01-2 2z"
+                                        />
+                                    </svg>
+                                </div>
+
+                                {/* Text */}
+                                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                    Belum Ada Pesanan
+                                </h3>
+                                <p className="text-sm text-gray-500 max-w-md">
+                                    Pesanan yang telah selesai akan muncul di sini?. Mulai terima pesanan pertama Anda!
+                                </p>
+                            </div>
+                        </td>
                     </tr>
                 )}
                 {dashboardData?.map((order) => (
@@ -256,10 +268,10 @@ const TableAllOrder = () => {
                                     <p className="font-medium text-sm">{order?.nama_buyer}</p>
                                 </div>
                             </div>
-                            
+
                             {/* Dropdown Button */}
                             <div className="relative dropdown-container">
-                                <button 
+                                <button
                                     onClick={() => toggleDropdown(order?.order_id)}
                                     className="flex flex-col gap-y-1 text-black hover:text-gray-600 p-2"
                                 >
@@ -290,6 +302,10 @@ const TableAllOrder = () => {
                         {/* Content Card */}
                         <div className="space-y-2 border-t border-gray-200 pt-3">
                             <div className="flex justify-between items-center">
+                                <span className="text-xs text-gray-500">Alamat:</span>
+                                <span className="text-sm text-gray-800 text-right whitespace-normal break-words max-w-[60%]">{order?.alamat}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
                                 <span className="text-xs text-gray-500">Jasa:</span>
                                 <span className="text-sm font-medium text-gray-800">{order?.nama_jasa}</span>
                             </div>
@@ -299,11 +315,10 @@ const TableAllOrder = () => {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-xs text-gray-500">Status:</span>
-                                <span className={`text-sm font-medium px-2 py-1 rounded ${
-                                    order?.status === 'selesai' ? 'bg-green-100 text-green-700' :
+                                <span className={`text-sm font-medium px-2 py-1 rounded ${order?.status === 'selesai' ? 'bg-green-100 text-green-700' :
                                     order?.status === 'proses' ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-gray-100 text-gray-700'
-                                }`}>
+                                        'bg-gray-100 text-gray-700'
+                                    }`}>
                                     {order?.status}
                                 </span>
                             </div>

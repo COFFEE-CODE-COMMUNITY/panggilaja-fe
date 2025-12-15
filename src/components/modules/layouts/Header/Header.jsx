@@ -38,6 +38,7 @@ import {
   seeProfile,
   selectSeeProfile,
   selectSeeProfileStatus,
+  resetUserProfile,
 } from "../../../../features/userSlice";
 import {
   selectSearchText,
@@ -79,6 +80,7 @@ const Header = () => {
   useEffect(() => {
     if (statusChange === "success") {
       dispatch(resetChangeAccountStatus());
+      dispatch(resetUserProfile());
       navigate('/dashboard')
     }
   }, [statusChange, dispatch, navigate]);
@@ -95,10 +97,17 @@ const Header = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (user?.id_buyer && statusProfile === "idle" && !profile) {
-      dispatch(seeProfile(user.id_buyer));
+    if (user?.id_buyer) {
+      const isProfileMismatch = profile && profile.id !== user.id_buyer;
+
+      if ((statusProfile === "idle" && !profile) || isProfileMismatch) {
+        if (isProfileMismatch) {
+          dispatch(resetUserProfile());
+        }
+        dispatch(seeProfile(user.id_buyer));
+      }
     }
-  }, [statusProfile, dispatch, user?.id_buyer]);
+  }, [statusProfile, dispatch, user?.id_buyer, profile]);
 
   useEffect(() => {
     if (!token) {
@@ -162,7 +171,7 @@ const Header = () => {
   }
 
   const haveSellerAccount = user?.available_roles?.length > 1;
-
+  console.log(user)
   return (
     <>
       {header && (
@@ -377,9 +386,6 @@ const Header = () => {
       {/* Desktop Profile Sidebar */}
       {sidebarProfile && (
         <div className="hidden sm:flex fixed xl:right-[150px] lg:right-[100px] md:right-[40px] right-[25px] lg:top-[90px] md:top-[80px] top-[75px] gap-4 z-100">
-
-
-
           {/* Main Profile Menu */}
           <div className="w-64 bg-white shadow-2xl rounded-sm border border-gray-100 overflow-hidden">
             {/* Profile Header */}
@@ -401,7 +407,7 @@ const Header = () => {
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-800 truncate">
-                    {user?.username}
+                    {profile?.fullname}
                   </p>
                   <p className="text-h6 text-gray-500">Konsumen</p>
                 </div>

@@ -141,7 +141,7 @@ export const getOrderBySellerId = createAsyncThunk(
   'seller/getOrderBySellerId',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/orders/${id}`)
+      const res = await api.get(`/sellers/${id}/orders`)
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');

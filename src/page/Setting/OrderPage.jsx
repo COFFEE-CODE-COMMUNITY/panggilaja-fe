@@ -22,7 +22,7 @@ const OrderPage = () => {
     const orderStatus = useSelector(selectOrdersStatus);
     const orderMessage = useSelector(selectOrdersError);
     const allService = useSelector(selectAllService);
-
+    console.log(order)
     useEffect(() => {
         if (user && user.id_buyer) {
             if (orderStatus === "idle") {
@@ -51,6 +51,7 @@ const OrderPage = () => {
                 service_id: serviceData.id || "",
                 service_name: serviceData.nama_jasa || "",
                 service_image: serviceData.foto_product || "",
+                is_reviewed: itemOrder.is_reviewed || false,
             };
         });
     }
@@ -174,15 +175,15 @@ const OrderPage = () => {
                                     {/* button*/}
                                     <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-50">
                                         <Button
-                                            variant={item.status === "completed" ? "secondary" : "secondary"}
-                                            className={`px-6 py-2 text-sm rounded-lg font-medium ${item.status === "completed"
+                                            variant={item.status === "completed" && !item.is_reviewed ? "secondary" : "secondary"}
+                                            className={`px-6 py-2 text-sm rounded-lg font-medium ${item.status === "completed" && !item.is_reviewed
                                                 ? "bg-secondary text-white hover:bg-secondary/90"
                                                 : "bg-transparent text-gray-300 border border-gray-200 cursor-not-allowed"
                                                 }`}
-                                            disabled={item.status !== "completed"}
-                                            to={item.status === "completed" ? `/service/review/${item.order_id}` : undefined}
+                                            disabled={item.status !== "completed" || item.is_reviewed}
+                                            to={item.status === "completed" && !item.is_reviewed ? `/service/review/${item.order_id}` : undefined}
                                         >
-                                            Beri Ulasan
+                                            {item.is_reviewed ? "Sudah Diulas" : "Beri Ulasan"}
                                         </Button>
 
                                         <Button

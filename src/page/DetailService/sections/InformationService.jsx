@@ -50,25 +50,19 @@ const InformationService = ({
   const [isStartingChat, setIsStartingChat] = useState(false);
   const reviews = useSelector(selectReviewService);
   const status = useSelector(selectReviewServiceStatus);
-  const statusFavorite = useSelector(selectAddFavoriteServiceStatus);
-  const messageFavorite = useSelector(selectAddFavoriteServiceError);
   const statusAdd = useSelector(selectAddFavoriteServiceStatus);
   const errorAdd = useSelector(selectAddFavoriteServiceError);
   const token = useSelector(selectAccessToken);
   const sellerProfile = useSelector(selectSelectedSeller);
 
   const [showMoreDesc, setShowMoreDesc] = useState(false);
-  console.log(user)
   const myId = user?.id_buyer;
-  const isBuyer = user?.active_role?.toUpperCase() === "BUYER";
 
   useEffect(() => {
     if (idSeller) {
       dispatch(getSellerById(idSeller));
     }
   }, [idSeller]);
-
-
 
   const handleAddFavorite = () => {
     dispatch(addFavoriteService(idService));
@@ -100,12 +94,12 @@ const InformationService = ({
   }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
   const handleStartChat = () => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
     if (isStartingChat || !idProvider || !nameService || !myId) {
-      console.error("Missing required data:", {
-        idProvider,
-        nameService,
-        myId,
-      });
       return;
     }
 
@@ -116,12 +110,10 @@ const InformationService = ({
       "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400";
     const shortDescription = description.substring(0, 50) + "...";
 
-    // Format pesan otomatis
     const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (ServiceID: ${idService}) (Harga: Rp ${basePrice.toLocaleString(
       "id-ID"
     )}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
 
-    // Data untuk socket
     const messageData = {
       id_buyer: myId,
       id_seller: idProvider,
@@ -129,21 +121,16 @@ const InformationService = ({
       sender_role: "BUYER",
     };
 
-    console.log("📤 Emitting message via socket:", messageData);
-
-    // 🔥 KIRIM VIA SOCKET (BUKAN HTTP!)
     socket.emit("send_message", messageData);
 
-    // Navigate ke chat dengan delay kecil
     setTimeout(() => {
       setIsStartingChat(false);
       navigate(`/chat/${idProvider}`, {
         state: { shouldRefreshList: true },
       });
-    }, 300); // 300ms delay untuk memastikan socket terkirim
+    }, 300);
   };
 
-  // 🆕 Listener untuk konfirmasi pesan terkirim (optional)
   useEffect(() => {
     const handleMessageReceived = (msg) => {
       console.log("✅ Message confirmed:", msg);
@@ -159,10 +146,9 @@ const InformationService = ({
   return (
     <div className="h-full flex-1 w-full flex flex-col gap-6 lg:py-0 py-6">
       <div className="flex flex-col gap-6">
-        {/* header */}
         <div className="space-y-4">
           <div className="flex justify-between items-start gap-4">
-            <div className="space-y-1">
+            <div className="space-y-1 w-full">
               <Link
                 to={`/profile-service/${idSeller}`}
                 className="text-sm font-medium text-primary flex items-center gap-2"
@@ -181,6 +167,7 @@ const InformationService = ({
               <button
                 onClick={isServiceFavorite ? () => dispatch(deleteFavoriteService(isServiceFavorite.id)) : handleAddFavorite}
                 className="cursor-pointer p-2 rounded-full hover:bg-gray-50 transition-colors"
+                title={isServiceFavorite ? "Hapus dari favorit" : "Tambah ke favorit"}
               >
                 {isServiceFavorite ? (
                   <FaHeart className="text-red-500 text-xl" />
@@ -204,20 +191,20 @@ const InformationService = ({
 
         <div className="h-px bg-gray-100"></div>
 
-        {/* harga selction */}
         <div>
           <p className="text-sm text-gray-500 mb-1">Mulai dari</p>
-          <h2 className="text-3xl font-bold text-primary">
-            Rp {parseInt(basePrice).toLocaleString('id-ID')}
-            {topPrice && topPrice > basePrice && (
-              <span className="text-lg text-gray-400 font-normal ml-2">
-                - Rp {parseInt(topPrice).toLocaleString('id-ID')}
-              </span>
-            )}
-          </h2>
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-3xl font-bold text-primary">
+              Rp {parseInt(basePrice).toLocaleString('id-ID')}
+              {topPrice && topPrice > basePrice && (
+                <span className="text-lg text-gray-400 font-normal ml-2">
+                  - Rp {parseInt(topPrice).toLocaleString('id-ID')}
+                </span>
+              )}
+            </h2>
+          </div>
         </div>
 
-        {/* deskripsi selection */}
         <div className="bg-gray-50 rounded-xl p-4">
           <h3 className="font-semibold text-gray-900 mb-2">Deskripsi Layanan</h3>
           <div className={`text-gray-600 text-sm leading-relaxed ${!showMoreDesc ? 'line-clamp-4' : ''}`}>
@@ -233,7 +220,6 @@ const InformationService = ({
           )}
         </div>
 
-        {/* button */}
         <div className="flex gap-3 mt-2">
           <Button
             variant="primary"

@@ -97,8 +97,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
           currentContacts.some((contact) => contact.id === partnerId);
 
         console.log(
-          `🔍 Checking contact ${partnerId}: ${
-            contactExists ? "EXISTS" : "NOT FOUND"
+          `🔍 Checking contact ${partnerId}: ${contactExists ? "EXISTS" : "NOT FOUND"
           }`
         );
 
@@ -106,6 +105,9 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
           // ✅ KONTAK SUDAH ADA: Update via Redux (TIDAK REFETCH)
           console.log(`✅ Updating existing contact: ${partnerId}`);
           const { isBuyer: currentIsBuyer } = paramsRef.current;
+
+          // Check if the message is from me
+          const isMyMessage = lastMessage?.sender_role?.toUpperCase() === role?.toUpperCase();
 
           // 🔥 PENTING: Hanya dispatch jika partnerId BENAR-BENAR cocok
           dispatch(
@@ -116,6 +118,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
                 created_at: lastMessage.created_at,
               },
               isBuyer: currentIsBuyer,
+              isMyMessage: isMyMessage
             })
           );
         } else {

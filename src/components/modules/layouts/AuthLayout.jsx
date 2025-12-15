@@ -3,7 +3,7 @@ import bgAuth from '../../../assets/bgAuth.jpg'
 
 const AuthLayout = ({title, subtitle, children, type, reset}) => {
   return (
-    <div className='flex h-screen relative overflow-hidden'>
+    <div className='flex h-screen relative overflow-y-auto'>
       <div className='w-full md:w-1/2 h-full'>
         <Link to='/' className='text-h4 lg:text-h3 font-bold cursor-pointer text-primary lg:p-[10px] md:p-[8px] px-[5px] py-[10px] pl-[10px] fixed top-0 left-0 z-100'>
           Panggil Aja
