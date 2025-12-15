@@ -2,12 +2,19 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
-import { selectCurrentUser } from "./features/authSlice";
+import { selectCurrentUser } from "./features/authSlice"; // Kept if needed elsewhere, but actually it is not used in my new code.
+// Wait, I can just remove the line if I want.
+// Step 7: replace
+
 
 export function ProtectedRoute({ children }) {
-  const user = useSelector(selectCurrentUser);
+  const token = useSelector((state) => state.auth.accessToken);
+  const location = useLocation();
 
-  // ✅ User ada → render layout & halaman
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
   return children;
 }
 

@@ -1,5 +1,7 @@
+import { useSelector } from "react-redux";
 import Card from "../../common/Card";
 import Stars from "../../common/Stars";
+import { selectCurrentUser } from "../../../features/authSlice";
 
 const ServiceCard = ({
   image,
@@ -8,10 +10,11 @@ const ServiceCard = ({
   basePrice,
   topPrice,
 }) => {
+  const linkTarget = `/service/${idService}`;
   return (
     <Card
       className="group hover:scale-101 z-10 transition-all duration-200 relative block overflow-hidden rounded-lg"
-      to={`/service/${idService}`}
+      to={linkTarget}
     >
       <img
         src={image}

@@ -17,7 +17,7 @@ const ProfileSetting = () => {
 
     const address = useSelector(selectSeeAddress)
     const statusAddress = useSelector(selectSeeAddressStatus)
-
+    console.log(address)
     useEffect(() => {
         if (user?.id_buyer && statusProfile === 'idle') {
             dispatch(seeProfile(user.id_buyer))

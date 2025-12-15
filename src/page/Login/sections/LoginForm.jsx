@@ -17,6 +17,7 @@ import {
   selectCurrentUser,
   selectLoginMessage,
   selectLoginStatus,
+  resetLoginStatus,
 } from "../../../features/authSlice";
 
 const LoginForm = () => {
@@ -31,6 +32,10 @@ const LoginForm = () => {
 
   const currentUser = useSelector(selectCurrentUser);
   const token = useSelector(selectAccessToken);
+
+  useEffect(() => {
+    dispatch(resetLoginStatus());
+  }, [dispatch]);
 
   useEffect(() => {
     if (token) {

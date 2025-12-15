@@ -20,6 +20,7 @@ import {
 } from "../../../../features/sellerSlice";
 import ModalSwitchAccount from "../../Modal/ModalSwitchAccount";
 import ModalConfirmDeleteSeller from "../../Modal/ModalConfirmDeleteSeller";
+import { selectContactSeller } from "../../../../features/chatSlice";
 
 export const SidebarDashboard = () => {
   const dispatch = useDispatch();
@@ -40,14 +41,8 @@ export const SidebarDashboard = () => {
   const deleteSellerStatus = useSelector(selectDeleteSellerStatus);
   const deleteSellerMessage = useSelector(selectDeleteSellerMessage);
 
-  useEffect(() => {
-    if (location.pathname.includes("dashboard/chat")) {
-      setSidebar(false);
-      setIsCollapsed(true);
-    } else {
-      setSidebar(true);
-    }
-  }, [location.pathname]);
+  const contactSeller = useSelector(selectContactSeller);
+  const unreadCount = contactSeller?.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0) || 0;
 
   useEffect(() => {
     if (deleteSellerStatus === "success") {
@@ -367,7 +362,16 @@ export const SidebarDashboard = () => {
                       fill="currentColor"
                     />
                   </svg>
-                  {!isCollapsed && <span>Pesan</span>}
+                  {!isCollapsed && (
+                    <div className="flex items-center justify-between w-full">
+                      <span>Pesan</span>
+                      {unreadCount > 0 && (
+                        <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </NavLink>
               </li>
             </ul>
@@ -396,7 +400,10 @@ export const SidebarDashboard = () => {
             <div
               className={`group flex items-center ${isCollapsed ? "justify-center" : "pr-3"
                 } py-2 text-sm text-gray-500 rounded-lg cursor-pointer`}
-              onClick={() => !isCollapsed && setModalProfile(!modalProfile)}
+              onClick={() => {
+                !isCollapsed && setModalProfile(!modalProfile)
+                isCollapsed && setIsCollapsed(!isCollapsed)
+              }}
             >
               {isCollapsed ? (
                 <img

@@ -12,7 +12,7 @@ export const getContactForBuyer = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message ||
-          "Terjadi kesalahan saat memuat kontak pembeli"
+        "Terjadi kesalahan saat memuat kontak pembeli"
       );
     }
   }
@@ -28,7 +28,7 @@ export const getContactForSeller = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message ||
-          "Terjadi kesalahan saat memuat kontak penjual"
+        "Terjadi kesalahan saat memuat kontak penjual"
       );
     }
   }
@@ -56,7 +56,7 @@ const chat = createSlice({
 
       if (state[listKey]) {
         const conversations = [...state[listKey]];
-        const chatIndex = conversations.findIndex((c) => c.id === partnerId);
+        const chatIndex = conversations.findIndex((c) => String(c.id).trim() === String(partnerId).trim());
 
         if (chatIndex > -1) {
           const chatToUpdate = conversations[chatIndex];
@@ -82,7 +82,7 @@ const chat = createSlice({
 
       if (state[listKey]) {
         // Cek apakah kontak sudah ada
-        const exists = state[listKey].some((c) => c.id === contact.id);
+        const exists = state[listKey].some((c) => String(c.id).trim() === String(contact.id).trim());
         if (!exists) {
           // Tambahkan kontak baru di posisi paling atas
           state[listKey] = [contact, ...state[listKey]];
@@ -93,14 +93,14 @@ const chat = createSlice({
 
     // 🆕 Update contact dari socket notification
     updateContactFromSocket: (state, action) => {
-      const { partnerId, lastMessage, isBuyer } = action.payload;
+      const { partnerId, lastMessage, isBuyer, isMyMessage } = action.payload;
       const listKey = isBuyer ? "contactBuyer" : "contactSeller";
 
       if (state[listKey]) {
         const conversations = [...state[listKey]];
 
         // Cari index kontak yang tepat berdasarkan partnerId
-        const chatIndex = conversations.findIndex((c) => c.id === partnerId);
+        const chatIndex = conversations.findIndex((c) => String(c.id).trim() === String(partnerId).trim());
 
         if (chatIndex > -1) {
           // ✅ Update HANYA kontak yang sesuai partnerId
@@ -113,6 +113,10 @@ const chat = createSlice({
               text: lastMessage.text,
               created_at: lastMessage.created_at,
             },
+            // ✅ Increment unread count ONLY if it's NOT my message
+            unreadCount: isMyMessage
+              ? (chatToUpdate.unreadCount || 0)
+              : (chatToUpdate.unreadCount || 0) + 1,
           };
 
           // Hapus dari posisi lama
@@ -125,11 +129,23 @@ const chat = createSlice({
             `✅ Contact updated via socket: ${partnerId}`,
             updatedChat
           );
-        } else {
-          // Kontak belum ada di list, perlu refetch
-          console.log(
-            `⚠️ Contact ${partnerId} not found in list, need refetch`
-          );
+        }
+      }
+    },
+
+    // 🆕 Mark chat as read
+    markChatAsRead: (state, action) => {
+      const { partnerId, isBuyer } = action.payload;
+      const listKey = isBuyer ? "contactBuyer" : "contactSeller";
+
+      if (state[listKey]) {
+        const conversations = state[listKey];
+        // Use String() and trim() for comparison to handle number vs string and whitespace issues
+        const chatIndex = conversations.findIndex((c) => String(c.id).trim() === String(partnerId).trim());
+
+        if (chatIndex > -1) {
+          // Mutate directly as Immer allows it, but let's be safe slightly
+          state[listKey][chatIndex].unreadCount = 0;
         }
       }
     },
@@ -227,6 +243,7 @@ export const {
   updateLastMessage,
   addNewContact,
   updateContactFromSocket,
+  markChatAsRead,
   resetChat,
 } = chat.actions;
 

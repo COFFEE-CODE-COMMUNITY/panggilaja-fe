@@ -14,7 +14,7 @@ const TableServices = () => {
     const dispatch = useDispatch()
 
     const [search, setSearch] = useState('')
-    const [activeServiceId, setActiveServiceId] = useState(null) 
+    const [activeServiceId, setActiveServiceId] = useState(null)
     const [deleteModal, setDeleteModal] = useState(false)
 
     const servicesSeller = useSelector(selectSellerServices)
@@ -29,20 +29,20 @@ const TableServices = () => {
     };
 
     useEffect(() => {
-        if (user && user.id_seller) { 
+        if (user && user.id_seller) {
             dispatch(getAllServicesByIdSeller(user.id_seller));
         }
-    }, [dispatch, user, statusDelete]); 
+    }, [dispatch, user, statusDelete]);
 
     useEffect(() => {
         if (statusDelete === 'success') {
             if (user?.id_seller) {
-                dispatch(getAllServicesByIdSeller(user?.id_seller)); 
+                dispatch(getAllServicesByIdSeller(user?.id_seller));
                 dispatch(resetDeleteStatus())
             }
             setDeleteModal(false)
         }
-    }, [dispatch, statusDelete, user?.id_seller]) 
+    }, [dispatch, statusDelete, user?.id_seller])
 
     // Render loading state
     if (status === 'loading') {
@@ -51,7 +51,7 @@ const TableServices = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-2 sm:mb-0 mb-20">  
+            <div className="flex flex-col gap-2 sm:mb-0 mb-20">
                 <div className='flex gap-5 items-center'>
                     <Input
                         placeholder="Cari jasa sekarang"
@@ -66,60 +66,64 @@ const TableServices = () => {
                         Tambah Jasa
                     </Button>
                 </div>
-            {/* Table */}
+                {/* Table */}
                 <table className="w-full text-left border border-gray-400 rounded-xl overflow-hidden">
                     {/* Header */}
                     <thead className="bg-primary text-white font-bold ">
                         <tr>
-                        <th className="p-4 w-[20%] col-span-2">
-                            Gambar
-                        </th>
-                        <th className="px-4 py-3 w-[15%]">
-                            Nama Jasa
-                        </th>
-                        <th className="px-4 py-3 w-[10%]">Aksi</th>
+                            <th className="p-4 w-[20%] col-span-2">
+                                Gambar
+                            </th>
+                            <th className="px-4 py-3 w-[15%]">
+                                Nama Jasa
+                            </th>
+                            <th className="px-4 py-3 w-[10%]">Aksi</th>
                         </tr>
                     </thead>
                     {/* Body */}
-                    <tbody>                    
+                    <tbody>
                         {search ? (
                             findServiceSeller?.map((service) => (
                                 <tr key={service.id} className="border-t border-gray-400 ">
                                     <td className="px-4 py-3 w-[20%]">
                                         <div className="flex items-center space-x-2 w-full">
-                                            <img 
-                                                src={service?.foto_product} 
-                                                alt={`Gambar ${service.nama_jasa}`}
-                                                className='w-16 h-16 object-cover rounded-md'
-                                            />
+                                            <Link to={`/dashboard/service/${service.id}`}>
+                                                <img
+                                                    src={service?.foto_product}
+                                                    alt={`Gambar ${service.nama_jasa}`}
+                                                    className='w-16 h-16 object-cover rounded-md hover:opacity-80 transition-opacity'
+                                                />
+                                            </Link>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 w-[15%] align-text-top font-semibold">
-                                        {service.nama_jasa}
-                                    </td>                        
+                                        <Link to={`/dashboard/service/${service.id}`} className="hover:text-primary transition-colors">
+                                            {service.nama_jasa}
+                                        </Link>
+                                    </td>
                                     {/* Kolom Aksi */}
                                     <td className="p-1 w-[10%] align-text-top">
-                                        <div className=" flex w-full justify-end relative">                                        
+                                        <div className=" flex w-full justify-end relative">
                                             {activeServiceId === service.id && (
                                                 <div className='absolute right-7 -top-15 mt-8 bg-white border border-gray-300  w-36 shadow-lg z-10'>
                                                     {/* Tombol Tutup */}
-                                                    <button 
+                                                    <button
                                                         className='absolute top-1 right-1 text-gray-500 hover:text-gray-900 p-1 rounded-full'
-                                                        onClick={() => setActiveServiceId(null)} 
+                                                        onClick={() => setActiveServiceId(null)}
                                                         aria-label="Tutup modal aksi"
                                                     >
                                                         <FaTimes size={12} />
                                                     </button>
-                                                    
+
                                                     <Link to={`/dashboard/manage-services/edit-service/${service.id}`}>
-                                                        <p 
+                                                        <p
                                                             className='hover:bg-primary hover:text-white p-2 pt-4 cursor-pointer rounded-t-xl text-sm whitespace-nowrap'
                                                             onClick={() => setActiveServiceId(null)}
                                                         >
                                                             Edit Layanan
                                                         </p>
                                                     </Link>
-                                                    <p 
+                                                    <p
                                                         className='hover:bg-primary hover:text-white p-2 cursor-pointer rounded-b-xl text-sm whitespace-nowrap'
                                                         onClick={() => setDeleteModal(true)}
                                                     >
@@ -129,7 +133,7 @@ const TableServices = () => {
                                             )}
 
                                             {/* Tombol Buka Aksi */}
-                                            <button 
+                                            <button
                                                 className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5 cursor-pointer p-2"
                                                 onClick={() => toggleModal(service.id)}
                                             >
@@ -142,74 +146,78 @@ const TableServices = () => {
                                 </tr>
                             ))
                         ) : (
-                            servicesSeller?.data.map((service) => (
+                            servicesSeller?.data?.map((service) => (
                                 <>
-                                
-                                <tr key={service.id} className="border-t border-gray-400 ">
-                                    <td className="px-4 py-3 w-[20%]">
-                                        <div className="flex items-center space-x-2 w-full">
-                                            <img 
-                                                src={service?.foto_product} 
-                                                alt={`Gambar ${service.nama_jasa}`}
-                                                className='w-16 h-16 object-cover rounded-md'
-                                            />
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3 w-[15%] align-text-top font-semibold">
-                                        {service.nama_jasa}
-                                    </td>                        
-                                    {/* Kolom Aksi */}
-                                    <td className="p-1 w-[10%] align-text-top">
-                                        <div className=" flex w-full justify-end relative">
-                                            
-                                            {/* Modal Action */}
-                                            {activeServiceId === service.id && (
-                                                // MODIFIKASI: Tambahkan tombol FaTimes di dalam div modal
-                                                <div className='absolute right-7 -top-15 mt-8 bg-white border border-gray-300 rounded-xl w-36 shadow-lg z-10'>
-                                                    {/* Tombol Tutup */}
-                                                    <button 
-                                                        className='absolute top-1 right-1 text-gray-500 hover:text-gray-900 p-1 rounded-full'
-                                                        onClick={() => setActiveServiceId(null)} 
-                                                        aria-label="Tutup modal aksi"
-                                                    >
-                                                        <FaTimes size={12} />
-                                                    </button>
-                                                    
-                                                    <Link to={`/dashboard/manage-services/edit-service/${service.id}`}>
-                                                        <p 
-                                                            className='hover:bg-primary hover:text-white p-2 pt-4 cursor-pointer rounded-t-xl text-sm whitespace-nowrap'
-                                                            onClick={() => setActiveServiceId(null)}
-                                                        >
-                                                            Edit Layanan
-                                                        </p>
-                                                    </Link>
-                                                    <p 
-                                                        className='hover:bg-primary hover:text-white p-2 cursor-pointer rounded-b-xl text-sm whitespace-nowrap'
-                                                        onClick={() => setDeleteModal(true)}
-                                                    >
-                                                        Hapus Layanan
-                                                    </p>
-                                                </div>
-                                            )}
 
-                                            {/* Tombol Buka Aksi */}
-                                            <button 
-                                                className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5 cursor-pointer p-2"
-                                                onClick={() => toggleModal(service.id)}
-                                            >
-                                                <span className="bg-black h-1 w-1 rounded-full"></span>
-                                                <span className="bg-black h-1 w-1 rounded-full"></span>
-                                                <span className="bg-black h-1 w-1 rounded-full"></span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>                
-                                {deleteModal && (
-                                    <ModalDeleteService 
-                                        onSubmit={() => dispatch(deleteService(service.id))}
-                                        onCancel={() => setDeleteModal(false)}
-                                    />
-                                )}
+                                    <tr key={service.id} className="border-t border-gray-400 ">
+                                        <td className="px-4 py-3 w-[20%]">
+                                            <div className="flex items-center space-x-2 w-full">
+                                                <Link to={`/dashboard/service/${service.id}`}>
+                                                    <img
+                                                        src={service?.foto_product}
+                                                        alt={`Gambar ${service.nama_jasa}`}
+                                                        className='w-16 h-16 object-cover rounded-md hover:opacity-80 transition-opacity'
+                                                    />
+                                                </Link>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 w-[15%] align-text-top font-semibold">
+                                            <Link to={`/dashboard/service/${service.id}`} className="hover:text-primary transition-colors">
+                                                {service.nama_jasa}
+                                            </Link>
+                                        </td>
+                                        {/* Kolom Aksi */}
+                                        <td className="p-1 w-[10%] align-text-top">
+                                            <div className=" flex w-full justify-end relative">
+
+                                                {/* Modal Action */}
+                                                {activeServiceId === service.id && (
+                                                    // MODIFIKASI: Tambahkan tombol FaTimes di dalam div modal
+                                                    <div className='absolute right-7 -top-15 mt-8 bg-white border border-gray-300 rounded-xl w-36 shadow-lg z-10'>
+                                                        {/* Tombol Tutup */}
+                                                        <button
+                                                            className='absolute top-1 right-1 text-gray-500 hover:text-gray-900 p-1 rounded-full'
+                                                            onClick={() => setActiveServiceId(null)}
+                                                            aria-label="Tutup modal aksi"
+                                                        >
+                                                            <FaTimes size={12} />
+                                                        </button>
+
+                                                        <Link to={`/dashboard/manage-services/edit-service/${service.id}`}>
+                                                            <p
+                                                                className='hover:bg-primary hover:text-white p-2 pt-4 cursor-pointer rounded-t-xl text-sm whitespace-nowrap'
+                                                                onClick={() => setActiveServiceId(null)}
+                                                            >
+                                                                Edit Layanan
+                                                            </p>
+                                                        </Link>
+                                                        <p
+                                                            className='hover:bg-primary hover:text-white p-2 cursor-pointer rounded-b-xl text-sm whitespace-nowrap'
+                                                            onClick={() => setDeleteModal(true)}
+                                                        >
+                                                            Hapus Layanan
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {/* Tombol Buka Aksi */}
+                                                <button
+                                                    className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5 cursor-pointer p-2"
+                                                    onClick={() => toggleModal(service.id)}
+                                                >
+                                                    <span className="bg-black h-1 w-1 rounded-full"></span>
+                                                    <span className="bg-black h-1 w-1 rounded-full"></span>
+                                                    <span className="bg-black h-1 w-1 rounded-full"></span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {deleteModal && (
+                                        <ModalDeleteService
+                                            onSubmit={() => dispatch(deleteService(service.id))}
+                                            onCancel={() => setDeleteModal(false)}
+                                        />
+                                    )}
                                 </>
                             ))
                         )}

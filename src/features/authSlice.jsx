@@ -82,7 +82,6 @@ export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      isLoggingOut = true; // ✅ Blok refresh token
       const response = await api.post(`auth/logout`);
       return response.data;
     } catch (error) {
@@ -90,7 +89,6 @@ export const logoutUser = createAsyncThunk(
     } finally {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
-      isLoggingOut = false;
     }
   }
 );
@@ -188,6 +186,18 @@ const authSlice = createSlice({
       (state.changeAccountStatus = "idle"),
         (state.changeAccountMessage = null),
         (state.changeAccountError = null);
+    },
+    resetLoginStatus: (state) => {
+      state.loginStatus = "idle";
+      state.loginMessage = null;
+      state.loginError = null;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.accessToken = null;
+      state.loginStatus = "idle";
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
     },
   },
   extraReducers: (builder) => {
@@ -429,6 +439,7 @@ export const {
   setOAuthCredentials,
   resetChangeAccountStatus,
   updateProfile,
+  resetLoginStatus,
 } = authSlice.actions;
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectAccessToken = (state) => state.auth.accessToken;

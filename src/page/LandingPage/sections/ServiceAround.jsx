@@ -35,16 +35,16 @@ const ServiceAround = () => {
 
   useEffect(() => {
     dispatch(getServices());
-    if(user?.id_buyer && token){
+    if (user?.id_buyer && token) {
       dispatch(seeAddress(user.id_buyer))
     }
   }, [dispatch]);
 
   useEffect(() => {
-    if(address?.data?.kecamatan && user?.id){
-      dispatch(getServicesAround({id : user.id, kecamatan : address?.data?.kecamatan}))
+    if (address?.data?.kecamatan && user?.id) {
+      dispatch(getServicesAround({ id: user.id, kecamatan: address?.data?.kecamatan }))
     }
-  },[address?.data?.kecamatan, favorites])
+  }, [address?.data?.kecamatan, favorites])
 
   // Loading State
   if (servicesStatus === "loading") {
@@ -107,7 +107,7 @@ const ServiceAround = () => {
 
   const servicesSlice = services.slice(0, 8);
   const servicesAroundSlice = servicesAround?.slice(0, 8)
-
+  console.log(servicesAroundSlice)
   // Success State
   if (servicesStatus === "success") {
     return (
@@ -151,26 +151,26 @@ const ServiceAround = () => {
         {/* Services Grid */}
         {services.length > 0 && (
           <>
-            {address?.data?.kecamatan ? (    
+            {address?.data?.kecamatan ? (
               <>
                 {servicesAroundSlice?.length === 0 ? (
                   <div className="">
-                    <NoServiceNearby/>
+                    <NoServiceNearby />
                   </div>
                 ) : (
                   <div className="grid gap-x-2 md:gap-x-3 lg:gap-x-4 gap-y-7 md:gap-y-8 lg:gap-y-9 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
-                  {servicesAroundSlice?.map((service, index) => (
-                    <ServiceCard
-                      key={index}
-                      idService={service.id}
-                      image={service.foto_product}
-                      serviceName={service.nama_jasa}
-                      basePrice={service.base_price}
-                      topPrice={service.top_price}
-                      star={4}
-                      desc={service.deskripsi}
-                    />
-                  ))}
+                    {servicesAroundSlice?.map((service, index) => (
+                      <ServiceCard
+                        key={index}
+                        idService={service.id}
+                        image={service.foto_product}
+                        serviceName={service.nama_jasa}
+                        basePrice={service.base_price}
+                        topPrice={service.top_price}
+                        star={4}
+                        desc={service.deskripsi}
+                      />
+                    ))}
                   </div>
                 )}
               </>
