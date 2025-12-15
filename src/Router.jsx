@@ -48,9 +48,12 @@ import FavoritePage from "./page/Setting/FavoritePage";
 import OrderPage from "./page/Setting/OrderPage";
 import DetailServiceForSeller from "./page/Dashboard/DetailServiceForSeller";
 
+import ScrollToTop from "./components/common/ScrollToTop";
+
 export default function Router() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* ====== MAIN LAYOUT ====== */}
         <Route path="/" element={<AppLayout />}>

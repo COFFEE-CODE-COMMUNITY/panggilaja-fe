@@ -82,7 +82,6 @@ export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      isLoggingOut = true; // ✅ Blok refresh token
       const response = await api.post(`auth/logout`);
       return response.data;
     } catch (error) {
@@ -90,7 +89,6 @@ export const logoutUser = createAsyncThunk(
     } finally {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
-      isLoggingOut = false;
     }
   }
 );

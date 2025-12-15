@@ -7,6 +7,13 @@ import { selectSelectedSeller } from '../../features/sellerSlice'
 const ProfileServices = () => {
   const services = useSelector(selectAllService)
   const seller = useSelector(selectSelectedSeller)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (services.length === 0 || !services) {
+      dispatch(getServices())
+    }
+  }, [dispatch])
 
   const servicesSeller = services?.filter((service) => service.seller_id === seller?.id)
   console.log(services)

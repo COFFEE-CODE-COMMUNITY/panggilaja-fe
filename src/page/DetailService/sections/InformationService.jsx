@@ -30,6 +30,8 @@ import {
 import Stars from "../../../components/common/Stars";
 import ReviewService from "./ReviewService";
 
+import ModalAuth from "../../../components/modules/Modal/ModalAuth";
+
 const InformationService = ({
   sellerName,
   idProvider,
@@ -56,7 +58,11 @@ const InformationService = ({
   const sellerProfile = useSelector(selectSelectedSeller);
 
   const [showMoreDesc, setShowMoreDesc] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const myId = user?.id_buyer;
+
+  let averageStar = reviews?.data?.reduce((total, review) => total + review.rating, 0) / reviews?.data?.length || 0;
+  console.log(averageStar)
 
   useEffect(() => {
     if (idSeller) {
@@ -95,7 +101,7 @@ const InformationService = ({
 
   const handleStartChat = () => {
     if (!token) {
-      navigate("/login");
+      setShowAuthModal(true);
       return;
     }
 
@@ -129,6 +135,14 @@ const InformationService = ({
         state: { shouldRefreshList: true },
       });
     }, 300);
+  };
+
+  const handleNego = () => {
+    if (!token) {
+      setShowAuthModal(true);
+      return;
+    }
+    navigate(`/service/nego/${idService}`);
   };
 
   useEffect(() => {
@@ -181,7 +195,7 @@ const InformationService = ({
           <div className="flex items-center gap-4 text-sm text-gray-600">
             <div className="flex items-center gap-1">
               <FaStar className="text-yellow-400" />
-              <span className="font-medium text-gray-900">{totalReview || 0}</span>
+              <span className="font-medium text-gray-900">{averageStar}</span>
               <span>({totalReview || 0} ulasan)</span>
             </div>
             <span className="w-1 h-1 rounded-full bg-gray-300"></span>
@@ -234,13 +248,18 @@ const InformationService = ({
           <Button
             variant="secondary"
             className="flex-1 gap-3 rounded-lg text-white font-medium h-[50px] hover:bg-secondary/90 flex items-center justify-center w-[150px] px-[10px]"
-            to={`/service/nego/${idService}`}
+            onClick={handleNego}
           >
             <FaHandshake />
             Negoin aja
           </Button>
         </div>
       </div>
+
+      <ModalAuth
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </div>
   );
 };

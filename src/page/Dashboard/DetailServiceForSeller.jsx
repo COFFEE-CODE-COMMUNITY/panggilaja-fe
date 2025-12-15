@@ -9,7 +9,7 @@ import {
     selectSelectedServiceStatus,
 } from "../../features/serviceSlice";
 import { useEffect } from "react";
-import InformationService from "../DetailService/sections/InformationService";
+import InformationServiceForSeller from "../DetailService/sections/InformationServiceForSeller";
 import ReviewService from "../DetailService/sections/ReviewService";
 import ImageService from "../DetailService/sections/ImageService";
 
@@ -61,17 +61,18 @@ const DetailServiceForSeller = () => {
                         <ImageService image={service.foto_product} />
                         <ReviewService reviews={reviews?.data || []} className={'lg:block hidden'} />
                     </div>
-                    <InformationService
+                    <InformationServiceForSeller
                         description={service.deskripsi}
                         idProvider={service.seller_id}
                         idService={service.id}
                         nameService={service.nama_jasa}
-                        totalReviewSeller={service.jumlah_rating}
+                        totalReviewSeller={service.jumlah_pembeli}
                         totalReview={service.jumlah_rating}
                         basePrice={service.base_price}
                         topPrice={service.top_price}
                         idSeller={service.seller_id}
                         foto_product={service.foto_product}
+                        averageRating={service.rata_rata_rating}
                     />
                     <ReviewService reviews={reviews?.data || []} className={'lg:hidden block'} />
                 </>
