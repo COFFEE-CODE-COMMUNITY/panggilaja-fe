@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "../../../../config/socket";
 import { API_BASE_URL } from "../../../../api/api";
@@ -533,9 +533,18 @@ const ChatLayout = () => {
                   )}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">
-                    {selectedChat.name}
-                  </p>
+                  {isBuyer ? (
+                    <Link to={`/profile-service/${selectedChat.id}`} title="Lihat Profil Penjual" className="hover:underline hover:text-primary transition-colors">
+                      <p className="font-semibold text-gray-800">
+                        {selectedChat.name}
+                      </p>
+                    </Link>
+                  ) : (
+                    <p className="font-semibold text-gray-800">
+                      {selectedChat.name}
+                    </p>
+                  )}
+
                   <p className="text-xs text-gray-500">
                     {selectedChat.isOnline ? "Online" : "Offline"}
                   </p>
