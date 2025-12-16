@@ -409,20 +409,37 @@ const ChatLayout = () => {
           }`}
       >
         <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center gap-3 mb-4">
-            {role === "buyer" && (
-              <button
-                onClick={handleBackToHome}
-                className="p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-primary/10 transition-colors flex-shrink-0"
-              >
-                <FaArrowLeft size={18} />
-              </button>
-            )}
-            <h2 className="text-xl font-bold text-gray-800 flex-1 text-center">
-              Pesan
-            </h2>
-            <div className="w-10"></div>
-          </div>
+          {location.pathname.includes("dashboard") ? (
+            <div className="flex items-center gap-3 mb-4 sm:block hidden">
+              {role === "buyer" && (
+                <button
+                  onClick={handleBackToHome}
+                  className="p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-primary/10 transition-colors flex-shrink-0"
+                >
+                  <FaArrowLeft size={18} />
+                </button>
+              )}
+              <h2 className="text-xl font-bold text-gray-800 flex-1 text-center">
+                Pesan
+              </h2>
+              <div className="w-10"></div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 mb-4">
+              {role === "buyer" && (
+                <button
+                  onClick={handleBackToHome}
+                  className="p-2 rounded-lg text-gray-600 hover:text-primary hover:bg-primary/10 transition-colors flex-shrink-0"
+                >
+                  <FaArrowLeft size={18} />
+                </button>
+              )}
+              <h2 className="text-xl font-bold text-gray-800 flex-1 text-center">
+                Pesan
+              </h2>
+              <div className="w-10"></div>
+            </div>
+          )}
 
           <div className="relative">
             <FaSearch
@@ -527,8 +544,9 @@ const ChatLayout = () => {
                 >
                   <button
                     onClick={(e) => {
-                      e.preventDefault(); // Prevent link nav when clicking back on mobile
+                      e.preventDefault();
                       setChatMobile(false);
+                      navigate('/chat');
                     }}
                     className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
@@ -563,7 +581,10 @@ const ChatLayout = () => {
               ) : (
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setChatMobile(false)}
+                    onClick={() => {
+                      setChatMobile(false);
+                      navigate('/dashboard/chat');
+                    }}
                     className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <FaArrowLeft className="text-gray-600" />

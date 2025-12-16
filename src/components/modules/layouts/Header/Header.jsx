@@ -21,6 +21,7 @@ import {
     FaShoppingBag,
     FaTimes,
     FaUser,
+    FaArrowLeft,
 } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
 import {
@@ -303,29 +304,46 @@ const Header = () => {
             )}
 
             {searchMobile && (
-                <div className="bg-white fixed h-screen top-0 bottom-0 right-0 left-0 px-[25px] py-[10px] sm:hidden z-100">
-                    <div className="flex gap-[15px] items-center">
-                        <form className="w-full" onSubmit={handleSubmit}>
-                            <Input
-                                placeholder="Cari jasa terdekat"
-                                className="bg-white rounded-[15px] shadow-sm"
-                                onChange={handleChange}
-                                onFocus={() => {
-                                    setSidebarMobile(false);
-                                    setSidebarProfile(false);
-                                }}
-                                value={search}
-                            />
-                        </form>
-                        <p
+                <div className="bg-white fixed inset-0 sm:hidden z-[110] flex flex-col">
+                    <div className="flex items-center gap-2 p-4 border-b border-gray-100">
+                        <button
                             onClick={() => {
                                 setSearchMobile(false);
                                 setHeader(true);
                             }}
-                            className="cursor-pointer text-gray-600 hover:text-secondary"
+                            className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
                         >
-                            Close
-                        </p>
+                            <FaArrowLeft size={20} />
+                        </button>
+
+                        <form className="flex-1 relative" onSubmit={handleSubmit}>
+                            <div className="relative flex items-center">
+                                <FaSearch className="absolute left-4 text-gray-400 z-10" size={16} />
+                                <Input
+                                    placeholder="Cari jasa terdekat"
+                                    className="w-full h-11 pl-11 pr-10 bg-gray-100 border-none rounded-full text-base focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-gray-400"
+                                    onChange={handleChange}
+                                    onFocus={() => {
+                                        setSidebarMobile(false);
+                                        setSidebarProfile(false);
+                                    }}
+                                    value={search}
+                                    autoFocus
+                                />
+                                {search && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSearch("");
+                                            dispatch(setSearchText(""));
+                                        }}
+                                        className="absolute right-3 p-1 text-gray-400 hover:text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
+                                    >
+                                        <FaTimes size={12} />
+                                    </button>
+                                )}
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

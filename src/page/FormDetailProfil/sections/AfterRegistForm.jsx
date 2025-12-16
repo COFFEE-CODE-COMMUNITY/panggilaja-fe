@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
 import Button from '../../../components/common/Button'
+import AddressPickerModal from '../../../components/modules/form/AddressPickerModal'
 import Input from '../../../components/common/Input'
 import { useDispatch, useSelector } from 'react-redux'
-import { 
-    addAddress as addAddressAction, 
-    selectSeeAddress, 
-    selectSeeAddressStatus, 
-    selectAddAddressStatus, 
-    seeAddress, 
-    selectAddAddress 
-} from '../../../features/userSlice' 
+import {
+    addAddress as addAddressAction,
+    selectSeeAddress,
+    selectSeeAddressStatus,
+    selectAddAddressStatus,
+    seeAddress,
+    selectAddAddress
+} from '../../../features/userSlice'
 import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
 import { useNavigate } from 'react-router-dom'
 
-import { 
+import {
     fetchProvinces,
     fetchRegencies,
     fetchDistricts,
@@ -21,8 +22,8 @@ import {
     selectAllRegencies,
     selectAllDistricts,
     selectAlamatStatus,
-    resetRegencies, 
-    resetDistricts, 
+    resetRegencies,
+    resetDistricts,
 } from '../../../features/addressSlice'
 
 
@@ -43,7 +44,7 @@ const AfterRegistForm = () => {
     const [provinsiCode, setProvinsiCode] = useState('')
     const [kotaCode, setKotaCode] = useState('')
     const [kecamatanCode, setKecamatanCode] = useState('')
-    
+
     const [kode_pos, setKode_Pos] = useState('')
     const [alamat, setAlamat] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -68,16 +69,16 @@ const AfterRegistForm = () => {
             navigate('/', { replace: true })
         }
     }, [address, addressStatus, navigate])
-    
+
     useEffect(() => {
         if (isSubmitting && addAddressStatus === 'success') {
             dispatch(seeAddress(user?.id_buyer))
-            
+
             setTimeout(() => {
                 navigate('/', { replace: true })
             }, 1000)
         }
-        
+
         if (addAddressStatus === 'error') {
             console.error('❌ Gagal menambahkan alamat')
             setIsSubmitting(false)
@@ -86,7 +87,7 @@ const AfterRegistForm = () => {
 
     const handleProvinceChange = (e) => {
         const code = e.target.value
-        setProvinsiCode(code) 
+        setProvinsiCode(code)
         setKotaCode('')
         setKecamatanCode('')
         dispatch(resetRegencies())
@@ -98,15 +99,15 @@ const AfterRegistForm = () => {
 
     const handleRegencyChange = (e) => {
         const code = e.target.value
-        setKotaCode(code) 
-        setKecamatanCode('') 
-        dispatch(resetDistricts()) 
+        setKotaCode(code)
+        setKecamatanCode('')
+        dispatch(resetDistricts())
 
         if (code) {
             dispatch(fetchDistricts(code))
         }
     }
-    
+
     const handleDistrictChange = (e) => {
         const code = e.target.value
         setKecamatanCode(code)
@@ -120,21 +121,21 @@ const AfterRegistForm = () => {
             alert('Mohon lengkapi semua field!')
             return
         }
-        
+
         const provinsiName = provinces.find(p => p.code === provinsiCode)?.name || provinsiCode;
         const kotaName = regencies.find(r => r.code === kotaCode)?.name || kotaCode;
         const kecamatanName = districts.find(d => d.code === kecamatanCode)?.name || kecamatanCode;
-        
+
         const data = {
             alamat,
-            provinsi: provinsiName.toLowerCase(), 
+            provinsi: provinsiName.toLowerCase(),
             kota: kotaName.toLowerCase(),
             kecamatan: kecamatanName.toLowerCase(),
             kode_pos
         }
-        
+
         setIsSubmitting(true)
-        
+
         dispatch(addAddressAction({ id: user?.id_buyer, data }))
     }
 
@@ -152,54 +153,33 @@ const AfterRegistForm = () => {
                             Lokasi
                         </label>
                         <div className='flex flex-col gap-3 w-full'>
-                            <select 
-                                className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                onChange={handleProvinceChange}
-                                value={provinsiCode} 
-                                required
-                                disabled={alamatStatus === 'loading' && provinces.length === 0}
-                            >
-                                <option value="">
-                                    {provinces.length === 0 && alamatStatus === 'loading' ? 'Memuat Provinsi...' : 'Pilih Provinsi'}
-                                </option>
-                                {provinces.map((p) => (
-                                    <option key={p.code} value={p.code}>{p.name}</option>
-                                ))}
-                            </select>
+                            <AddressPickerModal
+                                provinces={provinces}
+                                regencies={regencies}
+                                districts={districts}
+                                onProvinceChange={(code) => {
+                                    setProvinsiCode(code);
+                                    setKotaCode('');
+                                    setKecamatanCode('');
+                                    dispatch(resetRegencies());
+                                    if (code) dispatch(fetchRegencies(code));
+                                }}
+                                onRegencyChange={(code) => {
+                                    setKotaCode(code);
+                                    setKecamatanCode('');
+                                    dispatch(resetDistricts());
+                                    if (code) dispatch(fetchDistricts(code));
+                                }}
+                                onDistrictChange={(code) => setKecamatanCode(code)}
+                                currentProvince={provinsiCode}
+                                currentRegency={kotaCode}
+                                currentDistrict={kecamatanCode}
+                                loading={alamatStatus === 'loading'}
+                            />
 
-                            <select 
-                                className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                onChange={handleRegencyChange}  
-                                value={kotaCode} 
-                                required
-                                disabled={!provinsiCode || (alamatStatus === 'loading' && regencies.length === 0)}
-                            >
-                                <option value="">
-                                    {provinsiCode && regencies.length === 0 && alamatStatus === 'loading' ? 'Memuat Kota/Kabupaten...' : 'Pilih Kota/Kabupaten'}
-                                </option>
-                                {regencies.map((r) => (
-                                    <option key={r.code} value={r.code}>{r.name}</option>
-                                ))}
-                            </select>
-                            
-                            <select 
-                                className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                onChange={handleDistrictChange}
-                                value={kecamatanCode} 
-                                required
-                                disabled={!kotaCode || (alamatStatus === 'loading' && districts.length === 0)}
-                            >
-                                <option value="">
-                                    {kotaCode && districts.length === 0 && alamatStatus === 'loading' ? 'Memuat Kecamatan...' : 'Pilih Kecamatan'}
-                                </option>
-                                {districts.map((d) => (
-                                    <option key={d.code} value={d.code}>{d.name}</option>
-                                ))}
-                            </select>
-                            
-                            <Input 
-                                placeholder='Kode Pos (contoh: 40132)' 
-                                className='border-1 border-gray-200 rounded-lg w-full px-4 py-3 focus:border-blue-500 focus:outline-none'
+                            <Input
+                                placeholder='Kode Pos (contoh: 40132)'
+                                className='bg-white w-full border border-gray-200 outline-none rounded-lg p-3 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all'
                                 onChange={(e) => setKode_Pos(e.target.value)}
                                 value={kode_pos}
                                 required
@@ -209,12 +189,12 @@ const AfterRegistForm = () => {
 
                     <div className='flex flex-col lg:flex-row lg:items-start gap-4'>
                         <label htmlFor="detailAddress" className='text-lg w-full lg:w-[200px] font-medium'>
-                            Detail Alamat 
+                            Detail Alamat
                         </label>
-                        <textarea 
-                            name="detailAdress" 
-                            id="detailAdress" 
-                            placeholder='Contoh: Jl. Merdeka No. 123, RT 001/RW 005, Kelurahan Dago' 
+                        <textarea
+                            name="detailAdress"
+                            id="detailAdress"
+                            placeholder='Contoh: Jl. Merdeka No. 123, RT 001/RW 005, Kelurahan Dago'
                             className='w-full h-[120px] bg-white p-4 rounded-lg border-1 border-gray-200 focus:border-blue-500 focus:outline-none resize-none'
                             onChange={(e) => setAlamat(e.target.value)}
                             value={alamat}
@@ -236,8 +216,8 @@ const AfterRegistForm = () => {
                     )}
 
                     <div className='flex justify-end gap-3 pt-4'>
-                        <Button 
-                            variant='primary' 
+                        <Button
+                            variant='primary'
                             type='submit'
                             className='text-white px-8 py-3 rounded-[35px] disabled:opacity-50 disabled:cursor-not-allowed'
                             disabled={addAddressStatus === 'loading'}

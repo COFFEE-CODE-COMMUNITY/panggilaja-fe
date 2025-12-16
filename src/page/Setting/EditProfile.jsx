@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaCamera, FaSave, FaMapMarkedAlt, FaUserEdit } from "react-icons/fa";
 import { fetchDistricts, fetchProvinces, fetchRegencies, resetDistricts, resetRegencies, selectAlamatStatus, selectAllDistricts, selectAllProvinces, selectAllRegencies } from "../../features/addressSlice";
 import ModalSelect from "../../components/common/ModalSelect";
+import AddressPickerModal from "../../components/modules/form/AddressPickerModal";
 
 const EditProfile = () => {
     const dispatch = useDispatch();
@@ -312,46 +313,22 @@ const EditProfile = () => {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <ModalSelect
-                                            label="Provinsi"
-                                            placeholder={provinces.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Provinsi'}
-                                            options={provinces.map(p => ({ value: p.code, label: p.name }))}
-                                            value={provinsi}
-                                            onChange={handleProvinceChange}
-                                            disabled={alamatStatus === 'loading' && provinces.length === 0}
-                                            title="Pilih Provinsi"
-                                            required
-                                        />
-                                    </div>
+                                <div className="col-span-1 md:col-span-2">
+                                    <AddressPickerModal
+                                        provinces={provinces}
+                                        regencies={regencies}
+                                        districts={districts}
+                                        onProvinceChange={handleProvinceChange}
+                                        onRegencyChange={handleRegencyChange}
+                                        onDistrictChange={handleDistrictChange}
+                                        currentProvince={provinsi}
+                                        currentRegency={kota}
+                                        currentDistrict={kecamatan}
+                                        loading={alamatStatus === 'loading'}
+                                    />
+                                </div>
 
-                                    <div className="space-y-2">
-                                        <ModalSelect
-                                            label="Kota/Kabupaten"
-                                            placeholder={!provinsi ? 'Pilih Provinsi Dulu' : regencies.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Kota/Kabupaten'}
-                                            options={regencies.map(r => ({ value: r.code, label: r.name }))}
-                                            value={kota}
-                                            onChange={handleRegencyChange}
-                                            disabled={!provinsi || (alamatStatus === 'loading' && regencies.length === 0)}
-                                            title="Pilih Kota/Kabupaten"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <ModalSelect
-                                            label="Kecamatan"
-                                            placeholder={!kota ? 'Pilih Kota Dulu' : districts.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Kecamatan'}
-                                            options={districts.map(d => ({ value: d.code, label: d.name }))}
-                                            value={kecamatan}
-                                            onChange={handleDistrictChange}
-                                            disabled={!kota || (alamatStatus === 'loading' && districts.length === 0)}
-                                            title="Pilih Kecamatan"
-                                            required
-                                        />
-                                    </div>
-
+                                <div className="md:col-start-1 md:col-end-3">
                                     <InputForm
                                         label="Kode Pos"
                                         type="number"

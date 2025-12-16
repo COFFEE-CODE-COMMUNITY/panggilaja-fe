@@ -211,8 +211,6 @@ const InformationService = ({
           </div>
         </div>
 
-        <div className="h-px bg-gray-100"></div>
-
         <div>
           <p className="text-sm text-gray-500 mb-1">Mulai dari</p>
           <div className="flex items-baseline gap-2">
