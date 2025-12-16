@@ -114,6 +114,37 @@ export const deleteSellerById = createAsyncThunk(
   "seller/deleteSellerById",
   async (id, { dispatch, rejectWithValue }) => {
     try {
+      // 1. Delete All Services
+      try {
+        const servicesRes = await api.get(`/sellers/${id}/services`);
+        // Check if response has data array directly or nested
+        const services = servicesRes.data.data || servicesRes.data;
+
+        if (Array.isArray(services) && services.length > 0) {
+          await Promise.all(services.map(service =>
+            api.delete(`/services/${service.id}`).catch(err => console.error("Failed to delete service", service.id, err))
+          ));
+        }
+      } catch (serviceErr) {
+        console.error("Error fetching/deleting services:", serviceErr);
+        // Continue to verify if we can still proceed or if this is critical
+      }
+
+      // 2. Delete All Docs
+      try {
+        const docsRes = await api.get(`/sellers/${id}/docs`);
+        const docs = docsRes.data.data || docsRes.data;
+
+        if (Array.isArray(docs) && docs.length > 0) {
+          await Promise.all(docs.map(doc =>
+            api.delete(`/docs/${doc.id}`).catch(err => console.error("Failed to delete doc", doc.id, err))
+          ));
+        }
+      } catch (docsErr) {
+        console.error("Error fetching/deleting docs:", docsErr);
+      }
+
+      // 3. Delete Seller Profile
       await api.delete(`/sellers/${id}`);
 
       const user = JSON.parse(localStorage.getItem("user"));
@@ -267,7 +298,7 @@ const seller = createSlice({
       })
       .addCase(getAllServicesByIdSeller.rejected, (state, action) => {
         state.statusGetServiceSeller = 'error';
-        console.log(`errorr : ` + action.payload)
+
       })
 
       //get order by seller id

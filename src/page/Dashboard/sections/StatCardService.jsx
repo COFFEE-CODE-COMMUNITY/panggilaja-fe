@@ -48,7 +48,7 @@ const StatCardService = () => {
     )
   }
 
-  console.log(servicesSeller)
+
   return (
     <div className="grid grid-cols-3 gap-4 w-full">
       <div className="bg-white lg:p-8 md:p-6 p-4 rounded-lg shadow-md w-full">

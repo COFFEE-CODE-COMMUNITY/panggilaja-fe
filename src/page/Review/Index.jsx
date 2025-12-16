@@ -58,8 +58,7 @@ const ReviewPage = () => {
     };
 
     // Debug logging to see what we're sending
-    console.log("Submitting review with data:", reviewData);
-    console.log("For order ID:", orderId);
+
 
     dispatch(createNewReview({ reviewData, orderId })).then((result) => {
       if (result.meta.requestStatus === "fulfilled") {
@@ -117,7 +116,7 @@ const ReviewPage = () => {
           ) : (
             <div className="p-6">
               <ServiceCard service={orders} />
-              
+
               <RatingInput
                 selectedRating={selectedRating}
                 onRatingChange={handleRatingChange}

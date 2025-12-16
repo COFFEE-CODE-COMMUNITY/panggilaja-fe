@@ -4,6 +4,7 @@ import { selectChangeAccountStatus, selectCurrentUser } from '../../features/aut
 import {
   getAllServicesByIdSeller,
   getOrderBySellerId,
+  getSellerById,
   selectOrderSeller,
   selectSelectedSeller,
   selectSellerServices,
@@ -16,17 +17,43 @@ import { Link, useNavigate } from 'react-router-dom';
 const DashboardSkeleton = () => {
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-24 sm:pb-6 animate-pulse">
-      {/* Welcome Section Skeleton */}
-      <div className="bg-gradient-to-br from-gray-200 to-gray-300 px-4 sm:px-6 py-6 sm:py-8 shadow-lg">
-        <div className="max-w-7xl mx-auto space-y-3">
-          <div className="h-8 bg-gray-400 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-400 rounded w-1/4"></div>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6">
+        {/* Store Profile Card Skeleton */}
+        <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 flex flex-row items-center gap-4 sm:gap-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gray-100 rounded-bl-full -mr-8 -mt-8 pointer-events-none" />
+
+          <div className="relative flex-shrink-0">
+            <div className="h-16 w-16 sm:h-24 sm:w-24 bg-gray-200 rounded-full border-4 border-white"></div>
+          </div>
+
+          <div className="flex-1 text-left z-10 min-w-0 space-y-2 sm:space-y-3">
+            <div className="h-6 sm:h-8 bg-gray-200 rounded w-32 sm:w-48"></div>
+            <div className="h-3 sm:h-4 bg-gray-200 rounded w-full max-w-[150px] sm:max-w-xs"></div>
+
+            <div className="flex items-center gap-2">
+              <div className="h-3 sm:h-4 w-3 sm:w-4 bg-gray-200 rounded-full"></div>
+              <div className="h-3 sm:h-4 bg-gray-200 rounded w-20 sm:w-32"></div>
+            </div>
+          </div>
+
+          <div className="h-9 sm:h-11 w-24 sm:w-32 bg-gray-200 rounded-xl flex-shrink-0 z-10"></div>
+        </div>
+
         {/* Stats Cards Skeleton */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Mobile View: Single Row */}
+        <div className="block sm:hidden bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex flex-col items-center flex-1 space-y-2">
+                <div className="h-2 bg-gray-200 rounded w-8"></div>
+                <div className="h-5 bg-gray-200 rounded w-6"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop View: Grid */}
+        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
               <div className="h-10 w-10 bg-gray-200 rounded-lg mb-4"></div>
@@ -118,6 +145,7 @@ const DashboardUtama = () => {
   useEffect(() => {
     if (user?.id_seller) {
       // Small artificial delay to show skeleton if desired, or just load
+      dispatch(getSellerById(user?.id_seller));
       dispatch(getOrderBySellerId(user?.id_seller));
       dispatch(getAllServicesByIdSeller(user?.id_seller));
       dispatch(getContactForSeller(user?.id_seller));
@@ -151,24 +179,96 @@ const DashboardUtama = () => {
   if (isLoading) {
     return <DashboardSkeleton />
   }
-
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-24 sm:pb-6">
-      {/* Welcome Section - Mobile Optimized */}
-      <div className="bg-gradient-to-br bg-primary px-4 sm:px-6 py-6 sm:py-8 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
-            Halo, {sellerProfile?.nama_toko || 'Mitra'}!
-          </h1>
-          <p className="text-white/90 text-sm sm:text-base">
-            Kelola pesanan dan layanan Anda dengan mudah
-          </p>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6">
-        {/* Stats Cards - Compact on Mobile */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Store Profile Card - Top Widget */}
+        <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 flex flex-row items-center gap-4 sm:gap-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8 pointer-events-none" />
+
+          <div className="relative flex-shrink-0">
+            <img
+              src={sellerProfile?.foto_toko || "https://ui-avatars.com/api/?name=" + (sellerProfile?.nama_toko || "Toko")}
+              alt={sellerProfile?.nama_toko}
+              className="w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-gray-50 shadow-sm"
+            />
+            <Link
+              to={`/dashboard/manage-profile/${user?.id_seller}`}
+              className="absolute bottom-0 right-0 w-6 h-6 sm:w-8 sm:h-8 bg-white text-gray-600 rounded-full border border-gray-200 shadow-sm flex items-center justify-center hover:text-primary hover:border-primary transition-colors cursor-pointer"
+            >
+              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </Link>
+          </div>
+
+          <div className="flex-1 text-left z-10 min-w-0">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1 truncate">
+              {sellerProfile?.nama_toko || "Nama Toko Anda"}
+            </h1>
+            <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="truncate max-w-[200px] sm:max-w-md">
+                  {[
+                    sellerProfile?.address?.kecamatan,
+                    sellerProfile?.address?.kota,
+                    sellerProfile?.address?.provinsi
+                  ].filter(Boolean).join(', ') || "Lokasi belum diatur"}
+                </span>
+              </span>
+              <span className="hidden sm:inline w-1 h-1 rounded-full bg-gray-300"></span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Akun Terverifikasi
+              </span>
+            </div>
+          </div>
+
+          <Link
+            to={`/dashboard/manage-profile/${user?.id_seller}`}
+            className="flex px-4 py-2 sm:px-6 sm:py-2.5 bg-primary text-white rounded-xl font-medium shadow-sm hover:bg-primary/90 transition-all active:scale-95 items-center gap-2 whitespace-nowrap text-xs sm:text-base"
+          >
+            Kelola Toko
+          </Link>
+        </div>
+
+        {/* Stats Cards */}
+        {/* Mobile View: Single Row, Unified Card, No Icons */}
+        <div className="block sm:hidden bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between text-center divide-x divide-gray-100">
+            {/* Note: User said 'tanpa ada pemisah' (without separators). If they mean visually, I'll remove divide-x. 
+                 But usually 'separator' means distinct cards. I will try without divide-x first to strictly follow 'tanpa ada pemisah'.
+                 Actually, 'tanpa ada pemisah' might mean no gap/border between items. 
+                 I'll use a simple flex justify-between. */}
+            <div className="flex items-center justify-between w-full">
+              <div className="flex flex-col items-center flex-1">
+                <p className="text-[10px] text-gray-500 mb-0.5">Total</p>
+                <p className="text-lg font-bold text-gray-800">{stats.totalOrders}</p>
+              </div>
+              <div className="flex flex-col items-center flex-1">
+                <p className="text-[10px] text-gray-500 mb-0.5">Proses</p>
+                <p className="text-lg font-bold text-gray-800">{stats.inProgressOrders}</p>
+              </div>
+              <div className="flex flex-col items-center flex-1">
+                <p className="text-[10px] text-gray-500 mb-0.5">Selesai</p>
+                <p className="text-lg font-bold text-gray-800">{stats.completedOrders}</p>
+              </div>
+              <div className="flex flex-col items-center flex-1">
+                <p className="text-[10px] text-gray-500 mb-0.5">Layanan</p>
+                <p className="text-lg font-bold text-gray-800">{lengthService}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop View: Grid with Icons (Original Layout) */}
+        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Total Pesanan */}
           <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -279,7 +379,7 @@ const DashboardUtama = () => {
         </div>
 
         {/* Quick Actions - Mobile Optimized */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           <Link
             to="/dashboard/manage-order"
             className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 hover:border-primary hover:shadow-md transition-all active:scale-95"
@@ -333,7 +433,7 @@ const DashboardUtama = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-800 text-sm sm:text-base truncate">
-                  Kelola Layanan
+                  Kelola Produk
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-500 truncate">
                   Tambah & edit layanan
@@ -378,6 +478,7 @@ const DashboardUtama = () => {
               </div>
             </div>
           </Link>
+
         </div>
 
         {/* Grid for Latest Orders and Messages */}

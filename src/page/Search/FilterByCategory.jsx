@@ -20,7 +20,7 @@ const FilterByCategory = () => {
     const servicesAroundStatus = useSelector(selectServiceAroundStatus)
     const allService = useSelector(selectAllService)
 
-    console.log(allService)
+
 
     useEffect(() => {
         if (user?.id_buyer && token) {
@@ -41,7 +41,7 @@ const FilterByCategory = () => {
     } else {
         servicesByCategory = allService?.filter((service) => service?.kategori_id === id)
     }
-    console.log(servicesAround)
+
 
 
 

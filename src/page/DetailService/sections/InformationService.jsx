@@ -62,7 +62,7 @@ const InformationService = ({
   const myId = user?.id_buyer;
 
   let averageStar = reviews?.data?.reduce((total, review) => total + review.rating, 0) / reviews?.data?.length || 0;
-  console.log(averageStar)
+
 
   useEffect(() => {
     if (idSeller) {
@@ -147,7 +147,7 @@ const InformationService = ({
 
   useEffect(() => {
     const handleMessageReceived = (msg) => {
-      console.log("✅ Message confirmed:", msg);
+
     };
 
     socket.on("receive_message", handleMessageReceived);
@@ -210,8 +210,6 @@ const InformationService = ({
             <div>{totalReviewSeller || 0} Pesanan selesai</div>
           </div>
         </div>
-
-        <div className="h-px bg-gray-100"></div>
 
         <div>
           <p className="text-sm text-gray-500 mb-1">Mulai dari</p>

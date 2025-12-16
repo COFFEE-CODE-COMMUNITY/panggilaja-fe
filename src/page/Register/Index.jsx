@@ -50,7 +50,7 @@ const RegisterPage = () => {
     }
   }, [status]);
 
-  console.log(status);
+
 
   return (
     <AuthLayout

@@ -78,7 +78,7 @@ const SearchPage = () => {
         )
     }
 
-    console.log(serviceSearch)
+
     return (
         <div className='min-h-screen xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>
             <p className='font-medium'>Hasil Pencarian untuk: {searchText}</p>
