@@ -32,7 +32,7 @@ const TableServices = () => {
         if (user && user.id_seller) {
             dispatch(getAllServicesByIdSeller(user.id_seller));
         }
-    }, [dispatch, user, statusDelete]);
+    }, [dispatch, user]);
 
     useEffect(() => {
         if (statusDelete === 'success') {
@@ -254,19 +254,22 @@ const TableServices = () => {
                                         </button>
                                     </div>
                                 </div>
-                                {deleteModal && activeServiceId === service.id && (
-                                    <ModalDeleteService
-                                        onSubmit={() => dispatch(deleteService(service.id))}
-                                        onCancel={() => {
-                                            setDeleteModal(false);
-                                            setActiveServiceId(null);
-                                        }}
-                                    />
-                                )}
                             </React.Fragment>
                         ))
                     )}
                 </div>
+
+                {deleteModal && (
+                    <ModalDeleteService
+                        isLoading={statusDelete === 'loading'}
+                        onSubmit={() => activeServiceId && dispatch(deleteService(activeServiceId))}
+                        onCancel={() => {
+                            if (statusDelete === 'loading') return;
+                            setDeleteModal(false);
+                            setActiveServiceId(null);
+                        }}
+                    />
+                )}
             </div>
         </>
     )
