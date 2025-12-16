@@ -5,7 +5,6 @@ import socket from "../../../../config/socket";
 import { API_BASE_URL } from "../../../../api/api";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
-import { useContactRealtime } from "../../../../hooks/contactRealtime";
 import {
   FaSearch,
   FaArrowLeft,
@@ -28,6 +27,7 @@ import {
 import AcceptNegoCard from "./sections/AcceptNegoCard";
 import ServiceNegoCard from "./sections/ServiceNegoCard";
 import ServiceCard from "./sections/ServiceCard";
+import TypingIndicator from "./TypingIndicator";
 
 // UTILS
 import {
@@ -51,7 +51,13 @@ const ChatLayout = () => {
   const myId = isBuyer ? user?.id_buyer : user?.id_seller;
   const role = user?.active_role?.toLowerCase();
 
-  useContactRealtime(socket, myId, role, isBuyer);
+  const buyerId = isBuyer ? myId : partnerId;
+  const sellerId = isBuyer ? partnerId : myId;
+  // Ensure roomId is consistent and stable
+  const roomId = useMemo(() => {
+    if (!buyerId || !sellerId) return null;
+    return `${buyerId}_${sellerId}`;
+  }, [buyerId, sellerId]);
 
   const buyerStatus = useSelector(selectContactBuyerStatus);
   const sellerStatus = useSelector(selectContactSellerStatus);
@@ -71,8 +77,10 @@ const ChatLayout = () => {
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [confirmedMessageIds, setConfirmedMessageIds] = useState([]);
+  const [isPartnerTyping, setIsPartnerTyping] = useState(false);
   const chatContainerRef = useRef(null);
   const inputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
 
@@ -137,8 +145,8 @@ const ChatLayout = () => {
             text: msg.text,
             timestamp: formatTime(msg.created_at),
             sender:
-              (isBuyer && msg.sender_role.toUpperCase() === "BUYER") ||
-                (!isBuyer && msg.sender_role.toUpperCase() === "SELLER")
+              (isBuyer && msg.sender_role?.toUpperCase() === "BUYER") ||
+                (!isBuyer && msg.sender_role?.toUpperCase() === "SELLER")
                 ? "user"
                 : "seller",
           }));
@@ -166,19 +174,29 @@ const ChatLayout = () => {
     }
   }, [partnerId, conversations]);
 
-  // USEEFFECT #4: JOIN CHAT ROOM
+  // USEEFFECT #4: JOIN CHAT ROOM & RECONNECTION HANDLING
   useEffect(() => {
-    if (!partnerId || !myId) return;
+    if (!partnerId || !myId || !roomId) return;
 
-    const buyerId = isBuyer ? myId : partnerId;
-    const sellerId = isBuyer ? partnerId : myId;
-    const roomId = `${buyerId}_${sellerId}`;
+    const joinRoom = () => {
+      socket.emit("join_room", { buyerId, sellerId });
+      console.log(`👥 Joining chat room: ${roomId}`);
+    };
 
-    socket.emit("join_room", { buyerId, sellerId });
-    console.log(`👥 Joining chat room: ${roomId}`);
+    // Join immediately
+    joinRoom();
+
+    // Re-join on reconnection
+    const handleReconnect = () => {
+      console.log("🔄 Socket reconnected, re-joining chat room...");
+      joinRoom();
+    };
+
+    socket.on("reconnect", handleReconnect);
 
     return () => {
       console.log(`👋 Leaving chat room: ${roomId}`);
+      socket.off("reconnect", handleReconnect);
     };
   }, [partnerId, myId, isBuyer]);
 
@@ -209,6 +227,9 @@ const ChatLayout = () => {
           return prevMessages;
         }
 
+        // Stop typing indicator when message received
+        setIsPartnerTyping(false);
+
         return [
           ...prevMessages,
           {
@@ -225,10 +246,27 @@ const ChatLayout = () => {
       dispatch(markChatAsRead({ partnerId, isBuyer }));
     };
 
+    const handleUserTyping = ({ userId, isTyping }) => {
+      console.log(`📡 user_typing received: User ${userId}, isTyping: ${isTyping}, Partner: ${partnerId}`);
+      // Only show typing if it's from the current partner
+      if (String(userId) === String(partnerId)) {
+        setIsPartnerTyping(isTyping);
+      }
+    };
+
+    const handleErrorMessage = (data) => {
+      console.error("❌ Socket Error:", data);
+      alert(`Gagal mengirim pesan: ${data.error}`);
+    };
+
     socket.on("receive_message", handleNewMessage);
+    socket.on("user_typing", handleUserTyping);
+    socket.on("error_message", handleErrorMessage);
 
     return () => {
       socket.off("receive_message", handleNewMessage);
+      socket.off("user_typing", handleUserTyping);
+      socket.off("error_message", handleErrorMessage);
     };
   }, [partnerId, myId, isBuyer]);
 
@@ -238,15 +276,56 @@ const ChatLayout = () => {
       chatContainerRef.current.scrollTop =
         chatContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isPartnerTyping]);
 
   const filteredConversations = conversations.filter((conv) =>
     conv.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleInputChange = (e) => {
+    setText(e.target.value);
+
+    // Emit typing event
+    if (socket && roomId && myId) {
+      if (!typingTimeoutRef.current) {
+        console.log(`⌨️ Emitting TYPING START to ${roomId}`);
+        socket.emit("typing", {
+          roomId: roomId,
+          userId: myId,
+          isTyping: true,
+        });
+      }
+
+      // Clear existing timeout
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+      // Set timeout to stop typing
+      typingTimeoutRef.current = setTimeout(() => {
+        console.log(`⌨️ Emitting TYPING STOP to ${roomId}`);
+        socket.emit("typing", {
+          roomId: roomId,
+          userId: myId,
+          isTyping: false,
+        });
+        typingTimeoutRef.current = null;
+      }, 2000);
+    }
+  };
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!text.trim() || !partnerId || !myId) return;
+
+    // Stop typing immediately
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    if (roomId) {
+      socket.emit("typing", {
+        roomId: roomId,
+        userId: myId,
+        isTyping: false,
+      });
+    }
+    typingTimeoutRef.current = null;
 
     const messageData = {
       id_buyer: isBuyer ? myId : partnerId,
@@ -324,7 +403,7 @@ const ChatLayout = () => {
   };
 
   return (
-    <div className="h-screen w-full flex bg-gray-50">
+    <div className="h-screen w-full flex bg-gray-50/60">
       <div
         className={`h-full sm:w-80 w-full bg-white border-r border-gray-200 flex flex-col ${chatMobile ? "hidden sm:flex" : "flex"
           }`}
@@ -374,14 +453,17 @@ const ChatLayout = () => {
                   }`}
               >
                 <div className="relative flex-shrink-0">
-                  <img
-                    src={
-                      conv.avatar ||
-                      `https://ui-avatars.com/api/?name=${conv.name}`
-                    }
-                    alt={conv.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
+                  {conv.avatar ? (
+                    <img
+                      src={conv.avatar}
+                      alt={conv.name}
+                      className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                      <FaUser className="text-gray-400 text-xl" />
+                    </div>
+                  )}
                   {conv.isOnline && (
                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                   )}
@@ -434,7 +516,7 @@ const ChatLayout = () => {
                   <FaArrowLeft className="text-gray-600" />
                 </button>
                 <div className="relative">
-                  {setSelectedChat.avatar ? (
+                  {selectedChat.avatar ? (
                     <>
                       <img
                         src={selectedChat.avatar}
@@ -467,7 +549,7 @@ const ChatLayout = () => {
             {/* Messages Area */}
             <div
               ref={chatContainerRef}
-              className={`flex-1 overflow-auto p-4 space-y-4 bg-gray-50 scrollbar-hide`}
+              className={`flex-1 overflow-auto p-4 space-y-4 scrollbar-hide`}
             >
               {messagesLoading ? (
                 <div className="flex items-center justify-center h-full">
@@ -569,6 +651,8 @@ const ChatLayout = () => {
                     const pesanBuyer = negoMessageMatch[5];
                     const description = negoMessageMatch[6];
                     const imageUrl = negoMessageMatch[7];
+                    // Capture rating if present (Index 8), default to 0.0 if not found (or keep 4.5 if you prefer a 'new' default)
+                    const parsedRating = negoMessageMatch[8] ? parseFloat(negoMessageMatch[8]) : 0;
 
                     const negoCardData = {
                       image: imageUrl,
@@ -577,7 +661,7 @@ const ChatLayout = () => {
                       description: pesanBuyer || description,
                       originalPrice: `Rp ${originalPrice}`,
                       negoPrice: `Rp ${negoPrice}`,
-                      rating: 4.5,
+                      rating: parsedRating,
                     };
 
                     const messageSenderRole =
@@ -727,9 +811,17 @@ const ChatLayout = () => {
                           {msg.timestamp}
                         </p>
                       </div>
+                      ```
                     </div>
                   );
                 })
+              )}
+              {isPartnerTyping && (
+                <div className="flex justify-start transition-all duration-300">
+                  <div className="bg-white rounded-2xl px-4 py-3 shadow-sm rounded-bl-none">
+                    <TypingIndicator />
+                  </div>
+                </div>
               )}
             </div>
 
@@ -747,7 +839,7 @@ const ChatLayout = () => {
                   placeholder="Ketik pesan..."
                   className="flex-1 rounded-xl border-2 border-gray-200 px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                   value={text}
-                  onChange={(e) => setText(e.target.value)}
+                  onChange={handleInputChange}
                 />
                 <Button
                   type="submit"
@@ -804,7 +896,7 @@ const ChatLayout = () => {
             <Button
               variant="primary"
               className="w-full justify-center py-3 bg-primary text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
-              onClick={() => navigate('/dashboard/manage-order/process-order')}
+              onClick={() => navigate(isBuyer ? '/setting/order' : '/dashboard/manage-order/process-order')}
             >
               Lihat Status Pesanan
             </Button>

@@ -48,11 +48,13 @@ import FavoritePage from "./page/Setting/FavoritePage";
 import OrderPage from "./page/Setting/OrderPage";
 import DetailServiceForSeller from "./page/Dashboard/DetailServiceForSeller";
 
+import GlobalRealtimeListener from "./components/common/GlobalRealtimeListener";
 import ScrollToTop from "./components/common/ScrollToTop";
 
 export default function Router() {
   return (
     <BrowserRouter>
+      <GlobalRealtimeListener />
       <ScrollToTop />
       <Routes>
         {/* ====== MAIN LAYOUT ====== */}

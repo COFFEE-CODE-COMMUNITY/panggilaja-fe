@@ -8,6 +8,7 @@ import { changeAccount, selectChangeAccountStatus, selectCurrentUser } from '../
 import { getContactForSeller } from '../../../../features/chatSlice';
 import { getAllServicesByIdSeller, getOrderBySellerId } from '../../../../features/sellerSlice';
 import ModalSwitchAccount from '../../Modal/ModalSwitchAccount';
+import socket from '../../../../config/socket';
 
 const DashboardLayout = () => {
   const location = useLocation()
@@ -37,6 +38,23 @@ const DashboardLayout = () => {
       dispatch(getOrderBySellerId(user?.id_seller));
       dispatch(getContactForSeller(user?.id_seller));
     }
+  }, [dispatch, user?.id_seller]);
+
+  // Listen for new incoming orders
+  useEffect(() => {
+    if (!user?.id_seller) return;
+
+    const handleNewOrder = (data) => {
+      console.log("🔔 New order received (Socket):", data);
+      // Dispatch getOrderBySellerId to refresh the list and sidebar badge
+      dispatch(getOrderBySellerId(user.id_seller));
+    };
+
+    socket.on("new_incoming_order", handleNewOrder);
+
+    return () => {
+      socket.off("new_incoming_order", handleNewOrder);
+    };
   }, [dispatch, user?.id_seller]);
 
   return (

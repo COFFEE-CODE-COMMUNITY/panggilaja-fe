@@ -52,7 +52,7 @@ export const autoMessageRegex =
     /Halo, saya tertarik dengan layanan "([\s\S]+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Deskripsi: ([\s\S]*?)\) \(Gambar: (.+?)\)/;
 
 export const negoMessageRegex =
-    /Halo, saya tertarik dengan layanan "([\s\S]+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Nego: Rp ([^\)]+)\) \(Pesan: ([\s\S]*?)\) \(Deskripsi: ([\s\S]*?)\) \(Gambar: (.+?)\)/;
+    /Halo, saya tertarik dengan layanan "([\s\S]+?)"\. \(ServiceID: ([^\)]+)\) \(Harga: Rp ([^\)]+)\) \(Nego: Rp ([^\)]+)\) \(Pesan: ([\s\S]*?)\) \(Deskripsi: ([\s\S]*?)\) \(Gambar: (.+?)\)(?: \(Rating: ([^\)]+)\))?/;
 
 export const acceptNegoRegex =
     /Penawaran Anda sebesar Rp (.+?) untuk layanan "(.+?)" DITERIMA! 🎉/;

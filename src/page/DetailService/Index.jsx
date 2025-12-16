@@ -53,29 +53,46 @@ const DetailService = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-12 lg:flex lg:gap-12 min-h-[calc(100vh-100px)] py-3">
-      {status === "loading" && <div className="w-full h-screen">loading</div>}
-      {status === "success" && (
-        <>
-          <div className="flex flex-col lg:w-auto gap-6">
-            <ImageService image={service.foto_product} />
-            <ReviewService reviews={reviews?.data || []} className={'lg:block hidden'} />
+    <div className="bg-gray-50/60 min-h-screen w-full pt-28 pb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-2xl">
+        {status === "loading" && <div className="w-full h-screen">loading</div>}
+        {status === "success" && (
+          <div className="lg:flex lg:gap-8 items-start">
+            {/* Left Column */}
+            <div className="flex flex-col lg:w-auto gap-6 shrink-0">
+              <div className="bg-white p-4">
+                <ImageService image={service.foto_product} />
+              </div>
+              <div className="bg-white p-6 hidden lg:block max-w-[42rem]">
+                <ReviewService reviews={reviews?.data || []} className="" />
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="flex-1 mt-6 lg:mt-0 w-full min-w-0">
+              <div className="bg-white p-6 md:p-8 sticky top-28">
+                <InformationService
+                  description={service.deskripsi}
+                  idProvider={service.seller_id}
+                  idService={service.id}
+                  nameService={service.nama_jasa}
+                  totalReviewSeller={service.jumlah_rating}
+                  totalReview={service.jumlah_rating}
+                  basePrice={service.base_price}
+                  topPrice={service.top_price}
+                  idSeller={service.seller_id}
+                  foto_product={service.foto_product}
+                />
+              </div>
+            </div>
+
+            {/* Mobile Reviews */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-6 lg:hidden block">
+              <ReviewService reviews={reviews?.data || []} className="" />
+            </div>
           </div>
-          <InformationService
-            description={service.deskripsi}
-            idProvider={service.seller_id}
-            idService={service.id}
-            nameService={service.nama_jasa}
-            totalReviewSeller={service.jumlah_rating}
-            totalReview={service.jumlah_rating}
-            basePrice={service.base_price}
-            topPrice={service.top_price}
-            idSeller={service.seller_id}
-            foto_product={service.foto_product}
-          />
-          <ReviewService reviews={reviews?.data || []} className={'lg:hidden block'} />
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };

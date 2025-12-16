@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import InformationServiceForSeller from "../DetailService/sections/InformationServiceForSeller";
 import ReviewService from "../DetailService/sections/ReviewService";
 import ImageService from "../DetailService/sections/ImageService";
+import socket from "../../config/socket";
 
 const DetailServiceForSeller = () => {
     const { id } = useParams();
@@ -38,6 +39,27 @@ const DetailServiceForSeller = () => {
             console.log("Service ID not available yet");
         }
     }, [dispatch, service?.id]);
+
+    // Listen for real-time review updates
+    useEffect(() => {
+        if (!service?.id) return;
+
+        const handleReviewAdded = (data) => {
+            console.log("🔔 Review added (Socket):", data);
+            // Check if the review corresponds to the current service
+            if (String(data.serviceId) === String(service.id)) {
+                console.log("Refetching reviews and service details...");
+                dispatch(getReviewServicesById(service.id));
+                dispatch(getServicesById(id)); // Also refresh service details for rating update
+            }
+        };
+
+        socket.on("review_added", handleReviewAdded);
+
+        return () => {
+            socket.off("review_added", handleReviewAdded);
+        };
+    }, [service?.id, id, dispatch]);
 
     console.log("Current reviews state:", { reviews, reviewStatus });
 

@@ -2,7 +2,7 @@ import React from 'react'
 import Card from '../../common/Card'
 import Stars from '../../common/Stars'
 
-const ReviewCard = ({ profileImage, name, date, rating, reviewText }) => {
+const ReviewCard = ({ profileImage, name, date, rating, reviewText, serviceName, serviceImage }) => {
 
     return (
         <Card to={false} className='flex lg:gap-5 md:gap-4 gap-3 bg-gray-50/40 py-3 rounded-xl'>
@@ -24,6 +24,20 @@ const ReviewCard = ({ profileImage, name, date, rating, reviewText }) => {
                 <p className='font-light text-gray-700'>
                     {reviewText}
                 </p>
+
+                {/* Service Information */}
+                {serviceName && (
+                    <div className="mt-3 flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-100/50">
+                        <img
+                            src={serviceImage || "/default-service.png"}
+                            alt={serviceName}
+                            className="w-10 h-10 rounded-md object-cover bg-gray-100"
+                        />
+                        <p className="text-sm font-medium text-gray-700 clamp-1">
+                            {serviceName}
+                        </p>
+                    </div>
+                )}
             </div>
         </Card>
     )

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaStar, FaRegHeart, FaHeart, FaCommentDots, FaHandshake } from "react-icons/fa";
+import { FaStar, FaRegHeart, FaHeart, FaCommentDots, FaHandshake, FaUser } from "react-icons/fa";
 import Button from "../../../components/common/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -167,8 +167,16 @@ const InformationService = ({
                 to={`/profile-service/${idSeller}`}
                 className="text-sm font-medium text-primary flex items-center gap-2"
               >
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs">
-                  {sellerProfile?.nama_toko?.charAt(0) || 'S'}
+                <div className="w-8 h-8 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center overflow-hidden">
+                  {sellerProfile?.foto_toko || sellerProfile?.foto_profile ? (
+                    <img
+                      src={sellerProfile?.foto_toko || sellerProfile?.foto_profile}
+                      alt={sellerProfile?.nama_toko}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FaUser className="text-gray-500 text-sm" />
+                  )}
                 </div>
                 {sellerProfile?.nama_toko}
               </Link>
@@ -219,7 +227,7 @@ const InformationService = ({
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-xl p-4">
+        <div className="bg-gray-50/60 rounded-xl p-4">
           <h3 className="font-semibold text-gray-900 mb-2">Deskripsi Layanan</h3>
           <div className={`text-gray-600 text-sm leading-relaxed ${!showMoreDesc ? 'line-clamp-4' : ''}`}>
             {description}

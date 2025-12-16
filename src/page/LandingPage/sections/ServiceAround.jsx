@@ -167,7 +167,7 @@ const ServiceAround = () => {
                         serviceName={service.nama_jasa}
                         basePrice={service.base_price}
                         topPrice={service.top_price}
-                        star={4}
+                        star={service.rata_rata_rating}
                         desc={service.deskripsi}
                       />
                     ))}
@@ -184,7 +184,7 @@ const ServiceAround = () => {
                     serviceName={service.nama_jasa}
                     basePrice={service.base_price}
                     topPrice={service.top_price}
-                    star={4}
+                    star={service.rata_rata_rating}
                     desc={service.deskripsi}
                   />
                 ))}

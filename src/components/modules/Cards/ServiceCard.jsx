@@ -9,8 +9,10 @@ const ServiceCard = ({
   serviceName,
   basePrice,
   topPrice,
+  star,
+  customLink
 }) => {
-  const linkTarget = `/service/${idService}`;
+  const linkTarget = customLink || `/service/${idService}`;
   return (
     <Card
       className="group hover:scale-101 z-10 transition-all duration-200 relative block overflow-hidden rounded-lg"
@@ -27,7 +29,7 @@ const ServiceCard = ({
           {serviceName}
         </p>
 
-        <Stars many={4} variant="star" />
+        <Stars many={star} variant="star" />
 
         <p className="text-gray-700 md:text-h5 text-h6">
           Rp {basePrice} - {topPrice}

@@ -4,7 +4,13 @@ import {
   updateContactFromSocket,
   getContactForBuyer,
   getContactForSeller,
+  updateUserStatus,
+  setOnlineUsers
 } from "../features/chatSlice";
+
+// ... (existing code)
+
+
 
 /**
  * Custom hook untuk mendengarkan update contact list secara real-time
@@ -76,8 +82,24 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
 
     // Join user room untuk menerima notifikasi
     const userRoom = `user_${role}_${userId}`;
-    socket.emit("join_user_room", { userId, role });
-    console.log(`🔔 Joined user room: ${userRoom}`);
+
+    const joinUserRoom = () => {
+      socket.emit("join_user_room", { userId, role });
+      console.log(`🔔 Joined user room: ${userRoom}`);
+    };
+
+    // Join immediately
+    joinUserRoom();
+
+    // Re-join on reconnection
+    const handleReconnect = () => {
+      console.log("🔄 Socket reconnected, re-joining user room...");
+      joinUserRoom();
+    };
+
+    socket.on("reconnect", handleReconnect);
+    // Hardening: Update room join on initial connect/reconnect to avoid race conditions
+    socket.on("connect", joinUserRoom);
 
     // Handler untuk contact list update
     const handleContactUpdate = (data) => {
@@ -131,12 +153,33 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
       }
     };
 
+    // Handler untuk online status update
+    const handleStatusUpdate = (data) => {
+      console.log("🟢 User status update:", data);
+      dispatch(updateUserStatus(data));
+    };
+
+    // Handler untuk bulk online users list (Init Sync)
+    const handleOnlineUsersList = (onlineIds) => {
+      console.log("🟢 Initial Online Users Sync:", onlineIds);
+      dispatch(setOnlineUsers(onlineIds));
+    };
+
     // Listen untuk update
     socket.on("contact_list_updated", handleContactUpdate);
+    socket.on("user_status_update", handleStatusUpdate);
+    socket.on("online_users_list", handleOnlineUsersList);
+
+    // Request initial online status
+    socket.emit("get_online_users");
 
     // Cleanup
     return () => {
       socket.off("contact_list_updated", handleContactUpdate);
+      socket.off("user_status_update", handleStatusUpdate);
+      socket.off("online_users_list", handleOnlineUsersList);
+      socket.off("reconnect", handleReconnect);
+      socket.off("connect", joinUserRoom);
       if (refetchTimeoutRef.current) {
         clearTimeout(refetchTimeoutRef.current);
       }

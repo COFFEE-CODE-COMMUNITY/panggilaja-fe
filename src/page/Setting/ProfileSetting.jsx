@@ -75,7 +75,7 @@ const ProfileSetting = () => {
                         </div>
 
                         <Link to='/setting/edit'>
-                            <button className='bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 hover:text-primary hover:border-primary/30 transition-all shadow-sm flex items-center gap-2 font-medium text-sm'>
+                            <button className='bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 hover:text-primary hover:border-primary/30 transition-all shadow-sm flex items-center gap-2 font-medium text-sm cursor-pointer'>
                                 <FaEdit size={14} />
                                 <span>Edit Profil</span>
                             </button>
