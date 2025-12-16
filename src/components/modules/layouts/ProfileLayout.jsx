@@ -3,7 +3,6 @@ import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom'
 import Button from '../../common/Button'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllServicesByIdSeller, getSellerById, selectSelectedSeller, selectSellerServices, selectSellerStatus, selectServiceSellerStatus } from '../../../features/sellerSlice'
-import Bannerr from '../../../assets/Bannerr.jpeg'
 import { selectCurrentUser } from '../../../features/authSlice'
 
 const ProfileLayout = () => {
