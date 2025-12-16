@@ -177,7 +177,7 @@ function TambahJasaForm() {
                 <div className='w-full lg:w-1/2 flex flex-col gap-4'>
                     <h2 className='text-2xl font-semibold mb-2'>Detail Jasa</h2>
                     <InputForm
-                        label='Nama Jasa *'
+                        label='Nama Jasa'
                         type='text'
                         placeholder='Contoh: Jasa Desain Logo Premium'
                         value={nama_jasa}

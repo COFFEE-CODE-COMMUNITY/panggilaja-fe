@@ -1,11 +1,11 @@
 import io from "socket.io-client";
 
-const isDevelopment = import.meta.env.MODE === "development";
+const isDevelopment = import.meta.env.VITE_MODE === "development";
+console.log("sekarang lagi mode :", isDevelopment);
 
 const SOCKET_URL = isDevelopment
   ? "http://localhost:5000" // Development
   : import.meta.env.VITE_SOCKET_URL || "https://api.panggilaja.space"; // Production
-
 
 
 export const socket = io(SOCKET_URL, {

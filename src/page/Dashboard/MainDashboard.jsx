@@ -370,7 +370,7 @@ const DashboardUtama = () => {
               </div>
             </div>
             <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">
-              Layanan
+              Produk
             </h3>
             <p className="text-2xl sm:text-3xl font-bold text-gray-800">
               {lengthService}
