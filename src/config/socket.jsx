@@ -4,7 +4,7 @@ const isDevelopment = import.meta.env.MODE === "development";
 
 const SOCKET_URL = isDevelopment
   ? "http://localhost:5000" // Development
-  : import.meta.env.VITE_SOCKET_URL || "https://panggilaja.space"; // Production
+  : import.meta.env.VITE_SOCKET_URL || "https://api.panggilaja.space"; // Production
 
 console.log("🔌 Socket connecting to:", SOCKET_URL);
 console.log("🌍 Environment:", import.meta.env.MODE);
