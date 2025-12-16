@@ -74,7 +74,6 @@ const OrderPage = () => {
                 pesan_tambahan: itemOrder.pesan_tambahan,
 
                 seller_id: sellerData.id || "",
-                seller_id: sellerData.id || "",
                 seller_name: sellerData.nama_toko || "",
                 seller_image: sellerData.foto_toko || sellerData.foto_profile || "",
 
