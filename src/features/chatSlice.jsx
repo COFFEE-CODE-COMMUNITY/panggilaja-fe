@@ -12,7 +12,7 @@ export const getContactForBuyer = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message ||
-          "Terjadi kesalahan saat memuat kontak pembeli"
+        "Terjadi kesalahan saat memuat kontak pembeli"
       );
     }
   }
@@ -28,7 +28,7 @@ export const getContactForSeller = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message ||
-          "Terjadi kesalahan saat memuat kontak penjual"
+        "Terjadi kesalahan saat memuat kontak penjual"
       );
     }
   }
@@ -43,6 +43,8 @@ const initialState = {
   contactSeller: null,
   contactSellerStatus: "idle",
   contactSellerError: null,
+  // Global online state (Key: "role_userId")
+  onlineUsers: {},
 };
 
 const chat = createSlice({
@@ -56,7 +58,7 @@ const chat = createSlice({
 
       if (state[listKey]) {
         const conversations = [...state[listKey]];
-        const chatIndex = conversations.findIndex((c) => c.id === partnerId);
+        const chatIndex = conversations.findIndex((c) => String(c.id).trim() === String(partnerId).trim());
 
         if (chatIndex > -1) {
           const chatToUpdate = conversations[chatIndex];
@@ -82,25 +84,30 @@ const chat = createSlice({
 
       if (state[listKey]) {
         // Cek apakah kontak sudah ada
-        const exists = state[listKey].some((c) => c.id === contact.id);
+        const exists = state[listKey].some((c) => String(c.id).trim() === String(contact.id).trim());
         if (!exists) {
+          // Check online status from state
+          const targetRole = isBuyer ? 'seller' : 'buyer';
+          const userKey = `${targetRole}_${contact.id}`;
+          const isOnline = !!state.onlineUsers[userKey];
+
           // Tambahkan kontak baru di posisi paling atas
-          state[listKey] = [contact, ...state[listKey]];
-          console.log(`✅ New contact added: ${contact.name}`);
+          state[listKey] = [{ ...contact, isOnline }, ...state[listKey]];
+
         }
       }
     },
 
     // 🆕 Update contact dari socket notification
     updateContactFromSocket: (state, action) => {
-      const { partnerId, lastMessage, isBuyer } = action.payload;
+      const { partnerId, lastMessage, isBuyer, isMyMessage } = action.payload;
       const listKey = isBuyer ? "contactBuyer" : "contactSeller";
 
       if (state[listKey]) {
         const conversations = [...state[listKey]];
 
         // Cari index kontak yang tepat berdasarkan partnerId
-        const chatIndex = conversations.findIndex((c) => c.id === partnerId);
+        const chatIndex = conversations.findIndex((c) => String(c.id).trim() === String(partnerId).trim());
 
         if (chatIndex > -1) {
           // ✅ Update HANYA kontak yang sesuai partnerId
@@ -113,6 +120,10 @@ const chat = createSlice({
               text: lastMessage.text,
               created_at: lastMessage.created_at,
             },
+            // ✅ Increment unread count ONLY if it's NOT my message
+            unreadCount: isMyMessage
+              ? (chatToUpdate.unreadCount || 0)
+              : (chatToUpdate.unreadCount || 0) + 1,
           };
 
           // Hapus dari posisi lama
@@ -121,15 +132,24 @@ const chat = createSlice({
           // Tambahkan di posisi paling atas
           state[listKey] = [updatedChat, ...conversations];
 
-          console.log(
-            `✅ Contact updated via socket: ${partnerId}`,
-            updatedChat
-          );
-        } else {
-          // Kontak belum ada di list, perlu refetch
-          console.log(
-            `⚠️ Contact ${partnerId} not found in list, need refetch`
-          );
+
+        }
+      }
+    },
+
+    // 🆕 Mark chat as read
+    markChatAsRead: (state, action) => {
+      const { partnerId, isBuyer } = action.payload;
+      const listKey = isBuyer ? "contactBuyer" : "contactSeller";
+
+      if (state[listKey]) {
+        const conversations = state[listKey];
+        // Use String() and trim() for comparison to handle number vs string and whitespace issues
+        const chatIndex = conversations.findIndex((c) => String(c.id).trim() === String(partnerId).trim());
+
+        if (chatIndex > -1) {
+          // Mutate directly as Immer allows it, but let's be safe slightly
+          state[listKey][chatIndex].unreadCount = 0;
         }
       }
     },
@@ -141,6 +161,72 @@ const chat = createSlice({
       state.contactSeller = null;
       state.contactSellerStatus = "idle";
       state.contactSellerError = null;
+      state.onlineUsers = {};
+    },
+
+    // 🆕 Update User Online Status
+    updateUserStatus: (state, action) => {
+      const { userId, role, isOnline } = action.payload;
+      const normalizedRole = role?.toLowerCase();
+      const userKey = `${normalizedRole}_${userId}`;
+
+      // Update global map
+      if (isOnline) {
+        state.onlineUsers[userKey] = true;
+      } else {
+        delete state.onlineUsers[userKey];
+      }
+
+      // Update in Buyer Contacts (List of Sellers)
+      if (state.contactBuyer && normalizedRole === 'seller') {
+        const index = state.contactBuyer.findIndex(c => String(c.id) === String(userId));
+        if (index !== -1) {
+          state.contactBuyer[index] = { ...state.contactBuyer[index], isOnline };
+        }
+      }
+
+      // Update in Seller Contacts (List of Buyers)
+      if (state.contactSeller && normalizedRole === 'buyer') {
+        const index = state.contactSeller.findIndex(c => String(c.id) === String(userId));
+        if (index !== -1) {
+          state.contactSeller[index] = { ...state.contactSeller[index], isOnline };
+        }
+      }
+    },
+
+    // 🆕 Bulk Set Online Users (Sync Init State)
+    setOnlineUsers: (state, action) => {
+      const onlineList = action.payload; // Array of { userId, role }
+
+      // Rebuild global map
+      state.onlineUsers = {};
+      const onlineSellers = new Set();
+      const onlineBuyers = new Set();
+
+      onlineList.forEach(u => {
+        const role = u.role?.toLowerCase();
+        const key = `${role}_${u.userId}`;
+        state.onlineUsers[key] = true;
+
+        if (role === 'seller') onlineSellers.add(String(u.userId));
+        if (role === 'buyer') onlineBuyers.add(String(u.userId));
+      });
+
+      // Update Buyer Contacts (Match with Sellers)
+      if (state.contactBuyer) {
+        state.contactBuyer = state.contactBuyer.map(c => ({
+          ...c,
+          isOnline: onlineSellers.has(String(c.id))
+        }));
+      }
+
+      // Update Seller Contacts (Match with Buyers)
+      if (state.contactSeller) {
+        state.contactSeller = state.contactSeller.map(c => ({
+          ...c,
+          isOnline: onlineBuyers.has(String(c.id))
+        }));
+      }
     },
   },
   extraReducers: (builder) => {
@@ -151,11 +237,15 @@ const chat = createSlice({
       })
       .addCase(getContactForBuyer.fulfilled, (state, action) => {
         state.contactBuyerStatus = "success";
-        state.contactBuyer = action.payload.data.map((contact) => ({
-          ...contact,
-          name: contact.nama_toko,
-          avatar: contact.foto_toko,
-        }));
+        state.contactBuyer = action.payload.data.map((contact) => {
+          const userKey = `seller_${contact.id}`;
+          return {
+            ...contact,
+            name: contact.nama_toko,
+            avatar: contact.foto_toko,
+            isOnline: !!state.onlineUsers[userKey],
+          };
+        });
       })
       .addCase(getContactForBuyer.rejected, (state, action) => {
         state.contactBuyerStatus = "error";
@@ -168,11 +258,15 @@ const chat = createSlice({
       })
       .addCase(getContactForSeller.fulfilled, (state, action) => {
         state.contactSellerStatus = "success";
-        state.contactSeller = action.payload.data.map((contact) => ({
-          ...contact,
-          name: contact.nama,
-          avatar: contact.foto_profile,
-        }));
+        state.contactSeller = action.payload.data.map((contact) => {
+          const userKey = `buyer_${contact.id}`;
+          return {
+            ...contact,
+            name: contact.nama,
+            avatar: contact.foto_profile,
+            isOnline: !!state.onlineUsers[userKey],
+          };
+        });
       })
       .addCase(getContactForSeller.rejected, (state, action) => {
         state.contactSellerStatus = "error";
@@ -181,7 +275,7 @@ const chat = createSlice({
 
       // Logout & Switch Account
       .addCase(logoutUser.fulfilled, (state) => {
-        console.log("LOGOUT terdeteksi, membersihkan state chat...");
+
         state.contactBuyer = null;
         state.contactBuyerStatus = "idle";
         state.contactBuyerError = null;
@@ -190,7 +284,7 @@ const chat = createSlice({
         state.contactSellerError = null;
       })
       .addCase(changeAccount.fulfilled, (state) => {
-        console.log("CHANGE ACCOUNT terdeteksi, membersihkan state chat...");
+
         state.contactBuyer = null;
         state.contactBuyerStatus = "idle";
         state.contactBuyerError = null;
@@ -199,7 +293,7 @@ const chat = createSlice({
         state.contactSellerError = null;
       })
       .addCase("auth/logout", (state) => {
-        console.log("LOGOUT SINKRON terdeteksi, membersihkan state chat...");
+
         state.contactBuyer = null;
         state.contactBuyerStatus = "idle";
         state.contactBuyerError = null;
@@ -227,7 +321,10 @@ export const {
   updateLastMessage,
   addNewContact,
   updateContactFromSocket,
+  markChatAsRead,
   resetChat,
+  updateUserStatus,
+  setOnlineUsers
 } = chat.actions;
 
 export default chat.reducer;

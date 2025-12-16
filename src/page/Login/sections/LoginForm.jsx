@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"; // ← Hapus useState, tidak perlu lagi!
 import InputForm from "../../../components/modules/form/InputForm";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Button from "../../../components/common/Button";
 import {
   FaLock,
@@ -17,11 +17,13 @@ import {
   selectCurrentUser,
   selectLoginMessage,
   selectLoginStatus,
+  resetLoginStatus,
 } from "../../../features/authSlice";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,10 +35,16 @@ const LoginForm = () => {
   const token = useSelector(selectAccessToken);
 
   useEffect(() => {
+    dispatch(resetLoginStatus());
+  }, [dispatch]);
+
+  const from = location.state?.from?.pathname || "/";
+
+  useEffect(() => {
     if (token) {
-      navigate("/");
+      navigate(from, { replace: true });
     }
-  }, [token, navigate]);
+  }, [token, navigate, from]);
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value);
@@ -61,9 +69,9 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (status === "success" && currentUser) {
-      navigate("/");
+      navigate(from, { replace: true });
     }
-  }, [status, currentUser, navigate]);
+  }, [status, currentUser, navigate, from]);
   return (
     <div className="flex flex-col gap-4 md:gap-4 h-full">
       {/* Header Section */}

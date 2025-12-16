@@ -7,7 +7,7 @@ export const createNewReview = createAsyncThunk(
     try {
       // Add this debug line to see if token is being retrieved
       const token = localStorage.getItem("accessToken");
-      console.log("Token in reviewSlice:", token ? "exists" : "not found");
+
 
       const res = await api.post(`/review/service/${orderId}`, reviewData);
       return res.data;
@@ -20,12 +20,30 @@ export const createNewReview = createAsyncThunk(
   }
 );
 
+export const getReviewsBySellerId = createAsyncThunk(
+  "review/getReviewsBySellerId",
+  async (sellerId, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/review/seller/${sellerId}`);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch seller reviews" }
+      );
+    }
+  }
+);
+
 const reviewSlice = createSlice({
   name: "review",
   initialState: {
     review: null,
     createStatus: "idle",
     createError: null,
+
+    sellerReviews: [],
+    sellerReviewsStatus: "idle",
+    sellerReviewsError: null,
   },
 
   reducers: {
@@ -50,6 +68,22 @@ const reviewSlice = createSlice({
         state.createStatus = "error";
         state.createError =
           action.payload?.message || "failed to create review";
+      })
+
+      // Get Reviews By Seller
+      .addCase(getReviewsBySellerId.pending, (state) => {
+        state.sellerReviewsStatus = "loading";
+        state.sellerReviewsError = null;
+      })
+      .addCase(getReviewsBySellerId.fulfilled, (state, action) => {
+        state.sellerReviewsStatus = "success";
+        state.sellerReviews = action.payload.data; // Assuming response has data property
+        state.sellerReviewsError = null;
+      })
+      .addCase(getReviewsBySellerId.rejected, (state, action) => {
+        state.sellerReviewsStatus = "error";
+        state.sellerReviewsError =
+          action.payload?.message || "failed to fetch seller reviews";
       });
   },
 });
@@ -58,5 +92,9 @@ export const { clearCreateStatus } = reviewSlice.actions;
 
 export const selectCreateStatus = (state) => state.review.createStatus;
 export const selectCreateError = (state) => state.review.createError;
+
+export const selectSellerReviews = (state) => state.review.sellerReviews;
+export const selectSellerReviewsStatus = (state) => state.review.sellerReviewsStatus;
+export const selectSellerReviewsError = (state) => state.review.sellerReviewsError;
 
 export default reviewSlice.reducer;

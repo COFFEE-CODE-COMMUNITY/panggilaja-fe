@@ -18,7 +18,7 @@ const ModalConfirmDeleteDocs = ({ onConfirm, onCancel, isDeleting }) => {
                 <div className="flex gap-3 w-full">
                     <Button
                         onClick={onCancel}
-                        className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300 py-3 rounded-2xl"
+                        className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300 py-3 rounded-2xl cursor-pointer"
                         disabled={isDeleting}
                     >
                         Batal
@@ -26,7 +26,7 @@ const ModalConfirmDeleteDocs = ({ onConfirm, onCancel, isDeleting }) => {
                     <Button
                         variant="primary"
                         onClick={onConfirm}
-                        className="flex-1 text-white py-3 rounded-2xl hover:bg-primary/80"
+                        className="flex-1 text-white py-3 rounded-2xl hover:bg-primary/80 cursor-pointer"
                         disabled={isDeleting}
                     >
                         {isDeleting ? 'Menghapus...' : 'Ya, Hapus'}

@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaCamera, FaSave, FaMapMarkedAlt, FaUserEdit } from "react-icons/fa";
 import { fetchDistricts, fetchProvinces, fetchRegencies, resetDistricts, resetRegencies, selectAlamatStatus, selectAllDistricts, selectAllProvinces, selectAllRegencies } from "../../features/addressSlice";
+import ModalSelect from "../../components/common/ModalSelect";
 
 const EditProfile = () => {
     const dispatch = useDispatch();
@@ -153,8 +154,7 @@ const EditProfile = () => {
         setIsFileChanged(true);
     };
 
-    const handleProvinceChange = (e) => {
-        const code = e.target.value;
+    const handleProvinceChange = (code) => {
         setProvinsi(code);
         setKota('');
         setKecamatan('');
@@ -166,8 +166,7 @@ const EditProfile = () => {
         }
     };
 
-    const handleRegencyChange = (e) => {
-        const code = e.target.value;
+    const handleRegencyChange = (code) => {
         setKota(code);
         setKecamatan('');
         dispatch(resetDistricts());
@@ -177,8 +176,7 @@ const EditProfile = () => {
         }
     };
 
-    const handleDistrictChange = (e) => {
-        const code = e.target.value;
+    const handleDistrictChange = (code) => {
         setKecamatan(code);
     };
 
@@ -240,7 +238,7 @@ const EditProfile = () => {
                     <FaArrowLeft className='text-gray-600' />
                 </button>
                 <div>
-                    <h1 className='text-2xl font-bold text-gray-900'>Edit Profil</h1>
+                    <h1 className='text-2xl font-bold text-gray-900 cursor-pointer'>Edit Profil</h1>
                     <p className='text-gray-500 text-sm mt-1'>Perbarui informasi profil dan alamat anda</p>
                 </div>
             </div>
@@ -316,75 +314,42 @@ const EditProfile = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label htmlFor="province" className="block text-sm font-medium text-gray-700">Provinsi</label>
-                                        <div className="relative">
-                                            <select
-                                                className='w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none'
-                                                onChange={handleProvinceChange}
-                                                value={provinsi}
-                                                required
-                                                disabled={alamatStatus === 'loading' && provinces.length === 0}
-                                                id="province"
-                                            >
-                                                <option value="">
-                                                    {provinces.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Provinsi'}
-                                                </option>
-                                                {provinces.map((p) => (
-                                                    <option key={p.code} value={p.code}>{p.name}</option>
-                                                ))}
-                                            </select>
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                            </div>
-                                        </div>
+                                        <ModalSelect
+                                            label="Provinsi"
+                                            placeholder={provinces.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Provinsi'}
+                                            options={provinces.map(p => ({ value: p.code, label: p.name }))}
+                                            value={provinsi}
+                                            onChange={handleProvinceChange}
+                                            disabled={alamatStatus === 'loading' && provinces.length === 0}
+                                            title="Pilih Provinsi"
+                                            required
+                                        />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label htmlFor="regency" className="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
-                                        <div className="relative">
-                                            <select
-                                                className='w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none disabled:bg-gray-50 disabled:text-gray-400'
-                                                onChange={handleRegencyChange}
-                                                value={kota}
-                                                required
-                                                disabled={!provinsi || (alamatStatus === 'loading' && regencies.length === 0)}
-                                                id="regency"
-                                            >
-                                                <option value="">
-                                                    {!provinsi ? 'Pilih Provinsi Dulu' : regencies.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Kota/Kabupaten'}
-                                                </option>
-                                                {regencies.map((r) => (
-                                                    <option key={r.code} value={r.code}>{r.name}</option>
-                                                ))}
-                                            </select>
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                            </div>
-                                        </div>
+                                        <ModalSelect
+                                            label="Kota/Kabupaten"
+                                            placeholder={!provinsi ? 'Pilih Provinsi Dulu' : regencies.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Kota/Kabupaten'}
+                                            options={regencies.map(r => ({ value: r.code, label: r.name }))}
+                                            value={kota}
+                                            onChange={handleRegencyChange}
+                                            disabled={!provinsi || (alamatStatus === 'loading' && regencies.length === 0)}
+                                            title="Pilih Kota/Kabupaten"
+                                            required
+                                        />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label htmlFor="district" className="block text-sm font-medium text-gray-700">Kecamatan</label>
-                                        <div className="relative">
-                                            <select
-                                                className='w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none disabled:bg-gray-50 disabled:text-gray-400'
-                                                onChange={handleDistrictChange}
-                                                value={kecamatan}
-                                                required
-                                                disabled={!kota || (alamatStatus === 'loading' && districts.length === 0)}
-                                                id="district"
-                                            >
-                                                <option value="">
-                                                    {!kota ? 'Pilih Kota Dulu' : districts.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Kecamatan'}
-                                                </option>
-                                                {districts.map((d) => (
-                                                    <option key={d.code} value={d.code}>{d.name}</option>
-                                                ))}
-                                            </select>
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                            </div>
-                                        </div>
+                                        <ModalSelect
+                                            label="Kecamatan"
+                                            placeholder={!kota ? 'Pilih Kota Dulu' : districts.length === 0 && alamatStatus === 'loading' ? 'Memuat...' : 'Pilih Kecamatan'}
+                                            options={districts.map(d => ({ value: d.code, label: d.name }))}
+                                            value={kecamatan}
+                                            onChange={handleDistrictChange}
+                                            disabled={!kota || (alamatStatus === 'loading' && districts.length === 0)}
+                                            title="Pilih Kecamatan"
+                                            required
+                                        />
                                     </div>
 
                                     <InputForm

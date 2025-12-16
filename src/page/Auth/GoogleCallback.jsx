@@ -13,7 +13,7 @@ const GoogleCallback = () => {
     const userParam = searchParams.get('user');
     const error = searchParams.get('error');
 
-    console.log('🔍 Callback Params:', { token, userParam, error });
+
 
     const handleGoogleCallback = async () => {
       try {

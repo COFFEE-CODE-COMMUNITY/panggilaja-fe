@@ -1,13 +1,13 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { updateProfile, logout } from "../features/authSlice";
 
 const isDevelopment = import.meta.env.MODE === "development";
 const API_BASE_URL = isDevelopment
   ? "http://localhost:5000/api"
   : import.meta.env.VITE_API_BASE_URL || "https://api.panggilaja.space/api";
 
-console.log("🌐 API Base URL:", API_BASE_URL);
-console.log("🌍 Environment:", import.meta.env.MODE);
+
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -17,6 +17,11 @@ const api = axios.create({
 
 let isRefreshing = false;
 let failedQueue = [];
+
+let store = null;
+export const injectStore = (_store) => {
+  store = _store;
+};
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
@@ -37,12 +42,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    console.log("📤 API Request:", {
-      method: config.method?.toUpperCase(),
-      url: config.url,
-      baseURL: config.baseURL,
-      fullURL: `${config.baseURL}${config.url}`,
-    });
+
 
     return config;
   },
@@ -57,10 +57,7 @@ api.interceptors.request.use(
 // ==========================
 api.interceptors.response.use(
   (response) => {
-    console.log("✅ API Response:", {
-      url: response.config.url,
-      status: response.status,
-    });
+
     return response;
   },
 
@@ -70,12 +67,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    console.log("⚠️ Response Error:", {
-      url: originalRequest?.url,
-      status: error.response?.status,
-      retry: originalRequest?._retry,
-      message: error.message,
-    });
+
 
 
     const publicEndpoints = [
@@ -90,7 +82,7 @@ api.interceptors.response.use(
         originalRequest?.url?.includes(endpoint)
       )
     ) {
-      console.log("⏭️ Skipping refresh for public endpoint");
+
       return Promise.reject(error);
     }
 
@@ -99,7 +91,7 @@ api.interceptors.response.use(
     // ========================================
     if (error.response?.status === 401 && !originalRequest?._retry) {
       if (isRefreshing) {
-        console.log("⏳ Request queued while refreshing token");
+
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -114,11 +106,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        console.log("🔄 Attempting to refresh token...");
 
-        const response = await api.post("/auth/refresh");
-
-        console.log("✅ Refresh response:", response.data);
 
         const newAccessToken =
           response.data.data?.accessToken || response.data.accessToken;
@@ -132,7 +120,7 @@ api.interceptors.response.use(
         try {
           const decoded = jwtDecode(newAccessToken);
           decodedUser = decoded.user;
-          console.log("🔑 Decoded new token user:", decodedUser);
+
         } catch (decodeError) {
           console.warn("⚠️ Gagal decode access token:", decodeError);
         }
@@ -144,6 +132,11 @@ api.interceptors.response.use(
           localStorage.setItem("user", JSON.stringify(decodedUser));
         }
 
+        // ✅ SYNC REDUX: Update state agar aplikasi tahu token baru
+        if (store) {
+          store.dispatch(updateProfile());
+        }
+
         // Update header
         api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
@@ -151,7 +144,7 @@ api.interceptors.response.use(
         processQueue(null, newAccessToken);
         isRefreshing = false;
 
-        console.log("🔁 Retrying original request...");
+
         return api(originalRequest);
       } catch (refreshError) {
         console.error("❌ Refresh token failed:", refreshError);
@@ -159,18 +152,22 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         isRefreshing = false;
 
-        // ✅ PERBAIKAN: Clear storage
+        // ✅ PERBAIKAN: Clear storage & Redux
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
+
+        if (store) {
+          store.dispatch(logout());
+        }
 
         // ✅ PERBAIKAN: Redirect berdasarkan current path
         if (typeof window !== "undefined") {
           const currentPath = window.location.pathname;
-          
+
           // Jangan redirect kalau sudah di login page
           if (!currentPath.includes('/login')) {
-            console.log("🔄 Redirecting to login...");
-            
+
+
             // Redirect ke login dengan return URL
             const returnUrl = encodeURIComponent(currentPath);
             window.location.href = `/login?returnUrl=${returnUrl}`;

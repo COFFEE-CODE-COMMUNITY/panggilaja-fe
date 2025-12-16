@@ -18,7 +18,7 @@ const ModalDocsAdded = ({ onBack }) => {
 
                 <Button
                     onClick={onBack}
-                    className="w-full py-3 rounded-xl text-white font-semibold shadow-lg shadow-primary/30"
+                    className="w-full py-3 rounded-xl text-white font-semibold shadow-lg shadow-primary/30 cursor-pointer"
                     variant="primary"
                 >
                     Kembali ke Foto Profil

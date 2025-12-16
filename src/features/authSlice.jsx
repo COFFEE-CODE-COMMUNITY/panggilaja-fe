@@ -82,7 +82,6 @@ export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      isLoggingOut = true; // ✅ Blok refresh token
       const response = await api.post(`auth/logout`);
       return response.data;
     } catch (error) {
@@ -90,7 +89,6 @@ export const logoutUser = createAsyncThunk(
     } finally {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
-      isLoggingOut = false;
     }
   }
 );
@@ -189,6 +187,18 @@ const authSlice = createSlice({
         (state.changeAccountMessage = null),
         (state.changeAccountError = null);
     },
+    resetLoginStatus: (state) => {
+      state.loginStatus = "idle";
+      state.loginMessage = null;
+      state.loginError = null;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.accessToken = null;
+      state.loginStatus = "idle";
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -202,7 +212,7 @@ const authSlice = createSlice({
         const { message, data } = action.payload;
 
         // ✅ PERBAIKAN: accessToken sekarang langsung di data, bukan nested
-        console.log("Login Payload Data:", data);
+
         const accessToken = data ? data.accessToken : null;
 
         if (!accessToken) {
@@ -227,7 +237,7 @@ const authSlice = createSlice({
           localStorage.setItem("accessToken", accessToken);
           localStorage.setItem("user", JSON.stringify(userData));
 
-          console.log("✅ Login successful, user data:", userData);
+
         } catch (e) {
           console.error("❌ Gagal decode token saat login:", e);
           state.loginStatus = "failed";
@@ -392,7 +402,7 @@ const authSlice = createSlice({
         try {
           const decoded = jwtDecode(accessToken);
           finalUserData = decoded.user;
-          console.log("✅ User data dari token baru:", finalUserData);
+
         } catch (error) {
           console.error("❌ Gagal decode token:", error);
           state.changeAccountStatus = "failed";
@@ -409,10 +419,7 @@ const authSlice = createSlice({
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(finalUserData));
 
-        console.log(
-          "✅ Change account berhasil, role baru:",
-          finalUserData.role
-        );
+
       })
 
       .addCase(changeAccount.rejected, (state, action) => {
@@ -429,6 +436,7 @@ export const {
   setOAuthCredentials,
   resetChangeAccountStatus,
   updateProfile,
+  resetLoginStatus,
 } = authSlice.actions;
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectAccessToken = (state) => state.auth.accessToken;

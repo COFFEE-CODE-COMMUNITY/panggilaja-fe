@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Button from "../../../components/common/Button"; 
-import InputForm from "../../../components/modules/form/InputForm"; 
+import Button from "../../../components/common/Button";
+import InputForm from "../../../components/modules/form/InputForm";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategoryService, selectCategoryService, selectCategoryServiceStatus } from "../../../features/serviceSlice";
@@ -8,6 +8,8 @@ import { addSeller, selectAddSellerStatus } from "../../../features/sellerSlice"
 import { changeAccount, resetChangeAccountStatus, selectChangeAccountStatus } from "../../../features/authSlice";
 import { fetchDistricts, fetchProvinces, fetchRegencies, resetDistricts, resetRegencies, selectAlamatStatus, selectAllDistricts, selectAllProvinces, selectAllRegencies } from "../../../features/addressSlice";
 import Input from "../../../components/common/Input";
+import ModalSelect from "../../../components/common/ModalSelect"; // Updated import
+import AddressPickerModal from "../../../components/modules/form/AddressPickerModal"; // New import
 
 function ProfileMitraForm() {
     const categorys = useSelector(selectCategoryService)
@@ -21,9 +23,8 @@ function ProfileMitraForm() {
     const [previewUrl, setPreviewUrl] = useState(null)
 
     const [deskripsi_toko, setDeskripsi_Toko] = useState('')
-    const [kategori_toko, setKategori] = useState('')
-    const [pengalaman, setPengalaman] = useState('')
-    const [skill, setSkill] = useState('')
+    // const [kategori_toko, setKategori] = useState('') // Removed
+    const [selectedSkillIds, setSelectedSkillIds] = useState([]) // New multi-select state
     const [alamat, setAlamat] = useState('')
     const [provinsi, setProvinsi] = useState('')
     const [kota, setKota] = useState('')
@@ -36,10 +37,10 @@ function ProfileMitraForm() {
     const alamatStatus = useSelector(selectAlamatStatus)
 
     useEffect(() => {
-        if(!categorys){
+        if (!categorys) {
             dispatch(getCategoryService())
         }
-    },[dispatch])
+    }, [dispatch])
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -64,44 +65,49 @@ function ProfileMitraForm() {
             return;
         }
 
-        const provinsiName = provinces.find(p => p.code === provinsi)?.name || ''; 
-        const kotaObject = regencies.find(r => r.code === kota); 
-        const kotaName = kotaObject ? kotaObject.name : ''; 
+        const provinsiName = provinces.find(p => p.code === provinsi)?.name || '';
+        const kotaObject = regencies.find(r => r.code === kota);
+        const kotaName = kotaObject ? kotaObject.name : '';
         const kecamatanName = districts.find(d => d.code === kecamatan)?.name
 
-        const serviceData = {   
+        // Derive skill string and primary category
+        const skillString = selectedSkillIds.map(id => {
+            const cat = categorys?.data?.find(c => c.id === id);
+            return cat ? cat.kategori : '';
+        }).filter(Boolean).join(', ');
+
+        const primaryCategory = selectedSkillIds.length > 0 ? selectedSkillIds[0] : '';
+
+        const serviceData = {
             deskripsi_toko,
-            kategori_toko,
-            pengalaman,
-            skill,
-            alamat : alamat.toLowerCase(),
-            provinsi : provinsiName.toLowerCase(),
-            kota : kotaName.toLowerCase(),
-            kecamatan : kecamatanName.toLowerCase(),
+            kategori_toko: primaryCategory, // Use first selected skill as primary category
+            skill: skillString, // Keep skill for Skill table compatibility
+            pengalaman: skillString, // Map to pengalaman for display
+            alamat: alamat.toLowerCase(),
+            provinsi: provinsiName.toLowerCase(),
+            kota: kotaName.toLowerCase(),
+            kecamatan: kecamatanName.toLowerCase(),
             kode_pos
         };
-        
+
         const formData = new FormData();
-        
+
         formData.append('file', file);
-        
+
         formData.append('data', JSON.stringify(serviceData));
 
         dispatch(addSeller(formData)).unwrap()
-        .then(() => {
-            dispatch(changeAccount({targetRole : 'seller'}))
-        })
-        .catch((error) => {
-            alert(`Gagal membuat profil mitra: ${error.message || 'Terjadi kesalahan'}`);
-        });
+            .then(() => {
+                dispatch(changeAccount({ targetRole: 'seller' }))
+            })
     };
 
     useEffect(() => {
-        if(statusChange === 'success'){
+        if (statusChange === 'success') {
             dispatch(resetChangeAccountStatus());
             navigate('add-service')
         }
-    },[statusChange])
+    }, [statusChange])
 
     useEffect(() => {
         if (provinces.length === 0 && alamatStatus === 'idle') {
@@ -109,9 +115,8 @@ function ProfileMitraForm() {
         }
     }, [dispatch, provinces.length, alamatStatus])
 
-    const handleProvinceChange = (e) => {
-        const code = e.target.value
-        setProvinsi(code) 
+    const handleProvinceChange = (code) => {
+        setProvinsi(code)
         setKota('')
         setKecamatan('')
         dispatch(resetRegencies())
@@ -121,30 +126,31 @@ function ProfileMitraForm() {
         }
     }
 
-    const handleRegencyChange = (e) => {
-        const code = e.target.value
-        setKota(code) 
-        setKecamatan('') 
-        dispatch(resetDistricts()) 
+    const handleRegencyChange = (code) => {
+        setKota(code)
+        setKecamatan('')
+        dispatch(resetDistricts())
 
         if (code) {
             dispatch(fetchDistricts(code))
         }
     }
-    
-    const handleDistrictChange = (e) => {
-        const code = e.target.value
+
+    const handleDistrictChange = (code) => {
         setKecamatan(code)
     }
-    
+
+    // Options for ModalSelect (Keahlian)
+    const categoryOptions = categorys?.data?.map(c => ({ value: c.id, label: c.kategori })) || [];
+
     return (
         <div className="flex items-center justify-center py-5 px-4 lg:px-0">
-            <form 
+            <form
                 onSubmit={handleSubmit}
                 autoComplete="off"
                 className="w-full max-w-4xl py-[25px] px-4 md:px-0 space-y-6"
             >
-                
+
                 {/* Judul Form */}
                 <div>
                     <h2 className="text-[25px] md:text-[25px] lg:text-[26px] font-semibold text-left">Tentang Tokomu</h2>
@@ -162,63 +168,63 @@ function ProfileMitraForm() {
                             <div className="relative">
                                 <div className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-50 flex items-center justify-center">
                                     {previewUrl ? (
-                                        <img 
-                                            src={previewUrl} 
-                                            alt="Preview" 
+                                        <img
+                                            src={previewUrl}
+                                            alt="Preview"
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                                        <svg 
-                                            className="w-10 h-10 md:w-12 md:h-12 text-gray-400" 
-                                            fill="none" 
-                                            stroke="currentColor" 
+                                        <svg
+                                            className="w-10 h-10 md:w-12 md:h-12 text-gray-400"
+                                            fill="none"
+                                            stroke="currentColor"
                                             viewBox="0 0 24 24"
                                         >
-                                            <path 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round" 
-                                                strokeWidth="2" 
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                                             />
                                         </svg>
                                     )}
                                 </div>
-                                
+
                                 {/* Camera Icon Button */}
-                                <label 
-                                    htmlFor="file-upload" 
+                                <label
+                                    htmlFor="file-upload"
                                     className="absolute bottom-0 right-0 w-8 h-8 md:w-9 md:h-9 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-green-800 transition-colors shadow-lg"
                                 >
-                                    <svg 
-                                        className="w-4 h-4 md:w-5 md:h-5 text-white" 
-                                        fill="none" 
-                                        stroke="currentColor" 
+                                    <svg
+                                        className="w-4 h-4 md:w-5 md:h-5 text-white"
+                                        fill="none"
+                                        stroke="currentColor"
                                         viewBox="0 0 24 24"
                                     >
-                                        <path 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round" 
-                                            strokeWidth="2" 
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
                                             d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
                                         />
-                                        <path 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round" 
-                                            strokeWidth="2" 
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
                                             d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
                                         />
                                     </svg>
                                 </label>
-                                
-                                <input 
+
+                                <input
                                     id="file-upload"
-                                    type="file" 
+                                    type="file"
                                     accept="image/jpeg,image/png,image/jpg"
                                     className="hidden"
                                     onChange={handleFileChange}
                                 />
                             </div>
-                            
+
                             {/* Info Text */}
                             <div className="flex flex-col gap-1">
                                 <p className="text-sm md:text-base font-medium text-gray-700">
@@ -228,7 +234,7 @@ function ProfileMitraForm() {
                                     Format: JPG, PNG (Maks. 2MB)
                                 </p>
                                 {!file && (
-                                    <label 
+                                    <label
                                         htmlFor="file-upload"
                                         className="text-xs md:text-sm text-primary hover:text-green-800 font-medium cursor-pointer underline"
                                     >
@@ -239,147 +245,82 @@ function ProfileMitraForm() {
                         </div>
                     </div>
 
-                    {/* Kategori Toko */}
-                    <div>
-                        <label htmlFor="kategori_toko" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Kategori Toko</label>
-                        <div className="mt-2">
-                            <select 
-                                id="kategori_toko"
-                                className="w-full bg-gray-white px-[20px] py-[15px] rounded-[15px] outline-1 outline-gray-200 text-sm md:text-sm lg:text-base"
-                                onChange={(e) => setKategori(e.target.value)}
-                            >
-                                <option disabled>Kategori Jasa</option>
-                                {categorys?.status === 'success' && 
-                                    categorys.data.map((category) => (
-                                        <option key={category.id} value={category.id}>{category.kategori}</option>
-                                    ))
-                                }
-                            </select>
-                        </div>
-                    </div>
+
 
                     {/* Deskripsi Toko */}
                     <div className="md:col-span-2">
                         <label htmlFor="deskripsi_toko" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Deskripsi Toko</label>
-                        <div className="mt-2"> 
-                            <textarea 
+                        <div className="mt-2">
+                            <textarea
                                 id="deskripsi_toko"
-                                className="w-full h-[100px] md:h-[100px] lg:h-[110px] outline-1 outline-gray-200 p-[15px] md:p-[15px] lg:p-[16px] rounded-[15px] md:rounded-[15px] lg:rounded-[16px]" 
+                                className="w-full h-[100px] md:h-[100px] lg:h-[110px] outline-1 outline-gray-200 p-[15px] md:p-[15px] lg:p-[16px] rounded-[15px] md:rounded-[15px] lg:rounded-[16px]"
                                 placeholder="Masukkan deskripsi toko"
                                 onChange={(e) => setDeskripsi_Toko(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    {/* Pengalaman */}
+                    {/* Keahlian (Multi-select Modal) */}
                     <div>
-                        <label htmlFor="pengalaman" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Pengalaman</label>
-                        <div className="mt-2">
-                            <InputForm
-                                type="text"
-                                id="pengalaman"
-                                placeholder="Masukkan Detail Pengalaman Anda"
-                                onChange={(e) => setPengalaman(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Keahlian */}
-                    <div>
-                        <label htmlFor="keahlian" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Keahlian</label>
-                        <div className="mt-2">
-                            <InputForm
-                                type="text"
-                                id="keahlian"
-                                placeholder="Masukkan Keahlian"
-                                onChange={(e) => setSkill(e.target.value)}
-                            />
-                        </div>
+                        <ModalSelect
+                            label="Keahlian"
+                            title="Pilih Keahlian"
+                            placeholder="Pilih Keahlian (Bisa lebih dari satu)"
+                            options={categoryOptions}
+                            value={selectedSkillIds}
+                            onChange={setSelectedSkillIds}
+                            multiple={true}
+                        />
                     </div>
 
                     {/* Alamat */}
                     <div className="md:col-span-2">
-                        <label htmlFor="alamat" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Alamat</label>
+                        <label htmlFor="alamat" className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Alamat Lengkap</label>
                         <div className="mt-2">
-                            <textarea 
+                            <textarea
                                 id="alamat"
-                                className="w-full h-[100px] md:h-[100px] lg:h-[110px] outline-1 outline-gray-200 p-[15px] md:p-[15px] lg:p-[16px] rounded-[15px] md:rounded-[15px] lg:rounded-[16px]" 
-                                placeholder="Masukkan Detail Alamat Anda"
+                                className="w-full h-[100px] md:h-[100px] lg:h-[110px] outline-1 outline-gray-200 p-[15px] md:p-[15px] lg:p-[16px] rounded-[15px] md:rounded-[15px] lg:rounded-[16px]"
+                                placeholder="Masukkan Detail Alamat Anda (Jalan, No. Rumah, dll)"
                                 onChange={(e) => setAlamat(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    {/* Domisili */}
-                    <div className="md:col-span-2"> 
-                        <label className="block text-[15px] md:text-[15px] lg:text-[16px] font-medium text-gray-700">Domisili</label>
-                        <div className="mt-2"> 
-                            <div className='grid md:grid-cols-4 grid-cols-2 gap-3'>
-                                <select 
-                                    className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                    onChange={handleProvinceChange}
-                                    value={provinsi} 
-                                    required
-                                    disabled={alamatStatus === 'loading' && provinces.length === 0}
-                                >
-                                    <option value="">
-                                        {provinces.length === 0 && alamatStatus === 'loading' ? 'Memuat Provinsi...' : 'Pilih Provinsi'}
-                                    </option>
-                                    {provinces.map((p) => (
-                                        <option key={p.code} value={p.code}>{p.name}</option>
-                                    ))}
-                                </select>
-
-                                <select 
-                                    className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                    onChange={handleRegencyChange}  
-                                    value={kota} 
-                                    required
-                                    disabled={!provinsi || (alamatStatus === 'loading' && regencies.length === 0)}
-                                >
-                                    <option value="">
-                                        {provinsi && regencies.length === 0 && alamatStatus === 'loading' ? 'Memuat Kota/Kabupaten...' : 'Pilih Kota/Kabupaten'}
-                                    </option>
-                                    {regencies.map((r) => (
-                                        <option key={r.code} value={r.code}>{r.name}</option>
-                                    ))}
-                                </select>
-                                
-                                <select 
-                                    className='border-1 border-gray-200 px-4 py-3 rounded-lg bg-white w-full focus:border-blue-500 focus:outline-none'
-                                    onChange={handleDistrictChange}
-                                    value={kecamatan} 
-                                    required
-                                    disabled={!kota || (alamatStatus === 'loading' && districts.length === 0)}
-                                >
-                                    <option value="">
-                                        {kota && districts.length === 0 && alamatStatus === 'loading' ? 'Memuat Kecamatan...' : 'Pilih Kecamatan'}
-                                    </option>
-                                    {districts.map((d) => (
-                                        <option key={d.code} value={d.code}>{d.name}</option>
-                                    ))}
-                                </select>
-                                
-                                <Input  
-                                    placeholder='Kode Pos (contoh: 40132)' 
-                                    className='border-1 border-gray-200 rounded-lg w-full px-4 py-3 focus:border-blue-500 focus:outline-none'
-                                    onChange={(e) => setKode_Pos(e.target.value)}
-                                    value={kode_pos}
-                                    required
-                                />
-                            </div>
+                    {/* Domisili (Address Picker Modal) */}
+                    <div className="md:col-span-2">
+                        <AddressPickerModal
+                            provinces={provinces}
+                            regencies={regencies}
+                            districts={districts}
+                            onProvinceChange={handleProvinceChange}
+                            onRegencyChange={handleRegencyChange}
+                            onDistrictChange={handleDistrictChange}
+                            currentProvince={provinsi}
+                            currentRegency={kota}
+                            currentDistrict={kecamatan}
+                            loading={alamatStatus === 'loading'}
+                        />
+                        <div className="mt-4">
+                            <label className="block text-[15px] font-medium text-gray-700 mb-2">Kode Pos</label>
+                            <Input
+                                placeholder='Contoh: 40132'
+                                className='border-1 border-gray-200 rounded-lg w-full px-4 py-3 focus:border-blue-500 focus:outline-none'
+                                onChange={(e) => setKode_Pos(e.target.value)}
+                                value={kode_pos}
+                                required
+                            />
                         </div>
                     </div>
 
                 </div>
 
                 {/* Tombol Selanjutnya */}
-                <div className="flex justify-end pt-4"> 
-                    <Button 
-                        type="submit" 
-                        variant="primary" 
+                <div className="flex justify-end pt-4">
+                    <Button
+                        type="submit"
+                        variant="primary"
                         className="px-6 py-2 rounded-lg text-white"
-                    > 
+                    >
                         Selanjutnya
                     </Button>
                 </div>

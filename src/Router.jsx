@@ -46,10 +46,16 @@ import DashboardUtama from "./page/Dashboard/MainDashboard";
 import TestingPage from "./page/TestingPage";
 import FavoritePage from "./page/Setting/FavoritePage";
 import OrderPage from "./page/Setting/OrderPage";
+import DetailServiceForSeller from "./page/Dashboard/DetailServiceForSeller";
+
+import GlobalRealtimeListener from "./components/common/GlobalRealtimeListener";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 export default function Router() {
   return (
     <BrowserRouter>
+      <GlobalRealtimeListener />
+      <ScrollToTop />
       <Routes>
         {/* ====== MAIN LAYOUT ====== */}
         <Route path="/" element={<AppLayout />}>
@@ -58,7 +64,14 @@ export default function Router() {
           <Route path="favorites" element={<FavoriteMobile />} />
           <Route path="partner" element={<PartnerPage />} />
           <Route path="service/:id" element={<DetailService />} />
-          <Route path="service/nego/:id" element={<NegoPage />} />
+          <Route
+            path="service/nego/:id"
+            element={
+              <ProtectedRoute>
+                <NegoPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="search-result" element={<SearchPage />} />
           <Route path="category/:id" element={<FilterByCategory />} />
           <Route path="all-service-result" element={<SearchAllService />} />
@@ -147,6 +160,7 @@ export default function Router() {
             path="manage-services/edit-service/:id"
             element={<EditService />}
           />
+          <Route path="service/:id" element={<DetailServiceForSeller />} />
 
           <Route path="chat" element={<ChatLayout />} />
           <Route path="chat/:partnerId" element={<ChatLayout />} />

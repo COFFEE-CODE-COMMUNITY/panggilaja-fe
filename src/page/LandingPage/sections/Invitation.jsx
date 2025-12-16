@@ -7,8 +7,21 @@ import {
   FaArrowRight,
   FaCheckCircle,
 } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import ModalAuth from "../../../components/modules/Modal/ModalAuth";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { selectAccessToken } from "../../../features/authSlice";
 
 const Invitation = () => {
+  const token = useSelector(selectAccessToken);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const navigate = useNavigate();
+
+  const handlePartnerClick = () => {
+    navigate('/partner');
+  };
+
   return (
     <div className="w-full md:my-[40px] my-[50px]">
       {/* Section Header */}
@@ -124,16 +137,24 @@ const Invitation = () => {
 
           {/* Button */}
           {/* <Link to="/partner" className="relative z-10 w-full"> */}
-            <Button
-              variant="primary"
-              className="w-full text-white rounded-full lg:h-[52px] md:h-[45px] h-[40px] lg:text-h4 md:text-h5 text-h6 font-semibold flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group/btn"
-            >
-              <span>Daftar & Raih Peluang GRATIS</span>
-              <FaArrowRight className="text-sm group-hover/btn:translate-x-1 transition-transform duration-300" />
-            </Button>
+          <Button
+            variant="primary"
+            className="w-full text-white rounded-full lg:h-[52px] md:h-[45px] h-[40px] lg:text-h4 md:text-h5 text-h6 font-semibold flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group/btn"
+            onClick={handlePartnerClick}
+          >
+            <span>Daftar & Raih Peluang GRATIS</span>
+            <FaArrowRight className="text-sm group-hover/btn:translate-x-1 transition-transform duration-300" />
+          </Button>
           {/* </Link> */}
         </InvitationCard>
       </div>
+
+      <ModalAuth
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        title="Gabung Jadi Mitra"
+        description="Untuk menjadi mitra dan mulai berjualan, Anda perlu memiliki akun terlebih dahulu. Yuk, daftar atau masuk sekarang!"
+      />
 
       {/* Bottom Stats - Optional */}
       <div className="grid grid-cols-3 gap-4 mt-8 md:mt-12 text-center">
