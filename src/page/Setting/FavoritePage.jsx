@@ -105,13 +105,13 @@ const FavoritePage = () => {
                                         key={favorite.id}
                                         className="bg-white rounded-xl p-4 hover:shadow-md transition-all duration-300 group"
                                     >
-                                        <div className="flex flex-col sm:flex-row gap-6">
+                                        <div className="flex gap-6">
                                             {/* Image */}
-                                            <div className="w-full sm:w-48 md:w-56 aspect-video sm:aspect-[4/3] flex-shrink-0">
+                                            <div className="w-48 md:w-56 aspect-video sm:aspect-[4/3] flex-shrink-0">
                                                 <img
                                                     src={favorite?.foto_product}
                                                     alt={favorite.nama_jasa}
-                                                    className="w-full h-full object-cover rounded-lg"
+                                                    className="w-50 h-50 object-cover rounded-lg"
                                                 />
                                             </div>
 
@@ -154,7 +154,7 @@ const FavoritePage = () => {
                                                 </div>
 
                                                 {/* Actions */}
-                                                <div className="flex flex-wrap gap-3 mt-2 pt-4 border-t border-gray-100">
+                                                <div className="sm:block hidden flex flex-wrap gap-3 mt-2 pt-4 border-t border-gray-100">
                                                     <Button
                                                         variant="primary"
                                                         className="flex-1 sm:flex-none px-6 py-2 text-sm rounded-lg flex items-center justify-center gap-2 text-white"

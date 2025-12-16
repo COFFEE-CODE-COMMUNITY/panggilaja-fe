@@ -71,14 +71,14 @@ const ProfileLayout = () => {
             location.pathname.includes("manage-profile")
               ? "px-3"
               : "xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px]"
-          } sm:flex sm:flex-row flex-col w-full h-full gap-[10px] md:gap-[20px] lg:gap-[30px] mx-auto`}
+          } md:flex md:flex-row flex-col w-full h-full gap-[10px] md:gap-[20px] lg:gap-[30px] mx-auto`}
         >
-          <div className="sm:h-full flex sm:flex-col sm:items-center lg:px-[15px] lg:py-[35px] md:px-[10px] md:py-[30px] px-[5px] sm:py-[25px] py-[15px] gap-[15px]">
+          <div className="md:h-full flex md:flex-col md:items-center lg:px-[15px] lg:py-[35px] md:px-[10px] md:py-[30px] px-[5px] sm:py-[25px] py-[15px] gap-[15px]">
             <img
               src={seller?.foto_toko}
               className="bg-gray-200 lg:w-[110px] lg:h-[110px] md:w-[90px] md:h-[90px] w-[75px] h-[75px] rounded-full aspect-square"
             />
-            <div className="sm:text-center w-full">
+            <div className="md:text-center w-full">
               <p className="lg:text-h3 md:text-h4 text-h5 font-medium w-full">
                 {seller?.nama_toko}
               </p>
@@ -86,12 +86,12 @@ const ProfileLayout = () => {
             </div>
             <Button
               variant="primary"
-              className="sm:block hidden md:text-h5 text-h6 text-white rounded-lg lg:w-[220px] md:w-[180px] w-[100px] py-[10px] text-center"
+              className="md:block hidden md:text-h5 text-h6 text-white rounded-lg lg:w-[220px] md:w-[180px] w-[100px] py-[10px] text-center"
               to={`/chat/${seller?.id}`}
             >
               Kontak Saya
             </Button>
-            <div className="sm:flex hidden flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]">
+            <div className="md:flex hidden flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]">
               <p className="text-left md:text=h5 text-h6">Ahli Dalam</p>
               <div className="w-full flex flex-col">
                 {skills.map((skill) => (
@@ -103,7 +103,7 @@ const ProfileLayout = () => {
             </div>
           </div>
           <div>
-            <div className="flex flex-col sm:hidden gap-[10px]">
+            <div className="flex flex-col md:hidden gap-[10px]">
               <div className="w-full">
                 {skills.map((skill) => (
                   <p className="px-[10px] py-[5px] border-2 border-gray-200 rounded-[20px] text-h6 w-fit">
@@ -121,7 +121,7 @@ const ProfileLayout = () => {
             </div>
           </div>
           <div className="flex flex-col sm:w-5/7 w-full sm:my-0 my-[10px]">
-            <div className="w-full flex lg:gap-[40px] md:gap-[30px] gap-[20px] md:text-h5 text-h6 items-center lg:px-[30px] lg:py-[25px] px-[15px] py-[10px] font-medium">
+            <div className="w-full flex lg:gap-[40px] md:gap-[30px] gap-[20px] md:text-h5 text-h6 items-center lg:px-[30px] lg:py-[25px] px-[15px] py-[10px] font-medium md:mt-0 mt-6">
               <NavLink
                 to=""
                 end
