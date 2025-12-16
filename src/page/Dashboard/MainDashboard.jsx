@@ -433,7 +433,7 @@ const DashboardUtama = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-800 text-sm sm:text-base truncate">
-                  Kelola Layanan
+                  Kelola Produk
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-500 truncate">
                   Tambah & edit layanan
