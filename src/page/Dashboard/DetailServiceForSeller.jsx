@@ -31,12 +31,12 @@ const DetailServiceForSeller = () => {
     }, [dispatch, id]);
 
     useEffect(() => {
-        console.log("Service loaded:", service);
+
         if (service?.id) {
-            console.log("Dispatching getReviewServicesById with ID:", service.id);
+
             dispatch(getReviewServicesById(service.id));
         } else {
-            console.log("Service ID not available yet");
+
         }
     }, [dispatch, service?.id]);
 
@@ -45,10 +45,10 @@ const DetailServiceForSeller = () => {
         if (!service?.id) return;
 
         const handleReviewAdded = (data) => {
-            console.log("🔔 Review added (Socket):", data);
+
             // Check if the review corresponds to the current service
             if (String(data.serviceId) === String(service.id)) {
-                console.log("Refetching reviews and service details...");
+
                 dispatch(getReviewServicesById(service.id));
                 dispatch(getServicesById(id)); // Also refresh service details for rating update
             }
@@ -61,7 +61,7 @@ const DetailServiceForSeller = () => {
         };
     }, [service?.id, id, dispatch]);
 
-    console.log("Current reviews state:", { reviews, reviewStatus });
+
 
     if (status === "loading") {
         return (

@@ -30,16 +30,16 @@ const DetailService = () => {
   }, [dispatch, id]);
 
   useEffect(() => {
-    console.log("Service loaded:", service);
+
     if (service?.id) {
-      console.log("Dispatching getReviewServicesById with ID:", service.id);
+
       dispatch(getReviewServicesById(service.id));
     } else {
-      console.log("Service ID not available yet");
+
     }
   }, [dispatch, service?.id]);
 
-  console.log("Current reviews state:", { reviews, reviewStatus });
+
 
   const [isArtificialLoading, setIsArtificialLoading] = React.useState(true);
 

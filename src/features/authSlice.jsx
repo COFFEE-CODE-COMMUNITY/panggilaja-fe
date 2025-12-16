@@ -212,7 +212,7 @@ const authSlice = createSlice({
         const { message, data } = action.payload;
 
         // ✅ PERBAIKAN: accessToken sekarang langsung di data, bukan nested
-        console.log("Login Payload Data:", data);
+
         const accessToken = data ? data.accessToken : null;
 
         if (!accessToken) {
@@ -237,7 +237,7 @@ const authSlice = createSlice({
           localStorage.setItem("accessToken", accessToken);
           localStorage.setItem("user", JSON.stringify(userData));
 
-          console.log("✅ Login successful, user data:", userData);
+
         } catch (e) {
           console.error("❌ Gagal decode token saat login:", e);
           state.loginStatus = "failed";
@@ -402,7 +402,7 @@ const authSlice = createSlice({
         try {
           const decoded = jwtDecode(accessToken);
           finalUserData = decoded.user;
-          console.log("✅ User data dari token baru:", finalUserData);
+
         } catch (error) {
           console.error("❌ Gagal decode token:", error);
           state.changeAccountStatus = "failed";
@@ -419,10 +419,7 @@ const authSlice = createSlice({
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(finalUserData));
 
-        console.log(
-          "✅ Change account berhasil, role baru:",
-          finalUserData.role
-        );
+
       })
 
       .addCase(changeAccount.rejected, (state, action) => {

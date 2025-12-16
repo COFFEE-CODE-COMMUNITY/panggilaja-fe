@@ -17,23 +17,23 @@ const VerifyResetForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('verivikasi payload ')
-    if(email && resetCode){
-      dispatch(verifyCodeResetPassword({email, resetCode}))
+
+    if (email && resetCode) {
+      dispatch(verifyCodeResetPassword({ email, resetCode }))
     }
   }
 
   useEffect(() => {
-    if(status === 'success'){
+    if (status === 'success') {
       navigate('/reset-forget-password')
     }
-  },[status])
+  }, [status])
 
 
   return (
     <form onSubmit={handleSubmit}>
       <div className='flex flex-col gap-[10px]'>
-        <InputForm onChange={(e) => setResetCode(e.target.value)}/>
+        <InputForm onChange={(e) => setResetCode(e.target.value)} />
         <Button className='w-full md:h-[62px] h-[45px] text-center lg:text-h3 md:text-h4 text-h5 font-semibold bg-primary text-white rounded-[35px] flex justify-center items-center' >Reset</Button>
       </div>
     </form>

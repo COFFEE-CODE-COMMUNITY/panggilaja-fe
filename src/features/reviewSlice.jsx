@@ -7,7 +7,7 @@ export const createNewReview = createAsyncThunk(
     try {
       // Add this debug line to see if token is being retrieved
       const token = localStorage.getItem("accessToken");
-      console.log("Token in reviewSlice:", token ? "exists" : "not found");
+
 
       const res = await api.post(`/review/service/${orderId}`, reviewData);
       return res.data;

@@ -31,7 +31,7 @@ const ServiceAround = () => {
 
   const favorites = useSelector(selectFavoriteService)
 
-  console.log(servicesAround)
+
 
   useEffect(() => {
     dispatch(getServices());
@@ -107,7 +107,7 @@ const ServiceAround = () => {
 
   const servicesSlice = services.slice(0, 8);
   const servicesAroundSlice = servicesAround?.slice(0, 8)
-  console.log(servicesAroundSlice)
+
   // Success State
   if (servicesStatus === "success") {
     return (

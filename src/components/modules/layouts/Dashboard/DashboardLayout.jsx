@@ -60,7 +60,7 @@ const DashboardLayout = () => {
     if (!user?.id_seller) return;
 
     const handleNewOrder = (data) => {
-      console.log("🔔 New order received (Socket):", data);
+
       // Dispatch getOrderBySellerId to refresh the list and sidebar badge
       dispatch(getOrderBySellerId(user.id_seller));
     };

@@ -267,7 +267,7 @@ const seller = createSlice({
       })
       .addCase(getAllServicesByIdSeller.rejected, (state, action) => {
         state.statusGetServiceSeller = 'error';
-        console.log(`errorr : ` + action.payload)
+
       })
 
       //get order by seller id

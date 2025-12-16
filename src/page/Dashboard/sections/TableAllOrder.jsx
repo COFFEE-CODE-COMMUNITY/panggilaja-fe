@@ -39,7 +39,7 @@ const TableAllOrder = () => {
         }
     }, [updateStatus]);
 
-    console.log(orders)
+
 
     const formatDate = (dateString) => {
         if (!dateString) return 'Tanggal tidak tersedia';

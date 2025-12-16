@@ -164,7 +164,7 @@ const Header = () => {
     }
 
     const haveSellerAccount = user?.available_roles?.length > 1;
-    // console.log(user)
+
     return (
         <>
             {header && (

@@ -136,7 +136,7 @@ const ChatLayout = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log("📩 Messages Response:", messagesResponse.data);
+
 
         if (messagesResponse.data.success) {
           const formattedMessages = messagesResponse.data.data.map((msg) => ({
@@ -180,7 +180,7 @@ const ChatLayout = () => {
 
     const joinRoom = () => {
       socket.emit("join_room", { buyerId, sellerId });
-      console.log(`👥 Joining chat room: ${roomId}`);
+
     };
 
     // Join immediately
@@ -188,14 +188,14 @@ const ChatLayout = () => {
 
     // Re-join on reconnection
     const handleReconnect = () => {
-      console.log("🔄 Socket reconnected, re-joining chat room...");
+
       joinRoom();
     };
 
     socket.on("reconnect", handleReconnect);
 
     return () => {
-      console.log(`👋 Leaving chat room: ${roomId}`);
+
       socket.off("reconnect", handleReconnect);
     };
   }, [partnerId, myId, isBuyer]);
@@ -205,14 +205,14 @@ const ChatLayout = () => {
     if (!partnerId || !myId) return;
 
     const handleNewMessage = (newMessage) => {
-      console.log("💬 New message in active chat:", newMessage);
+
 
       const messagePartnerId = isBuyer
         ? newMessage.id_seller
         : newMessage.id_buyer;
 
       if (messagePartnerId !== partnerId) {
-        console.log("⏭️ Message not for this chat, skipping");
+
         return;
       }
 
@@ -223,7 +223,7 @@ const ChatLayout = () => {
       setMessages((prevMessages) => {
         const exists = prevMessages.some((msg) => msg.id === newMessage.id);
         if (exists) {
-          console.log("⚠️ Message already exists, skipping");
+
           return prevMessages;
         }
 
@@ -247,9 +247,7 @@ const ChatLayout = () => {
     };
 
     const handleUserTyping = ({ userId, isTyping }) => {
-      console.log(
-        `📡 user_typing received: User ${userId}, isTyping: ${isTyping}, Partner: ${partnerId}`
-      );
+
       // Only show typing if it's from the current partner
       if (String(userId) === String(partnerId)) {
         setIsPartnerTyping(isTyping);
@@ -290,7 +288,7 @@ const ChatLayout = () => {
     // Emit typing event
     if (socket && roomId && myId) {
       if (!typingTimeoutRef.current) {
-        console.log(`⌨️ Emitting TYPING START to ${roomId}`);
+
         socket.emit("typing", {
           roomId: roomId,
           userId: myId,
@@ -303,7 +301,7 @@ const ChatLayout = () => {
 
       // Set timeout to stop typing
       typingTimeoutRef.current = setTimeout(() => {
-        console.log(`⌨️ Emitting TYPING STOP to ${roomId}`);
+
         socket.emit("typing", {
           roomId: roomId,
           userId: myId,
@@ -336,7 +334,7 @@ const ChatLayout = () => {
       sender_role: isBuyer ? "BUYER" : "SELLER",
     };
 
-    console.log("📤 Emitting message via socket:", messageData);
+
     socket.emit("send_message", messageData);
     setText("");
   };
@@ -361,7 +359,7 @@ const ChatLayout = () => {
     setConfirmedMessageIds((prev) => [...prev, messageId]);
 
     try {
-      console.log("📦 Creating order with data:", orderData);
+
 
       const agreedPriceFormatted =
         orderData.agreedPrice.toLocaleString("id-ID");
@@ -377,7 +375,7 @@ const ChatLayout = () => {
         }
       );
 
-      console.log("✅ Order created successfully:", response.data);
+
 
       if (response.data.status === "success") {
         const orderId = response.data.data.id;
@@ -651,7 +649,7 @@ const ChatLayout = () => {
                     }
 
                     const handleConfirmOrder = () => {
-                      console.log("✅ Buyer mengkonfirmasi pesanan");
+
 
                       // Find the last nego message for this service
                       const lastNegoMessage = [...messages]
@@ -673,7 +671,7 @@ const ChatLayout = () => {
                           ),
                         };
 
-                        console.log("📦 Creating order:", orderData);
+
                         handleCreateOrder(orderData, msg.id);
                       } else {
                         alert(
@@ -746,7 +744,7 @@ const ChatLayout = () => {
                     const currentUserRole = isBuyer ? "BUYER" : "SELLER";
 
                     const handleAcceptNego = () => {
-                      console.log("✅ Nego diterima");
+
                       const acceptMessage = `Penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" DITERIMA! 🎉`;
                       socket.emit("send_message", {
                         id_buyer: isBuyer ? myId : partnerId,
@@ -757,7 +755,7 @@ const ChatLayout = () => {
                     };
 
                     const handleRejectNego = () => {
-                      console.log("❌ Nego ditolak");
+
                       const rejectMessage = `Maaf, penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" tidak dapat kami terima. Terima kasih atas pengertiannya.`;
                       socket.emit("send_message", {
                         id_buyer: isBuyer ? myId : partnerId,
@@ -768,7 +766,7 @@ const ChatLayout = () => {
                     };
 
                     const handleCounterOffer = (newPrice) => {
-                      console.log("🔄 Counter offer:", newPrice);
+
 
                       const formattedOriginalPrice = originalPrice.replace(
                         /\./g,

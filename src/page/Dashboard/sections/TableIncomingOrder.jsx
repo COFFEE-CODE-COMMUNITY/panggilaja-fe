@@ -77,7 +77,7 @@ const TableIncomingOrder = () => {
 
 
     const handleHubungiPembeli = (orderId) => {
-        console.log('Hubungi pembeli untuk order:', orderId)
+
         navigate('/dashboard/chat/' + orderId)
         // setOpenDropdown(null) // This line was commented out in the instruction, keeping it commented.
     }
@@ -89,7 +89,7 @@ const TableIncomingOrder = () => {
 
     const confirmFinishOrder = () => {
         if (selectedOrderId) {
-            console.log('Menandai orderan selesai:', selectedOrderId)
+
             dispatch(updateOrderStatus({
                 orderId: selectedOrderId,
                 status: 'completed'

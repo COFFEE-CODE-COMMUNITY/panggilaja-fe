@@ -94,7 +94,7 @@ const ProfileLayout = () => {
     return <ProfileSkeleton />
   }
 
-  console.log(seller);
+
 
   if (status === "success") {
     // Use pengalaman field directly from seller data
@@ -109,8 +109,8 @@ const ProfileLayout = () => {
       <div className={`flex flex-col h-full ${isBuyer ? "mt-20" : ""}`}>
         <div
           className={`${location.pathname.includes("manage-profile")
-              ? "px-3"
-              : "xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px]"
+            ? "px-3"
+            : "xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px]"
             } md:flex md:flex-row flex-col w-full h-full gap-[10px] md:gap-[20px] lg:gap-[30px] mx-auto`}
         >
           <div className="md:h-full flex md:flex-col md:items-center lg:px-[15px] lg:py-[35px] md:px-[10px] md:py-[30px] px-[5px] sm:py-[25px] py-[15px] gap-[15px]">
