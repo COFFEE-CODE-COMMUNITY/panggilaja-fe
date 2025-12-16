@@ -146,7 +146,7 @@ const ChatLayout = () => {
             timestamp: formatTime(msg.created_at),
             sender:
               (isBuyer && msg.sender_role?.toUpperCase() === "BUYER") ||
-                (!isBuyer && msg.sender_role?.toUpperCase() === "SELLER")
+              (!isBuyer && msg.sender_role?.toUpperCase() === "SELLER")
                 ? "user"
                 : "seller",
           }));
@@ -247,7 +247,9 @@ const ChatLayout = () => {
     };
 
     const handleUserTyping = ({ userId, isTyping }) => {
-      console.log(`📡 user_typing received: User ${userId}, isTyping: ${isTyping}, Partner: ${partnerId}`);
+      console.log(
+        `📡 user_typing received: User ${userId}, isTyping: ${isTyping}, Partner: ${partnerId}`
+      );
       // Only show typing if it's from the current partner
       if (String(userId) === String(partnerId)) {
         setIsPartnerTyping(isTyping);
@@ -405,8 +407,14 @@ const ChatLayout = () => {
   return (
     <div className="h-screen w-full flex bg-gray-50/60">
       <div
+<<<<<<< HEAD
         className={`h-full md:w-80 w-full bg-white border-r border-gray-200 flex flex-col ${chatMobile ? "hidden md:flex" : "flex"
           }`}
+=======
+        className={`h-full sm:w-80 w-full bg-white border-r border-gray-200 flex flex-col ${
+          chatMobile ? "hidden sm:flex" : "flex"
+        }`}
+>>>>>>> 9458ce025ce2cfd1bd284160b0b6dfc04f429503
       >
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-3 mb-4">
@@ -449,8 +457,9 @@ const ChatLayout = () => {
               <button
                 key={conv.id}
                 onClick={() => handleSelectChat(conv)}
-                className={`cursor-pointer w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 ${selectedChat?.id === conv.id ? "bg-primary/5" : ""
-                  }`}
+                className={`cursor-pointer w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 ${
+                  selectedChat?.id === conv.id ? "bg-primary/5" : ""
+                }`}
               >
                 <div className="relative flex-shrink-0">
                   {conv.avatar ? (
@@ -501,8 +510,14 @@ const ChatLayout = () => {
 
       {/* Chat Area */}
       <div
+<<<<<<< HEAD
         className={`flex-1 flex flex-col ${chatMobile ? "flex" : "hidden md:flex"
           }`}
+=======
+        className={`flex-1 flex flex-col ${
+          chatMobile ? "flex" : "hidden sm:flex"
+        }`}
+>>>>>>> 9458ce025ce2cfd1bd284160b0b6dfc04f429503
       >
         {selectedChat ? (
           <>
@@ -617,10 +632,11 @@ const ChatLayout = () => {
                     return (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.sender === "user"
-                          ? "justify-end"
-                          : "justify-start"
-                          }`}
+                        className={`flex ${
+                          msg.sender === "user"
+                            ? "justify-end"
+                            : "justify-start"
+                        }`}
                       >
                         <div className="max-w-xs lg:max-w-md">
                           <AcceptNegoCard
@@ -630,8 +646,9 @@ const ChatLayout = () => {
                             isConfirmed={isAlreadyConfirmed}
                           />
                           <p
-                            className={`text-xs mt-1 text-gray-500 ${msg.sender === "user" ? "text-right" : "text-left"
-                              }`}
+                            className={`text-xs mt-1 text-gray-500 ${
+                              msg.sender === "user" ? "text-right" : "text-left"
+                            }`}
                           >
                             {msg.timestamp}
                           </p>
@@ -652,7 +669,9 @@ const ChatLayout = () => {
                     const description = negoMessageMatch[6];
                     const imageUrl = negoMessageMatch[7];
                     // Capture rating if present (Index 8), default to 0.0 if not found (or keep 4.5 if you prefer a 'new' default)
-                    const parsedRating = negoMessageMatch[8] ? parseFloat(negoMessageMatch[8]) : 0;
+                    const parsedRating = negoMessageMatch[8]
+                      ? parseFloat(negoMessageMatch[8])
+                      : 0;
 
                     const negoCardData = {
                       image: imageUrl,
@@ -670,8 +689,8 @@ const ChatLayout = () => {
                           ? "BUYER"
                           : "SELLER"
                         : isBuyer
-                          ? "SELLER"
-                          : "BUYER";
+                        ? "SELLER"
+                        : "BUYER";
 
                     const currentUserRole = isBuyer ? "BUYER" : "SELLER";
 
@@ -707,8 +726,9 @@ const ChatLayout = () => {
                       const formattedNewPrice =
                         newPrice.toLocaleString("id-ID");
 
-                      const counterNegoMessage = `Halo, saya tertarik dengan layanan "${serviceName}". (ServiceID: ${serviceId}) (Harga: Rp ${formattedOriginalPrice}) (Nego: Rp ${formattedNewPrice}) (Pesan: ${pesanBuyer || description
-                        }) (Deskripsi: ${description}) (Gambar: ${imageUrl})`;
+                      const counterNegoMessage = `Halo, saya tertarik dengan layanan "${serviceName}". (ServiceID: ${serviceId}) (Harga: Rp ${formattedOriginalPrice}) (Nego: Rp ${formattedNewPrice}) (Pesan: ${
+                        pesanBuyer || description
+                      }) (Deskripsi: ${description}) (Gambar: ${imageUrl})`;
 
                       socket.emit("send_message", {
                         id_buyer: isBuyer ? myId : partnerId,
@@ -721,10 +741,11 @@ const ChatLayout = () => {
                     return (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.sender === "user"
-                          ? "justify-end"
-                          : "justify-start"
-                          }`}
+                        className={`flex ${
+                          msg.sender === "user"
+                            ? "justify-end"
+                            : "justify-start"
+                        }`}
                       >
                         <div className="max-w-xs lg:max-w-md">
                           <ServiceNegoCard
@@ -737,8 +758,9 @@ const ChatLayout = () => {
                             myRole={currentUserRole}
                           />
                           <p
-                            className={`text-xs mt-1 text-gray-500 ${msg.sender === "user" ? "text-right" : "text-left"
-                              }`}
+                            className={`text-xs mt-1 text-gray-500 ${
+                              msg.sender === "user" ? "text-right" : "text-left"
+                            }`}
                           >
                             {msg.timestamp}
                           </p>
@@ -770,16 +792,18 @@ const ChatLayout = () => {
                     return (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.sender === "user"
-                          ? "justify-end"
-                          : "justify-start"
-                          }`}
+                        className={`flex ${
+                          msg.sender === "user"
+                            ? "justify-end"
+                            : "justify-start"
+                        }`}
                       >
                         <div className="max-w-xs lg:max-w-md">
                           <ServiceCard data={cardData} />
                           <p
-                            className={`text-xs mt-1 text-gray-500 ${msg.sender === "user" ? "text-right" : "text-left"
-                              }`}
+                            className={`text-xs mt-1 text-gray-500 ${
+                              msg.sender === "user" ? "text-right" : "text-left"
+                            }`}
                           >
                             {msg.timestamp}
                           </p>
@@ -792,26 +816,28 @@ const ChatLayout = () => {
                   return (
                     <div
                       key={msg.id}
-                      className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"
-                        }`}
+                      className={`flex ${
+                        msg.sender === "user" ? "justify-end" : "justify-start"
+                      }`}
                     >
                       <div
-                        className={`max-w-xs lg:max-w-md xl:max-w-lg ${msg.sender === "user"
-                          ? "bg-primary text-white"
-                          : "bg-white text-gray-800"
-                          } rounded-2xl px-4 py-3 shadow-sm`}
+                        className={`max-w-xs lg:max-w-md xl:max-w-lg ${
+                          msg.sender === "user"
+                            ? "bg-primary text-white"
+                            : "bg-white text-gray-800"
+                        } rounded-2xl px-4 py-3 shadow-sm`}
                       >
                         <p className="text-sm md:text-base">{msg.text}</p>
                         <p
-                          className={`text-xs mt-1 ${msg.sender === "user"
-                            ? "text-white/70"
-                            : "text-gray-500"
-                            }`}
+                          className={`text-xs mt-1 ${
+                            msg.sender === "user"
+                              ? "text-white/70"
+                              : "text-gray-500"
+                          }`}
                         >
                           {msg.timestamp}
                         </p>
                       </div>
-                      ```
                     </div>
                   );
                 })
@@ -827,8 +853,9 @@ const ChatLayout = () => {
 
             {/* Input Area */}
             <div
-              className={`bg-white border-t border-gray-200 p-4 ${location.pathname.includes("dashboard") ? "" : ""
-                }`}
+              className={`bg-white border-t border-gray-200 p-4 ${
+                location.pathname.includes("dashboard") ? "" : ""
+              }`}
             >
               <form
                 onSubmit={handleSendMessage}
@@ -889,14 +916,21 @@ const ChatLayout = () => {
             Pesanan Berhasil Dibuat!
           </h3>
           <p className="text-gray-600 mb-6">
-            Pesanan Anda telah diteruskan ke penjual. Silakan cek status pesanan di halaman Dashboard.
+            Pesanan Anda telah diteruskan ke penjual. Silakan cek status pesanan
+            di halaman Dashboard.
           </p>
 
           <div className="flex flex-col gap-3">
             <Button
               variant="primary"
               className="w-full justify-center py-3 bg-primary text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
-              onClick={() => navigate(isBuyer ? '/setting/order' : '/dashboard/manage-order/process-order')}
+              onClick={() =>
+                navigate(
+                  isBuyer
+                    ? "/setting/order"
+                    : "/dashboard/manage-order/process-order"
+                )
+              }
             >
               Lihat Status Pesanan
             </Button>
