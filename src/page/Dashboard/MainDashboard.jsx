@@ -59,7 +59,7 @@ const DashboardUtama = () => {
     }
   }, [orders?.data, services?.data]);
 
-  const latestOrders = orders?.data?.slice(0, 5) || [];
+  const latestOrders = orders?.data?.slice(0, 3) || [];
 
   const serviceMap = new Map(
     services?.data?.map((service) => [service.id, service]) || []

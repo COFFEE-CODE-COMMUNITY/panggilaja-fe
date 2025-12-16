@@ -405,7 +405,7 @@ const ChatLayout = () => {
   return (
     <div className="h-screen w-full flex bg-gray-50/60">
       <div
-        className={`h-full sm:w-80 w-full bg-white border-r border-gray-200 flex flex-col ${chatMobile ? "hidden sm:flex" : "flex"
+        className={`h-full md:w-80 w-full bg-white border-r border-gray-200 flex flex-col ${chatMobile ? "hidden md:flex" : "flex"
           }`}
       >
         <div className="p-4 border-b border-gray-200">
@@ -501,7 +501,7 @@ const ChatLayout = () => {
 
       {/* Chat Area */}
       <div
-        className={`flex-1 flex flex-col ${chatMobile ? "flex" : "hidden sm:flex"
+        className={`flex-1 flex flex-col ${chatMobile ? "flex" : "hidden md:flex"
           }`}
       >
         {selectedChat ? (
@@ -511,7 +511,7 @@ const ChatLayout = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setChatMobile(false)}
-                  className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <FaArrowLeft className="text-gray-600" />
                 </button>

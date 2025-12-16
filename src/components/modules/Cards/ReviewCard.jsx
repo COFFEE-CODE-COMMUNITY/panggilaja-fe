@@ -9,7 +9,7 @@ const ReviewCard = ({ profileImage, name, date, rating, reviewText, serviceName,
             <div>
                 <img
                     src={profileImage || "/default-avatar.png"}
-                    className='lg:w-20 md:w-30 w-40 aspect-square rounded-full bg-gray-200 object-cover'
+                    className='lg:w-20 md:w-15 w-10 aspect-square rounded-full bg-gray-200 object-cover'
                 />
             </div>
             <div className='flex flex-col lg:gap-3 md:gap-2 gap-1 w-full'>
