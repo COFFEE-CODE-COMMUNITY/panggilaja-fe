@@ -7,15 +7,12 @@ const SettingLayout = () => {
   const isRootSetting = location.pathname === '/setting'
 
   return (
-    <div className='min-h-screen'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        <div className='flex flex-col md:flex-row gap-8'>
+    <div className='md:h-[calc(100vh-140px)] min-h-screen md:min-h-0'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full'>
+        <div className='flex flex-col md:flex-row gap-8 h-full'>
           {/* sidebar */}
-          <div className={`md:w-64 flex-shrink-0 ${!isRootSetting ? 'hidden md:block' : 'block'}`}>
-            <div className='bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-24'>
-              <div className='p-4 border-b border-gray-100'>
-                <h1 className='text-xl font-bold text-gray-900'>Pengaturan</h1>
-              </div>
+          <div className={`md:w-64 flex-shrink-0 ${!isRootSetting ? 'hidden md:block' : 'block'} h-full`}>
+            <div className='bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-full md:h-auto'>
               <nav className='flex flex-col p-2'>
                 <NavLink
                   to='profile'
@@ -71,7 +68,7 @@ const SettingLayout = () => {
           </div>
 
           {/* isi placeholder */}
-          <div className={`flex-1 ${isRootSetting ? 'hidden md:block' : 'block'}`}>
+          <div className={`flex-1 ${isRootSetting ? 'hidden md:block' : 'block'} md:h-full md:overflow-y-auto scrollbar-hide pb-20 md:pb-0`}>
             <Outlet />
           </div>
         </div>

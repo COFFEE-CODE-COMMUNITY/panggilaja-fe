@@ -8,7 +8,7 @@ import {
   selectSelectedSeller,
   selectSellerServices,
 } from '../../features/sellerSlice';
-import { selectContactSeller } from '../../features/chatSlice';
+import { selectContactSeller, getContactForSeller } from '../../features/chatSlice';
 import { Link, useNavigate } from 'react-router-dom';
 
 const DashboardUtama = () => {
@@ -37,6 +37,7 @@ const DashboardUtama = () => {
     if (user?.id_seller) {
       dispatch(getOrderBySellerId(user?.id_seller));
       dispatch(getAllServicesByIdSeller(user?.id_seller));
+      dispatch(getContactForSeller(user?.id_seller));
     }
   }, [dispatch, user?.id_seller]);
 

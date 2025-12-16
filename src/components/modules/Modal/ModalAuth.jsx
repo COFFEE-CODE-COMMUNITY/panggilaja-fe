@@ -1,10 +1,16 @@
 import React from "react";
 import { FaUser, FaTimes } from "react-icons/fa";
 import Button from "../../common/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const ModalAuth = ({ isOpen, onClose }) => {
+const ModalAuth = ({
+    isOpen,
+    onClose,
+    title = "Masuk untuk Melanjutkan",
+    description = "Kamu perlu akun untuk menghubungi penjual atau melakukan negosiasi harga. Yuk, masuk atau daftar sekarang!"
+}) => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     if (!isOpen) return null;
 
@@ -13,7 +19,7 @@ const ModalAuth = ({ isOpen, onClose }) => {
             <div className="bg-white rounded-2xl w-full max-w-md p-6 relative animate-in fade-in zoom-in duration-200">
                 <button
                     onClick={onClose}
-                    className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
                     <FaTimes size={20} />
                 </button>
@@ -24,18 +30,18 @@ const ModalAuth = ({ isOpen, onClose }) => {
                     </div>
 
                     <h3 className="text-xl font-bold text-gray-900">
-                        Masuk untuk Melanjutkan
+                        {title}
                     </h3>
 
                     <p className="text-gray-600 leading-relaxed">
-                        Kamu perlu akun untuk menghubungi penjual atau melakukan negosiasi harga. Yuk, masuk atau daftar sekarang!
+                        {description}
                     </p>
 
                     <div className="flex flex-col gap-3 pt-4">
                         <Button
                             variant="primary"
                             className="w-full py-3 rounded-xl font-semibold text-white hover:bg-primary/80"
-                            onClick={() => navigate("/login")}
+                            onClick={() => navigate("/login", { state: { from: location } })}
                         >
                             Masuk Sekarang
                         </Button>

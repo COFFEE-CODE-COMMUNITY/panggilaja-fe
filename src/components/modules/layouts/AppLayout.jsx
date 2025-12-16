@@ -10,24 +10,24 @@ const AppLayout = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation();
-  
+
   const user = useSelector(selectCurrentUser)
   const token = useSelector(selectAccessToken)
   const address = useSelector(selectSeeAddress)
-  
-  const addressStatus = useSelector(selectSeeAddressStatus); 
+
+  const addressStatus = useSelector(selectSeeAddressStatus);
 
   const addressData = address?.data;
   const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
 
   useEffect(() => {
-    if(user?.active_role === 'seller'){
+    if (user?.active_role === 'seller') {
       navigate('/dashboard')
     }
-  },[user?.active_role])
+  }, [user?.active_role])
 
   useEffect(() => {
-    if(user?.id_buyer && token && (address === null || address?.data?.alamat === null)){
+    if (user?.id_buyer && token && (address === null || address?.data?.alamat === null)) {
       dispatch(seeAddress(user.id_buyer))
     }
   }, [dispatch, user?.id_buyer, token]);
@@ -53,11 +53,11 @@ const AppLayout = () => {
     mainContentClasses = 'flex-grow'
   }
 
-  if (location.pathname.startsWith('/profile-service')){
+  if (location.pathname.startsWith('/profile-service')) {
     containerClasses = 'h-screen relative flex flex-col'
   }
 
-  if (location.pathname.includes('nego') || location.pathname.includes('profile-service') || location.pathname.includes('service')){
+  if (location.pathname.includes('nego') || location.pathname.includes('profile-service') || location.pathname.includes('service')) {
     margin = ''
   } else {
     margin = 'xl:mt-30 lg:mt-25 md:mt-23 mt-16'
@@ -65,11 +65,11 @@ const AppLayout = () => {
 
   return (
     <div className={`${containerClasses} overflow-hidden`}>
-      <Header/>
-      <div className={`${mainContentClasses} ${margin} ${location.pathname.includes('nego') ? '' : 'mb-40'}`}> 
-        <Outlet/>
+      <Header />
+      <div className={`${mainContentClasses} ${margin} ${location.pathname.includes('nego') || location.pathname.startsWith('/service/') ? '' : 'mb-40'}`}>
+        <Outlet />
       </div>
-      {!shouldHideFooter && <Footer/>}
+      {!shouldHideFooter && <Footer />}
     </div>
   )
 }

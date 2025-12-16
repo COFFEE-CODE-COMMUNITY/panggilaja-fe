@@ -19,14 +19,13 @@ const ModalDeleteService = ({ onSubmit, onCancel }) => {
         <div className="flex gap-3">
           <Button
             onClick={onCancel}
-            className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50"
-            variant="secondary"
+            className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 cursor-pointer"
           >
             Batal
           </Button>
           <Button
             onClick={onSubmit}
-            className="flex-1 py-3 rounded-xl text-white font-semibold shadow-lg shadow-red-500/30 bg-red-500 hover:bg-red-600 border-none"
+            className="flex-1 py-3 rounded-xl text-white font-semibold shadow-lg bg-primary border-none hover:bg-primary/80 cursor-pointer"
             variant="primary"
           >
             Ya, Hapus

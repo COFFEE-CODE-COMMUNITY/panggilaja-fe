@@ -4,7 +4,9 @@ import { selectCurrentUser } from '../../../features/authSlice'
 import { getAllServicesByIdSeller, getOrderBySellerId, selectOrderSeller, selectOrderSellerMessage, selectOrderSellerStatus, selectSellerServices } from '../../../features/sellerSlice'
 import { selectAllService } from '../../../features/serviceSlice'
 import { useNavigate } from 'react-router-dom'
-import { selectUpdateOrderError, selectUpdateOrderStatus, updateOrderStatus } from '../../../features/orderSlice'
+import { selectUpdateOrderError, selectUpdateOrderStatus, updateOrderStatus, clearOrderStatus } from '../../../features/orderSlice'
+import { FaUser } from "react-icons/fa";
+import Modal from '../../../components/common/Modal';
 
 const TableIncomingOrder = () => {
     const user = useSelector(selectCurrentUser)
@@ -14,122 +16,164 @@ const TableIncomingOrder = () => {
     const ordersMessage = useSelector(selectOrderSellerMessage)
     const allService = useSelector(selectSellerServices)
     const navigate = useNavigate()
-    const [openDropdown, setOpenDropdown] = useState(null)
     const updateStatus = useSelector(selectUpdateOrderStatus)
     const updateError = useSelector(selectUpdateOrderError)
 
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+    // Refresh orders when updateStatus is success
+    useEffect(() => {
+        if (updateStatus === 'success' && user?.id_seller) {
+            dispatch(getOrderBySellerId(user?.id_seller));
+            dispatch(clearOrderStatus());
+        }
+    }, [updateStatus, user?.id_seller, dispatch]);
+
+    // Close modal when success
+    useEffect(() => {
+        if (updateStatus === 'success') {
+            setShowConfirmModal(false);
+            setSelectedOrderId(null);
+        }
+    }, [updateStatus]);
+
+    const [dashboardData, setDashboardData] = useState([]);
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (!event.target.closest('.dropdown-container')) {
-                setOpenDropdown(null)
-            }
+        if (user?.id_seller) {
+            dispatch(getOrderBySellerId(user.id_seller));
+            dispatch(getAllServicesByIdSeller(user.id_seller));
         }
-        
-        document.addEventListener('click', handleClickOutside)
-        return () => document.removeEventListener('click', handleClickOutside)
-    }, [])
-    
-    let dashboardData = [];
-    if (orders && allService) {
-        const serviceMap = new Map(
-            allService.data.map(service => [service.id, service])
-        );
+    }, [dispatch, user?.id_seller]);
 
-        dashboardData = orders.data.map((order) => {
-            const serviceDetail = serviceMap.get(order.service_id);
-
-            return {
-                order_id: order.id, 
-                nama_jasa: serviceDetail ? serviceDetail.nama_jasa : 'Jasa Tidak Ditemukan',
-                id_buyer : order.buyer_id,
-                tanggal: order.tanggal,
-                status: order.status
+    useEffect(() => {
+        if (orders && allService) {
+            const formatDate = (dateString) => {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
             };
-        });
 
-    }
+            const transformedData = orders.map(order => {
+                const serviceDetail = allService.find(service => service.id === order.service_id);
+                const fullAddress = order?.buyer?.address ?
+                    `${order.buyer.address.street}, ${order.buyer.address.city}, ${order.buyer.address.province}, ${order.buyer.address.postal_code}` :
+                    'Alamat tidak tersedia';
 
-    const toggleDropdown = (orderId) => {
-        setOpenDropdown(openDropdown === orderId ? null : orderId)
-    }
+                return {
+                    foto_buyer: order?.buyer?.foto_buyer,
+                    order_id: order?.id,
+                    nama_jasa: serviceDetail ? serviceDetail?.nama_jasa : 'Jasa Tidak Ditemukan',
+                    id_buyer: order?.buyer_id,
+                    tanggal: formatDate(order?.tanggal),
+                    status: order?.status,
+                    nama_buyer: order?.buyer?.fullname,
+                    alamat: fullAddress
+                };
+            });
+            setDashboardData(transformedData);
+        }
+    }, [orders, allService]);
+
 
     const handleHubungiPembeli = (orderId) => {
         console.log('Hubungi pembeli untuk order:', orderId)
-        navigate('/dashboard/chat/'+orderId)
-        setOpenDropdown(null)
+        navigate('/dashboard/chat/' + orderId)
+        // setOpenDropdown(null) // This line was commented out in the instruction, keeping it commented.
     }
 
     const handleOrderanSelesai = (orderId) => {
-        console.log('Menandai orderan selesai:', orderId)
-        dispatch(updateOrderStatus({
-            orderId: orderId,
-            status: 'selesai'
-        }))
-        setOpenDropdown(null)
+        setSelectedOrderId(orderId);
+        setShowConfirmModal(true);
     }
-    
-    
+
+    const confirmFinishOrder = () => {
+        if (selectedOrderId) {
+            console.log('Menandai orderan selesai:', selectedOrderId)
+            dispatch(updateOrderStatus({
+                orderId: selectedOrderId,
+                status: 'completed'
+            }));
+        }
+    }
+
+
     return (
         <div className="w-full sm:mb-0 mb-20">
-            <div className="hidden md:block border border-gray-400 rounded-lg overflow-x-auto">
-                <table className="w-full text-left">
-                    <thead className="bg-primary text-white font-bold rounded-lg">
-                        <tr>
-                            <th className="p-4 w-[20%]">Nama Pemesan</th>
-                            <th className="px-4 py-3 w-[15%]">Jasa</th>
-                            <th className="px-4 py-3 w-[18%]">Tanggal</th>
-                            <th className="px-4 py-3 w-[18%]">Status</th>
-                            <th className="px-4 py-3 w-[10%]">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {dashboardData.map((order) => (
-                            <tr key={order.order_id} className="border-t border-gray-400">
-                                <td className="px-4 py-3 w-[20%]">
-                                    <div className="flex items-center space-x-2 w-full">
-                                        <input type="checkbox" className="w-5 h-5 rounded-lg" />
-                                        <div className="bg-gray-100 rounded-full h-8 w-8"></div>
-                                    </div>
-                                </td>
-                                <td className="px-4 py-3 w-[15%]">
-                                    {order?.nama_jasa}
-                                </td>
-                                <td className="px-4 py-3 w-[18%]">{order?.tanggal || 'Placeholder'}</td>
-                                <td className="px-4 py-3 w-[18%]">{order?.status}</td>
-                                <td className="px-4 py-3 w-[10%]">
-                                    <div className="flex w-full justify-end relative dropdown-container">
-                                        <button 
-                                            onClick={() => toggleDropdown(order.order_id)}
-                                            className="flex flex-col gap-y-1 text-black hover:text-gray-600 mr-5 p-2"
-                                        >
-                                            <span className="bg-black h-1 w-1 rounded-full"></span>
-                                            <span className="bg-black h-1 w-1 rounded-full"></span>
-                                            <span className="bg-black h-1 w-1 rounded-full"></span>
-                                        </button>
+            {/* Desktop View - Hidden on mobile */}
+            <div className="hidden md:block">
+                {/* Global Header */}
+                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-primary text-white font-bold rounded-t-lg items-center">
+                    <div className="col-span-5">Produk</div>
+                    <div className="col-span-2">Tanggal</div>
+                    <div className="col-span-2">Status</div>
+                    <div className="col-span-3 text-right">Aksi</div>
+                </div>
 
-                                        {openDropdown === order.order_id && (
-                                            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                                                <button
-                                                    onClick={() => handleHubungiPembeli(order.id_buyer)}
-                                                    className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700 border-b border-gray-200"
-                                                >
-                                                    📞 Hubungi Pembeli
-                                                </button>
-                                                <button
-                                                    onClick={() => handleOrderanSelesai(order.order_id)}
-                                                    className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700"
-                                                >
-                                                    ✅ Orderan Selesai
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <div className="space-y-4 mt-2">
+                    {dashboardData?.map((order) => (
+                        <div key={order.order_id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                            {/* Buyer Header */}
+                            <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    {order?.foto_buyer ? (
+                                        <img
+                                            src={order.foto_buyer}
+                                            alt={order.nama_buyer}
+                                            className="w-6 h-6 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-xs">
+                                            <FaUser />
+                                        </div>
+                                    )}
+                                    <span className="font-semibold text-gray-700 text-sm">User #{order.id_buyer}</span>
+                                </div>
+                                <span className="text-xs text-gray-400">Order ID: {order.order_id}</span>
+                            </div>
+
+                            {/* Card Body */}
+                            <div className="p-6 grid grid-cols-12 gap-4 items-center">
+                                {/* Product (Col 5) */}
+                                <div className="col-span-5 pr-4">
+                                    <h4 className="font-bold text-gray-800 text-base">{order?.nama_jasa}</h4>
+                                </div>
+
+                                {/* Date (Col 2) */}
+                                <div className="col-span-2">
+                                    <p className="text-sm text-gray-600">{order?.tanggal}</p>
+                                </div>
+
+                                {/* Status (Col 2) */}
+                                <div className="col-span-2">
+                                    <span className={`text-xs font-semibold px-2 py-1 rounded inline-block ${order?.status === 'selesai' || order?.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                        (order?.status === 'proses' || order?.status === 'in_progress') ? 'bg-yellow-100 text-yellow-700' :
+                                            'bg-gray-100 text-gray-700'
+                                        }`}>
+                                        {order?.status === 'in_progress' ? 'Proses' : (order?.status === 'completed' ? 'Selesai' : order?.status)}
+                                    </span>
+                                </div>
+
+                                {/* Action (Col 3) */}
+                                <div className="col-span-3 flex justify-end gap-2">
+                                    <button
+                                        onClick={() => handleHubungiPembeli(order.id_buyer)}
+                                        className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-medium hover:bg-gray-200 transition-colors"
+                                    >
+                                        Hubungi
+                                    </button>
+                                    <button
+                                        onClick={() => handleOrderanSelesai(order.order_id)}
+                                        disabled={order?.status === 'completed' || order?.status === 'selesai'}
+                                        className="px-4 py-2 rounded-lg border border-primary text-primary bg-white text-sm font-medium hover:bg-primary hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400 disabled:bg-gray-50"
+                                    >
+                                        Selesai
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Mobile View - Card Layout */}
@@ -139,40 +183,27 @@ const TableIncomingOrder = () => {
                         {/* Header Card */}
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center space-x-3">
-                                <div className="bg-gray-100 rounded-full h-10 w-10"></div>
+                                {order?.foto_buyer ? (
+                                    <img
+                                        src={order.foto_buyer}
+                                        alt={order.nama_buyer}
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                                        <FaUser />
+                                    </div>
+                                )}
                                 <div>
                                     <p className="text-xs text-gray-500">Nama Pemesan</p>
                                     <p className="font-medium text-sm">User #{order.id_buyer}</p>
                                 </div>
                             </div>
-                            
-                            {/* Dropdown Button */}
-                            <div className="relative dropdown-container">
-                                <button 
-                                    onClick={() => toggleDropdown(order.order_id)}
-                                    className="flex flex-col gap-y-1 text-black hover:text-gray-600 p-2"
-                                >
-                                    <span className="bg-black h-1 w-1 rounded-full"></span>
-                                    <span className="bg-black h-1 w-1 rounded-full"></span>
-                                    <span className="bg-black h-1 w-1 rounded-full"></span>
-                                </button>
-
-                                {openDropdown === order.order_id && (
-                                    <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                                        <button
-                                            onClick={() => handleHubungiPembeli(order.id_buyer)}
-                                            className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700 border-b border-gray-200"
-                                        >
-                                            📞 Hubungi Pembeli
-                                        </button>
-                                        <button
-                                            onClick={() => handleOrderanSelesai(order.order_id)}
-                                            className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700"
-                                        >
-                                            ✅ Orderan Selesai
-                                        </button>
-                                    </div>
-                                )}
+                            <div className={`px-2 py-1 rounded text-xs font-medium ${order?.status === 'selesai' || order?.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                (order?.status === 'proses' || order?.status === 'in_progress') ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-gray-100 text-gray-700'
+                                }`}>
+                                {order?.status === 'in_progress' ? 'Proses' : (order?.status === 'completed' ? 'Selesai' : order?.status)}
                             </div>
                         </div>
 
@@ -186,20 +217,59 @@ const TableIncomingOrder = () => {
                                 <span className="text-xs text-gray-500">Tanggal:</span>
                                 <span className="text-sm text-gray-800">{order?.tanggal || 'Placeholder'}</span>
                             </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500">Status:</span>
-                                <span className={`text-sm font-medium px-2 py-1 rounded ${
-                                    order?.status === 'selesai' ? 'bg-green-100 text-green-700' :
-                                    order?.status === 'proses' ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-gray-100 text-gray-700'
-                                }`}>
-                                    {order?.status}
-                                </span>
-                            </div>
+                        </div>
+
+                        <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
+                            <button
+                                onClick={() => handleHubungiPembeli(order.id_buyer)}
+                                className="cursor-pointer flex-1 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition-colors"
+                            >
+                                Hubungi Pembeli
+                            </button>
+                            <button
+                                onClick={() => handleOrderanSelesai(order.order_id)}
+                                disabled={order?.status === 'completed' || order?.status === 'selesai'}
+                                className="cursor-pointer flex-1 py-2 rounded-lg border border-primary text-primary bg-white text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400"
+                            >
+                                Orderan Selesai
+                            </button>
                         </div>
                     </div>
                 ))}
             </div>
+            {/* Modal Confirmation */}
+            <Modal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} width="max-w-md">
+                <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">Konfirmasi Pesanan Selesai</h3>
+                    <p className="text-gray-600 mb-6">
+                        Apakah Anda yakin ingin menandai pesanan ini sebagai selesai?
+                        Pastikan Anda telah menyelesaikan semua layanan yang diminta.
+                    </p>
+                    <div className="flex justify-end gap-3">
+                        <button
+                            onClick={() => setShowConfirmModal(false)}
+                            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                            disabled={updateStatus === 'loading'}
+                        >
+                            Batal
+                        </button>
+                        <button
+                            onClick={confirmFinishOrder}
+                            className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors flex items-center gap-2"
+                            disabled={updateStatus === 'loading'}
+                        >
+                            {updateStatus === 'loading' ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    Memproses...
+                                </>
+                            ) : (
+                                'Ya, Selesai'
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     )
 }
