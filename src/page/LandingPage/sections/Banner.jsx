@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import Bannerr from "../../../assets/Bannerr.jpeg";
+import banner1 from "../../../assets/banner1.png";
+import banner2 from "../../../assets/banner2.png";
+import banner3 from "../../../assets/banner3.png";
 import { MdLocationOn } from "react-icons/md";
 import { selectSeeAddress } from "../../../features/userSlice";
 import { useSelector } from "react-redux";
@@ -11,19 +13,19 @@ const Banner = () => {
   const banners = [
     {
       id: 1,
-      image: Bannerr,
+      image: banner1,
       title: "Promo Spesial Hari Ini",
       description: "Diskon hingga 50% untuk semua jasa",
     },
     {
       id: 2,
-      image: Bannerr, // Replace with your second banner image
+      image: banner2,
       title: "Jasa Terpercaya #1",
       description: "Ribuan mitra siap melayani Anda",
     },
     {
       id: 3,
-      image: Bannerr, // Replace with your third banner image
+      image: banner3,
       title: "Gratis Ongkir",
       description: "Untuk pemesanan pertama Anda",
     },
@@ -36,8 +38,8 @@ const Banner = () => {
   const [isDragging, setIsDragging] = useState(false);
   const sliderRef = useRef(null);
 
-  const address = useSelector(selectSeeAddress)
-  const token = useSelector(selectAccessToken)
+  const address = useSelector(selectSeeAddress);
+  const token = useSelector(selectAccessToken);
 
   // Auto slide function
   const nextSlide = useCallback(() => {
@@ -153,10 +155,12 @@ const Banner = () => {
   return (
     <div className="w-full md:mb-0 relative group">
       {token && (
-        <div className='w-full flex justify-end mb-2'>
-          <div className='flex items-center gap-1'>
-              <MdLocationOn className='text-gray-500'/>
-              <p className='font-light sm:text-h5 text-h6'>{address?.data?.kecamatan}</p>
+        <div className="w-full flex justify-end mb-2">
+          <div className="flex items-center gap-1">
+            <MdLocationOn className="text-gray-500" />
+            <p className="font-light sm:text-h5 text-h6">
+              {address?.data?.kecamatan}
+            </p>
           </div>
         </div>
       )}
@@ -188,17 +192,18 @@ const Banner = () => {
               }}
             >
               {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-r"></div>
+              {/* <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div> */}
 
               {/* Banner Content - Optional */}
-              <div className="text-white z-10 md:block pointer-events-none mt-auto absolute bottom-0 p-4 mb-4">
+              {/* <div className="text-white z-10 md:block pointer-events-none mt-auto absolute bottom-0 p-4 mb-4">
                 <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold md:mb-2 mb-1">
-                    {banner.title}
+                  {banner.title}
                 </h2>
                 <p className="text-md md:text-lg lg:text-xl opacity-90">
-                    {banner.description}
+                  {banner.description}
                 </p>
-            </div>
+              </div> */}
             </div>
           ))}
         </div>
