@@ -83,9 +83,9 @@ const Header = () => {
         if (statusChange === "success") {
             dispatch(resetChangeAccountStatus());
             dispatch(resetUserProfile());
-            navigate('/dashboard')
+            // navigate('/dashboard') // Removed because we navigate immediately
         }
-    }, [statusChange, dispatch, navigate]);
+    }, [statusChange, dispatch]); // Removed navigate dependency
 
     useEffect(() => {
         setSearch(urlSearchText);
@@ -136,16 +136,7 @@ const Header = () => {
         }
     }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
 
-    if (statusChange === "loading") {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Memuat data...</p>
-                </div>
-            </div>
-        );
-    }
+    // Removed the blocking loader for statusChange === "loading"
 
     const handleChange = (e) => {
         setSearch(e.target.value);
@@ -173,7 +164,7 @@ const Header = () => {
     }
 
     const haveSellerAccount = user?.available_roles?.length > 1;
-    console.log(user)
+    // console.log(user)
     return (
         <>
             {header && (
@@ -581,7 +572,10 @@ const Header = () => {
                 <ModalSwitchAccount
                     onRedirect={() => {
                         dispatch(changeAccount({ targetRole: "seller" }))
-                        setStatusChanges(false)
+                        navigate('/dashboard')
+                        // We DO NOT close the modal here (setStatusChanges(false)).
+                        // We let the navigation unmount the Header component, keeping the modal visible until the page physically changes.
+                        // This prevents the "flash" of the Landing Page before the Dashboard Skeleton appears.
                     }}
                     destinationName={'seller dashboard'}
                     textSwitch={'Your account has been successfully switched to a seller account. You can now start managing your services.'}

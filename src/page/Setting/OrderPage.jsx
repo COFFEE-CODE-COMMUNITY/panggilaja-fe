@@ -138,6 +138,33 @@ const OrderPage = () => {
         }
     };
 
+    const OrderSkeleton = () => (
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 animate-pulse">
+            <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gray-200" />
+                    <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-24" />
+                        <div className="h-3 bg-gray-200 rounded w-16" />
+                    </div>
+                </div>
+                <div className="w-20 h-6 bg-gray-200 rounded-full" />
+            </div>
+            <div className="flex gap-4">
+                <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0" />
+                <div className="flex-1 space-y-3">
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-full" />
+                    <div className="h-4 bg-gray-200 rounded w-1/2" />
+                </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-50">
+                <div className="w-24 h-8 bg-gray-200 rounded-lg" />
+                <div className="w-32 h-8 bg-gray-200 rounded-lg" />
+            </div>
+        </div>
+    );
+
     return (
         <div className='w-full animate-fade-in'>
             {/* header */}
@@ -160,12 +187,12 @@ const OrderPage = () => {
 
                     {/* filter tab */}
                     <div className="border-b border-gray-200 mb-6">
-                        <div className="flex gap-8">
+                        <div className="flex gap-8 overflow-x-auto no-scrollbar">
                             {["semua", "proses", "selesai"].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`py-4 font-medium capitalize text-sm transition-all relative ${activeTab === tab
+                                    className={`py-4 font-medium capitalize text-sm transition-all relative whitespace-nowrap ${activeTab === tab
                                         ? "text-primary font-bold after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-primary after:rounded-t-full"
                                         : "text-gray-500 hover:text-gray-700 cursor-pointer"
                                         }`}
@@ -178,7 +205,13 @@ const OrderPage = () => {
 
                     {/* order card */}
                     <div className="space-y-4">
-                        {filteredOrders.length > 0 ? (
+                        {orderStatus === 'loading' ? (
+                            <div className="flex flex-col gap-4">
+                                {[1, 2, 3].map((i) => (
+                                    <OrderSkeleton key={i} />
+                                ))}
+                            </div>
+                        ) : filteredOrders.length > 0 ? (
                             filteredOrders.map((item) => (
                                 <div
                                     key={item.order_id}
@@ -192,6 +225,7 @@ const OrderPage = () => {
                                                     <img
                                                         src={item.seller_image}
                                                         className="w-full h-full object-cover"
+                                                        alt={item.seller_name}
                                                     />
                                                 ) : (
                                                     item.seller_name.charAt(0)
@@ -203,7 +237,7 @@ const OrderPage = () => {
                                             </div>
                                         </Link>
                                         <span
-                                            className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${item.status === "completed"
+                                            className={`px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium capitalize ${item.status === "completed"
                                                 ? "bg-green-50 text-green-700"
                                                 : item.status === "in_progress"
                                                     ? "bg-blue-50 text-blue-700"
@@ -221,31 +255,32 @@ const OrderPage = () => {
                                         <Link to={`/service/${item.service_id}`} className="shrink-0">
                                             <img
                                                 src={item.service_image}
-                                                className="w-24 h-24 rounded-lg object-cover border border-gray-100 hover:border-primary transition-colors"
+                                                className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg object-cover border border-gray-100 hover:border-primary transition-colors"
+                                                alt={item.service_name}
                                             />
                                         </Link>
 
                                         <div className="flex-1 min-w-0 flex flex-col justify-between">
                                             <div>
                                                 <Link to={`/service/${item.service_id}`} className="block">
-                                                    <h3 className="font-bold text-gray-900 mb-1 truncate text-lg hover:text-primary transition-colors">{item.service_name}</h3>
+                                                    <h3 className="font-bold text-gray-900 mb-1 truncate text-base sm:text-lg hover:text-primary transition-colors">{item.service_name}</h3>
                                                 </Link>
-                                                <p className="text-sm text-gray-500 line-clamp-2">
+                                                <p className="text-xs sm:text-sm text-gray-500 line-clamp-2 leading-relaxed">
                                                     {item.pesan_tambahan || "Tidak ada catatan tambahan"}
                                                 </p>
                                             </div>
                                             <div className="mt-2">
-                                                <p className="text-xs text-gray-500">Total Harga</p>
-                                                <p className="text-base font-bold text-primary">{formatHarga(item.total_harga)}</p>
+                                                <p className="text-[10px] sm:text-xs text-gray-500">Total Harga</p>
+                                                <p className="text-sm sm:text-base font-bold text-primary">{formatHarga(item.total_harga)}</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* button*/}
-                                    <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-50">
+                                    <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4 pt-4 border-t border-gray-50">
                                         <Button
                                             variant={item.status === "completed" && !item.is_reviewed ? "secondary" : "secondary"}
-                                            className={`px-6 py-2 text-sm rounded-lg font-medium ${item.status === "completed" && !item.is_reviewed
+                                            className={`w-full sm:w-auto px-6 py-2 text-sm rounded-lg font-medium justify-center ${item.status === "completed" && !item.is_reviewed
                                                 ? "bg-secondary text-white hover:bg-secondary/90"
                                                 : "bg-transparent text-gray-300 border border-gray-200 cursor-not-allowed"
                                                 }`}
@@ -258,7 +293,7 @@ const OrderPage = () => {
 
                                         <Button
                                             variant="primary"
-                                            className="px-6 py-2 text-sm rounded-lg font-medium text-white shadow-sm hover:shadow hover:bg-primary/90"
+                                            className="w-full sm:w-auto px-6 py-2 text-sm rounded-lg font-medium text-white shadow-sm hover:shadow hover:bg-primary/90 justify-center"
                                             to={`/chat/${item.seller_id}`}
                                         >
                                             Hubungi Sekarang

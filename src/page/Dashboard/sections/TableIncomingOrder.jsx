@@ -97,6 +97,84 @@ const TableIncomingOrder = () => {
         }
     }
 
+    const [isArtificialLoading, setIsArtificialLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsArtificialLoading(false);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const OrderTableSkeleton = () => (
+        <div className="w-full sm:mb-0 mb-20">
+            {/* Desktop Header Skeleton */}
+            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-100 rounded-t-lg items-center animate-pulse">
+                <div className="col-span-5 h-6 bg-gray-200 rounded" />
+                <div className="col-span-2 h-6 bg-gray-200 rounded" />
+                <div className="col-span-2 h-6 bg-gray-200 rounded" />
+                <div className="col-span-3 h-6 bg-gray-200 rounded" />
+            </div>
+
+            <div className="space-y-4 mt-2">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse">
+                        {/* Desktop Skeleton */}
+                        <div className="hidden md:block bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <div className="p-6 grid grid-cols-12 gap-4 items-center">
+                                {/* Buyer Header Skeleton */}
+                                <div className="col-span-12 flex items-center justify-between mb-4 border-b border-gray-100 pb-2">
+                                    <div className="w-32 h-4 bg-gray-200 rounded" />
+                                    <div className="w-24 h-4 bg-gray-200 rounded" />
+                                </div>
+                                <div className="col-span-5 flex flex-col gap-2">
+                                    <div className="w-3/4 h-6 bg-gray-200 rounded" />
+                                    <div className="w-full h-4 bg-gray-200 rounded" />
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="w-24 h-4 bg-gray-200 rounded" />
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="w-16 h-6 bg-gray-200 rounded" />
+                                </div>
+                                <div className="col-span-3 flex justify-end gap-2">
+                                    <div className="w-20 h-8 bg-gray-200 rounded-lg" />
+                                    <div className="w-20 h-8 bg-gray-200 rounded-lg" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Skeleton */}
+                        <div className="md:hidden bg-white border border-gray-300 rounded-lg p-4 relative">
+                            <div className="flex justify-between mb-4">
+                                <div className="flex gap-2">
+                                    <div className="w-8 h-8 bg-gray-200 rounded-full" />
+                                    <div className="space-y-1">
+                                        <div className="w-12 h-3 bg-gray-200 rounded" />
+                                        <div className="w-20 h-4 bg-gray-200 rounded" />
+                                    </div>
+                                </div>
+                                <div className="w-12 h-6 bg-gray-200 rounded" />
+                            </div>
+                            <div className="space-y-2 border-t border-gray-200 pt-2">
+                                <div className="h-4 bg-gray-200 rounded w-full" />
+                                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                            </div>
+                            <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
+                                <div className="flex-1 h-10 bg-gray-200 rounded-lg" />
+                                <div className="flex-1 h-10 bg-gray-200 rounded-lg" />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    if (ordersStatus === 'loading' || isArtificialLoading) {
+        return <OrderTableSkeleton />;
+    }
 
     return (
         <div className="w-full sm:mb-0 mb-20">
@@ -104,7 +182,7 @@ const TableIncomingOrder = () => {
             <div className="hidden md:block">
                 {/* Global Header */}
                 <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-primary text-white font-bold rounded-t-lg items-center">
-                    <div className="col-span-5">Produk</div>
+                    <div className="col-span-5">Layanan</div>
                     <div className="col-span-2">Tanggal</div>
                     <div className="col-span-2">Status</div>
                     <div className="col-span-3 text-right">Aksi</div>
@@ -178,65 +256,68 @@ const TableIncomingOrder = () => {
 
             {/* Mobile View - Card Layout */}
             <div className="md:hidden space-y-3">
-                {dashboardData.map((order) => (
-                    <div key={order.order_id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
-                        {/* Header Card */}
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center space-x-3">
-                                {order?.foto_buyer ? (
-                                    <img
-                                        src={order.foto_buyer}
-                                        alt={order.nama_buyer}
-                                        className="w-8 h-8 rounded-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
-                                        <FaUser />
+                {
+                    dashboardData.map((order) => (
+                        <div key={order.order_id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
+                            {/* Header Card */}
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center space-x-3">
+                                    {order?.foto_buyer ? (
+                                        <img
+                                            src={order.foto_buyer}
+                                            alt={order.nama_buyer}
+                                            className="w-8 h-8 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                                            <FaUser />
+                                        </div>
+                                    )}
+                                    <div>
+                                        <p className="text-xs text-gray-500">Nama Pemesan</p>
+                                        <p className="font-medium text-sm">User #{order.id_buyer}</p>
                                     </div>
-                                )}
-                                <div>
-                                    <p className="text-xs text-gray-500">Nama Pemesan</p>
-                                    <p className="font-medium text-sm">User #{order.id_buyer}</p>
+                                </div>
+                                <div className={`px-2 py-1 rounded text-xs font-medium ${order?.status === 'selesai' || order?.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                    (order?.status === 'proses' || order?.status === 'in_progress') ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-gray-100 text-gray-700'
+                                    }`}>
+                                    {order?.status === 'in_progress' ? 'Proses' : (order?.status === 'completed' ? 'Selesai' : order?.status)}
                                 </div>
                             </div>
-                            <div className={`px-2 py-1 rounded text-xs font-medium ${order?.status === 'selesai' || order?.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                (order?.status === 'proses' || order?.status === 'in_progress') ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-gray-100 text-gray-700'
-                                }`}>
-                                {order?.status === 'in_progress' ? 'Proses' : (order?.status === 'completed' ? 'Selesai' : order?.status)}
-                            </div>
-                        </div>
 
-                        {/* Content Card */}
-                        <div className="space-y-2 border-t border-gray-200 pt-3">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500">Jasa:</span>
-                                <span className="text-sm font-medium text-gray-800">{order?.nama_jasa}</span>
+                            {/* Content Card */}
+                            <div className="space-y-2 border-t border-gray-200 pt-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-gray-500">Jasa:</span>
+                                    <span className="text-sm font-medium text-gray-800">{order?.nama_jasa}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-gray-500">Tanggal:</span>
+                                    <span className="text-sm text-gray-800">{order?.tanggal || 'Placeholder'}</span>
+                                </div>
                             </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500">Tanggal:</span>
-                                <span className="text-sm text-gray-800">{order?.tanggal || 'Placeholder'}</span>
-                            </div>
-                        </div>
 
-                        <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
-                            <button
-                                onClick={() => handleHubungiPembeli(order.id_buyer)}
-                                className="cursor-pointer flex-1 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition-colors"
-                            >
-                                Hubungi Pembeli
-                            </button>
-                            <button
-                                onClick={() => handleOrderanSelesai(order.order_id)}
-                                disabled={order?.status === 'completed' || order?.status === 'selesai'}
-                                className="cursor-pointer flex-1 py-2 rounded-lg border border-primary text-primary bg-white text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400"
-                            >
-                                Orderan Selesai
-                            </button>
+                            <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
+                                <button
+                                    onClick={() => handleHubungiPembeli(order.id_buyer)}
+                                    className="cursor-pointer flex-1 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition-colors"
+                                >
+                                    Hubungi Pembeli
+                                </button>
+                                <button
+                                    onClick={() => handleOrderanSelesai(order.order_id)}
+                                    disabled={order?.status === 'completed' || order?.status === 'selesai'}
+                                    className="cursor-pointer flex-1 py-2 rounded-lg border border-primary text-primary bg-white text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400"
+                                >
+                                    Orderan Selesai
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                }
             </div>
+
             {/* Modal Confirmation */}
             <Modal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} width="max-w-md">
                 <div className="p-6">
@@ -270,7 +351,7 @@ const TableIncomingOrder = () => {
                     </div>
                 </div>
             </Modal>
-        </div>
+        </div >
     )
 }
 

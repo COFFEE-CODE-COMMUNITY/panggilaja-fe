@@ -25,6 +25,7 @@ const FavoritePage = () => {
     const deleteStatus = useSelector(selectDeleteFavoriteServiceStatus)
 
     const [isStartingChat, setIsStartingChat] = useState(false)
+    const [optimisticDeletedIds, setOptimisticDeletedIds] = useState([])
 
     useEffect(() => {
         if (user?.id) {
@@ -32,12 +33,14 @@ const FavoritePage = () => {
         }
     }, [dispatch, user?.id, deleteStatus])
 
+
+
     let favoritesService = [];
 
     if (favoritesStatus === "success" && favorites.data && services.length > 0) {
         const favoritedServiceIds = favorites.data.map((fav) => fav.service_id);
         favoritesService = services.filter((service) =>
-            favoritedServiceIds.includes(service.id)
+            favoritedServiceIds.includes(service.id) && !optimisticDeletedIds.includes(service.id)
         );
     }
 
@@ -57,7 +60,7 @@ const FavoritePage = () => {
         // Format pesan otomatis
         const autoMessage = `Halo, saya tertarik dengan layanan "${service.nama_jasa}". (ServiceID: ${service.id}) (Harga: Rp ${service.base_price.toLocaleString("id-ID")}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
 
-        // Data untuk socket
+        // Data for socket
         const messageData = {
             id_buyer: myId,
             id_seller: idProvider,
@@ -74,6 +77,29 @@ const FavoritePage = () => {
             });
         }, 300);
     };
+
+    const handleOptimisticDelete = (favoriteId, serviceId) => {
+        setOptimisticDeletedIds((prev) => [...prev, serviceId]);
+        dispatch(deleteFavoriteService(favoriteId));
+    };
+
+    const FavoriteSkeleton = () => (
+        <div className="flex gap-4 animate-pulse">
+            <div className="w-24 sm:w-32 md:w-48 aspect-[3/4] sm:aspect-[4/3] bg-gray-200 rounded-lg flex-shrink-0" />
+            <div className="flex-1 flex flex-col min-w-0">
+                <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1 min-w-0 space-y-2">
+                        <div className="h-5 bg-gray-200 rounded w-3/4" />
+                        <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    </div>
+                    <div className="w-8 h-8 bg-gray-200 rounded-full" />
+                </div>
+                <div className="h-6 bg-gray-200 rounded w-1/4 mt-4" />
+                <div className="h-4 bg-gray-200 rounded w-full mt-3" />
+                <div className="h-4 bg-gray-200 rounded w-2/3 mt-2" />
+            </div>
+        </div>
+    );
 
     return (
         <div className='w-full animate-fade-in'>
@@ -92,9 +118,15 @@ const FavoritePage = () => {
             </div>
 
             {/* list container */}
-            <div className='bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden min-h-[400px]'>
-                <div className='p-6 sm:p-8'>
-                    {favoritesService.length > 0 ? (
+            <div className='bg-white overflow-hidden min-h-[600px] rounded-xl shadow-sm border border-gray-100 p-4'>
+                <div className=''>
+                    {favoritesStatus === 'loading' ? (
+                        <div className="flex flex-col gap-6">
+                            {[1, 2, 3].map((i) => (
+                                <FavoriteSkeleton key={i} />
+                            ))}
+                        </div>
+                    ) : favoritesService.length > 0 ? (
                         <div className='flex flex-col gap-6'>
                             {favoritesService.map((favorite) => {
                                 const idDelFav = favorites.data.find(
@@ -105,74 +137,50 @@ const FavoritePage = () => {
                                         key={favorite.id}
                                         className="bg-white rounded-xl p-4 hover:shadow-md transition-all duration-300 group"
                                     >
-                                        <div className="flex gap-6">
+                                        <div className="flex gap-4">
                                             {/* Image */}
-                                            <div className="w-48 md:w-56 aspect-video sm:aspect-[4/3] flex-shrink-0">
+                                            <div className="w-24 sm:w-32 md:w-48 aspect-[3/4] sm:aspect-[4/3] flex-shrink-0">
                                                 <img
                                                     src={favorite?.foto_product}
                                                     alt={favorite.nama_jasa}
-                                                    className="w-50 h-50 object-cover rounded-lg"
+                                                    className="w-full h-full object-cover rounded-lg shadow-sm"
                                                 />
                                             </div>
 
                                             {/* Content */}
-                                            <div className="flex-1 flex flex-col justify-between min-w-0 gap-4">
-                                                <div>
-                                                    <div className="flex justify-between items-start gap-4">
-                                                        <div>
-                                                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                                                                <FaStore className="text-primary" />
-                                                                <span>{favorite.seller_name || "Nama Toko"}</span>
-                                                            </div>
-                                                            <Link
-                                                                to={`/service/${favorite.id}`}
-                                                                className="text-xl font-bold text-gray-900 hover:text-primary transition-colors line-clamp-1"
-                                                            >
+                                            <div className="flex-1 flex flex-col min-w-0">
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-base sm:text-lg font-bold text-gray-900 line-clamp-2 mb-1">
+                                                            <Link to={`/service/${favorite.id}`} className="hover:text-primary transition-colors">
                                                                 {favorite.nama_jasa}
                                                             </Link>
+                                                        </h3>
+                                                        <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+                                                            <FaStore className="text-primary" />
+                                                            <span className="truncate">{favorite.seller_name || "Nama Toko"}</span>
                                                         </div>
-                                                        <button
-                                                            onClick={() => dispatch(deleteFavoriteService(idDelFav.id))}
-                                                            className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors flex-shrink-0"
-                                                            title="Hapus dari favorit"
-                                                        >
-                                                            <FaHeart size={20} />
-                                                        </button>
                                                     </div>
-
-                                                    <p className="text-primary font-bold text-lg mt-1">
-                                                        {new Intl.NumberFormat("id-ID", {
-                                                            style: "currency",
-                                                            currency: "IDR",
-                                                            minimumFractionDigits: 0,
-                                                        }).format(favorite.base_price)}
-                                                    </p>
-
-                                                    <p className="text-gray-600 text-sm mt-3 line-clamp-2 sm:line-clamp-3 leading-relaxed">
-                                                        {favorite.deskripsi}
-                                                    </p>
+                                                    <button
+                                                        onClick={() => handleOptimisticDelete(idDelFav.id, favorite.id)}
+                                                        className="p-1.5 sm:p-2 hover:text-gray-400 text-red-500 hover:bg-red-50 rounded-full transition-all flex-shrink-0 cursor-pointer"
+                                                        title="Hapus dari favorit"
+                                                    >
+                                                        <FaHeart size={18} className="sm:w-5 sm:h-5" />
+                                                    </button>
                                                 </div>
 
-                                                {/* Actions */}
-                                                <div className="sm:block hidden flex flex-wrap gap-3 mt-2 pt-4 border-t border-gray-100">
-                                                    <Button
-                                                        variant="primary"
-                                                        className="flex-1 sm:flex-none px-6 py-2 text-sm rounded-lg flex items-center justify-center gap-2 text-white"
-                                                        onClick={() => handleStartChat(favorite)}
-                                                        disabled={isStartingChat}
-                                                    >
-                                                        <FaCommentDots />
-                                                        Hubungi Sekarang
-                                                    </Button>
-                                                    <Button
-                                                        variant="secondary"
-                                                        className="flex-1 sm:flex-none px-6 py-2 text-sm rounded-lg flex items-center justify-center gap-2 text-white"
-                                                        to={`/service/nego/${favorite.id}`}
-                                                    >
-                                                        <FaHandshake />
-                                                        Negoin Aja
-                                                    </Button>
-                                                </div>
+                                                <p className="text-primary font-bold text-base sm:text-lg mb-1">
+                                                    {new Intl.NumberFormat("id-ID", {
+                                                        style: "currency",
+                                                        currency: "IDR",
+                                                        minimumFractionDigits: 0,
+                                                    }).format(favorite.base_price)}
+                                                </p>
+
+                                                <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 leading-relaxed">
+                                                    {favorite.deskripsi}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -193,7 +201,7 @@ const FavoritePage = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

@@ -44,9 +44,75 @@ const TableServices = () => {
         }
     }, [dispatch, statusDelete, user?.id_seller])
 
+    const [isArtificialLoading, setIsArtificialLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsArtificialLoading(false);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const ManageServiceSkeleton = () => (
+        <div className="flex flex-col gap-2 sm:mb-0 mb-20">
+            <div className='flex gap-5 items-center'>
+                <div className="flex-1 h-12 bg-gray-200 rounded-full animate-pulse" />
+                <div className="w-32 h-12 bg-gray-200 rounded-xl animate-pulse" />
+            </div>
+
+            {/* Desktop Header Skeleton */}
+            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-100 rounded-t-lg items-center animate-pulse mt-4">
+                <div className="col-span-2 h-6 bg-gray-200 rounded" />
+                <div className="col-span-5 h-6 bg-gray-200 rounded" />
+                <div className="col-span-2 h-6 bg-gray-200 rounded" />
+                <div className="col-span-3 h-6 bg-gray-200 rounded" />
+            </div>
+
+            <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse">
+                        {/* Desktop Skeleton */}
+                        <div className="hidden md:block bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <div className="p-6 grid grid-cols-12 gap-4 items-center">
+                                <div className="col-span-2">
+                                    <div className="w-16 h-16 bg-gray-200 rounded-lg" />
+                                </div>
+                                <div className="col-span-5">
+                                    <div className="h-6 bg-gray-200 rounded w-1/2" />
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="h-6 bg-gray-200 rounded w-2/3" />
+                                </div>
+                                <div className="col-span-3 flex justify-end gap-2">
+                                    <div className="w-16 h-8 bg-gray-200 rounded-lg" />
+                                    <div className="w-16 h-8 bg-gray-200 rounded-lg" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Skeleton */}
+                        <div className="md:hidden bg-white border border-gray-300 rounded-lg p-4 relative">
+                            <div className="flex gap-4">
+                                <div className="w-20 h-20 bg-gray-200 rounded-lg shrink-0" />
+                                <div className="flex-1 space-y-2">
+                                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                                    <div className="h-4 bg-gray-200 rounded w-1/2" />
+                                </div>
+                            </div>
+                            <div className="mt-4 flex gap-2">
+                                <div className="flex-1 h-10 bg-gray-200 rounded-lg" />
+                                <div className="flex-1 h-10 bg-gray-200 rounded-lg" />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
     // Render loading state
-    if (status === 'loading') {
-        return <p>Memuat layanan...</p>
+    if (status === 'loading' || isArtificialLoading) {
+        return <ManageServiceSkeleton />
     }
 
     return (

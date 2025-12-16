@@ -14,6 +14,8 @@ const SearchAllService = () => {
     const error = useSelector(selectAllServiceError)
     const token = useSelector(selectAccessToken)
 
+
+
     useEffect(() => {
         if (status === 'idle' && !allServices) {
             dispatch(getServices())
@@ -21,12 +23,30 @@ const SearchAllService = () => {
     }, [status, dispatch])
 
 
+
+
+
+    const SearchSkeleton = () => (
+        <div className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm animate-pulse">
+            <div className="w-full h-48 bg-gray-200" />
+            <div className="p-4 space-y-3">
+                <div className="h-5 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                <div className="flex justify-between items-center pt-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                    <div className="h-8 bg-gray-200 rounded w-1/3" />
+                </div>
+            </div>
+        </div>
+    );
+
     if (status === 'loading') {
         return (
-            <div className='flex justify-center items-center min-h-screen'>
-                <div className='text-center'>
-                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto'></div>
-                    <p className='mt-4 text-gray-600'>Memuat data...</p>
+            <div className='min-h-screen py-[15px] sm:mt-20 flex flex-col gap-[15px] xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] mx-auto'>
+                <div className='grid gap-y-10 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 md:gap-x-6 gap-x-4'>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                        <SearchSkeleton key={i} />
+                    ))}
                 </div>
             </div>
         )

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "../../../../config/socket";
 import { API_BASE_URL } from "../../../../api/api";
@@ -443,8 +443,20 @@ const ChatLayout = () => {
         {/* Chat List */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           {listLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+            // Chat Sidebar Skeleton
+            <div className="divide-y divide-gray-100 animate-pulse">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="flex items-center gap-3 p-4">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex-shrink-0"></div>
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex justify-between">
+                      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/6"></div>
+                    </div>
+                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredConversations.length > 0 ? (
             filteredConversations.map((conv) => (
@@ -510,39 +522,82 @@ const ChatLayout = () => {
           <>
             {/* Chat Header */}
             <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setChatMobile(false)}
-                  className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              {isBuyer ? (
+                <Link
+                  to={`/profile-service/${selectedChat.id}`}
+                  className="flex items-center gap-3 hover:bg-gray-50 rounded-lg p-1 transition-colors group"
                 >
-                  <FaArrowLeft className="text-gray-600" />
-                </button>
-                <div className="relative">
-                  {selectedChat.avatar ? (
-                    <>
-                      <img
-                        src={selectedChat.avatar}
-                        className="w-10 h-10 rounded-full bg-amber-500"
-                      />
-                      {selectedChat.isOnline && (
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center border-1 border-gray-200">
-                      <FaUser size={25} />
-                    </div>
-                  )}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault(); // Prevent link nav when clicking back on mobile
+                      setChatMobile(false);
+                    }}
+                    className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <FaArrowLeft className="text-gray-600" />
+                  </button>
+                  <div className="relative">
+                    {selectedChat.avatar ? (
+                      <>
+                        <img
+                          src={selectedChat.avatar}
+                          className="w-10 h-10 rounded-full bg-amber-500 object-cover border border-gray-100 group-hover:border-primary transition-colors"
+                        />
+                        {selectedChat.isOnline && (
+                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center border-1 border-gray-200 group-hover:border-primary transition-colors">
+                        <FaUser size={25} />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800 group-hover:text-primary transition-colors">
+                      {selectedChat.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {selectedChat.isOnline ? "Online" : "Offline"}
+                    </p>
+                  </div>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setChatMobile(false)}
+                    className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <FaArrowLeft className="text-gray-600" />
+                  </button>
+                  <div className="relative">
+                    {selectedChat.avatar ? (
+                      <>
+                        <img
+                          src={selectedChat.avatar}
+                          className="w-10 h-10 rounded-full bg-amber-500"
+                        />
+                        {selectedChat.isOnline && (
+                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center border-1 border-gray-200">
+                        <FaUser size={25} />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      {selectedChat.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {selectedChat.isOnline ? "Online" : "Offline"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-800">
-                    {selectedChat.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {selectedChat.isOnline ? "Online" : "Offline"}
-                  </p>
-                </div>
-              </div>
+              )}
+
               <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <FaEllipsisV className="text-gray-600" />
               </button>
@@ -554,8 +609,19 @@ const ChatLayout = () => {
               className={`flex-1 overflow-auto p-4 space-y-4 scrollbar-hide`}
             >
               {messagesLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                // Chat Room Skeleton
+                <div className="space-y-4 animate-pulse pt-10">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`
+                        max-w-[70%] rounded-2xl p-4 
+                        ${i % 2 === 0 ? 'bg-primary/10 rounded-tr-sm' : 'bg-gray-100 rounded-tl-sm'}
+                      `}>
+                        <div className="h-3 bg-gray-200 rounded w-48 mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-32"></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 messages.map((msg, index) => {

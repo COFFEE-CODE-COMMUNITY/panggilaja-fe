@@ -18,18 +18,18 @@ const Category = () => {
 
   category?.data?.map((category) => {
     CategoriesService.map((categoryDummy) => {
-      if(categoryDummy.name === category.kategori){
+      if (categoryDummy.name === category.kategori) {
         categoryMap.push({
-          name : category.kategori,
-          id : category.id,
-          logo : categoryDummy.logo
+          name: category.kategori,
+          id: category.id,
+          logo: categoryDummy.logo
         })
       }
     })
   })
 
   return (
-    <div className="w-full flex flex-col md:gap-[10px] gap-[5px]">
+    <div className="w-full flex flex-col md:gap-[10px] gap-[5px] animate-fade-in">
       <p className="xl:text-h4 text-h5 font-semibold">Kategori jasa</p>
       <div className="grid md:grid-cols-6 grid-cols-3 xl:gap-[15px] lg:gap-[10px] gap-[5px] w-full">
         {categoryMap.map((category) => {

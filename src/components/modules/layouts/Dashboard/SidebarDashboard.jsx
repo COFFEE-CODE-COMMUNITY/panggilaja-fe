@@ -80,16 +80,7 @@ export const SidebarDashboard = () => {
     dispatch(deleteSellerById(user?.id_seller));
   }
 
-  if (statusChange === "loading") {
-    return (
-      <div className="z-100 bg-white justify-center items-center h-screen fixed w-full flex">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Memuat data...</p>
-        </div>
-      </div>
-    );
-  }
+  // Removed blocking spinner for statusChange === "loading"
 
   return (
     <>
@@ -480,6 +471,7 @@ export const SidebarDashboard = () => {
         <ModalSwitchAccount
           onRedirect={() => {
             dispatch(changeAccount({ targetRole: "buyer" }))
+            navigate('/'); // Navigate immediately
             setStatusChanges(false)
           }}
           destinationName={'home'}

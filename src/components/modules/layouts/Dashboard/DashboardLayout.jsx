@@ -4,7 +4,7 @@ import { SidebarDashboard } from './SidebarDashboard';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllService } from '../../../../features/serviceSlice';
-import { changeAccount, selectChangeAccountStatus, selectCurrentUser } from '../../../../features/authSlice';
+import { changeAccount, selectAccessToken, selectChangeAccountStatus, selectCurrentUser } from '../../../../features/authSlice';
 import { getContactForSeller } from '../../../../features/chatSlice';
 import { getAllServicesByIdSeller, getOrderBySellerId } from '../../../../features/sellerSlice';
 import ModalSwitchAccount from '../../Modal/ModalSwitchAccount';
@@ -14,6 +14,7 @@ const DashboardLayout = () => {
   const location = useLocation()
   const dispatch = useDispatch()
   const user = useSelector(selectCurrentUser)
+  const token = useSelector(selectAccessToken)
   const navigate = useNavigate()
 
   let style = ''
@@ -21,11 +22,25 @@ const DashboardLayout = () => {
     style = 'p-0'
   }
 
+  const changeAccountStatus = useSelector(selectChangeAccountStatus);
+
   useEffect(() => {
-    if (user?.active_role === 'buyer') {
-      navigate('/')
+    // 1. Check Token (Replacement for ProtectedRoute)
+    if (!token) {
+      navigate('/login', { replace: true });
+      return;
     }
-  }, [user?.active_role])
+
+    // 2. Wait for account switch loading
+    if (changeAccountStatus === 'loading') return;
+
+    // 3. Check Role (Role Guard)
+    // Add a small delay/check to ensure we don't redirect just because the user state hasn't updated yet?
+    // Actually, if we are in DashboardLayout, we MUST be a seller.
+    if (user && user.active_role === 'buyer') {
+      navigate('/', { replace: true })
+    }
+  }, [user?.active_role, changeAccountStatus, token])
 
   useEffect(() => {
     if (user && user.id_seller) {

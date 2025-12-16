@@ -98,6 +98,85 @@ const TableProgressOrder = () => {
     }
 
 
+    const [isArtificialLoading, setIsArtificialLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsArtificialLoading(false);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const OrderTableSkeleton = () => (
+        <div className="w-full sm:mb-0 mb-20">
+            {/* Desktop Header Skeleton */}
+            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-100 rounded-t-lg items-center animate-pulse">
+                <div className="col-span-5 h-6 bg-gray-200 rounded" />
+                <div className="col-span-2 h-6 bg-gray-200 rounded" />
+                <div className="col-span-2 h-6 bg-gray-200 rounded" />
+                <div className="col-span-3 h-6 bg-gray-200 rounded" />
+            </div>
+
+            <div className="space-y-4 mt-2">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse">
+                        {/* Desktop Skeleton */}
+                        <div className="hidden md:block bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <div className="p-6 grid grid-cols-12 gap-4 items-center">
+                                {/* Buyer Header Skeleton */}
+                                <div className="col-span-12 flex items-center justify-between mb-4 border-b border-gray-100 pb-2">
+                                    <div className="w-32 h-4 bg-gray-200 rounded" />
+                                    <div className="w-24 h-4 bg-gray-200 rounded" />
+                                </div>
+                                <div className="col-span-5 flex flex-col gap-2">
+                                    <div className="w-3/4 h-6 bg-gray-200 rounded" />
+                                    <div className="w-full h-4 bg-gray-200 rounded" />
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="w-24 h-4 bg-gray-200 rounded" />
+                                </div>
+                                <div className="col-span-2">
+                                    <div className="w-16 h-6 bg-gray-200 rounded" />
+                                </div>
+                                <div className="col-span-3 flex justify-end gap-2">
+                                    <div className="w-20 h-8 bg-gray-200 rounded-lg" />
+                                    <div className="w-20 h-8 bg-gray-200 rounded-lg" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Skeleton */}
+                        <div className="md:hidden bg-white border border-gray-300 rounded-lg p-4 relative">
+                            <div className="flex justify-between mb-4">
+                                <div className="flex gap-2">
+                                    <div className="w-8 h-8 bg-gray-200 rounded-full" />
+                                    <div className="space-y-1">
+                                        <div className="w-12 h-3 bg-gray-200 rounded" />
+                                        <div className="w-20 h-4 bg-gray-200 rounded" />
+                                    </div>
+                                </div>
+                                <div className="w-12 h-6 bg-gray-200 rounded" />
+                            </div>
+                            <div className="space-y-2 border-t border-gray-200 pt-2">
+                                <div className="h-4 bg-gray-200 rounded w-full" />
+                                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                            </div>
+                            <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
+                                <div className="flex-1 h-10 bg-gray-200 rounded-lg" />
+                                <div className="flex-1 h-10 bg-gray-200 rounded-lg" />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    if (ordersStatus === 'loading' || isArtificialLoading) {
+        return <OrderTableSkeleton />;
+    }
+
     return (
         <div className="w-full sm:mb-0 mb-20">
             {/* Desktop View - Hidden on mobile */}

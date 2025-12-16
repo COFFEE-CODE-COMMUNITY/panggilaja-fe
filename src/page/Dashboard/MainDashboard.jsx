@@ -1,24 +1,95 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectCurrentUser } from '../../features/authSlice';
+import { selectChangeAccountStatus, selectCurrentUser } from '../../features/authSlice';
 import {
   getAllServicesByIdSeller,
   getOrderBySellerId,
   selectOrderSeller,
   selectSelectedSeller,
   selectSellerServices,
+  selectOrderSellerStatus,
+  selectServiceSellerStatus,
 } from '../../features/sellerSlice';
-import { selectContactSeller, getContactForSeller } from '../../features/chatSlice';
+import { selectContactSeller, getContactForSeller, selectContactSellerStatus } from '../../features/chatSlice';
 import { Link, useNavigate } from 'react-router-dom';
+
+const DashboardSkeleton = () => {
+  return (
+    <div className="w-full min-h-screen bg-gray-50 pb-24 sm:pb-6 animate-pulse">
+      {/* Welcome Section Skeleton */}
+      <div className="bg-gradient-to-br from-gray-200 to-gray-300 px-4 sm:px-6 py-6 sm:py-8 shadow-lg">
+        <div className="max-w-7xl mx-auto space-y-3">
+          <div className="h-8 bg-gray-400 rounded w-1/3"></div>
+          <div className="h-4 bg-gray-400 rounded w-1/4"></div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6">
+        {/* Stats Cards Skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
+              <div className="h-10 w-10 bg-gray-200 rounded-lg mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+              <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Actions Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+              <div className="h-12 w-12 bg-gray-200 rounded-lg"></div>
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Grid for Latest Orders and Messages Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[1, 2].map((i) => (
+            <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-100 h-fit">
+              <div className="p-4 sm:p-6 border-b border-gray-100 flex justify-between items-center">
+                <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+              </div>
+              <div className="p-4 sm:p-6 space-y-4">
+                {[1, 2, 3].map((j) => (
+                  <div key={j} className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-gray-200 rounded-lg"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const DashboardUtama = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
+  const changeAccountStatus = useSelector(selectChangeAccountStatus);
   const orders = useSelector(selectOrderSeller);
   const services = useSelector(selectSellerServices);
   const sellerProfile = useSelector(selectSelectedSeller);
   const contactSeller = useSelector(selectContactSeller);
+
+  const ordersStatus = useSelector(selectOrderSellerStatus);
+  const servicesStatus = useSelector(selectServiceSellerStatus);
+  const contactStatus = useSelector(selectContactSellerStatus);
+
   const unreadCount = contactSeller?.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0) || 0;
 
   const [stats, setStats] = useState({
@@ -28,6 +99,17 @@ const DashboardUtama = () => {
     totalServices: 0,
   });
 
+  // Loading based on account switch TO SELLER or initial data fetch
+  // If we are switching TO BUYER (active_role === 'seller' && status === 'loading'), we do NOT want to show dashboard skeleton.
+
+  const isSwitchingToSeller = changeAccountStatus === 'loading' && user?.active_role === 'buyer';
+  const isDataLoading =
+    changeAccountStatus !== 'loading' &&
+    user?.active_role === 'seller' &&
+    (ordersStatus === 'loading' || servicesStatus === 'loading' || contactStatus === 'loading');
+
+  const isLoading = isSwitchingToSeller || isDataLoading || !user?.id_seller;
+
   let lengthService = 0
   services?.data?.map(() => {
     lengthService += 1
@@ -35,6 +117,7 @@ const DashboardUtama = () => {
 
   useEffect(() => {
     if (user?.id_seller) {
+      // Small artificial delay to show skeleton if desired, or just load
       dispatch(getOrderBySellerId(user?.id_seller));
       dispatch(getAllServicesByIdSeller(user?.id_seller));
       dispatch(getContactForSeller(user?.id_seller));
@@ -64,6 +147,10 @@ const DashboardUtama = () => {
   const serviceMap = new Map(
     services?.data?.map((service) => [service.id, service]) || []
   );
+
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-24 sm:pb-6">

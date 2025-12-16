@@ -105,15 +105,63 @@ const NegoPage = () => {
     });
   };
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat data...</p>
+  const [isArtificialLoading, setIsArtificialLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsArtificialLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const NegoSkeleton = () => (
+    <div className="lg:pt-20 md:pt-18 pt-15 min-h-screen py-[25px] sm:bg-gray-50 bg-white xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] animate-pulse">
+      <div className="w-full flex justify-center">
+        <div className="md:flex md:flex-row flex flex-col gap-[10px] w-full">
+          <div className="md:w-3/4 w-full md:h-full lg:py-[25px] md:py-[15px] py-[10px] px-4 sm:px-6 flex flex-col gap-[20px] sm:border-2 sm:border-gray-100 bg-white rounded-lg">
+            {/* Warning Box Skeleton */}
+            <div className="h-24 bg-blue-50 rounded-lg w-full" />
+
+            {/* Mobile Detail Jasa Skeleton */}
+            <div className="md:hidden h-24 bg-gray-200 rounded-lg w-full" />
+
+            {/* Alamat Skeleton */}
+            <div className="space-y-2">
+              <div className="h-6 bg-gray-200 rounded w-24" />
+              <div className="h-20 bg-gray-200 rounded-xl w-full" />
+            </div>
+
+            {/* Form Skeleton */}
+            <div className="flex flex-col gap-6 mt-4">
+              <div className="space-y-2">
+                <div className="h-5 bg-gray-200 rounded w-1/3" />
+                <div className="h-12 bg-gray-200 rounded-xl w-full" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-5 bg-gray-200 rounded w-1/4" />
+                <div className="h-48 bg-gray-200 rounded-xl w-full" />
+              </div>
+              <div className="h-12 bg-primary/20 rounded-lg w-full mt-4" />
+            </div>
+          </div>
+
+          {/* Desktop Sidebar Skeleton */}
+          <div className="md:w-1/4 hidden md:flex flex-col gap-[15px] h-fit sticky top-4 border-2 border-gray-100 bg-white px-[15px] py-[15px] rounded-lg">
+            <div className="h-6 bg-gray-200 rounded w-1/2" />
+            <div className="h-48 bg-gray-200 rounded-[15px] w-full" />
+            <div className="space-y-2">
+              <div className="h-6 bg-gray-200 rounded w-3/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
+            </div>
+            <div className="h-10 bg-gray-200 rounded-lg w-full" />
+          </div>
         </div>
       </div>
-    );
+    </div>
+  );
+
+  if (status === "loading" || isArtificialLoading) {
+    return <NegoSkeleton />;
   }
 
   return (

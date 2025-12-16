@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Header from './Header/Header'
 import Footer from './Footer'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
+import { selectAccessToken, selectCurrentUser, selectChangeAccountStatus } from '../../../features/authSlice'
 import { seeAddress, selectSeeAddress, selectSeeAddressStatus } from '../../../features/userSlice'
 
 const AppLayout = () => {
@@ -14,6 +14,7 @@ const AppLayout = () => {
   const user = useSelector(selectCurrentUser)
   const token = useSelector(selectAccessToken)
   const address = useSelector(selectSeeAddress)
+  const changeAccountStatus = useSelector(selectChangeAccountStatus)
 
   const addressStatus = useSelector(selectSeeAddressStatus);
 
@@ -21,10 +22,13 @@ const AppLayout = () => {
   const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
 
   useEffect(() => {
+    // Prevent redirect if we are currently switching accounts
+    if (changeAccountStatus === 'loading') return;
+
     if (user?.active_role === 'seller') {
       navigate('/dashboard')
     }
-  }, [user?.active_role])
+  }, [user?.active_role, changeAccountStatus])
 
   useEffect(() => {
     if (user?.id_buyer && token && (address === null || address?.data?.alamat === null)) {
@@ -64,7 +68,7 @@ const AppLayout = () => {
   }
 
   return (
-    <div className={`${containerClasses} overflow-hidden`}>
+    <div className={`overflow-hidden ${containerClasses}`}>
       <Header />
       <div className={`${mainContentClasses} ${margin} ${location.pathname.includes('nego') || location.pathname.startsWith('/service/') ? '' : 'mb-40'}`}>
         <Outlet />

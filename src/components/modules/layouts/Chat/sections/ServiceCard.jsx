@@ -1,6 +1,7 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
 import Button from "../../../../common/Button";
+import { Link } from "react-router-dom";
 
 const ServiceCard = ({ data }) => {
     return (
@@ -40,9 +41,11 @@ const ServiceCard = ({ data }) => {
                             <p className="text-xl font-bold text-primary">{data.price}</p>
                         </div>
                     </div>
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-semibold">
-                        Lihat Detail
-                    </Button>
+                    <Link to={`/service/${data.serviceId}`}>
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-semibold">
+                            Lihat Detail
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </div>

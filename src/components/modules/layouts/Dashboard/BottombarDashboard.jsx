@@ -297,6 +297,8 @@ const BottombarDashboard = () => {
         <ModalSwitchAccount
           onRedirect={() => {
             dispatch(changeAccount({ targetRole: "buyer" }))
+            // Navigate immediately to trigger LandingPage skeleton
+            navigate('/');
             setStatusChanges(false)
           }}
           destinationName={'home'}
