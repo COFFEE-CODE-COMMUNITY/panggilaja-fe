@@ -84,7 +84,7 @@ const DashboardLayout = () => {
   // Mobile Header Component - Moved to separate file
 
   return (
-    <div className='flex relative h-screen bg-gray-50'>
+    <div className='flex relative h-screen bg-gray-50/50'>
       <SidebarDashboard />
       {/* <BottombarDashboard /> */}
 

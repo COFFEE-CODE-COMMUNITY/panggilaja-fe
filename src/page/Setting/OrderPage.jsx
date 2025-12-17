@@ -293,7 +293,7 @@ const OrderPage = () => {
 
                                             <Button
                                                 variant="primary"
-                                                className="w-full sm:w-auto px-6 py-2 text-sm rounded-lg font-medium text-white shadow-sm hover:shadow hover:bg-primary/90 flex items-center justify-center"
+                                                className="w-full sm:w-auto px-6 py-2 text-sm rounded-lg font-medium text-white shadow-sm hover:shadow hover:bg-primary/90 justify-center"
                                                 to={`/chat/${item.seller_id}`}
                                             >
                                                 Hubungi Sekarang

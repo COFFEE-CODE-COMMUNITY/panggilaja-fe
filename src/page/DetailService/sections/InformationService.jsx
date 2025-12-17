@@ -111,28 +111,25 @@ const InformationService = ({
 
     setIsStartingChat(true);
 
+
     const imageUrl =
       foto_product ||
       "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400";
     const shortDescription = description.substring(0, 50) + "...";
 
-    const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (ServiceID: ${idService}) (Harga: Rp ${basePrice.toLocaleString(
-      "id-ID"
-    )}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
-
-    const messageData = {
-      id_buyer: myId,
-      id_seller: idProvider,
-      text: autoMessage,
-      sender_role: "BUYER",
-    };
-
-    socket.emit("send_message", messageData);
-
     setTimeout(() => {
       setIsStartingChat(false);
       navigate(`/chat/${idProvider}`, {
-        state: { shouldRefreshList: true },
+        state: {
+          shouldRefreshList: true,
+          service: {
+            id: idService,
+            name: nameService,
+            price: `Rp ${parseInt(basePrice).toLocaleString('id-ID')}`,
+            image: imageUrl,
+            description: shortDescription
+          }
+        },
       });
     }, 300);
   };

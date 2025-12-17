@@ -8,6 +8,7 @@ import { addService, getCategoryService, resetAddStatus, selectAddServiceError, 
 import { useNavigate } from 'react-router-dom';
 import AddServiceStatusModal from '../../../components/modules/Modal/ModalAddService';
 import ModalServiceAdded from '../../../components/modules/Modal/ModalAddService';
+import ModalSelect from '../../../components/common/ModalSelect';
 
 const FormAddService = () => {
     const dispatch = useDispatch();
@@ -137,7 +138,7 @@ const FormAddService = () => {
         <>
             <form onSubmit={handleSubmit} className='flex gap-6 lg:p-6 md:p-5 p-4 w-full sm:flex-row flex-col'>
                 <div className='w-full lg:w-1/2 flex flex-col gap-4'>
-                    <div className='relative aspect-square w-full bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden hover:border-primary transition-colors'>
+                    <div className='bg-white relative aspect-square w-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden hover:border-primary transition-colors'>
                         {preview ? (
                             <>
                                 <img
@@ -185,24 +186,15 @@ const FormAddService = () => {
                         required
                     />
 
-                    <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>
-                            Kategori *
-                        </label>
-                        <select
-                            className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-primary focus:outline-none"
-                            onChange={(e) => setKategori_Id(e.target.value)}
-                            value={kategori_id}
-                            required
-                        >
-                            <option value="">Pilih Kategori</option>
-                            {categories?.data?.map((category, index) => (
-                                <option key={index} value={category.id}>
-                                    {category.kategori}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <ModalSelect
+                        label="Kategori *"
+                        title="Pilih Kategori"
+                        placeholder="Pilih Kategori"
+                        options={categories?.data?.map(cat => ({ value: cat.id, label: cat.kategori })) || []}
+                        value={kategori_id}
+                        onChange={(val) => setKategori_Id(val)}
+                        required
+                    />
 
                     <div>
                         <label className='block text-sm font-medium text-gray-700 mb-2'>
@@ -236,7 +228,7 @@ const FormAddService = () => {
                             Deskripsi *
                         </label>
                         <textarea
-                            className='w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:border-primary focus:outline-none h-32 resize-none'
+                            className='bg-white w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:border-primary focus:outline-none h-32 resize-none'
                             placeholder='Jelaskan detail jasa yang Anda tawarkan...'
                             value={deskripsi}
                             onChange={(e) => setDeskripsi(e.target.value)}

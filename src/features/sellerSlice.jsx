@@ -14,6 +14,18 @@ export const getSellers = createAsyncThunk(
   }
 );
 
+export const getPublicSellerById = createAsyncThunk(
+  'seller/getPublicSellerById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/sellers/${id}`, { skipAuth: true })
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
+    }
+  }
+);
+
 export const getSellerById = createAsyncThunk(
   'seller/getSellerById',
   async (id, { rejectWithValue }) => {
@@ -66,7 +78,7 @@ export const getAllServicesByIdSeller = createAsyncThunk(
   'seller/getAllServicesByIdSeller',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/sellers/${id}/services`)
+      const res = await api.get(`/sellers/${id}/services`, { skipAuth: true })
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -90,7 +102,7 @@ export const getDocsById = createAsyncThunk(
   'seller/getDocsById',
   async (id, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/sellers/${id}/docs`)
+      const res = await api.get(`/sellers/${id}/docs`, { skipAuth: true })
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Terjadi kesalahan');
@@ -245,6 +257,20 @@ const seller = createSlice({
         state.selectedSeller = action.payload;
       })
       .addCase(getSellerById.rejected, (state, action) => {
+        state.status = 'error';
+        state.message = action.payload
+      })
+
+      //get public seller by id
+      .addCase(getPublicSellerById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getPublicSellerById.fulfilled, (state, action) => {
+        state.status = 'success';
+        state.message = action.payload
+        state.selectedSeller = action.payload;
+      })
+      .addCase(getPublicSellerById.rejected, (state, action) => {
         state.status = 'error';
         state.message = action.payload
       })

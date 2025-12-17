@@ -26,7 +26,8 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Redirect to login jika unauthorized
-      window.location.href = "/login";
+      // window.location.href = "/login"; // DISABLED: Aggressive redirect breaks public pages
+      console.warn("Orphan axios instance 401: Redirect disabled.");
     }
     return Promise.reject(error);
   }
