@@ -324,9 +324,58 @@ const ChatLayout = () => {
       sender_role: isBuyer ? "BUYER" : "SELLER",
     };
 
+    // --- DEFERRED AUTO-MESSAGE LOGIC (User Request: Send only when buyer chats) ---
+    // --- DEFERRED AUTO-MESSAGE LOGIC (Context-Aware) ---
+    if (isBuyer && location.state?.service) {
+      const service = location.state.service;
+
+      // Keys
+      const contextKey = `last_context_service_buyer_${myId}`;
+      const timestampKey = `chat_inquiry_time_${myId}_${service.id}`;
+
+      // Data
+      const lastContextId = localStorage.getItem(contextKey);
+      const lastInquiryTime = localStorage.getItem(timestampKey);
+      const now = Date.now();
+
+      // Conditions
+      const isContextSwitch = lastContextId !== service.id;
+      const cooldownDuration = 5 * 60 * 1000; // 5 Minutes (if same context)
+      const isCooldownPassed = !lastInquiryTime || (now - parseInt(lastInquiryTime)) > cooldownDuration;
+
+      let shouldSendContext = false;
+
+      // Logic: Send if we switched context OR if enough time specifically passed for this service (refresh protection)
+      if (isContextSwitch) {
+        shouldSendContext = true;
+      } else if (isCooldownPassed) {
+        shouldSendContext = true;
+      }
+
+      if (shouldSendContext) {
+        const autoMessage = `Halo, saya tertarik dengan layanan "${service.name}". (ServiceID: ${service.id}) (Harga: ${service.price}) (Deskripsi: ${service.description || ''}) (Gambar: ${service.image})`;
+
+        socket.emit("send_message", {
+          id_buyer: myId,
+          id_seller: partnerId,
+          text: autoMessage,
+          sender_role: "BUYER"
+        });
+
+        // Update State
+        localStorage.setItem(contextKey, service.id);
+        localStorage.setItem(timestampKey, now.toString());
+      }
+    }
     // ------------------------------------
-    socket.emit("send_message", messageData);
-    setText("");
+
+    // ------------------------------------
+
+    // Force a small delay for the user's text message to ensure the Auto-Message (Card) arrives first
+    setTimeout(() => {
+      socket.emit("send_message", messageData);
+      setText("");
+    }, 500);
   };
 
   const handleSelectChat = (conversation) => {
@@ -873,15 +922,15 @@ const ChatLayout = () => {
                         rating: 4.5,
                       };
 
-                      // BUYER POV: Hide this message (only show sticky card at top)
-                      if (isBuyer) return null;
-
-                      // SELLER POV: Show "Inquiry Notification"
+                      // BUYER & SELLER POV: Show "Inquiry Notification"
                       return (
                         <div key={msg.id} className="w-full my-6 flex flex-col items-center animate-in fade-in duration-500">
+                          {/* Subtle Context Separator */}
+                          <div className="w-1/3 h-px bg-gray-200 mb-6"></div>
+
                           <div className="w-full max-w-lg bg-gray-50/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 flex flex-col gap-3">
                             <p className="text-xs text-center font-medium text-gray-500 uppercase tracking-wider">
-                              Pembeli menanyakan jasa ini
+                              {isBuyer ? "Anda menanyakan jasa ini" : "Pembeli menanyakan jasa ini"}
                             </p>
 
                             <div className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition-shadow">

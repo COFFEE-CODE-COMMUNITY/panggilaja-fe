@@ -117,34 +117,6 @@ const InformationService = ({
       "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400";
     const shortDescription = description.substring(0, 50) + "...";
 
-    const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (ServiceID: ${idService}) (Harga: Rp ${parseInt(basePrice).toLocaleString(
-      "id-ID"
-    )}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
-
-    const messageData = {
-      id_buyer: myId,
-      id_seller: idProvider,
-      text: autoMessage,
-      sender_role: "BUYER",
-    };
-
-    const cooldownKey = `chat_inquiry_${myId}_${idService}`;
-    const lastInquiry = localStorage.getItem(cooldownKey);
-    const now = Date.now();
-    const twelveHours = 12 * 60 * 60 * 1000;
-
-    let shouldSendMessage = true;
-
-    if (lastInquiry && (now - parseInt(lastInquiry)) < twelveHours) {
-      console.log("⏳ Inquiry cooldown active. Skipping auto-message.");
-      shouldSendMessage = false;
-    }
-
-    if (shouldSendMessage) {
-      socket.emit("send_message", messageData);
-      localStorage.setItem(cooldownKey, now.toString());
-    }
-
     setTimeout(() => {
       setIsStartingChat(false);
       navigate(`/chat/${idProvider}`, {
