@@ -30,11 +30,10 @@ export const RatingInput = ({ selectedRating, onRatingChange }) => {
             aria-label={`Rating ${star} bintang`}
           >
             <Star
-              className={`w-12 h-12 cursor-pointer ${
-                star <= (hoverRating || selectedRating)
+              className={`w-12 h-12 cursor-pointer ${star <= (hoverRating || selectedRating)
                   ? "fill-yellow-400 text-yellow-400"
                   : "text-gray-300"
-              }`}
+                }`}
             />
           </button>
         ))}

@@ -56,7 +56,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
     // Delay 500ms sebelum refetch (tunggu burst messages selesai)
     refetchTimeoutRef.current = setTimeout(() => {
       if (pendingRefetchRef.current) {
-        console.log("🔄 Executing debounced refetch...");
+
         const { isBuyer: currentIsBuyer, userId: currentUserId } =
           paramsRef.current;
 
@@ -72,11 +72,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
 
   useEffect(() => {
     if (!socket || !userId || !role) {
-      console.log("⚠️ Socket hook skipped:", {
-        socket: !!socket,
-        userId,
-        role,
-      });
+
       return;
     }
 
@@ -85,7 +81,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
 
     const joinUserRoom = () => {
       socket.emit("join_user_room", { userId, role });
-      console.log(`🔔 Joined user room: ${userRoom}`);
+
     };
 
     // Join immediately
@@ -93,7 +89,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
 
     // Re-join on reconnection
     const handleReconnect = () => {
-      console.log("🔄 Socket reconnected, re-joining user room...");
+
       joinUserRoom();
     };
 
@@ -103,11 +99,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
 
     // Handler untuk contact list update
     const handleContactUpdate = (data) => {
-      console.log("📬 Contact list update received:", data);
-      console.log(
-        "📋 Current contacts:",
-        contactsRef.current?.map((c) => ({ id: c.id, name: c.name }))
-      );
+
 
       const { type, partnerId, lastMessage } = data;
 
@@ -118,14 +110,11 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
           Array.isArray(currentContacts) &&
           currentContacts.some((contact) => contact.id === partnerId);
 
-        console.log(
-          `🔍 Checking contact ${partnerId}: ${contactExists ? "EXISTS" : "NOT FOUND"
-          }`
-        );
+
 
         if (contactExists) {
           // ✅ KONTAK SUDAH ADA: Update via Redux (TIDAK REFETCH)
-          console.log(`✅ Updating existing contact: ${partnerId}`);
+
           const { isBuyer: currentIsBuyer } = paramsRef.current;
 
           // Check if the message is from me
@@ -145,9 +134,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
           );
         } else {
           // ❌ KONTAK BELUM ADA: Perlu refetch (tapi dengan debouncing)
-          console.log(
-            `🆕 New contact detected: ${partnerId}, scheduling refetch...`
-          );
+
           debouncedRefetch();
         }
       }
@@ -155,13 +142,13 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
 
     // Handler untuk online status update
     const handleStatusUpdate = (data) => {
-      console.log("🟢 User status update:", data);
+
       dispatch(updateUserStatus(data));
     };
 
     // Handler untuk bulk online users list (Init Sync)
     const handleOnlineUsersList = (onlineIds) => {
-      console.log("🟢 Initial Online Users Sync:", onlineIds);
+
       dispatch(setOnlineUsers(onlineIds));
     };
 
@@ -183,7 +170,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
       if (refetchTimeoutRef.current) {
         clearTimeout(refetchTimeoutRef.current);
       }
-      console.log(`👋 Left user room: ${userRoom}`);
+
     };
   }, [socket, userId, role, dispatch, debouncedRefetch]);
 

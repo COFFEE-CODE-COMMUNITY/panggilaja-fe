@@ -74,7 +74,7 @@ export default function Router() {
           />
           <Route path="search-result" element={<SearchPage />} />
           <Route path="category/:id" element={<FilterByCategory />} />
-          <Route path="all-service-result" element={<SearchAllService />} />
+          <Route path="see-all" element={<SearchAllService />} />
 
           {/* ====== PROFILE SERVICE ====== */}
           <Route path="profile-service/:id" element={<ProfileLayout />}>

@@ -12,7 +12,8 @@ const AddressPickerModal = ({
     currentProvince,
     currentRegency,
     currentDistrict,
-    loading = false
+    loading = false,
+    className = ""
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState(1); // 1: Province, 2: Regency, 3: District
@@ -98,7 +99,7 @@ const AddressPickerModal = ({
             {/* Trigger Button */}
             <div
                 onClick={() => setIsOpen(true)}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 cursor-pointer flex items-center justify-between transition-all hover:border-primary hover:shadow-sm active:scale-[99%]"
+                className={`w-full bg-white border border-gray-200 rounded-xl px-4 py-3 cursor-pointer flex items-center justify-between transition-all hover:border-primary hover:shadow-sm active:scale-[99%] ${className}`}
             >
                 <div className="flex items-center gap-3 text-gray-700">
                     <div className="bg-primary/10 p-2 rounded-lg text-primary">
@@ -121,7 +122,7 @@ const AddressPickerModal = ({
                         {/* Header */}
                         <div className="p-4 border-b border-gray-100 flex items-center gap-3 bg-gray-50/50">
                             {step > 1 && (
-                                <button onClick={handleBack} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                                <button onClick={handleBack} className="cursor-pointer p-2 hover:bg-gray-200 rounded-full transition-colors">
                                     <FaArrowLeft className="text-gray-600" />
                                 </button>
                             )}
@@ -133,7 +134,7 @@ const AddressPickerModal = ({
                                     <div className={`h-1 flex-1 rounded-full ${step >= 3 ? 'bg-primary' : 'bg-gray-200'}`}></div>
                                 </div>
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-gray-200 rounded-full text-gray-500">
+                            <button onClick={() => setIsOpen(false)} className="cursor-pointer p-2 hover:bg-gray-200 rounded-full text-gray-500">
                                 <FaTimes />
                             </button>
                         </div>
@@ -162,7 +163,7 @@ const AddressPickerModal = ({
                                         <button
                                             key={opt.value}
                                             onClick={() => handleSelect(opt.value)}
-                                            className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-between group"
+                                            className="cursor-pointer w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-between group"
                                         >
                                             <span className="text-gray-700 font-medium group-hover:text-primary transition-colors">{opt.label}</span>
                                             <FaChevronRight className="text-gray-300 text-xs group-hover:text-primary" />

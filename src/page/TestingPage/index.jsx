@@ -11,7 +11,7 @@ const TestingPage = () => {
     dispatch(getBuyerOrders());
   }, [dispatch]);
 
-  console.log("INI ORDERANNYA", buyerOrders);
+
 
   if (status === "loading") return <p>Loading order...</p>;
   if (error) return <p>Error: {error}</p>;

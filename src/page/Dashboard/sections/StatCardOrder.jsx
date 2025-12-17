@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { selectOrderSeller, selectOrderSellerStatus } from '../../../features/sellerSlice'
 import { useSelector } from 'react-redux'
+import { FaShoppingBag, FaClock, FaCheckCircle } from 'react-icons/fa'
 
 const StatCardOrder = () => {
   const orders = useSelector(selectOrderSeller)
@@ -36,14 +37,15 @@ const StatCardOrder = () => {
 
   if (status === 'loading' || isArtificialLoading) {
     return (
-      <div className="grid grid-cols-3 gap-4 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white lg:p-8 md:p-6 p-4 rounded-lg shadow-md w-full animate-pulse">
-            <div className="flex justify-between w-full md:items-end">
-              <div className="flex flex-col w-full">
-                <div className="h-6 bg-gray-200 rounded w-1/2 mb-3 md:mb-6"></div>
+          <div key={i} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm animate-pulse">
+            <div className="flex justify-between items-start">
+              <div className="flex flex-col gap-3 w-full">
+                <div className="h-4 bg-gray-100 rounded w-1/2"></div>
                 <div className="h-8 bg-gray-200 rounded w-1/4"></div>
               </div>
+              <div className="h-10 w-10 bg-gray-100 rounded-lg"></div>
             </div>
           </div>
         ))}
@@ -51,46 +53,52 @@ const StatCardOrder = () => {
     )
   }
 
+  const cards = [
+    {
+      title: "Total Pesanan",
+      count: lengthAllOrder,
+      icon: <FaShoppingBag size={20} />,
+      colors: "text-blue-600 bg-blue-50 border-blue-100",
+      iconColor: "text-blue-600",
+    },
+    {
+      title: "Pesanan Diproses",
+      count: lengthProggressOrder,
+      icon: <FaClock size={20} />,
+      colors: "text-orange-600 bg-orange-50 border-orange-100",
+      iconColor: "text-orange-600",
+    },
+    {
+      title: "Pesanan Selesai",
+      count: lengthDoneOrder,
+      icon: <FaCheckCircle size={20} />,
+      colors: "text-green-600 bg-green-50 border-green-100",
+      iconColor: "text-green-600",
+    }
+  ]
+
   return (
-    <div className="grid grid-cols-3 gap-4 w-full">
-      <div className="bg-white lg:p-8 md:p-6 p-4 rounded-lg shadow-md w-full">
-        <div className="flex justify-between w-full md:items-end">
-          <div className="flex flex-col">
-            <p className=" text-h5 font-bold text-gray-500 mb-3 md:mb-6">
-              Total Pesanan
-            </p>
-            <p className="font-semibold text-xl md:text-3xl">
-              {lengthAllOrder}
-            </p>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+      {cards.map((card, index) => (
+        <div
+          key={index}
+          className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
+        >
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col gap-1">
+              <p className="text-gray-500 font-medium text-sm lg:text-base">
+                {card.title}
+              </p>
+              <h3 className="text-2xl lg:text-3xl font-bold text-gray-800 mt-1">
+                {card.count}
+              </h3>
+            </div>
+            <div className={`p-3 rounded-xl ${card.colors} group-hover:scale-110 transition-transform duration-300`}>
+              {card.icon}
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="bg-white lg:p-8 md:p-6 p-4 rounded-lg shadow-md w-full">
-        <div className="flex justify-between w-full md:items-end">
-          <div className="flex flex-col">
-            <p className="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
-              Pesanan Diproses
-            </p>
-            <p className="font-semibold text-xl md:text-3xl">
-              {lengthProggressOrder}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white lg:p-8 md:p-6 p-4 rounded-lg shadow-md w-full">
-        <div className="flex justify-between w-full md:items-end">
-          <div className="flex flex-col">
-            <p className="text-h5 font-bold text-gray-500 mb-3 md:mb-6">
-              Pesanan Selesai
-            </p>
-            <p className="font-semibold text-xl md:text-3xl">
-              {lengthDoneOrder}
-            </p>
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   )
 }

@@ -93,7 +93,7 @@ const chat = createSlice({
 
           // Tambahkan kontak baru di posisi paling atas
           state[listKey] = [{ ...contact, isOnline }, ...state[listKey]];
-          console.log(`✅ New contact added: ${contact.name}`);
+
         }
       }
     },
@@ -132,10 +132,7 @@ const chat = createSlice({
           // Tambahkan di posisi paling atas
           state[listKey] = [updatedChat, ...conversations];
 
-          console.log(
-            `✅ Contact updated via socket: ${partnerId}`,
-            updatedChat
-          );
+
         }
       }
     },
@@ -278,7 +275,7 @@ const chat = createSlice({
 
       // Logout & Switch Account
       .addCase(logoutUser.fulfilled, (state) => {
-        console.log("LOGOUT terdeteksi, membersihkan state chat...");
+
         state.contactBuyer = null;
         state.contactBuyerStatus = "idle";
         state.contactBuyerError = null;
@@ -287,7 +284,7 @@ const chat = createSlice({
         state.contactSellerError = null;
       })
       .addCase(changeAccount.fulfilled, (state) => {
-        console.log("CHANGE ACCOUNT terdeteksi, membersihkan state chat...");
+
         state.contactBuyer = null;
         state.contactBuyerStatus = "idle";
         state.contactBuyerError = null;
@@ -296,7 +293,7 @@ const chat = createSlice({
         state.contactSellerError = null;
       })
       .addCase("auth/logout", (state) => {
-        console.log("LOGOUT SINKRON terdeteksi, membersihkan state chat...");
+
         state.contactBuyer = null;
         state.contactBuyerStatus = "idle";
         state.contactBuyerError = null;

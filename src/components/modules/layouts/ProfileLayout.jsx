@@ -103,20 +103,19 @@ const ProfileLayout = () => {
     // The pengalaman field is a comma-separated string (e.g. "Mekanik, Teknisi Listrik")
     const skills = seller?.pengalaman
       ? seller.pengalaman
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
       : [];
     return (
       <div className={`flex flex-col h-full ${isBuyer ? "mt-20" : ""}`}>
         <div
-          className={`${
-            location.pathname.includes("manage-profile")
-              ? "px-3"
-              : "xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px]"
-          } md:flex md:flex-row flex-col w-full h-full gap-[10px] md:gap-[20px] lg:gap-[30px] mx-auto`}
+          className={`${location.pathname.includes("manage-profile")
+            ? "px-3"
+            : "xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px]"
+            } bg-white md:flex md:flex-row flex-col w-full h-full gap-[10px] md:gap-[20px] lg:gap-[30px] mx-auto`}
         >
-          <div className="md:h-full flex md:flex-col md:items-center lg:px-[15px] lg:py-[35px] md:px-[10px] md:py-[30px] px-[5px] sm:py-[25px] py-[15px] gap-[15px]">
+          <div className="border-r-1 border-gray-100 md:h-full flex md:flex-col md:items-center lg:px-[15px] lg:py-[35px] md:px-[10px] md:py-[30px] px-[5px] sm:py-[25px] py-[15px] gap-[15px]">
             <img
               src={seller?.foto_toko}
               className="bg-gray-200 lg:w-[110px] lg:h-[110px] md:w-[90px] md:h-[90px] w-[75px] h-[75px] rounded-full aspect-square"

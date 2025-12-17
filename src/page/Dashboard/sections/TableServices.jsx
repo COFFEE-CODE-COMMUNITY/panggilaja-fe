@@ -5,7 +5,7 @@ import { getAllServicesByIdSeller, resetServiceSeller, selectSellerServices, sel
 import { Link } from 'react-router-dom'
 import { deleteService, resetDeleteStatus, selectDeleteServiceStatus } from '../../../features/serviceSlice'
 import Button from '../../../components/common/Button'
-import { FaTimes } from 'react-icons/fa' // Pastikan FaTimes diimpor
+import { FaTimes, FaSearch } from 'react-icons/fa' // Pastikan FaTimes diimpor
 import Input from '../../../components/common/Input'
 import ModalDeleteService from '../../../components/modules/Modal/ModalDeleteService'
 
@@ -117,16 +117,20 @@ const TableServices = () => {
 
     return (
         <>
-            <div className="flex flex-col gap-2 sm:mb-0 mb-20">
+            <div className="flex flex-col sm:mb-0 mb-20 gap-[10px]">
                 <div className='flex gap-5 items-center'>
-                    <Input
-                        placeholder="Cari jasa sekarang"
-                        className="flex-1 border-2 border-gray-200 rounded-full text-h5 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+                    {/* Search Bar - Consistent with Chat & Orders */}
+                    <div className="relative flex-1">
+                        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                        <Input
+                            placeholder="Cari jasa sekarang"
+                            className="bg-gray-50/50 w-full rounded-xl pl-10 pr-4 py-2.5 border border-gray-100 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-base"
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
                     <Button
                         variant='primary'
-                        className='px-5 py-3 text-white rounded-xl'
+                        className='px-5 py-2.5 text-white rounded-xl flex-shrink-0'
                         to={`/dashboard/manage-services/add-service`}
                     >
                         Tambah Jasa
@@ -202,7 +206,7 @@ const TableServices = () => {
                                                     setActiveServiceId(service.id);
                                                     setDeleteModal(true);
                                                 }}
-                                                className="px-4 py-2 rounded-lg border border-red-500 text-red-500 bg-white text-sm font-medium hover:bg-red-50 transition-colors"
+                                                className="cursor-pointer px-4 py-2 rounded-lg border border-red-500 text-red-500 bg-white text-sm font-medium hover:bg-red-50 transition-colors"
                                             >
                                                 Hapus
                                             </button>
@@ -248,7 +252,7 @@ const TableServices = () => {
                                                 setActiveServiceId(service.id);
                                                 setDeleteModal(true);
                                             }}
-                                            className="flex-1 py-2 rounded-lg border border-red-500 text-red-500 bg-white text-sm font-medium hover:bg-red-50 transition-colors cursor-pointer"
+                                            className="cursor-pointer flex-1 py-2 rounded-lg border border-red-500 text-red-500 bg-white text-sm font-medium hover:bg-red-50 transition-colors cursor-pointer"
                                         >
                                             Hapus
                                         </button>

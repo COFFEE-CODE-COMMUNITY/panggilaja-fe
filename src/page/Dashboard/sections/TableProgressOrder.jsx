@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../../features/authSlice'
 import { getAllServicesByIdSeller, getOrderBySellerId, selectOrderSeller, selectOrderSellerMessage, selectOrderSellerStatus, selectSellerServices } from '../../../features/sellerSlice'
 import { selectAllService } from '../../../features/serviceSlice'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { selectUpdateOrderError, selectUpdateOrderStatus, updateOrderStatus, clearOrderStatus } from '../../../features/orderSlice'
 import { FaUser } from "react-icons/fa";
 import Modal from '../../../components/common/Modal';
@@ -76,6 +76,17 @@ const TableProgressOrder = () => {
     }
 
     const dashboardDataFilterProgress = dashboardData?.filter((data) => data?.status === 'in_progress' || data?.status === 'proses')
+
+    const { searchQuery } = useOutletContext() || { searchQuery: "" };
+
+    const filteredData = dashboardDataFilterProgress?.filter(item => {
+        const query = searchQuery.toLowerCase();
+        return (
+            item.nama_jasa.toLowerCase().includes(query) ||
+            item.nama_buyer.toLowerCase().includes(query) ||
+            item.order_id.toLowerCase().includes(query)
+        );
+    });
 
     const handleHubungiPembeli = (orderId) => {
         console?.log('Hubungi pembeli untuk order:', orderId)
@@ -202,7 +213,7 @@ const TableProgressOrder = () => {
                         </div>
                     )}
 
-                    {dashboardDataFilterProgress?.map((order) => (
+                    {filteredData?.map((order) => (
                         <div key={order?.order_id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                             {/* Buyer Header */}
                             <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
@@ -270,12 +281,12 @@ const TableProgressOrder = () => {
 
             {/* Mobile View - Card Layout */}
             <div className="md:hidden space-y-3">
-                {dashboardDataFilterProgress?.length === 0 && (
+                {filteredData?.length === 0 && (
                     <div className="p-8 text-center bg-gray-50 rounded-lg">
                         <p className="text-gray-500">Belum ada pesanan</p>
                     </div>
                 )}
-                {dashboardDataFilterProgress?.map((order) => (
+                {filteredData?.map((order) => (
                     <div key={order?.order_id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
                         {/* Header Card */}
                         <div className="flex items-center justify-between mb-3">

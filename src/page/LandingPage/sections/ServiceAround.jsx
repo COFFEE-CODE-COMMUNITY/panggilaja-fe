@@ -31,7 +31,7 @@ const ServiceAround = () => {
 
   const favorites = useSelector(selectFavoriteService)
 
-  console.log(servicesAround)
+
 
   useEffect(() => {
     dispatch(getServices());
@@ -107,7 +107,7 @@ const ServiceAround = () => {
 
   const servicesSlice = services.slice(0, 8);
   const servicesAroundSlice = servicesAround?.slice(0, 8)
-  console.log(servicesAroundSlice)
+
   // Success State
   if (servicesStatus === "success") {
     return (
@@ -122,7 +122,7 @@ const ServiceAround = () => {
               Temukan jasa terbaik di area Anda
             </p>
           </div>
-          <Link to="all-service-result">
+          <Link to="see-all">
             <div className="group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300">
               <p className="xl:text-h5 text-h6 font-medium text-gray-700 group-hover:text-primary transition-colors duration-300">
                 Lihat semua

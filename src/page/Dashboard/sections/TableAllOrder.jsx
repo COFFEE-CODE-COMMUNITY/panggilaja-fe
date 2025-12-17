@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../../features/authSlice'
 import { getAllServicesByIdSeller, getOrderBySellerId, selectOrderSeller, selectOrderSellerMessage, selectOrderSellerStatus, selectSellerServices } from '../../../features/sellerSlice'
 import { selectAllService } from '../../../features/serviceSlice'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { selectUpdateOrderError, selectUpdateOrderStatus, updateOrderStatus, clearOrderStatus } from '../../../features/orderSlice'
 import { FaUser } from "react-icons/fa";
 import Modal from '../../../components/common/Modal';
@@ -39,6 +39,8 @@ const TableAllOrder = () => {
         }
     }, [updateStatus]);
 
+    const { searchQuery } = useOutletContext() || { searchQuery: "" };
+
     console.log(orders)
 
     const formatDate = (dateString) => {
@@ -60,7 +62,7 @@ const TableAllOrder = () => {
         );
 
         // 2?. Loop (map) data order kamu
-        dashboardData = orders?.data?.map((order) => {
+        const rawData = orders?.data?.map((order) => {
             // 3?. Cari detail service yang cocok pakai serviceMap
             const serviceDetail = serviceMap?.get(order?.service_id);
 
@@ -79,6 +81,16 @@ const TableAllOrder = () => {
                 nama_buyer: order?.buyer?.fullname,
                 alamat: fullAddress
             };
+        });
+
+        // FILTER logic
+        dashboardData = rawData.filter(item => {
+            const query = searchQuery.toLowerCase();
+            return (
+                item.nama_jasa.toLowerCase().includes(query) ||
+                item.nama_buyer.toLowerCase().includes(query) ||
+                item.order_id.toLowerCase().includes(query)
+            );
         });
     }
 
