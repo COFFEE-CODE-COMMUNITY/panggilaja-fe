@@ -130,13 +130,15 @@ const ProfileLayout = () => {
                 {seller?.nama_toko}
               </p>
             </div>
-            <Button
-              variant="primary"
-              className="md:block hidden md:text-h5 text-h6 text-white rounded-lg lg:w-[220px] md:w-[180px] w-[100px] py-[10px] text-center"
-              to={`/chat/${seller?.id}`}
-            >
-              Kontak Saya
-            </Button>
+            {profile?.active_role === "buyer" && (
+              <Button
+                variant="primary"
+                className="md:block hidden md:text-h5 text-h6 text-white rounded-lg lg:w-[220px] md:w-[180px] w-[100px] py-[10px] text-center"
+                to={`/chat/${seller?.id}`}
+              >
+                Kontak Saya
+              </Button>
+            )}
             <div className="md:flex hidden flex-col gap-[10px] lg:w-[200px] md:w-[180px] w-[100px]">
               <p className="text-left md:text=h5 text-h6">Ahli Dalam</p>
               <div className="w-full flex flex-col">
@@ -157,13 +159,15 @@ const ProfileLayout = () => {
                   </p>
                 ))}
               </div>
-              <Button
-                variant="primary"
-                className="md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] py-[10px] w-full flex justify-center"
-                to={`/chat/${seller?.id_seller}`}
-              >
-                Kontak Saya
-              </Button>
+              {profile?.active_role === "buyer" && (
+                <Button
+                  variant="primary"
+                  className="md:text-h5 text-h6 text-white rounded-[40px] lg:w-[220px] md:w-[180px] py-[10px] w-full flex justify-center"
+                  to={`/chat/${seller?.id_seller}`}
+                >
+                  Kontak Saya
+                </Button>
+              )}
             </div>
           </div>
           <div className="flex flex-col sm:w-5/7 w-full sm:my-0 my-[10px]">
