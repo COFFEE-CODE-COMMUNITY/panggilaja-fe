@@ -224,10 +224,10 @@ const InformationService = ({
 
         <div className="bg-gray-50/60 rounded-xl p-4">
           <h3 className="font-semibold text-gray-900 mb-2">Deskripsi Layanan</h3>
-          <div className={`text-gray-600 text-sm leading-relaxed ${!showMoreDesc ? 'line-clamp-4' : ''}`}>
+          <div className={`text-gray-600 text-sm leading-relaxed whitespace-pre-wrap ${!showMoreDesc ? 'line-clamp-4' : ''}`}>
             {description}
           </div>
-          {description.length > 200 && (
+          {(description.length > 150 || description.split('\n').length > 3) && (
             <button
               onClick={() => setShowMoreDesc(!showMoreDesc)}
               className="text-primary text-sm font-medium mt-2 hover:underline"
