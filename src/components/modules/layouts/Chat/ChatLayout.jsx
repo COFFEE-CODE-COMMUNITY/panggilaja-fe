@@ -781,6 +781,18 @@ const ChatLayout = () => {
                         text: acceptMessage,
                         sender_role: currentUserRole,
                       });
+
+                      // Cara sementara (supaya aman ketika melakukan demo)
+                      setTimeout(() => {
+                        console.log(
+                          "🔄 Force refreshing contact list after send..."
+                        );
+                        if (isBuyer) {
+                          dispatch(getContactForBuyer(myId));
+                        } else {
+                          dispatch(getContactForSeller(myId));
+                        }
+                      }, 1000);
                     };
 
                     const handleRejectNego = () => {
@@ -792,6 +804,18 @@ const ChatLayout = () => {
                         text: rejectMessage,
                         sender_role: currentUserRole,
                       });
+
+                      // Cara sementara (supaya aman ketika melakukan demo)
+                      setTimeout(() => {
+                        console.log(
+                          "🔄 Force refreshing contact list after send..."
+                        );
+                        if (isBuyer) {
+                          dispatch(getContactForBuyer(myId));
+                        } else {
+                          dispatch(getContactForSeller(myId));
+                        }
+                      }, 1000);
                     };
 
                     const handleCounterOffer = (newPrice) => {
@@ -814,6 +838,18 @@ const ChatLayout = () => {
                         text: counterNegoMessage,
                         sender_role: currentUserRole,
                       });
+
+                      // Cara sementara (supaya aman ketika melakukan demo)
+                      setTimeout(() => {
+                        console.log(
+                          "🔄 Force refreshing contact list after send..."
+                        );
+                        if (isBuyer) {
+                          dispatch(getContactForBuyer(myId));
+                        } else {
+                          dispatch(getContactForSeller(myId));
+                        }
+                      }, 1000);
                     };
 
                     return (
