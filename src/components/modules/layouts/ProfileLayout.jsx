@@ -129,7 +129,6 @@ const ProfileLayout = () => {
               <p className="lg:text-h3 md:text-h4 text-h5 font-medium w-full">
                 {seller?.nama_toko}
               </p>
-              <p className="md:text-h5 text-h6 font-light w-50">{`${seller?.address?.alamat}, ${seller?.address?.kecamatan}, ${seller?.address?.kota}, ${seller?.address?.provinsi}`}</p>
             </div>
             <Button
               variant="primary"

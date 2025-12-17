@@ -138,8 +138,6 @@ const ChatLayout = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-
-
         if (messagesResponse.data.success) {
           const formattedMessages = messagesResponse.data.data.map((msg) => ({
             id: msg.id,
@@ -182,7 +180,6 @@ const ChatLayout = () => {
 
     const joinRoom = () => {
       socket.emit("join_room", { buyerId, sellerId });
-
     };
 
     // Join immediately
@@ -190,14 +187,12 @@ const ChatLayout = () => {
 
     // Re-join on reconnection
     const handleReconnect = () => {
-
       joinRoom();
     };
 
     socket.on("reconnect", handleReconnect);
 
     return () => {
-
       socket.off("reconnect", handleReconnect);
     };
   }, [partnerId, myId, isBuyer]);
@@ -207,14 +202,11 @@ const ChatLayout = () => {
     if (!partnerId || !myId) return;
 
     const handleNewMessage = (newMessage) => {
-
-
       const messagePartnerId = isBuyer
         ? newMessage.id_seller
         : newMessage.id_buyer;
 
       if (messagePartnerId !== partnerId) {
-
         return;
       }
 
@@ -225,7 +217,6 @@ const ChatLayout = () => {
       setMessages((prevMessages) => {
         const exists = prevMessages.some((msg) => msg.id === newMessage.id);
         if (exists) {
-
           return prevMessages;
         }
 
@@ -249,7 +240,6 @@ const ChatLayout = () => {
     };
 
     const handleUserTyping = ({ userId, isTyping }) => {
-
       // Only show typing if it's from the current partner
       if (String(userId) === String(partnerId)) {
         setIsPartnerTyping(isTyping);
@@ -290,7 +280,6 @@ const ChatLayout = () => {
     // Emit typing event
     if (socket && roomId && myId) {
       if (!typingTimeoutRef.current) {
-
         socket.emit("typing", {
           roomId: roomId,
           userId: myId,
@@ -303,7 +292,6 @@ const ChatLayout = () => {
 
       // Set timeout to stop typing
       typingTimeoutRef.current = setTimeout(() => {
-
         socket.emit("typing", {
           roomId: roomId,
           userId: myId,
@@ -364,8 +352,6 @@ const ChatLayout = () => {
       }
     }
     // ------------------------------------
-
-
     socket.emit("send_message", messageData);
     setText("");
   };
@@ -390,8 +376,6 @@ const ChatLayout = () => {
     setConfirmedMessageIds((prev) => [...prev, messageId]);
 
     try {
-
-
       const agreedPriceFormatted =
         orderData.agreedPrice.toLocaleString("id-ID");
 
@@ -405,8 +389,6 @@ const ChatLayout = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-
 
       if (response.data.status === "success") {
         const orderId = response.data.data.id;
@@ -577,7 +559,7 @@ const ChatLayout = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setChatMobile(false);
-                      navigate('/chat');
+                      navigate("/chat");
                     }}
                     className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
@@ -614,7 +596,7 @@ const ChatLayout = () => {
                   <button
                     onClick={() => {
                       setChatMobile(false);
-                      navigate('/dashboard/chat');
+                      navigate("/dashboard/chat");
                     }}
                     className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
