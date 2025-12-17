@@ -1,13 +1,14 @@
 import io from "socket.io-client";
 
-const isDevelopment = import.meta.env.MODE === "development";
+const isDevelopment = import.meta.env.VITE_MODE === "development";
+console.log("sekarang lagi mode :", isDevelopment);
 
 const SOCKET_URL = isDevelopment
   ? "http://localhost:5000" // Development
   : import.meta.env.VITE_SOCKET_URL || "https://api.panggilaja.space"; // Production
 
 console.log("🔌 Socket connecting to:", SOCKET_URL);
-console.log("🌍 Environment:", import.meta.env.MODE);
+console.log("🌍 Environment:", import.meta.env.VITE_MODE);
 
 export const socket = io(SOCKET_URL, {
   // Config penting untuk production

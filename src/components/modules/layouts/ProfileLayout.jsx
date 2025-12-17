@@ -98,8 +98,6 @@ const ProfileLayout = () => {
     return <ProfileSkeleton />;
   }
 
-  console.log(seller);
-
   if (status === "success") {
     // Use pengalaman field directly from seller data
     // The pengalaman field is a comma-separated string (e.g. "Mekanik, Teknisi Listrik")
