@@ -127,12 +127,36 @@ const InformationService = ({
       sender_role: "BUYER",
     };
 
-    socket.emit("send_message", messageData);
+    const cooldownKey = `chat_inquiry_${myId}_${idService}`;
+    const lastInquiry = localStorage.getItem(cooldownKey);
+    const now = Date.now();
+    const twelveHours = 12 * 60 * 60 * 1000;
+
+    let shouldSendMessage = true;
+
+    if (lastInquiry && (now - parseInt(lastInquiry)) < twelveHours) {
+      console.log("⏳ Inquiry cooldown active. Skipping auto-message.");
+      shouldSendMessage = false;
+    }
+
+    if (shouldSendMessage) {
+      socket.emit("send_message", messageData);
+      localStorage.setItem(cooldownKey, now.toString());
+    }
 
     setTimeout(() => {
       setIsStartingChat(false);
       navigate(`/chat/${idProvider}`, {
-        state: { shouldRefreshList: true },
+        state: {
+          shouldRefreshList: true,
+          service: {
+            id: idService,
+            name: nameService,
+            price: `Rp ${parseInt(basePrice).toLocaleString('id-ID')}`,
+            image: imageUrl,
+            description: shortDescription
+          }
+        },
       });
     }, 300);
   };

@@ -1,52 +1,54 @@
 import React from "react";
-import { FaStar } from "react-icons/fa";
 import Button from "../../../../common/Button";
 import { Link } from "react-router-dom";
 
-const ServiceCard = ({ data }) => {
+const ServiceCard = ({ service, onClose }) => {
+    if (!service) return null;
+
     return (
-        <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow max-w-sm">
-            <div className="relative">
+        <div className="sticky top-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-100 p-3 flex items-center gap-3 shadow-sm animate-in slide-in-from-top duration-300">
+            {/* Image */}
+            <div className="relative w-12 h-12 flex-shrink-0">
                 <img
-                    src={data.image}
-                    alt={data.serviceName}
-                    className="w-full h-48 object-cover"
+                    src={service.image}
+                    alt={service.name}
+                    className="w-full h-full object-cover rounded-md border border-gray-200"
                 />
-                <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
-                    <FaStar className="text-yellow-400" size={14} />
-                    <span className="text-sm font-semibold">{data.rating}</span>
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-gray-800 truncate leading-tight">
+                    {service.name}
+                </h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-sm font-bold text-primary">
+                        {service.price}
+                    </span>
+                    {/* Optional: Add stock or other info here if available */}
                 </div>
             </div>
 
-            <div className="p-4">
-                <h3 className="font-bold text-lg text-gray-800 mb-2">
-                    {data.serviceName}
-                </h3>
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                    {data.description}
-                </p>
+            {/* Actions */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Detail Button - Navigates to Service Detail */}
+                <Link to={`/service/${service.id}`}>
+                    <Button className="bg-primary hover:bg-primary/90 text-white px-4 py-1.5 rounded-lg text-xs font-semibold shadow-md shadow-primary/20">
+                        Lihat Jasa
+                    </Button>
+                </Link>
 
-                {data.status && (
-                    <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="text-xs font-bold text-blue-700 text-center">
-                            💬 {data.status}
-                        </p>
-                    </div>
+                {/* Close Button (Context sensitive) */}
+                {onClose && (
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600 p-1"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 )}
-
-                <div className="flex flex-col gap-3">
-                    <div>
-                        <p className="text-xs text-gray-500 mb-1">Harga</p>
-                        <div className="flex items-baseline gap-2">
-                            <p className="text-xl font-bold text-primary">{data.price}</p>
-                        </div>
-                    </div>
-                    <Link to={`/service/${data.serviceId}`}>
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-sm font-semibold">
-                            Lihat Detail
-                        </Button>
-                    </Link>
-                </div>
             </div>
         </div>
     );

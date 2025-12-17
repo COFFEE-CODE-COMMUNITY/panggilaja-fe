@@ -28,7 +28,7 @@ const EditableImageService = ({ image, onImageChange }) => {
 
     return (
         <div
-            className="w-full lg:w-[40rem] xl:w-[42rem] overflow-hidden rounded-2xl border border-gray-100 shadow-sm relative group cursor-pointer"
+            className="bg-white w-full lg:w-[40rem] xl:w-[42rem] overflow-hidden rounded-2xl border border-gray-100 shadow-sm relative group cursor-pointer"
             onClick={handleImageClick}
         >
             <img

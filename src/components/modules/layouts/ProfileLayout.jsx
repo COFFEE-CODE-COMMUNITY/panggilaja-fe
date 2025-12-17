@@ -10,7 +10,7 @@ import Button from "../../common/Button";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllServicesByIdSeller,
-  getSellerById,
+  getPublicSellerById,
   selectSelectedSeller,
   selectSellerServices,
   selectSellerStatus,
@@ -38,7 +38,7 @@ const ProfileLayout = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(getSellerById(id));
+      dispatch(getPublicSellerById(id));
     }
   }, [id, dispatch]);
 
@@ -51,9 +51,14 @@ const ProfileLayout = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const isDashboard = location.pathname.includes("manage-profile");
+  const layoutClasses = isDashboard
+    ? "flex flex-col h-full"
+    : "flex flex-col min-h-screen xl:mt-30 lg:mt-25 md:mt-23 mt-20";
+
   const ProfileSkeleton = () => (
     <div
-      className={`flex flex-col h-full ${isBuyer ? "mt-20" : ""} animate-pulse`}
+      className={`${layoutClasses} animate-pulse`}
     >
       <div
         className={`xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] md:flex md:flex-row flex-col w-full h-full gap-[10px] md:gap-[20px] lg:gap-[30px] mx-auto`}
@@ -108,7 +113,7 @@ const ProfileLayout = () => {
         .filter(Boolean)
       : [];
     return (
-      <div className={`flex flex-col h-full ${isBuyer ? "mt-20" : ""}`}>
+      <div className={layoutClasses}>
         <div
           className={`${location.pathname.includes("manage-profile")
             ? "px-3"

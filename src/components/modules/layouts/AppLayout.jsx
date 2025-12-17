@@ -58,7 +58,7 @@ const AppLayout = () => {
   }
 
   if (location.pathname.startsWith('/profile-service')) {
-    containerClasses = 'h-screen relative flex flex-col'
+    containerClasses = 'min-h-screen relative flex flex-col'
   }
 
   if (location.pathname.includes('nego') || location.pathname.includes('profile-service') || location.pathname.includes('service')) {

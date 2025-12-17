@@ -2,6 +2,7 @@ import React from 'react';
 import { FaStar } from 'react-icons/fa';
 import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
+import ModalSelect from '../../../components/common/ModalSelect';
 
 const EditableInformationService = ({
     serviceName,
@@ -45,18 +46,15 @@ const EditableInformationService = ({
                             />
 
                             {/* Category Dropdown */}
-                            <select
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 focus:outline-none focus:border-primary"
-                            >
-                                <option value="">Pilih Kategori</option>
-                                {categories?.data?.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>
-                                        {cat.kategori}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="w-48">
+                                <ModalSelect
+                                    placeholder="Pilih Kategori"
+                                    title="Pilih Kategori"
+                                    options={categories?.data?.map(cat => ({ value: cat.id, label: cat.kategori })) || []}
+                                    value={category}
+                                    onChange={(val) => setCategory(val)}
+                                />
+                            </div>
                         </div>
                     </div>
 

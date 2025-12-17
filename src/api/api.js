@@ -38,7 +38,8 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
 
-    if (token) {
+    // ✅ CHECK FOR SKIP AUTH (Public API calls should NOT attach token if requested)
+    if (token && !config.skipAuth) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -89,9 +90,15 @@ api.interceptors.response.use(
     // ========================================
     // HANDLE 401 → REFRESH TOKEN
     // ========================================
-    if (error.response?.status === 401 && !originalRequest?._retry) {
+    // Only handle 401 if we actually have a token (user was logged in) AND skipAuth is FALSE
+    const storedToken = localStorage.getItem("accessToken");
+    if (
+      error.response?.status === 401 &&
+      !originalRequest?._retry &&
+      storedToken &&
+      !originalRequest?.skipAuth
+    ) {
       if (isRefreshing) {
-
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -160,19 +167,17 @@ api.interceptors.response.use(
           store.dispatch(logout());
         }
 
-        // ✅ PERBAIKAN: Redirect berdasarkan current path
+        // ✅ PERBAIKAN: Jangan redirect paksa. Biarkan Router atau UI menangani state "logged out".
+        // Ini mencegah "mental" ke login page saat berada di halaman publik.
+        /* 
         if (typeof window !== "undefined") {
           const currentPath = window.location.pathname;
-
-          // Jangan redirect kalau sudah di login page
           if (!currentPath.includes('/login')) {
-
-
-            // Redirect ke login dengan return URL
             const returnUrl = encodeURIComponent(currentPath);
             window.location.href = `/login?returnUrl=${returnUrl}`;
           }
-        }
+        } 
+        */
 
         return Promise.reject(refreshError);
       }

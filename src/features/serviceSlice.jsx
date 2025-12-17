@@ -9,7 +9,9 @@ export const getServices = createAsyncThunk(
   "services/getServices",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get("/services");
+      // Add timestamp to prevent browser caching of the GET request
+      const res = await api.get(`/services?t=${Date.now()}`);
+      console.log("📡 getServices fetched fresh data, timestamp:", Date.now());
       return res.data.data;
     } catch (err) {
       return rejectWithValue(
