@@ -136,8 +136,6 @@ const ChatLayout = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-
-
         if (messagesResponse.data.success) {
           const formattedMessages = messagesResponse.data.data.map((msg) => ({
             id: msg.id,
@@ -180,7 +178,6 @@ const ChatLayout = () => {
 
     const joinRoom = () => {
       socket.emit("join_room", { buyerId, sellerId });
-
     };
 
     // Join immediately
@@ -188,14 +185,12 @@ const ChatLayout = () => {
 
     // Re-join on reconnection
     const handleReconnect = () => {
-
       joinRoom();
     };
 
     socket.on("reconnect", handleReconnect);
 
     return () => {
-
       socket.off("reconnect", handleReconnect);
     };
   }, [partnerId, myId, isBuyer]);
@@ -205,14 +200,11 @@ const ChatLayout = () => {
     if (!partnerId || !myId) return;
 
     const handleNewMessage = (newMessage) => {
-
-
       const messagePartnerId = isBuyer
         ? newMessage.id_seller
         : newMessage.id_buyer;
 
       if (messagePartnerId !== partnerId) {
-
         return;
       }
 
@@ -223,7 +215,6 @@ const ChatLayout = () => {
       setMessages((prevMessages) => {
         const exists = prevMessages.some((msg) => msg.id === newMessage.id);
         if (exists) {
-
           return prevMessages;
         }
 
@@ -247,7 +238,6 @@ const ChatLayout = () => {
     };
 
     const handleUserTyping = ({ userId, isTyping }) => {
-
       // Only show typing if it's from the current partner
       if (String(userId) === String(partnerId)) {
         setIsPartnerTyping(isTyping);
@@ -288,7 +278,6 @@ const ChatLayout = () => {
     // Emit typing event
     if (socket && roomId && myId) {
       if (!typingTimeoutRef.current) {
-
         socket.emit("typing", {
           roomId: roomId,
           userId: myId,
@@ -301,7 +290,6 @@ const ChatLayout = () => {
 
       // Set timeout to stop typing
       typingTimeoutRef.current = setTimeout(() => {
-
         socket.emit("typing", {
           roomId: roomId,
           userId: myId,
@@ -333,7 +321,6 @@ const ChatLayout = () => {
       text: text,
       sender_role: isBuyer ? "BUYER" : "SELLER",
     };
-
 
     socket.emit("send_message", messageData);
 
@@ -370,8 +357,6 @@ const ChatLayout = () => {
     setConfirmedMessageIds((prev) => [...prev, messageId]);
 
     try {
-
-
       const agreedPriceFormatted =
         orderData.agreedPrice.toLocaleString("id-ID");
 
@@ -385,8 +370,6 @@ const ChatLayout = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-
 
       if (response.data.status === "success") {
         const orderId = response.data.data.id;
@@ -560,7 +543,7 @@ const ChatLayout = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setChatMobile(false);
-                      navigate('/chat');
+                      navigate("/chat");
                     }}
                     className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
@@ -597,7 +580,7 @@ const ChatLayout = () => {
                   <button
                     onClick={() => {
                       setChatMobile(false);
-                      navigate('/dashboard/chat');
+                      navigate("/dashboard/chat");
                     }}
                     className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
@@ -695,8 +678,6 @@ const ChatLayout = () => {
                     }
 
                     const handleConfirmOrder = () => {
-
-
                       // Find the last nego message for this service
                       const lastNegoMessage = [...messages]
                         .reverse()
@@ -716,7 +697,6 @@ const ChatLayout = () => {
                             agreedPrice.replace(/\./g, "").replace(",", ".")
                           ),
                         };
-
 
                         handleCreateOrder(orderData, msg.id);
                       } else {
@@ -792,7 +772,6 @@ const ChatLayout = () => {
                     const currentUserRole = isBuyer ? "BUYER" : "SELLER";
 
                     const handleAcceptNego = () => {
-
                       const acceptMessage = `Penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" DITERIMA! 🎉`;
                       socket.emit("send_message", {
                         id_buyer: isBuyer ? myId : partnerId,
@@ -815,7 +794,6 @@ const ChatLayout = () => {
                     };
 
                     const handleRejectNego = () => {
-
                       const rejectMessage = `Maaf, penawaran Anda sebesar Rp ${negoPrice} untuk layanan "${serviceName}" tidak dapat kami terima. Terima kasih atas pengertiannya.`;
                       socket.emit("send_message", {
                         id_buyer: isBuyer ? myId : partnerId,
@@ -838,8 +816,6 @@ const ChatLayout = () => {
                     };
 
                     const handleCounterOffer = (newPrice) => {
-
-
                       const formattedOriginalPrice = originalPrice.replace(
                         /\./g,
                         ""

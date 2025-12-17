@@ -5,13 +5,7 @@ import { selectSelectedSeller } from "../../features/sellerSlice";
 import { useSelector } from "react-redux";
 
 const ProfileIndex = () => {
-<<<<<<< HEAD
-  const seller = useSelector(selectSelectedSeller)
-
-=======
   const seller = useSelector(selectSelectedSeller);
-  console.log("Ini isi dari sellernya :", seller);
->>>>>>> 077907d9b6e67c1712e5a2ae1a0d8a3626f12a20
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-[30%_70%] border-1 border-gray-100 border-solid p-15 rounded-md">
