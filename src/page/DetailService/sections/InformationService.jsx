@@ -111,12 +111,13 @@ const InformationService = ({
 
     setIsStartingChat(true);
 
+
     const imageUrl =
       foto_product ||
       "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400";
     const shortDescription = description.substring(0, 50) + "...";
 
-    const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (ServiceID: ${idService}) (Harga: Rp ${basePrice.toLocaleString(
+    const autoMessage = `Halo, saya tertarik dengan layanan "${nameService}". (ServiceID: ${idService}) (Harga: Rp ${parseInt(basePrice).toLocaleString(
       "id-ID"
     )}) (Deskripsi: ${shortDescription}) (Gambar: ${imageUrl})`;
 

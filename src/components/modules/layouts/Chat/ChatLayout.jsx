@@ -324,33 +324,6 @@ const ChatLayout = () => {
       sender_role: isBuyer ? "BUYER" : "SELLER",
     };
 
-    // --- DEFERRED AUTO-MESSAGE LOGIC ---
-    // If user is Buyer AND has Service Context AND first message for this session/cooldown
-    if (isBuyer && location.state?.service) {
-      const service = location.state.service;
-      const cooldownKey = `chat_inquiry_${myId}_${service.id}`;
-      const lastInquiry = localStorage.getItem(cooldownKey);
-      const now = Date.now();
-      const twelveHours = 12 * 60 * 60 * 1000;
-
-      let shouldSendContext = true;
-      if (lastInquiry && (now - parseInt(lastInquiry)) < twelveHours) {
-        shouldSendContext = false;
-      }
-
-      if (shouldSendContext) {
-        const autoMessage = `Halo, saya tertarik dengan layanan "${service.name}". (ServiceID: ${service.id}) (Harga: ${service.price}) (Deskripsi: ${service.description || ''}) (Gambar: ${service.image})`;
-
-        socket.emit("send_message", {
-          id_buyer: myId,
-          id_seller: partnerId,
-          text: autoMessage,
-          sender_role: "BUYER"
-        });
-
-        localStorage.setItem(cooldownKey, now.toString());
-      }
-    }
     // ------------------------------------
     socket.emit("send_message", messageData);
     setText("");
@@ -859,14 +832,36 @@ const ChatLayout = () => {
                     }
 
                     // Check for Auto message
-                    const autoMessageMatch = autoMessageRegex.exec(msg.text);
+                    let autoMessageMatch = autoMessageRegex.exec(msg.text);
+
+                    // Fallback: If regex fails but it looks like an auto-message, force it (Safety Net)
+                    // We check for unique structural markers instead of just the prefix to be more robust
+                    const isLikelyAutoMessage = !autoMessageMatch && (
+                      msg.text.includes("(ServiceID:") &&
+                      msg.text.includes("(Harga:")
+                    );
+
+                    if (isLikelyAutoMessage) {
+                      // Attempt to extract at least the service name roughly
+                      const nameMatch = msg.text.match(/layanan "([\s\S]+?)"/);
+                      const fallbackName = nameMatch ? nameMatch[1] : "Layanan";
+
+                      autoMessageMatch = [
+                        msg.text,
+                        fallbackName, // 1: Name
+                        "", // 2: ID
+                        "", // 3: Price
+                        "", // 4: Desc
+                        ""  // 5: Image
+                      ];
+                    }
 
                     if (autoMessageMatch) {
                       const serviceName = autoMessageMatch[1];
-                      const serviceId = autoMessageMatch[2];
-                      const price = autoMessageMatch[3];
-                      const description = autoMessageMatch[4];
-                      const imageUrl = autoMessageMatch[5];
+                      const serviceId = autoMessageMatch[2] || "unknown";
+                      const price = autoMessageMatch[3] || "-";
+                      const description = autoMessageMatch[4] || "";
+                      const imageUrl = autoMessageMatch[5] || "https://placehold.co/100?text=Service"; // Fallback image
 
                       const cardData = {
                         image: imageUrl,
@@ -874,7 +869,7 @@ const ChatLayout = () => {
                         serviceId: serviceId,
                         description: description,
                         status: "Tanya produk ini!",
-                        price: `Rp ${price}`,
+                        price: price.startsWith("Rp") ? price : `Rp ${price}`,
                         rating: 4.5,
                       };
 
@@ -895,17 +890,20 @@ const ChatLayout = () => {
                                   src={imageUrl}
                                   alt={serviceName}
                                   className="w-full h-full object-cover"
+                                  onError={(e) => { e.target.src = "https://placehold.co/100?text=IMG"; }}
                                 />
                               </div>
                               <div className="flex-1 min-w-0 text-left">
                                 <h4 className="font-bold text-gray-800 text-sm truncate">{serviceName}</h4>
-                                <p className="text-primary font-bold text-sm mt-0.5">Rp {price}</p>
+                                <p className="text-primary font-bold text-sm mt-0.5">{cardData.price}</p>
                               </div>
-                              <Link to={`/service/${serviceId}`}>
-                                <Button className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors shadow-sm">
-                                  Lihat
-                                </Button>
-                              </Link>
+                              {serviceId !== "unknown" && (
+                                <Link to={`/service/${serviceId}`}>
+                                  <Button className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors shadow-sm">
+                                    Lihat
+                                  </Button>
+                                </Link>
+                              )}
                             </div>
 
                             <div className="flex justify-center items-center gap-2">
