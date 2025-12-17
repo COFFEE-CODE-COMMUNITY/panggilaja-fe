@@ -265,10 +265,11 @@ const ChatLayout = () => {
   // USEEFFECT #6: AUTO SCROLL
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+      setTimeout(() => {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }, 100);
     }
-  }, [messages, isPartnerTyping]);
+  }, [messages, isPartnerTyping, selectedChat]);
 
   const filteredConversations = conversations.filter((conv) =>
     conv.name?.toLowerCase().includes(searchQuery.toLowerCase())
