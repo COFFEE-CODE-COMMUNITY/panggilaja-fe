@@ -62,7 +62,7 @@ const InformationService = ({
   const myId = user?.id_buyer;
 
   let averageStar = reviews?.data?.reduce((total, review) => total + review.rating, 0) / reviews?.data?.length || 0;
-  console.log(averageStar)
+
 
   useEffect(() => {
     if (idSeller) {
@@ -147,7 +147,7 @@ const InformationService = ({
 
   useEffect(() => {
     const handleMessageReceived = (msg) => {
-      console.log("✅ Message confirmed:", msg);
+
     };
 
     socket.on("receive_message", handleMessageReceived);
@@ -211,8 +211,6 @@ const InformationService = ({
           </div>
         </div>
 
-        <div className="h-px bg-gray-100"></div>
-
         <div>
           <p className="text-sm text-gray-500 mb-1">Mulai dari</p>
           <div className="flex items-baseline gap-2">
@@ -229,10 +227,10 @@ const InformationService = ({
 
         <div className="bg-gray-50/60 rounded-xl p-4">
           <h3 className="font-semibold text-gray-900 mb-2">Deskripsi Layanan</h3>
-          <div className={`text-gray-600 text-sm leading-relaxed ${!showMoreDesc ? 'line-clamp-4' : ''}`}>
+          <div className={`text-gray-600 text-sm leading-relaxed whitespace-pre-wrap ${!showMoreDesc ? 'line-clamp-4' : ''}`}>
             {description}
           </div>
-          {description.length > 200 && (
+          {(description.length > 150 || description.split('\n').length > 3) && (
             <button
               onClick={() => setShowMoreDesc(!showMoreDesc)}
               className="text-primary text-sm font-medium mt-2 hover:underline"

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../features/authSlice';
 import socket from '../../config/socket';
 import { useContactRealtime } from '../../hooks/contactRealtime';
+import { useServiceRealtime } from '../../hooks/useServiceRealtime';
 
 const GlobalRealtimeListener = () => {
     const user = useSelector(selectCurrentUser);
@@ -12,6 +13,7 @@ const GlobalRealtimeListener = () => {
     const role = user?.active_role?.toLowerCase();
 
     useContactRealtime(socket, myId, role, isBuyer);
+    useServiceRealtime(socket);
 
     return null;
 };

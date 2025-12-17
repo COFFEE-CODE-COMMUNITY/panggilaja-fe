@@ -1,11 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
-import StatCardOrder from "./sections/StatCardOrder";
+// import StatCardOrder from "./sections/StatCardOrder";
 import { NavLink, Outlet } from "react-router-dom";
 import { seeProfile, selectSeeProfile } from "../../features/userSlice";
 import { useEffect, useState } from "react";
+import Input from "../../components/common/Input";
+import { FaSearch } from "react-icons/fa";
 
 const ManageOrderLayout = () => {
   const [isArtificialLoading, setIsArtificialLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,9 +18,20 @@ const ManageOrderLayout = () => {
   }, []);
 
   return (
-    <div className="w-full px-[15px] flex flex-col gap-[10px] min-h-screen sm:mb-20">
+    <div className="w-full px-[15px] lg:py-[10px] md:py-[5px] py-[5px] flex flex-col gap-[10px] min-h-screen sm:mb-20">
       <div className="h-full flex flex-col w-full xl:gap-8 lg:gap-7 md:gap-5 gap-3">
-        <StatCardOrder />
+        {/* <StatCardOrder /> */}
+        {/* Search Bar - Consistent with Chat & Services */}
+        <div className="relative">
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <Input
+            placeholder="Cari pesanan..."
+            className="bg-gray-50/50 w-full rounded-xl pl-10 pr-4 py-2.5 border border-gray-100 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
         <div>
           {isArtificialLoading ? (
             <div className="flex justify-start lg:gap-5 md:gap-4 gap-3">
@@ -73,7 +87,7 @@ const ManageOrderLayout = () => {
             </ul>
           )}
         </div>
-        <Outlet />
+        <Outlet context={{ searchQuery }} />
       </div>
     </div>
   );

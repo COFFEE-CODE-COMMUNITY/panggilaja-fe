@@ -10,6 +10,7 @@ import { fetchDistricts, fetchProvinces, fetchRegencies, resetDistricts, resetRe
 import Input from "../../../components/common/Input";
 import ModalSelect from "../../../components/common/ModalSelect"; // Updated import
 import AddressPickerModal from "../../../components/modules/form/AddressPickerModal"; // New import
+import ModalSuccessBecomeSeller from "../../../components/modules/Modal/ModalSuccessBecomeSeller";
 
 function ProfileMitraForm() {
     const categorys = useSelector(selectCategoryService)
@@ -102,12 +103,22 @@ function ProfileMitraForm() {
             })
     };
 
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
     useEffect(() => {
         if (statusChange === 'success') {
             dispatch(resetChangeAccountStatus());
-            navigate('add-service')
+            setShowSuccessModal(true);
         }
-    }, [statusChange])
+    }, [statusChange]);
+
+    const handleAddService = () => {
+        navigate('add-service');
+    };
+
+    const handleSkipToDashboard = () => {
+        navigate('/dashboard/manage-services');
+    };
 
     useEffect(() => {
         if (provinces.length === 0 && alamatStatus === 'idle') {
@@ -144,7 +155,7 @@ function ProfileMitraForm() {
     const categoryOptions = categorys?.data?.map(c => ({ value: c.id, label: c.kategori })) || [];
 
     return (
-        <div className="flex items-center justify-center py-5 px-4 lg:px-0">
+        <div className="flex items-center justify-center px-4 lg:px-0">
             <form
                 onSubmit={handleSubmit}
                 autoComplete="off"
@@ -226,7 +237,7 @@ function ProfileMitraForm() {
                             </div>
 
                             {/* Info Text */}
-                            <div className="flex flex-col gap-1">
+                            <div className="hidden md:flex flex-col gap-1">
                                 <p className="text-sm md:text-base font-medium text-gray-700">
                                     {file ? file.name : 'Pilih foto profil'}
                                 </p>
@@ -326,6 +337,13 @@ function ProfileMitraForm() {
                 </div>
 
             </form>
+
+            {showSuccessModal && (
+                <ModalSuccessBecomeSeller
+                    onAddService={handleAddService}
+                    onSkip={handleSkipToDashboard}
+                />
+            )}
         </div>
     );
 }

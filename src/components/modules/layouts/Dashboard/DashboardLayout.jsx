@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import BottombarDashboard from './BottombarDashboard';
+// import BottombarDashboard from './BottombarDashboard';
 import { SidebarDashboard } from './SidebarDashboard';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,10 @@ import { getContactForSeller } from '../../../../features/chatSlice';
 import { getAllServicesByIdSeller, getOrderBySellerId } from '../../../../features/sellerSlice';
 import ModalSwitchAccount from '../../Modal/ModalSwitchAccount';
 import socket from '../../../../config/socket';
+import { FaArrowLeft, FaRegComment } from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import { selectContactSeller } from '../../../../features/chatSlice';
+import MobileHeader from './MobileHeader';
 
 const DashboardLayout = () => {
   const location = useLocation()
@@ -60,7 +64,7 @@ const DashboardLayout = () => {
     if (!user?.id_seller) return;
 
     const handleNewOrder = (data) => {
-      console.log("🔔 New order received (Socket):", data);
+
       // Dispatch getOrderBySellerId to refresh the list and sidebar badge
       dispatch(getOrderBySellerId(user.id_seller));
     };
@@ -72,11 +76,22 @@ const DashboardLayout = () => {
     };
   }, [dispatch, user?.id_seller]);
 
+  // Logic for Mobile Header is now in MobileHeader.jsx
+
+  const isMainDashboard = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
+  // const title = getPageTitle(location.pathname); // Moved to MobileHeader
+
+  // Mobile Header Component - Moved to separate file
+
   return (
-    <div className='flex relative h-screen'>
+    <div className='flex relative h-screen bg-gray-50'>
       <SidebarDashboard />
-      <BottombarDashboard />
-      <main className={`flex-1 overflow-y-auto`}>
+      {/* <BottombarDashboard /> */}
+
+      {/* Show Mobile Header on all pages except chat details */}
+      {!location.pathname.includes('/chat/') && <MobileHeader />}
+
+      <main className={`flex-1 ${location.pathname.includes('/chat/') ? 'overflow-hidden h-[100dvh]' : 'overflow-y-auto'} ${!location.pathname.includes('/chat/') ? 'pt-[70px] md:pt-0' : ''}`}>
         <Outlet />
       </main>
     </div>

@@ -61,7 +61,7 @@ export const SidebarDashboard = () => {
     dispatch(changeAccount({ targetRole: "buyer" }));
   };
 
-  console.log(user);
+
 
   useEffect(() => {
     if (user && user.id_seller) {

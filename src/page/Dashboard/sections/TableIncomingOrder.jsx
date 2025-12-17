@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../../features/authSlice'
 import { getAllServicesByIdSeller, getOrderBySellerId, selectOrderSeller, selectOrderSellerMessage, selectOrderSellerStatus, selectSellerServices } from '../../../features/sellerSlice'
 import { selectAllService } from '../../../features/serviceSlice'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { selectUpdateOrderError, selectUpdateOrderStatus, updateOrderStatus, clearOrderStatus } from '../../../features/orderSlice'
 import { FaUser } from "react-icons/fa";
 import Modal from '../../../components/common/Modal';
@@ -39,6 +39,17 @@ const TableIncomingOrder = () => {
     }, [updateStatus]);
 
     const [dashboardData, setDashboardData] = useState([]);
+    const { searchQuery } = useOutletContext() || { searchQuery: "" };
+
+    // Filter Logic
+    const filteredData = dashboardData.filter(item => {
+        const query = searchQuery.toLowerCase();
+        return (
+            item.nama_jasa.toLowerCase().includes(query) ||
+            item.nama_buyer.toLowerCase().includes(query) ||
+            item.order_id.toLowerCase().includes(query)
+        );
+    });
 
     useEffect(() => {
         if (user?.id_seller) {
@@ -77,7 +88,7 @@ const TableIncomingOrder = () => {
 
 
     const handleHubungiPembeli = (orderId) => {
-        console.log('Hubungi pembeli untuk order:', orderId)
+
         navigate('/dashboard/chat/' + orderId)
         // setOpenDropdown(null) // This line was commented out in the instruction, keeping it commented.
     }
@@ -89,7 +100,7 @@ const TableIncomingOrder = () => {
 
     const confirmFinishOrder = () => {
         if (selectedOrderId) {
-            console.log('Menandai orderan selesai:', selectedOrderId)
+
             dispatch(updateOrderStatus({
                 orderId: selectedOrderId,
                 status: 'completed'
@@ -189,7 +200,7 @@ const TableIncomingOrder = () => {
                 </div>
 
                 <div className="space-y-4 mt-2">
-                    {dashboardData?.map((order) => (
+                    {filteredData?.map((order) => (
                         <div key={order.order_id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                             {/* Buyer Header */}
                             <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
@@ -257,7 +268,7 @@ const TableIncomingOrder = () => {
             {/* Mobile View - Card Layout */}
             <div className="md:hidden space-y-3">
                 {
-                    dashboardData.map((order) => (
+                    filteredData?.map((order) => (
                         <div key={order.order_id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
                             {/* Header Card */}
                             <div className="flex items-center justify-between mb-3">

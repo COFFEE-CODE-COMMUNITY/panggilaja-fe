@@ -30,16 +30,16 @@ const DetailService = () => {
   }, [dispatch, id]);
 
   useEffect(() => {
-    console.log("Service loaded:", service);
+
     if (service?.id) {
-      console.log("Dispatching getReviewServicesById with ID:", service.id);
+
       dispatch(getReviewServicesById(service.id));
     } else {
-      console.log("Service ID not available yet");
+
     }
   }, [dispatch, service?.id]);
 
-  console.log("Current reviews state:", { reviews, reviewStatus });
+
 
   const [isArtificialLoading, setIsArtificialLoading] = React.useState(true);
 
@@ -92,14 +92,14 @@ const DetailService = () => {
   }
 
   return (
-    <div className="bg-gray-50/60 min-h-screen w-full pt-28 pb-12">
+    <div className="bg-gray-50/60 min-h-screen w-full lg:pt-28 md:pt-24 pt-20 pb-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-2xl">
         {status === "loading" && <div className="w-full h-screen">loading</div>}
         {status === "success" && (
           <div className="lg:flex lg:gap-8 items-start">
             {/* Left Column */}
             <div className="flex flex-col lg:w-auto gap-6 shrink-0">
-              <div className="bg-white p-4">
+              <div className="bg-white md:p-4 p-0">
                 <ImageService image={service.foto_product} />
               </div>
               <div className="bg-white p-6 hidden lg:block max-w-[42rem]">
@@ -108,8 +108,8 @@ const DetailService = () => {
             </div>
 
             {/* Right Column */}
-            <div className="flex-1 mt-6 lg:mt-0 w-full min-w-0">
-              <div className="bg-white p-6 md:p-8 sticky top-28">
+            <div className="flex-1 mt-1 lg:mt-0 w-full min-w-0">
+              <div className="bg-white p-3 md:p-5 lg:p-8 sticky top-28">
                 <InformationService
                   description={service.deskripsi}
                   idProvider={service.seller_id}

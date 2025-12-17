@@ -5,8 +5,8 @@ import { selectSelectedSeller } from '../../features/sellerSlice'
 import { useSelector } from 'react-redux'
 
 const ProfileIndex = () => {
-    const seller = useSelector(selectSelectedSeller)
-    console.log(seller)
+  const seller = useSelector(selectSelectedSeller)
+
   return (
     <div className='min-h-screen'>
       {seller.deskripsi_toko}

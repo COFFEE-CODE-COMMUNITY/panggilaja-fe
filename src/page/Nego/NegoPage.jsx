@@ -96,7 +96,7 @@ const NegoPage = () => {
       sender_role: "BUYER",
     };
 
-    console.log("📤 Mengirim penawaran via socket:", messageData);
+
     socket.emit("send_message", messageData);
 
     // Navigate dengan state refresh
