@@ -7,40 +7,22 @@ import {
   useParams,
 } from "react-router-dom";
 import Button from "../../common/Button";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  getAllServicesByIdSeller,
-  getSellerById,
-  selectSelectedSeller,
-  selectSellerServices,
-  selectSellerStatus,
-  selectServiceSellerStatus,
-} from "../../../features/sellerSlice";
-import { selectCurrentUser } from "../../../features/authSlice";
+import useAuthStore from "../../../store/useAuthStore";
+import { useGetSellerById, useGetSellerServices } from "../../../hooks/useSellers";
 
 const ProfileLayout = () => {
   const { id } = useParams();
 
-  const dispatch = useDispatch();
-  const seller = useSelector(selectSelectedSeller);
-  const status = useSelector(selectSellerStatus);
-  const profile = useSelector(selectCurrentUser);
+  const profile = useAuthStore(state => state.user);
   const location = useLocation();
-
-  const sellerService = useSelector(selectSellerServices);
-  const sellerServiceStatus = useSelector(selectServiceSellerStatus);
 
   const isBuyer = profile?.active_role === "buyer";
 
-  useEffect(() => {
-    dispatch(getAllServicesByIdSeller(id));
-  }, [dispatch, id]);
+  const { data: sellerData, isLoading: sellerLoading, isSuccess: sellerSuccess } = useGetSellerById(id);
+  const seller = sellerData || null;
+  const status = sellerLoading ? 'loading' : sellerSuccess ? 'success' : 'error';
 
-  useEffect(() => {
-    if (id) {
-      dispatch(getSellerById(id));
-    }
-  }, [id, dispatch]);
+  const { data: sellerService, isLoading: sellerServiceStatus } = useGetSellerServices(id);
 
   const [isArtificialLoading, setIsArtificialLoading] = React.useState(true);
 

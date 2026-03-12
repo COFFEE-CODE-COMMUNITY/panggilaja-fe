@@ -1,52 +1,33 @@
 import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { getServices, getServicesAround, selectAllService, selectServiceAround, selectServiceAroundStatus } from '../../features/serviceSlice'
-import { selectAccessToken, selectCurrentUser } from '../../features/authSlice'
-import { seeAddress, selectSeeAddress } from '../../features/userSlice'
+import { useGetServices, useGetServicesAround } from '../../hooks/useServices'
+import useAuthStore from '../../store/useAuthStore'
+import { useGetAddresses } from '../../hooks/useUsers'
 import ServiceAround from '../LandingPage/sections/ServiceAround'
 import ServiceCard from '../../components/modules/Cards/ServiceCard'
 import NoServiceNearby from '../../store/NoServiceNearby'
+import { useParams } from 'react-router-dom'
 
 const FilterByCategory = () => {
     const { id } = useParams()
 
-    const dispatch = useDispatch();
-    const user = useSelector(selectCurrentUser)
-    const token = useSelector(selectAccessToken)
-    const address = useSelector(selectSeeAddress)
+    const user = useAuthStore(state => state.user)
+    const token = useAuthStore(state => state.accessToken)
 
-    const servicesAround = useSelector(selectServiceAround)
-    const servicesAroundStatus = useSelector(selectServiceAroundStatus)
-    const allService = useSelector(selectAllService)
+    const { data: addressResponse } = useGetAddresses(user?.id_buyer);
+    const userKecamatan = addressResponse?.kecamatan;
 
+    const { data: allServicesResponse } = useGetServices();
+    const allService = allServicesResponse?.data || allServicesResponse || [];
 
-
-    useEffect(() => {
-        if (user?.id_buyer && token) {
-            dispatch(seeAddress(user?.id_buyer))
-        }
-    }, [user?.id_buyer, token]);
-
-    useEffect(() => {
-        if (address?.data?.kecamatan && user?.id) {
-            dispatch(getServicesAround({ id: user.id, kecamatan: address?.data?.kecamatan }))
-        }
-    }, [address?.data?.kecamatan])
-
+    const { data: servicesAroundResponse, isFetching } = useGetServicesAround(user?.id_buyer, userKecamatan);
     let servicesByCategory = []
 
     if (token) {
-        servicesByCategory = servicesAround?.filter((service) => service?.kategori_id === id)
+        servicesByCategory = servicesAroundResponse?.data?.filter((service) => service?.kategori_id === id)
     } else {
         servicesByCategory = allService?.filter((service) => service?.kategori_id === id)
     }
-
-
-
-
-
-
+    console.log(servicesAroundResponse)
     const SearchSkeleton = () => (
         <div className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm animate-pulse">
             <div className="w-full h-48 bg-gray-200" />
@@ -61,7 +42,7 @@ const FilterByCategory = () => {
         </div>
     );
 
-    if (servicesAroundStatus === 'loading') {
+    if (isFetching) {
         return (
             <div className='min-h-screen xl:px-[150px] sm:mt-20 lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] py-[15px] flex flex-col gap-[15px]'>
                 <div className='grid md:grid-cols-4 grid-cols-2 gap-x-1 gap-y-4 md:gap-x-2 md:gap-y-5 lg:gap-x-3 lg:gap-y-6'>

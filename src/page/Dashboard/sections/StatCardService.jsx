@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { selectCurrentUser } from '../../../features/authSlice'
-import { useDispatch, useSelector } from 'react-redux'
-import { getAllServicesByIdSeller, selectSellerServices, selectServiceSellerStatus } from '../../../features/sellerSlice'
-import { selectDeleteServiceStatus } from '../../../features/serviceSlice'
+import useAuthStore from '../../../store/useAuthStore'
+import { useGetSellerServices } from '../../../hooks/useSellers'
 
 const StatCardService = () => {
-  const user = useSelector(selectCurrentUser)
-  const dispatch = useDispatch()
+  const user = useAuthStore(state => state.user)
 
-  const servicesSeller = useSelector(selectSellerServices)
-  const status = useSelector(selectServiceSellerStatus)
-
-  useEffect(() => {
-    if (user && user.id_seller) {
-      dispatch(getAllServicesByIdSeller(user.id_seller));
-    }
-  }, [dispatch, user]);
+  const { data: servicesResponse, status: servicesQueryStatus } = useGetSellerServices(user?.id_seller);
+  const servicesSeller = servicesResponse || null;
+  const status = servicesQueryStatus === 'pending' ? 'loading' : servicesQueryStatus;
 
   const [isArtificialLoading, setIsArtificialLoading] = useState(true);
 

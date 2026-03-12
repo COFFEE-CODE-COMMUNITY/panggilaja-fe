@@ -1,18 +1,10 @@
 import { CategoriesService } from "../dummy/CategoryData";
 import Card from "../../../components/common/Card";
-import { useDispatch, useSelector } from "react-redux";
-import { getCategoryService, selectCategoryService, selectCategoryServiceStatus } from "../../../features/serviceSlice";
-import { useEffect } from "react";
+import { useGetCategoryService } from "../../../hooks/useServices";
 
 const Category = () => {
-  const category = useSelector(selectCategoryService)
-  const categoryStatus = useSelector(selectCategoryServiceStatus)
-
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(getCategoryService())
-  }, [])
+  const { data: categoryData, status: categoryStatus } = useGetCategoryService();
+  const category = categoryData || { data: [] };
 
   let categoryMap = []
 

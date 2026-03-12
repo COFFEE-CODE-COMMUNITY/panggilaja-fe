@@ -1,34 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { FaArrowLeft, FaEdit, FaUser, FaEnvelope, FaMapMarkerAlt, FaCity, FaBuilding, FaMailBulk } from 'react-icons/fa'
-import { selectCurrentUser } from '../../features/authSlice'
-import { seeAddress, seeProfile, selectSeeAddress, selectSeeAddressStatus, selectSeeProfile, selectSeeProfileStatus, selectUpdateProfileStatus } from '../../features/userSlice'
-import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
+import useAuthStore from '../../store/useAuthStore'
+import { useGetProfile, useGetAddresses } from '../../hooks/useUsers'
 
 
 const ProfileSetting = () => {
-    const user = useSelector(selectCurrentUser)
-    const dispatch = useDispatch()
+    const user = useAuthStore(state => state.user)
     const navigate = useNavigate()
 
-    const profile = useSelector(selectSeeProfile)
-    const statusProfile = useSelector(selectSeeProfileStatus)
-    const statusUpdate = useSelector(selectUpdateProfileStatus)
+    const { data: profileResponse } = useGetProfile(user?.id_buyer)
+    const profile = profileResponse || null
 
-    const address = useSelector(selectSeeAddress)
-    const statusAddress = useSelector(selectSeeAddressStatus)
-
-    useEffect(() => {
-        if (user?.id_buyer && statusProfile === 'idle') {
-            dispatch(seeProfile(user.id_buyer))
-        }
-    }, [statusProfile, dispatch, user?.id_buyer, statusUpdate, profile])
-
-    useEffect(() => {
-        if (user?.id_buyer && statusAddress === 'idle') {
-            dispatch(seeAddress(user.id_buyer))
-        }
-    }, [dispatch, user?.id_buyer, statusAddress, address?.data])
+    const { data: addressResponse } = useGetAddresses(user?.id_buyer)
+    const address = addressResponse || null
 
     return (
         <div className='w-full animate-fade-in'>

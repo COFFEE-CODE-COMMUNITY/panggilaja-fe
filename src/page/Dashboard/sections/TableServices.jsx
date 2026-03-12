@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { selectCurrentUser } from '../../../features/authSlice'
-import { getAllServicesByIdSeller, resetServiceSeller, selectSellerServices, selectServiceSellerStatus } from '../../../features/sellerSlice'
+import useAuthStore from '../../../store/useAuthStore'
+import { useGetSellerServices } from '../../../hooks/useSellers'
 import { Link } from 'react-router-dom'
-import { deleteService, resetDeleteStatus, selectDeleteServiceStatus } from '../../../features/serviceSlice'
+import { useDeleteService } from '../../../hooks/useServices'
 import Button from '../../../components/common/Button'
 import { FaTimes, FaSearch } from 'react-icons/fa' // Pastikan FaTimes diimpor
 import Input from '../../../components/common/Input'
 import ModalDeleteService from '../../../components/modules/Modal/ModalDeleteService'
 
 const TableServices = () => {
-    const user = useSelector(selectCurrentUser)
-    const dispatch = useDispatch()
+    const user = useAuthStore(state => state.user)
 
     const [search, setSearch] = useState('')
     const [activeServiceId, setActiveServiceId] = useState(null)
     const [deleteModal, setDeleteModal] = useState(false)
 
-    const servicesSeller = useSelector(selectSellerServices)
-    const status = useSelector(selectServiceSellerStatus)
+    const { data: servicesResponse, status: servicesQueryStatus, refetch: refetchServices } = useGetSellerServices(user?.id_seller);
+    console.log(servicesResponse)
+    const servicesSeller = servicesResponse || null;
+    const status = servicesQueryStatus === 'pending' ? 'loading' : servicesQueryStatus;
 
-    const statusDelete = useSelector(selectDeleteServiceStatus)
+    const { mutateAsync: deleteServiceMutation, status: deleteMutationStatus, reset: resetDeleteStatus } = useDeleteService();
+    const statusDelete = deleteMutationStatus === 'pending' ? 'loading' : deleteMutationStatus;
 
     const findServiceSeller = servicesSeller?.data?.filter((service) => service?.nama_jasa?.toLowerCase().includes(search.toLowerCase()))
 
@@ -28,30 +29,19 @@ const TableServices = () => {
         setActiveServiceId(activeServiceId === serviceId ? null : serviceId);
     };
 
-    useEffect(() => {
-        if (user && user.id_seller) {
-            dispatch(getAllServicesByIdSeller(user.id_seller));
+    const handleDeleteService = async () => {
+        if (!activeServiceId) return;
+        try {
+            await deleteServiceMutation(activeServiceId);
+            refetchServices();
+            setDeleteModal(false);
+            setActiveServiceId(null);
+            resetDeleteStatus();
+        } catch (error) {
+            console.error("Failed to delete service:", error);
         }
-    }, [dispatch, user]);
+    };
 
-    useEffect(() => {
-        if (statusDelete === 'success') {
-            if (user?.id_seller) {
-                dispatch(getAllServicesByIdSeller(user?.id_seller));
-                dispatch(resetDeleteStatus())
-            }
-            setDeleteModal(false)
-        }
-    }, [dispatch, statusDelete, user?.id_seller])
-
-    const [isArtificialLoading, setIsArtificialLoading] = useState(true);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsArtificialLoading(false);
-        }, 300);
-        return () => clearTimeout(timer);
-    }, []);
 
     const ManageServiceSkeleton = () => (
         <div className="flex flex-col gap-2 sm:mb-0 mb-20">
@@ -111,7 +101,7 @@ const TableServices = () => {
     );
 
     // Render loading state
-    if (status === 'loading' || isArtificialLoading) {
+    if (status === 'loading') {
         return <ManageServiceSkeleton />
     }
 
@@ -266,7 +256,7 @@ const TableServices = () => {
                 {deleteModal && (
                     <ModalDeleteService
                         isLoading={statusDelete === 'loading'}
-                        onSubmit={() => activeServiceId && dispatch(deleteService(activeServiceId))}
+                        onSubmit={handleDeleteService}
                         onCancel={() => {
                             if (statusDelete === 'loading') return;
                             setDeleteModal(false);

@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
 import AuthLayout from "../../components/modules/layouts/AuthLayout";
 import RegisterForm from "./sections/RegisterForm";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import {
-  registerUser,
-  selectRegisterMessage,
-  selectRegisterStatus,
-} from "../../features/authSlice";
+import { useRegister } from "../../hooks/useAuth";
 
 const RegisterPage = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
@@ -18,8 +11,10 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const message = useSelector(selectRegisterMessage);
-  const status = useSelector(selectRegisterStatus);
+  const { mutate: register, status: mutationStatus, error } = useRegister();
+
+  const status = mutationStatus === "pending" ? "loading" : mutationStatus;
+  const message = error?.response?.data?.message || error?.message || "";
 
   const handleChangeUsername = (e) => {
     setUsername(e.target.value);
@@ -40,7 +35,7 @@ const RegisterPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (username && email && password === confirmPassword) {
-      dispatch(registerUser({ username, email, password }));
+      register({ username, email, password });
     }
   };
 

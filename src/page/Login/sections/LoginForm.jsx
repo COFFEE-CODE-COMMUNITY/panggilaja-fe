@@ -10,33 +10,23 @@ import {
   FaShieldAlt,
 } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  loginUser,
-  selectAccessToken,
-  selectCurrentUser,
-  selectLoginMessage,
-  selectLoginStatus,
-  resetLoginStatus,
-} from "../../../features/authSlice";
+import useAuthStore from "../../../store/useAuthStore";
+import { useLogin } from "../../../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 
 const LoginForm = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const status = useSelector(selectLoginStatus);
-  const message = useSelector(selectLoginMessage);
+  const currentUser = useAuthStore(state => state.user);
+  const token = useAuthStore(state => state.accessToken);
 
-  const currentUser = useSelector(selectCurrentUser);
-  const token = useSelector(selectAccessToken);
-
-  useEffect(() => {
-    dispatch(resetLoginStatus());
-  }, [dispatch]);
+  const { mutate: login, status: mutationStatus, error, isSuccess } = useLogin();
+  const status = mutationStatus === "pending" ? "loading" : mutationStatus;
+  const message = error?.response?.data?.message || error?.message || "";
 
   const from = location.state?.from?.pathname || "/";
 
@@ -57,7 +47,15 @@ const LoginForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (email && password) {
-      dispatch(loginUser({ email, password }));
+      login({ email, password }, {
+        onSuccess: (data) => {
+          console.log(data)
+          const token = data.data.accessToken
+          const user = jwtDecode(token).user
+          console.log(user)
+          useAuthStore.getState().setAuth(token, user);
+        }
+      });
     }
   };
 
@@ -67,11 +65,6 @@ const LoginForm = () => {
     window.location.replace("https://api.panggilaja.space/auth/google");
   };
 
-  useEffect(() => {
-    if (status === "success" && currentUser) {
-      navigate(from, { replace: true });
-    }
-  }, [status, currentUser, navigate, from]);
   return (
     <div className="flex flex-col gap-4 md:gap-4 h-full">
       {/* Header Section */}
@@ -89,7 +82,7 @@ const LoginForm = () => {
       </div>
 
       {/* Error Message */}
-      {status === "failed" && message && (
+      {status === "error" && message && (
         <div className="bg-red-50/50 border border-red-200 p-4 rounded-xl animate-shake shadow-sm mb-2">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0 p-1 bg-red-100 rounded-full mt-0.5">
@@ -198,8 +191,9 @@ const LoginForm = () => {
         <Button
           type="submit"
           className="group w-full h-12 md:h-14 text-base md:text-lg font-bold bg-primary hover:bg-primary/90 text-white rounded-xl flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 mt-2"
+          disabled={status === "loading"}
         >
-          <span>Masuk Sekarang</span>
+          <span>{status === "loading" ? "Memproses..." : "Masuk Sekarang"}</span>
         </Button>
       </form>
 

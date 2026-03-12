@@ -2,42 +2,32 @@ import React, { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Header from './Header/Header'
 import Footer from './Footer'
-import { useDispatch, useSelector } from 'react-redux'
-import { selectAccessToken, selectCurrentUser, selectChangeAccountStatus } from '../../../features/authSlice'
-import { seeAddress, selectSeeAddress, selectSeeAddressStatus } from '../../../features/userSlice'
+import useAuthStore from "../../../store/useAuthStore";
+import { useGetAddresses } from "../../../hooks/useUsers";
 
 const AppLayout = () => {
-  const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation();
 
-  const user = useSelector(selectCurrentUser)
-  const token = useSelector(selectAccessToken)
-  const address = useSelector(selectSeeAddress)
-  const changeAccountStatus = useSelector(selectChangeAccountStatus)
+  const user = useAuthStore(state => state.user)
+  const token = useAuthStore(state => state.accessToken)
 
-  const addressStatus = useSelector(selectSeeAddressStatus);
+  let isAddressMissing = false
+  let addressStatus = false
 
-  const addressData = address?.data;
-  const isAddressMissing = !addressData || !addressData.alamat || addressData.alamat === null;
+  if (token) {
+    const { data: addressResponse, isSuccess: addressStatus } = useGetAddresses(user?.id_buyer);
+    isAddressMissing = !addressResponse?.alamat
+  }
 
   useEffect(() => {
-    // Prevent redirect if we are currently switching accounts
-    if (changeAccountStatus === 'loading') return;
-
     if (user?.active_role === 'seller') {
       navigate('/dashboard')
     }
-  }, [user?.active_role, changeAccountStatus])
+  }, [user?.active_role])
 
   useEffect(() => {
-    if (user?.id_buyer && token && (address === null || address?.data?.alamat === null)) {
-      dispatch(seeAddress(user.id_buyer))
-    }
-  }, [dispatch, user?.id_buyer, token]);
-
-  useEffect(() => {
-    if (isAddressMissing && token && addressStatus === 'success') {
+    if (isAddressMissing && token && addressStatus) {
       navigate('/form-detail-profile', { replace: true });
     }
   }, [isAddressMissing, token, addressStatus, navigate]);

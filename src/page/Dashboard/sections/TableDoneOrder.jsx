@@ -1,38 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { selectCurrentUser } from '../../../features/authSlice'
-import { getOrderBySellerId, selectOrderSeller, selectOrderSellerStatus, selectOrderSellerMessage, selectSellerServices } from '../../../features/sellerSlice'
-import { selectAllService } from '../../../features/serviceSlice'
+import useAuthStore from '../../../store/useAuthStore'
+import { useGetOrdersBySellerId, useGetSellerServices } from '../../../hooks/useSellers'
 import { useNavigate, useOutletContext } from 'react-router-dom'
-import { selectUpdateOrderError, selectUpdateOrderStatus, updateOrderStatus, clearOrderStatus } from '../../../features/orderSlice'
+import { useUpdateOrderStatus } from '../../../hooks/useOrders'
 import { FaUser } from "react-icons/fa";
 
 const TableDoneOrder = () => {
-    const user = useSelector(selectCurrentUser)
-    const dispatch = useDispatch()
-    const orders = useSelector(selectOrderSeller)
-    const ordersStatus = useSelector(selectOrderSellerStatus)
-    const ordersMessage = useSelector(selectOrderSellerMessage)
-    const allService = useSelector(selectSellerServices)
+    const user = useAuthStore(state => state.user)
     const navigate = useNavigate()
-    const updateStatus = useSelector(selectUpdateOrderStatus)
-    const updateError = useSelector(selectUpdateOrderError)
 
-    // Refresh orders when updateStatus is success
-    useEffect(() => {
-        if (updateStatus === 'success' && user?.id_seller) {
-            dispatch(getOrderBySellerId(user?.id_seller));
-            dispatch(clearOrderStatus()); // Clear status after refresh
-        }
-    }, [updateStatus, user?.id_seller, dispatch]);
+    const { data: ordersResponse, status: ordersQueryStatus, refetch: refetchOrders } = useGetOrdersBySellerId(user?.id_seller);
+    const orders = ordersResponse || null;
+    const ordersStatus = ordersQueryStatus === 'pending' ? 'loading' : ordersQueryStatus;
 
-    useEffect(() => {
-        if (user && user?.id_seller) {
-            if (ordersStatus === 'idle') {
-                dispatch(getOrderBySellerId(user?.id_seller));
-            }
-        }
-    }, [dispatch, ordersStatus, user]);
+    const { data: servicesResponse } = useGetSellerServices(user?.id_seller);
+    const allService = servicesResponse || null;
+
+    const { mutateAsync: updateOrderStatusMutation, status: updateMutationStatus, reset: resetUpdateStatus } = useUpdateOrderStatus();
+    const updateStatus = updateMutationStatus === 'pending' ? 'loading' : updateMutationStatus;
+
+    const handleConfirmFinishOrderSuccess = () => {
+        refetchOrders();
+        resetUpdateStatus();
+    };
 
     const formatDate = (dateString) => {
         if (!dateString) return 'Tanggal tidak tersedia';
@@ -89,12 +79,17 @@ const TableDoneOrder = () => {
         navigate('/dashboard/chat/' + orderId)
     }
 
-    const handleOrderanSelesai = (orderId) => {
+    const handleOrderanSelesai = async (orderId) => {
         console?.log('Menandai orderan selesai:', orderId)
-        dispatch(updateOrderStatus({
-            orderId: orderId,
-            status: 'completed'
-        }))
+        try {
+            await updateOrderStatusMutation({
+                orderId: orderId,
+                status: 'completed'
+            });
+            handleConfirmFinishOrderSuccess();
+        } catch (error) {
+            console.error("Failed to finish order", error);
+        }
     }
 
 

@@ -1,36 +1,26 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { selectCurrentUser } from "../../features/authSlice";
-import InputForm from "../../components/modules/form/InputForm";
-import {
-    resetUpdateProfile,
-    seeAddress,
-    seeProfile,
-    selectSeeAddress,
-    selectSeeProfile,
-    selectUpdateProfileError,
-    selectUpdateProfileStatus,
-    updateProfile
-} from "../../features/userSlice";
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaCamera, FaSave, FaMapMarkedAlt, FaUserEdit } from "react-icons/fa";
-import { fetchDistricts, fetchProvinces, fetchRegencies, resetDistricts, resetRegencies, selectAlamatStatus, selectAllDistricts, selectAllProvinces, selectAllRegencies } from "../../features/addressSlice";
+import { useGetProfile, useGetAddresses, useUpdateProfile } from "../../hooks/useUsers";
+import { useGetProvinces, useGetRegencies, useGetDistricts } from "../../hooks/useAddress";
+import useAuthStore from "../../store/useAuthStore";
 import ModalSelect from "../../components/common/ModalSelect";
 import AddressPickerModal from "../../components/modules/form/AddressPickerModal";
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaCamera, FaMapMarkedAlt, FaSave, FaUserEdit } from "react-icons/fa";
+import InputForm from "../../components/modules/form/InputForm";
 
 const EditProfile = () => {
-    const dispatch = useDispatch();
-    const user = useSelector(selectCurrentUser);
-    const navigate = useNavigate()
-    const statusEdit = useSelector(selectUpdateProfileStatus)
-    const statusMessage = useSelector(selectUpdateProfileError)
-    const address = useSelector(selectSeeAddress)
-    const profile = useSelector(selectSeeProfile)
+    const user = useAuthStore(state => state.user);
+    const navigate = useNavigate();
 
-    const provinces = useSelector(selectAllProvinces)
-    const regencies = useSelector(selectAllRegencies)
-    const districts = useSelector(selectAllDistricts)
-    const alamatStatus = useSelector(selectAlamatStatus)
+    const { data: profileResponse, refetch: refetchProfile } = useGetProfile(user?.id_buyer);
+    const profile = profileResponse || null;
+
+    const { data: addressResponse, refetch: refetchAddress } = useGetAddresses(user?.id_buyer);
+    const address = addressResponse || null;
+
+    const { mutate: updateProfileMutation, status: mutationStatus, error: mutationError } = useUpdateProfile();
+    const statusEdit = mutationStatus === "pending" ? "loading" : mutationStatus;
+    const statusMessage = mutationError ? mutationError.message : null;
 
     const [fullname, setFullname] = useState('');
     const [alamat, setAlamat] = useState('');
@@ -43,13 +33,23 @@ const EditProfile = () => {
     const [preview, setPreview] = useState('');
     const [isFileChanged, setIsFileChanged] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
-    const [shouldLoadKota, setShouldLoadKota] = useState(false);
-    const [shouldLoadKecamatan, setShouldLoadKecamatan] = useState(false);
+
+    const { data: provincesResponse, isLoading: isLoadingProvinces } = useGetProvinces();
+    const provinces = provincesResponse?.data || provincesResponse || [];
+
+    const { data: regenciesResponse, isLoading: isLoadingRegencies } = useGetRegencies(provinsi);
+    const regencies = regenciesResponse?.data || regenciesResponse || [];
+
+    const { data: districtsResponse, isLoading: isLoadingDistricts } = useGetDistricts(kota);
+    const districts = districtsResponse?.data || districtsResponse || [];
+
+    const alamatStatus = isLoadingProvinces || isLoadingRegencies || isLoadingDistricts ? "loading" : "idle";
 
     const normalizeString = (str) => {
         return str ? str.toLowerCase().trim() : '';
     };
 
+    // Initialize form data once profile and address are loaded
     useEffect(() => {
         if (profile && address?.data && provinces.length > 0 && !isDataLoaded) {
             setFullname(profile.fullname || '');
@@ -57,66 +57,34 @@ const EditProfile = () => {
             setKode_Pos(address.data.kode_pos || '');
             setPreview(profile.foto_buyer || '');
 
-            const provinsiFromDB = normalizeString(address.data.provinsi);
-            const foundProvinsi = provinces.find(p =>
-                normalizeString(p.name) === provinsiFromDB
-            );
-
-            if (foundProvinsi) {
-                setProvinsi(foundProvinsi.code);
-                setShouldLoadKota(true);
-            }
+            const normalize = (s) => s?.toLowerCase().trim();
+            const provFromDB = normalize(address.data.provinsi);
+            const foundProv = provinces.find(p => normalize(p.name) === provFromDB);
+            if (foundProv) setProvinsi(foundProv.code);
 
             setIsDataLoaded(true);
         }
     }, [profile, address, provinces, isDataLoaded]);
 
+    // Dependent fields for Kota
     useEffect(() => {
-        if (provinces.length === 0 && alamatStatus === 'idle') {
-            dispatch(fetchProvinces());
+        if (isDataLoaded && regencies.length > 0 && !kota && address?.data?.kota) {
+            const normalize = (s) => s?.toLowerCase().trim();
+            const kotaFromDB = normalize(address.data.kota);
+            const foundKota = regencies.find(r => normalize(r.name) === kotaFromDB);
+            if (foundKota) setKota(foundKota.code);
         }
-    }, [dispatch, provinces.length, alamatStatus]);
+    }, [isDataLoaded, regencies, address?.data?.kota, kota]);
 
+    // Dependent fields for Kecamatan
     useEffect(() => {
-        if (provinsi && shouldLoadKota) {
-            dispatch(fetchRegencies(provinsi));
-            setShouldLoadKota(false);
+        if (isDataLoaded && districts.length > 0 && !kecamatan && address?.data?.kecamatan) {
+            const normalize = (s) => s?.toLowerCase().trim();
+            const kecFromDB = normalize(address.data.kecamatan);
+            const foundKec = districts.find(d => normalize(d.name) === kecFromDB);
+            if (foundKec) setKecamatan(foundKec.code);
         }
-    }, [provinsi, shouldLoadKota, dispatch]);
-
-    useEffect(() => {
-        if (regencies.length > 0 && address?.data?.kota && isDataLoaded && !kota) {
-            const kotaFromDB = normalizeString(address.data.kota);
-            const foundKota = regencies.find(r =>
-                normalizeString(r.name) === kotaFromDB
-            );
-
-            if (foundKota) {
-                setKota(foundKota.code);
-                setShouldLoadKecamatan(true);
-            }
-        }
-    }, [regencies, address?.data?.kota, isDataLoaded, kota]);
-
-    useEffect(() => {
-        if (kota && shouldLoadKecamatan) {
-            dispatch(fetchDistricts(kota));
-            setShouldLoadKecamatan(false);
-        }
-    }, [kota, shouldLoadKecamatan, dispatch]);
-
-    useEffect(() => {
-        if (districts.length > 0 && address?.data?.kecamatan && isDataLoaded && !kecamatan) {
-            const kecamatanFromDB = normalizeString(address.data.kecamatan);
-            const foundKecamatan = districts.find(d =>
-                normalizeString(d.name) === kecamatanFromDB
-            );
-
-            if (foundKecamatan) {
-                setKecamatan(foundKecamatan.code);
-            }
-        }
-    }, [districts, address?.data?.kecamatan, isDataLoaded, kecamatan]);
+    }, [isDataLoaded, districts, address?.data?.kecamatan, kecamatan]);
 
     useEffect(() => {
         const fetchExistingImage = async () => {
@@ -159,22 +127,11 @@ const EditProfile = () => {
         setProvinsi(code);
         setKota('');
         setKecamatan('');
-        dispatch(resetRegencies());
-        dispatch(resetDistricts());
-
-        if (code) {
-            dispatch(fetchRegencies(code));
-        }
     };
 
     const handleRegencyChange = (code) => {
         setKota(code);
         setKecamatan('');
-        dispatch(resetDistricts());
-
-        if (code) {
-            dispatch(fetchDistricts(code));
-        }
     };
 
     const handleDistrictChange = (code) => {
@@ -208,25 +165,17 @@ const EditProfile = () => {
         formData.append("data", JSON.stringify(dataJson));
         formData.append("file", file);
 
-        dispatch(updateProfile({ id: address?.data?.id, data: formData }));
+        updateProfileMutation(
+            { id: address?.data?.id, data: formData },
+            {
+                onSuccess: () => {
+                    refetchProfile();
+                    refetchAddress();
+                    navigate('/setting/profile');
+                }
+            }
+        );
     };
-
-
-    useEffect(() => {
-        if (!address?.data && !profile) {
-            dispatch(seeAddress(user?.id_buyer));
-            dispatch(seeProfile(user?.id_buyer));
-        }
-    }, [dispatch, address?.data, profile, user?.id_buyer]);
-
-    useEffect(() => {
-        if (statusEdit === 'success') {
-            dispatch(resetUpdateProfile());
-            dispatch(seeAddress(user?.id_buyer));
-            dispatch(seeProfile(user?.id_buyer));
-            navigate('/setting/profile');
-        }
-    }, [statusEdit, dispatch, user?.id_buyer, navigate]);
 
     return (
         <div className="w-full animate-fade-in">

@@ -1,31 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  getServicesById,
-  selectSelectedService,
-  selectSelectedServiceStatus,
-  editService,
-  selectEditServicesServiceStatus,
-  resetEditStatus,
-  getCategoryService,
-  selectCategoryService
-} from '../../features/serviceSlice'
-import { selectSelectedSeller, getSellerById } from '../../features/sellerSlice'
+import { useGetServiceById, useEditService, useGetCategoryService } from '../../hooks/useServices'
+import { useGetSellerById } from '../../hooks/useSellers'
 import EditableImageService from './sections/EditableImageService'
 import EditableInformationService from './sections/EditableInformationService'
 import ModalEditService from '../../components/modules/Modal/ModalEditService'
 
 const EditService = () => {
   const { id } = useParams()
-  const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const service = useSelector(selectSelectedService)
-  const status = useSelector(selectSelectedServiceStatus)
-  const editStatus = useSelector(selectEditServicesServiceStatus)
-  const categories = useSelector(selectCategoryService)
-  const seller = useSelector(selectSelectedSeller)
+  const { data: serviceResponse, status: serviceQueryStatus } = useGetServiceById(id);
+  const service = serviceResponse?.data || serviceResponse || null;
+  const status = serviceQueryStatus === 'pending' ? 'loading' : serviceQueryStatus;
+
+  const { data: categoriesResponse } = useGetCategoryService();
+  const categories = categoriesResponse || null;
+
+  const { data: sellerResponse } = useGetSellerById(service?.seller_id);
+  const seller = sellerResponse?.data || sellerResponse || null;
+
+  const { mutateAsync: editServiceMutation, status: editMutationStatus, reset: resetEditStatus } = useEditService();
+  const editStatus = editMutationStatus === 'pending' ? 'loading' : editMutationStatus;
 
   const [serviceName, setServiceName] = useState('')
   const [basePrice, setBasePrice] = useState('')
@@ -36,17 +32,7 @@ const EditService = () => {
   const [preview, setPreview] = useState(null)
   const [modalEdit, setModalEdit] = useState(false)
 
-  useEffect(() => {
-    if (id) {
-      dispatch(getServicesById(id))
-    }
-  }, [id, dispatch])
 
-  useEffect(() => {
-    if (!categories?.data) {
-      dispatch(getCategoryService())
-    }
-  }, [dispatch, categories])
 
   useEffect(() => {
     if (service && status === 'success') {
@@ -56,19 +42,15 @@ const EditService = () => {
       setDescription(service.deskripsi)
       setCategory(service.kategori_id)
       setPreview(service.foto_product)
-
-      if (service.seller_id) {
-        dispatch(getSellerById(service.seller_id))
-      }
     }
-  }, [service, status, dispatch])
+  }, [service, status])
 
   useEffect(() => {
     if (editStatus === 'success') {
       setModalEdit(true)
-      dispatch(resetEditStatus())
+      resetEditStatus()
     }
-  }, [editStatus, dispatch])
+  }, [editStatus, resetEditStatus])
 
   const handleImageChange = (file) => {
     setImage(file)
@@ -122,9 +104,9 @@ const EditService = () => {
       formData.append('kategori_id', category);
       formData.append('file', image); // Assuming 'file' is the key
 
-      dispatch(editService({ id, data: formData }));
+      editServiceMutation({ id, data: formData });
     } else {
-      dispatch(editService({ id, data: serviceData }));
+      editServiceMutation({ id, data: serviceData });
     }
   }
 

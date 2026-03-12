@@ -1,9 +1,3 @@
-import { useEffect, useState } from "react";
-import { FaStar } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
-import { selectReviewService } from "../../../features/serviceSlice";
-import { selectSelectedSeller } from "../../../features/sellerSlice";
-
 const InformationServiceForSeller = ({
     nameService,
     totalReview,
@@ -14,9 +8,6 @@ const InformationServiceForSeller = ({
     averageRating,
 }) => {
     const [showMoreDesc, setShowMoreDesc] = useState(false);
-
-    // Still keeping these mainly for display consistency if needed, but not linking to profile
-    const sellerProfile = useSelector(selectSelectedSeller);
 
     // No specific actions needed for seller view (no favorites, no chat init here)
 

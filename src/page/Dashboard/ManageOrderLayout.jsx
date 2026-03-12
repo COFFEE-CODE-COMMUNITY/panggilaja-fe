@@ -1,7 +1,5 @@
-import { useDispatch, useSelector } from "react-redux";
 // import StatCardOrder from "./sections/StatCardOrder";
 import { NavLink, Outlet } from "react-router-dom";
-import { seeProfile, selectSeeProfile } from "../../features/userSlice";
 import { useEffect, useState } from "react";
 import Input from "../../components/common/Input";
 import { FaSearch } from "react-icons/fa";

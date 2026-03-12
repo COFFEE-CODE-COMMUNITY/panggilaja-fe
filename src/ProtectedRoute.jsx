@@ -1,14 +1,10 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
-import { selectCurrentUser } from "./features/authSlice"; // Kept if needed elsewhere, but actually it is not used in my new code.
-// Wait, I can just remove the line if I want.
-// Step 7: replace
-
+import useAuthStore from "./store/useAuthStore";
 
 export function ProtectedRoute({ children }) {
-  const token = useSelector((state) => state.auth.accessToken);
+  const token = useAuthStore((state) => state.accessToken);
   const location = useLocation();
 
   if (!token) {
@@ -19,7 +15,7 @@ export function ProtectedRoute({ children }) {
 }
 
 export const HomeRoute = ({ children }) => {
-  const token = useSelector((state) => state.auth.accessToken);
+  const token = useAuthStore((state) => state.accessToken);
 
   if (!token) {
     return <Navigate to="/about" replace />;
@@ -29,7 +25,7 @@ export const HomeRoute = ({ children }) => {
 };
 
 export const GuestRoute = ({ children }) => {
-  const token = useSelector((state) => state.auth.accessToken);
+  const token = useAuthStore((state) => state.accessToken);
 
   useEffect(() => {
     if (token) {

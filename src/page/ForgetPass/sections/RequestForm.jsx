@@ -1,39 +1,38 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import InputForm from '../../../components/modules/form/InputForm'
 import Button from '../../../components/common/Button'
-import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { requestResetPassword,selectResetPasswordRequestMessage, selectResetPasswordRequestStatus, } from '../../../features/authSlice'
+import { useNavigate } from 'react-router-dom'
+import { useRequestResetPassword } from '../../../hooks/useAuth'
+import useAuthStore from '../../../store/useAuthStore'
 
 const RequestForm = () => {
-  const dispatch = useDispatch()
   const navigate = useNavigate()
-
   const [email, setEmail] = useState('')
+  const setResetEmail = useAuthStore((state) => state.setResetEmail);
 
-  const status = useSelector(selectResetPasswordRequestStatus)
-  const message = useSelector(selectResetPasswordRequestMessage)
+  const { mutateAsync: requestReset, status } = useRequestResetPassword();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    dispatch(requestResetPassword(email))
-  }
-
-  useEffect(() => {
-    if(status === 'success'){
-      navigate('/verify-forget-password')
+    try {
+      await requestReset(email);
+      setResetEmail(email);
+      navigate('/verify-forget-password');
+    } catch (error) {
+      console.error("Request reset failed:", error);
     }
-  },[dispatch, status])
+  }
 
   return (
     <form onSubmit={handleSubmit}>
       <div className='flex flex-col gap-[10px]'>
-        <InputForm label='Email' placeholder='Masukkan email' type='email' onChange={(e) => setEmail(e.target.value)}/>
+        <InputForm label='Email' placeholder='Masukkan email' type='email' onChange={(e) => setEmail(e.target.value)} />
         <Button
           type="submit"
-          className="group w-full h-12 md:h-14 text-base md:text-lg font-bold bg-primary hover:bg-primary/90 text-white rounded-xl flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 mt-2"
+          disabled={status === 'loading'}
+          className="group w-full h-12 md:h-14 text-base md:text-lg font-bold bg-primary hover:bg-primary/90 text-white rounded-xl flex justify-center items-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 mt-2 disabled:bg-gray-400"
         >
-          <span>Reset Password</span>
+          <span>{status === 'loading' ? 'Loading...' : 'Reset Password'}</span>
         </Button>
       </div>
     </form>

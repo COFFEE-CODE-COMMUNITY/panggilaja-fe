@@ -1,43 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { selectCurrentUser } from '../../../features/authSlice'
-import { getAllServicesByIdSeller, getOrderBySellerId, selectOrderSeller, selectOrderSellerMessage, selectOrderSellerStatus, selectSellerServices } from '../../../features/sellerSlice'
-import { selectAllService } from '../../../features/serviceSlice'
+import useAuthStore from '../../../store/useAuthStore'
+import { useGetOrdersBySellerId, useGetSellerServices } from '../../../hooks/useSellers'
 import { useNavigate, useOutletContext } from 'react-router-dom'
-import { selectUpdateOrderError, selectUpdateOrderStatus, updateOrderStatus, clearOrderStatus } from '../../../features/orderSlice'
+import { useUpdateOrderStatus } from '../../../hooks/useOrders'
 import { FaUser } from "react-icons/fa";
 import Modal from '../../../components/common/Modal';
 
 const TableAllOrder = () => {
-    const user = useSelector(selectCurrentUser)
-    const dispatch = useDispatch()
-    const orders = useSelector(selectOrderSeller)
-    const ordersStatus = useSelector(selectOrderSellerStatus)
-    const ordersMessage = useSelector(selectOrderSellerMessage)
-    const allService = useSelector(selectSellerServices)
+    const user = useAuthStore(state => state.user)
     const navigate = useNavigate()
-    // State untuk manage dropdown yang terbuka
-    const updateStatus = useSelector(selectUpdateOrderStatus)
-    const updateError = useSelector(selectUpdateOrderError)
+
+    const { data: ordersResponse, status: ordersQueryStatus, refetch: refetchOrders } = useGetOrdersBySellerId(user?.id_seller);
+    const orders = ordersResponse || null;
+    const ordersStatus = ordersQueryStatus === 'pending' ? 'loading' : ordersQueryStatus;
+
+    const { data: servicesResponse } = useGetSellerServices(user?.id_seller);
+    const allService = servicesResponse || null;
+
+    const { mutateAsync: updateOrderStatusMutation, status: updateMutationStatus, reset: resetUpdateStatus } = useUpdateOrderStatus();
+    const updateStatus = updateMutationStatus === 'pending' ? 'loading' : updateMutationStatus;
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
 
-    // Refresh orders when updateStatus is success
-    useEffect(() => {
-        if (updateStatus === 'success' && user?.id_seller) {
-            dispatch(getOrderBySellerId(user?.id_seller));
-            dispatch(clearOrderStatus());
-        }
-    }, [updateStatus, user?.id_seller, dispatch]);
-
-    // Close modal when success
-    useEffect(() => {
-        if (updateStatus === 'success') {
-            setShowConfirmModal(false);
-            setSelectedOrderId(null);
-        }
-    }, [updateStatus]);
+    const handleConfirmFinishOrderSuccess = () => {
+        refetchOrders();
+        resetUpdateStatus();
+        setShowConfirmModal(false);
+        setSelectedOrderId(null);
+    };
 
     const { searchQuery } = useOutletContext() || { searchQuery: "" };
 
@@ -140,13 +131,18 @@ const TableAllOrder = () => {
         setShowConfirmModal(true);
     }
 
-    const confirmFinishOrder = () => {
+    const confirmFinishOrder = async () => {
         if (selectedOrderId) {
             console?.log('Menandai orderan selesai:', selectedOrderId)
-            dispatch(updateOrderStatus({
-                orderId: selectedOrderId,
-                status: 'completed'
-            }));
+            try {
+                await updateOrderStatusMutation({
+                    orderId: selectedOrderId,
+                    status: 'completed'
+                });
+                handleConfirmFinishOrderSuccess();
+            } catch (error) {
+                console.error("Failed to finish order", error);
+            }
         }
     }
 

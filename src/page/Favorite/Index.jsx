@@ -1,24 +1,27 @@
 import React from 'react'
 import ServiceCard from '../../components/modules/Cards/ServiceCard'
-import { useSelector } from 'react-redux'
-import { selectAllService, selectFavoriteService, selectFavoriteServiceStatus } from '../../features/serviceSlice'
 import { FaRegHeart } from 'react-icons/fa'
+import { useGetFavoriteServices, useGetServices } from '../../hooks/useServices'
+import useAuthStore from '../../store/useAuthStore'
 
-const FavoriteMobile= () => {
-  const favorites = useSelector(selectFavoriteService)
-  const favoritesStatus = useSelector(selectFavoriteServiceStatus)
+const FavoriteMobile = () => {
+  const user = useAuthStore((state) => state.user);
 
-  const services = useSelector(selectAllService)
+  const { data: favoritesResponse, status: favoritesStatus } = useGetFavoriteServices(user?.id);
+  const { data: servicesResponse } = useGetServices();
+
+  const services = servicesResponse?.data || [];
+  const favoritesData = favoritesResponse?.data || [];
 
   let favoritesService = [];
 
-  if (favoritesStatus === "success" && favorites.data && services.length > 0) {
-    const favoritedServiceIds = favorites.data.map((fav) => fav.service_id);
+  if (favoritesStatus === "success" && favoritesData.length > 0 && services.length > 0) {
+    const favoritedServiceIds = favoritesData.map((fav) => fav.service_id);
 
-    favoritesService = services.filter((service) =>
-      favoritedServiceIds.includes(service.id)
-    );
-  }
+    favoritesService = services.filter((service) =>
+      favoritedServiceIds.includes(service.id)
+    );
+  }
 
   return (
     <>
@@ -28,16 +31,17 @@ const FavoriteMobile= () => {
           <p className="text-h5">Belum ada favorit</p>
         </div>
       )}
-      <div className='grid grid-cols-2 px-2 gap-3 h-screen w-full'>
+      <div className='grid grid-cols-2 px-2 gap-3 min-h-screen w-full'>
         {favoritesService.map((favorite) => (
           <ServiceCard
+            key={favorite.id}
             basePrice={favorite.base_price}
             topPrice={favorite.top_price}
             image={favorite.foto_product}
             sellerName={favorite.seller_name}
             idService={favorite.id}
             star={5}
-            serviceName={favorite.nama_jasa} 
+            serviceName={favorite.nama_jasa}
             guest={false}
           />
         ))}

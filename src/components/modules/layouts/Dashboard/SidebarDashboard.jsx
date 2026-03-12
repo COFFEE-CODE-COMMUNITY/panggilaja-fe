@@ -1,86 +1,62 @@
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import Button from "../../../common/Button";
-import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import {
-  changeAccount,
-  resetChangeAccountStatus,
-  selectChangeAccountMessage,
-  selectChangeAccountStatus,
-  selectCurrentUser,
-} from "../../../../features/authSlice";
-
-import {
-  deleteSellerById,
-  getSellerById,
-  resetSellerStatusDelete,
-  selectDeleteSellerMessage,
-  selectDeleteSellerStatus,
-  selectSelectedSeller,
-  selectOrderSeller,
-} from "../../../../features/sellerSlice";
 import ModalSwitchAccount from "../../Modal/ModalSwitchAccount";
 import ModalConfirmDeleteSeller from "../../Modal/ModalConfirmDeleteSeller";
-import { selectContactSeller } from "../../../../features/chatSlice";
+import useAuthStore from "../../../../store/useAuthStore";
+import { useChangeAccount } from "../../../../hooks/useAuth";
+import { useDeleteSellerById, useGetSellerById, useGetOrdersBySellerId } from "../../../../hooks/useSellers";
+import { useGetContactForSeller } from "../../../../hooks/useChat";
 
 export const SidebarDashboard = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const user = useSelector(selectCurrentUser);
-  const sellerProfile = useSelector(selectSelectedSeller);
-  const statusChange = useSelector(selectChangeAccountStatus);
+  // Zustand Store
+  const user = useAuthStore((state) => state.user);
 
-  const [profileSeller, setProfileSeller] = useState(false);
+  // TanStack Query Hooks
+  const { data: sellerResponse } = useGetSellerById(user?.id_seller);
+  const sellerProfile = sellerResponse?.data || sellerResponse || null;
+
+  const { data: sellerOrders } = useGetOrdersBySellerId(user?.id_seller);
+  const { data: contactSeller } = useGetContactForSeller(user?.id_seller);
+
+  const { mutate: changeAccountMutate, status: statusChange } = useChangeAccount();
+  const { mutate: deleteSellerMutate, status: deleteSellerStatus } = useDeleteSellerById();
+
   const [modalProfile, setModalProfile] = useState(false);
-  const [sidebar, setSidebar] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [statusChanges, setStatusChanges] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [statusChanges, setStatusChanges] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const deleteSellerStatus = useSelector(selectDeleteSellerStatus);
-  const deleteSellerMessage = useSelector(selectDeleteSellerMessage);
+  // Calculate unread count
+  const contacts = Array.isArray(contactSeller) ? contactSeller : (contactSeller?.data || []);
+  const unreadCount = contacts.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0) || 0;
 
-  const sellerOrders = useSelector(selectOrderSeller);
-  const contactSeller = useSelector(selectContactSeller);
-  const unreadCount = contactSeller?.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0) || 0;
-
-  // Ensure sellerOrders is treated as an array (handle { data: [...] } response structure)
+  // Calculate incoming order count
   const ordersList = Array.isArray(sellerOrders) ? sellerOrders : (sellerOrders?.data || []);
   const incomingOrderCount = ordersList.filter(order => order?.status === 'in_progress' || order?.status === 'pending').length || 0;
 
   useEffect(() => {
     if (deleteSellerStatus === "success") {
-      dispatch(resetSellerStatusDelete());
       navigate("/");
     }
-  }, [user?.active_role, deleteSellerStatus]);
-
-  const handleSwitchToBuyer = () => {
-    dispatch(changeAccount({ targetRole: "buyer" }));
-  };
-
-
-
-  useEffect(() => {
-    if (user && user.id_seller) {
-      dispatch(getSellerById(user.id_seller));
-    }
-  }, [dispatch, user?.id_seller]);
+  }, [deleteSellerStatus, navigate]);
 
   useEffect(() => {
     if (statusChange === "success") {
-      dispatch(resetChangeAccountStatus());
       navigate("/");
     }
-  }, [statusChange, dispatch, navigate]);
+  }, [statusChange, navigate]);
+
+  const handleSwitchToBuyer = () => {
+    changeAccountMutate({ targetRole: "buyer" });
+  };
 
   const handleDeleteAccount = () => {
-    dispatch(deleteSellerById(user?.id_seller));
+    deleteSellerMutate(user?.id_seller);
   }
-
-  // Removed blocking spinner for statusChange === "loading"
 
   return (
     <>
@@ -470,7 +446,7 @@ export const SidebarDashboard = () => {
       {statusChanges && (
         <ModalSwitchAccount
           onRedirect={() => {
-            dispatch(changeAccount({ targetRole: "buyer" }))
+            handleSwitchToBuyer();
             navigate('/'); // Navigate immediately
             setStatusChanges(false)
           }}
@@ -482,7 +458,7 @@ export const SidebarDashboard = () => {
         <ModalConfirmDeleteSeller
           onConfirm={handleDeleteAccount}
           onCancel={() => setShowDeleteModal(false)}
-          isDeleting={deleteSellerStatus === 'loading'}
+          isDeleting={deleteSellerStatus === 'pending'}
         />
       )}
     </>

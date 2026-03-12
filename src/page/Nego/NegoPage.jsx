@@ -1,13 +1,9 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import socket from "../../config/socket";
-import {
-  getServicesById,
-  selectSelectedService,
-  selectSelectedServiceStatus,
-} from "../../features/serviceSlice";
+import useAuthStore from "../../store/useAuthStore";
+import { useGetServiceById } from "../../hooks/useServices";
+import { useGetAddresses } from "../../hooks/useUsers";
 import { useEffect, useState } from "react";
-import { selectCurrentUser } from "../../features/authSlice";
+
 import {
   FaComments,
   FaExclamationCircle,
@@ -16,28 +12,24 @@ import {
 } from "react-icons/fa";
 import Button from "../../components/common/Button";
 import Modal from "../../components/common/Modal";
-import { selectSeeAddress } from "../../features/userSlice";
-
+import socket from "../../config/socket";
 const NegoPage = () => {
   const { id } = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const service = useSelector(selectSelectedService);
-  const status = useSelector(selectSelectedServiceStatus);
-  const user = useSelector(selectCurrentUser);
-  const address = useSelector(selectSeeAddress);
+  const user = useAuthStore(state => state.user);
+
+  const { data: serviceResponse, status: serviceQueryStatus } = useGetServiceById(id);
+  const service = serviceResponse?.data || serviceResponse || null;
+  const status = serviceQueryStatus === 'pending' ? 'loading' : serviceQueryStatus;
+
+  const { data: addressResponse } = useGetAddresses(user?.id_buyer);
+  const address = addressResponse || null;
 
   const [showModal, setShowModal] = useState(false);
   const [harga, setHarga] = useState("");
   const [pesan, setPesan] = useState("");
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    if (id) {
-      dispatch(getServicesById(id));
-    }
-  }, [id, dispatch]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -105,15 +97,6 @@ const NegoPage = () => {
     });
   };
 
-  const [isArtificialLoading, setIsArtificialLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsArtificialLoading(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, []);
-
   const NegoSkeleton = () => (
     <div className="lg:pt-20 md:pt-18 pt-15 min-h-screen py-[25px] sm:bg-gray-50 bg-white xl:px-[150px] lg:px-[100px] md:px-[55px] sm:px-[35px] px-[10px] animate-pulse">
       <div className="w-full flex justify-center">
@@ -160,7 +143,7 @@ const NegoPage = () => {
     </div>
   );
 
-  if (status === "loading" || isArtificialLoading) {
+  if (status === "loading") {
     return <NegoSkeleton />;
   }
 

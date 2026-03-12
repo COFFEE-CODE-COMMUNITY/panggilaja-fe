@@ -1,27 +1,18 @@
 import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getServices, selectAllService, selectAllServiceError, selectAllServiceStatus } from '../../features/serviceSlice'
-import { selectSearchText } from '../../features/searchSlice'
+import useSearchStore from '../../store/useSearchStore'
+import { useGetServices } from '../../hooks/useServices'
 import ServiceCard from '../../components/modules/Cards/ServiceCard'
 import { useLocation } from 'react-router-dom'
 
 const SearchPage = () => {
-    const dispatch = useDispatch()
+    const { data: allServicesResponse, status: allServicesStatus, error: allServicesError } = useGetServices();
+    const allServices = allServicesResponse?.data || allServicesResponse || [];
 
-    const allServices = useSelector(selectAllService)
-    const status = useSelector(selectAllServiceStatus)
-    const error = useSelector(selectAllServiceError)
+    const status = allServicesStatus;
+    const error = allServicesError ? "failed" : null;
 
-    const searchText = useSelector(selectSearchText)
-    const lowerCaseSearchText = searchText.toLowerCase().trim()
-
-
-
-    useEffect(() => {
-        if (status === 'idle' && !allServices) {
-            dispatch(getServices())
-        }
-    }, [status, dispatch])
+    const searchText = useSearchStore(state => state.searchText);
+    const lowerCaseSearchText = searchText.toLowerCase().trim();
 
 
 
@@ -68,7 +59,7 @@ const SearchPage = () => {
         )
     }
 
-    if (status === 'failed') {
+    if (error === 'failed' || status === 'error') {
         return (
             <div className='absolute top-0 left-0 right-0 bottom-0 bg-white flex justify-center items-center'>
                 <p className='text-h3 font-medium'>

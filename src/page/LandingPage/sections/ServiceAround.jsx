@@ -1,50 +1,28 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  getServices,
-  getServicesAround,
-  selectAllService,
-  selectAllServiceStatus,
-  selectFavoriteService,
-  selectServiceAround,
-  selectServiceAroundError,
-  selectServiceAroundStatus,
-} from "../../../features/serviceSlice";
+import { useGetServices, useGetServicesAround } from "../../../hooks/useServices";
+import { useGetAddresses } from "../../../hooks/useUsers";
+import useAuthStore from "../../../store/useAuthStore";
 import ServiceCard from "../../../components/modules/Cards/ServiceCard";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaBox } from "react-icons/fa";
-import { selectAccessToken, selectCurrentUser } from "../../../features/authSlice";
-import { seeAddress, selectSeeAddress } from "../../../features/userSlice";
 import Stars from "../../../components/common/Stars";
 import NoServiceNearby from "../../../store/NoServiceNearby";
 
 const ServiceAround = () => {
-  const dispatch = useDispatch();
-  const services = useSelector(selectAllService);
-  const servicesStatus = useSelector(selectAllServiceStatus);
-  const user = useSelector(selectCurrentUser)
-  const token = useSelector(selectAccessToken)
-  const address = useSelector(selectSeeAddress)
+  const user = useAuthStore(state => state.user);
+  const token = useAuthStore(state => state.accessToken);
 
-  const servicesAround = useSelector(selectServiceAround)
-  const servicesAroundStatus = useSelector(selectServiceAroundStatus)
+  const { data: addressResponse } = useGetAddresses(user?.id_buyer);
+  const address = addressResponse || null;
 
-  const favorites = useSelector(selectFavoriteService)
+  const { data: servicesResponse, status: queryStatus, refetch: refetchServices } = useGetServices();
+  console.log(servicesResponse)
+  const services = servicesResponse || [];
+  const servicesStatus = queryStatus === "pending" ? "loading" : queryStatus;
 
-
-
-  useEffect(() => {
-    dispatch(getServices());
-    if (user?.id_buyer && token) {
-      dispatch(seeAddress(user.id_buyer))
-    }
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (address?.data?.kecamatan && user?.id) {
-      dispatch(getServicesAround({ id: user.id, kecamatan: address?.data?.kecamatan }))
-    }
-  }, [address?.data?.kecamatan, favorites])
+  const kecamatan = address?.data?.kecamatan;
+  const { data: servicesAroundResponse, status: servicesAroundStatus } = useGetServicesAround(user?.id, kecamatan);
+  const servicesAround = servicesAroundResponse?.data || [];
 
   // Loading State
   if (servicesStatus === "loading") {
@@ -95,7 +73,7 @@ const ServiceAround = () => {
             Gagal memuat data jasa. Silakan coba lagi.
           </p>
           <button
-            onClick={() => dispatch(getServices())}
+            onClick={() => refetchServices()}
             className="px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors text-sm font-medium"
           >
             Coba Lagi

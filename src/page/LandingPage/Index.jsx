@@ -1,14 +1,11 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import React from 'react'
+import { useIsMutating } from '@tanstack/react-query'
 import Banner from './sections/Banner'
 import Category from './sections/Category'
 import ServiceAround from './sections/ServiceAround'
 import Invitation from './sections/Invitation'
 import Review from './sections/Review'
-import Stars from '../../components/common/Stars'
 import Faq from './sections/Faq'
-import ModalSwitchAccount from '../../components/modules/Modal/ModalSwitchAccount'
-import { selectChangeAccountStatus } from '../../features/authSlice'
 
 const LandingPageSkeleton = () => {
   return (
@@ -40,10 +37,9 @@ const LandingPageSkeleton = () => {
 }
 
 const LandingPage = () => {
-  const [modal, setModal] = useState(false)
-  const changeAccountStatus = useSelector(selectChangeAccountStatus);
+  const isChangingAccount = useIsMutating({ mutationKey: ['changeAccount'] });
 
-  if (changeAccountStatus === 'loading') {
+  if (isChangingAccount) {
     return <LandingPageSkeleton />
   }
 

@@ -7,14 +7,13 @@ import {
   FaArrowRight,
   FaCheckCircle,
 } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import ModalAuth from "../../../components/modules/Modal/ModalAuth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { selectAccessToken } from "../../../features/authSlice";
+import useAuthStore from "../../../store/useAuthStore";
+import ModalAuth from "../../../components/modules/Modal/ModalAuth";
 
 const Invitation = () => {
-  const token = useSelector(selectAccessToken);
+  const token = useAuthStore((state) => state.accessToken);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
 

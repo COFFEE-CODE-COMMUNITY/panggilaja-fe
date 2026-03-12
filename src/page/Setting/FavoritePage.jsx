@@ -1,39 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { FaArrowLeft, FaHeart, FaRegHeart, FaStore, FaCommentDots, FaHandshake } from 'react-icons/fa'
-import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { selectCurrentUser } from '../../features/authSlice'
-import {
-    deleteFavoriteService,
-    getFavoriteService,
-    selectAllService,
-    selectDeleteFavoriteServiceStatus,
-    selectFavoriteService,
-    selectFavoriteServiceStatus
-} from '../../features/serviceSlice'
+import useAuthStore from '../../store/useAuthStore'
+import { useGetFavoriteServices, useDeleteFavoriteService, useGetServices } from '../../hooks/useServices'
 import socket from '../../config/socket'
 import Button from '../../components/common/Button'
 
 const FavoritePage = () => {
-    const user = useSelector(selectCurrentUser)
-    const dispatch = useDispatch()
+    const user = useAuthStore(state => state.user)
     const navigate = useNavigate()
 
-    const favorites = useSelector(selectFavoriteService)
-    const favoritesStatus = useSelector(selectFavoriteServiceStatus)
-    const services = useSelector(selectAllService)
-    const deleteStatus = useSelector(selectDeleteFavoriteServiceStatus)
+    const { data: favoritesResponse, status: favoritesQueryStatus } = useGetFavoriteServices(user?.id);
+    const favorites = favoritesResponse || { data: [] };
+    const favoritesStatus = favoritesQueryStatus === "pending" ? "loading" : favoritesQueryStatus;
+
+    const { data: servicesResponse } = useGetServices();
+    const services = servicesResponse?.data || servicesResponse || [];
+
+    const { mutate: deleteFavorite, status: deleteMutationStatus } = useDeleteFavoriteService();
+    const deleteStatus = deleteMutationStatus === "pending" ? "loading" : deleteMutationStatus;
 
     const [isStartingChat, setIsStartingChat] = useState(false)
     const [optimisticDeletedIds, setOptimisticDeletedIds] = useState([])
-
-    useEffect(() => {
-        if (user?.id) {
-            dispatch(getFavoriteService(user.id))
-        }
-    }, [dispatch, user?.id, deleteStatus])
-
-
 
     let favoritesService = [];
 
@@ -80,7 +68,7 @@ const FavoritePage = () => {
 
     const handleOptimisticDelete = (favoriteId, serviceId) => {
         setOptimisticDeletedIds((prev) => [...prev, serviceId]);
-        dispatch(deleteFavoriteService(favoriteId));
+        deleteFavorite(favoriteId);
     };
 
     const FavoriteSkeleton = () => (

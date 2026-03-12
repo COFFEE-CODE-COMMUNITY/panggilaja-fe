@@ -1,26 +1,23 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link } from 'react-router-dom'
-import { getDocsById, selectSellerDocs, selectSellerDocsStatus, deleteDocs } from '../../features/sellerSlice'
-import { selectCurrentUser } from '../../features/authSlice'
+import { useGetDocsById, useDeleteDocs } from '../../hooks/useSellers'
+import useAuthStore from '../../store/useAuthStore'
 import ModalConfirmDeleteDocs from '../../components/modules/Modal/ModalConfirmDeleteDocs'
 
 const ProfilePhotos = () => {
   const { id } = useParams()
-  const dispatch = useDispatch()
-  const user = useSelector(selectCurrentUser)
-  const docs = useSelector(selectSellerDocs)
-  const status = useSelector(selectSellerDocsStatus)
+  const user = useAuthStore(state => state.user)
+
+  const { data: docsResponse, status: docsQueryStatus, refetch: refetchDocs } = useGetDocsById(id);
+  const docs = docsResponse?.data || docsResponse || [];
+  const status = docsQueryStatus === 'pending' ? 'loading' : docsQueryStatus;
+
+  const { mutateAsync: deleteDocsMutation } = useDeleteDocs();
 
   const [selectedImage, setSelectedImage] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  useEffect(() => {
-    if (id) {
-      dispatch(getDocsById(id))
-    }
-  }, [dispatch, id])
 
   const openLightbox = (image) => {
     setSelectedImage(image)
@@ -34,8 +31,8 @@ const ProfilePhotos = () => {
     if (!deleteId) return
     setIsDeleting(true)
     try {
-      await dispatch(deleteDocs(deleteId)).unwrap()
-      dispatch(getDocsById(id))
+      await deleteDocsMutation(deleteId)
+      refetchDocs()
       setDeleteId(null)
     } catch (error) {
       alert('Gagal menghapus foto')

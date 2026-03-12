@@ -1,25 +1,47 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom'
-import { changeAccount, selectChangeAccountStatus, selectCurrentUser } from '../../../../features/authSlice';
-import { deleteSellerById, selectDeleteSellerStatus, selectSelectedSeller } from '../../../../features/sellerSlice';
+import { useNavigate, NavLink } from 'react-router-dom'
 import Button from '../../../common/Button';
 import ModalSwitchAccount from '../../Modal/ModalSwitchAccount';
 import ModalConfirmDeleteSeller from '../../Modal/ModalConfirmDeleteSeller';
+import useAuthStore from '../../../../store/useAuthStore';
+import { useChangeAccount } from '../../../../hooks/useAuth';
+import { useGetSellerById, useDeleteSellerById } from '../../../../hooks/useSellers';
+import { useEffect } from 'react';
 
 const BottombarDashboard = () => {
-  const user = useSelector(selectCurrentUser);
-  const dispatch = useDispatch();
-  const sellerProfile = useSelector(selectSelectedSeller);
-  const statusChange = useSelector(selectChangeAccountStatus);
+  const navigate = useNavigate();
+  // Zustand Store
+  const user = useAuthStore((state) => state.user);
+
+  // TanStack Query Hooks
+  const { data: sellerResponse } = useGetSellerById(user?.id_seller);
+  const sellerProfile = sellerResponse?.data || sellerResponse || null;
+
+  const { mutate: changeAccountMutate, status: statusChange } = useChangeAccount();
+  const { mutate: deleteSellerMutate, status: deleteSellerStatus } = useDeleteSellerById();
+
   const [statusChanges, setStatusChanges] = useState(false)
   const [modal, setModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const deleteSellerStatus = useSelector(selectDeleteSellerStatus);
+
+  useEffect(() => {
+    if (statusChange === "success") {
+      navigate("/");
+    }
+  }, [statusChange, navigate]);
+
+  useEffect(() => {
+    if (deleteSellerStatus === "success") {
+      navigate("/");
+    }
+  }, [deleteSellerStatus, navigate]);
 
   const handleDeleteAccount = () => {
-    dispatch(deleteSellerById(user?.id_seller));
+    deleteSellerMutate(user?.id_seller);
   }
+
+  const handleSwitchToBuyer = () => {
+    changeAccountMutate({ targetRole: "buyer" });
+  };
 
   return (
     <div className='fixed bottom-0 md:hidden w-full py-2 bg-white z-100'>
@@ -278,7 +300,6 @@ const BottombarDashboard = () => {
               <Button
                 variant="primary"
                 className="w-full text-white py-1 rounded-xl"
-                // onClick={() => dispatch(changeAccount({ targetRole: "buyer" }))}
                 onClick={() => setStatusChanges(true)}
               >
                 Pindah Akun
@@ -296,7 +317,7 @@ const BottombarDashboard = () => {
       {statusChanges && (
         <ModalSwitchAccount
           onRedirect={() => {
-            dispatch(changeAccount({ targetRole: "buyer" }))
+            handleSwitchToBuyer();
             // Navigate immediately to trigger LandingPage skeleton
             navigate('/');
             setStatusChanges(false)
@@ -309,7 +330,7 @@ const BottombarDashboard = () => {
         <ModalConfirmDeleteSeller
           onConfirm={handleDeleteAccount}
           onCancel={() => setShowDeleteModal(false)}
-          isDeleting={deleteSellerStatus === 'loading'}
+          isDeleting={deleteSellerStatus === 'pending'}
         />
       )}
     </div>

@@ -1,23 +1,14 @@
 import React, { useEffect } from 'react'
 import ServiceCard from '../../components/modules/Cards/ServiceCard'
-import { useDispatch, useSelector } from 'react-redux'
-import { getServices, selectAllService } from '../../features/serviceSlice'
-import { selectSelectedSeller } from '../../features/sellerSlice'
-import { useLocation } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
+import { useGetSellerServices } from '../../hooks/useSellers'
 
 const ProfileServices = () => {
-  const services = useSelector(selectAllService)
-  const seller = useSelector(selectSelectedSeller)
-  const dispatch = useDispatch()
+  const { id } = useParams()
   const location = useLocation()
 
-  useEffect(() => {
-    if (services.length === 0 || !services) {
-      dispatch(getServices())
-    }
-  }, [dispatch])
-
-  const servicesSeller = services?.filter((service) => service.seller_id === seller?.id)
+  const { data: sellerServicesResponse } = useGetSellerServices(id);
+  const servicesSeller = sellerServicesResponse?.data || sellerServicesResponse || [];
 
   const isDashboard = location.pathname.includes('/dashboard');
 

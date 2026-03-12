@@ -1,31 +1,20 @@
 import { useEffect, useRef, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  updateContactFromSocket,
-  getContactForBuyer,
-  getContactForSeller,
-  updateUserStatus,
-  setOnlineUsers
-} from "../features/chatSlice";
-
-// ... (existing code)
-
-
+import { useQueryClient } from "@tanstack/react-query";
+import useChatStore from "../store/useChatStore";
 
 /**
  * Custom hook untuk mendengarkan update contact list secara real-time
  * SAFEST VERSION: Menggunakan ref untuk avoid dependency issues
  */
 export const useContactRealtime = (socket, userId, role, isBuyer) => {
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const setOnlineUsers = useChatStore(state => state.setOnlineUsers);
+  const updateUserStatus = useChatStore(state => state.updateUserStatus);
 
-  // Get current contact list dari Redux dengan safe check
-  const contacts = useSelector((state) => {
-    if (!state?.chat) return [];
-    return isBuyer
-      ? state.chat.contactBuyer || []
-      : state.chat.contactSeller || [];
-  });
+  // Get current contact list dari React Query cache
+  const queryKey = isBuyer ? ['contactsBuyer', userId] : ['contactsSeller', userId];
+  const contactsData = queryClient.getQueryData(queryKey);
+  const contacts = Array.isArray(contactsData?.data) ? contactsData.data : [];
 
   // Simpan contacts di ref untuk diakses dalam handler tanpa dependency
   const contactsRef = useRef(contacts);
@@ -56,19 +45,13 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
     // Delay 500ms sebelum refetch (tunggu burst messages selesai)
     refetchTimeoutRef.current = setTimeout(() => {
       if (pendingRefetchRef.current) {
-
-        const { isBuyer: currentIsBuyer, userId: currentUserId } =
-          paramsRef.current;
-
-        if (currentIsBuyer) {
-          dispatch(getContactForBuyer(currentUserId));
-        } else {
-          dispatch(getContactForSeller(currentUserId));
-        }
+        const { isBuyer: currentIsBuyer, userId: currentUserId } = paramsRef.current;
+        const targetQueryKey = currentIsBuyer ? ['contactsBuyer', currentUserId] : ['contactsSeller', currentUserId];
+        queryClient.invalidateQueries({ queryKey: targetQueryKey });
         pendingRefetchRef.current = false;
       }
     }, 500); // 500ms debounce
-  }, [dispatch]);
+  }, [queryClient]);
 
   useEffect(() => {
     if (!socket || !userId || !role) {
@@ -113,28 +96,13 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
 
 
         if (contactExists) {
-          // ✅ KONTAK SUDAH ADA: Update via Redux (TIDAK REFETCH)
-
-          const { isBuyer: currentIsBuyer } = paramsRef.current;
-
-          // Check if the message is from me
-          const isMyMessage = lastMessage?.sender_role?.toUpperCase() === role?.toUpperCase();
-
-          // 🔥 PENTING: Hanya dispatch jika partnerId BENAR-BENAR cocok
-          dispatch(
-            updateContactFromSocket({
-              partnerId: partnerId, // Pastikan partnerId yang tepat
-              lastMessage: {
-                text: lastMessage.text,
-                created_at: lastMessage.created_at,
-              },
-              isBuyer: currentIsBuyer,
-              isMyMessage: isMyMessage
-            })
-          );
+          // ✅ KONTAK SUDAH ADA: Update via React Query Invalidation (Aman dan simple)
+          const { isBuyer: currentIsBuyer, userId: currentUserId } = paramsRef.current;
+          const targetQueryKey = currentIsBuyer ? ['contactsBuyer', currentUserId] : ['contactsSeller', currentUserId];
+          // We can just invalidate it to fetch the latest list including last messages
+          queryClient.invalidateQueries({ queryKey: targetQueryKey });
         } else {
           // ❌ KONTAK BELUM ADA: Perlu refetch (tapi dengan debouncing)
-
           debouncedRefetch();
         }
       }
@@ -142,14 +110,12 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
 
     // Handler untuk online status update
     const handleStatusUpdate = (data) => {
-
-      dispatch(updateUserStatus(data));
+      updateUserStatus(data.userId, data.role, data.isOnline);
     };
 
     // Handler untuk bulk online users list (Init Sync)
     const handleOnlineUsersList = (onlineIds) => {
-
-      dispatch(setOnlineUsers(onlineIds));
+      setOnlineUsers(onlineIds);
     };
 
     // Listen untuk update
@@ -172,7 +138,7 @@ export const useContactRealtime = (socket, userId, role, isBuyer) => {
       }
 
     };
-  }, [socket, userId, role, dispatch, debouncedRefetch]);
+  }, [socket, userId, role, debouncedRefetch, setOnlineUsers, updateUserStatus]);
 
   // Cleanup on unmount
   useEffect(() => {

@@ -1,6 +1,5 @@
-import { useDispatch, useSelector } from "react-redux";
-import { selectCurrentUser } from "../../../features/authSlice";
-import { addService, getCategoryService, resetAddStatus, selectAddServiceError, selectAddServiceStatus, selectCategoryService, selectCategoryServiceStatus } from "../../../features/serviceSlice";
+import useAuthStore from "../../../store/useAuthStore";
+import { useGetCategoryService, useAddService } from "../../../hooks/useServices";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import InputForm from "../../../components/modules/form/InputForm";
@@ -10,16 +9,17 @@ import ModalServiceAdded from "../../../components/modules/Modal/ModalAddService
 
 
 function TambahJasaForm() {
-    const dispatch = useDispatch();
-    const user = useSelector(selectCurrentUser);
+    const user = useAuthStore(state => state.user);
 
-    const status = useSelector(selectAddServiceStatus);
-    const message = useSelector(selectAddServiceError);
+    const { mutateAsync: addServiceMutation, status: addMutationStatus, error: addMutationError, reset: resetAddStatus } = useAddService();
+    const status = addMutationStatus === 'pending' ? 'loading' : addMutationStatus;
+    const message = addMutationError ? addMutationError.message : null;
 
     const navigate = useNavigate()
 
-    const categories = useSelector(selectCategoryService)
-    const categoriesStatus = useSelector(selectCategoryServiceStatus)
+    const { data: categoriesResponse, status: categoriesQueryStatus } = useGetCategoryService();
+    const categories = categoriesResponse || null;
+    const categoriesStatus = categoriesQueryStatus === 'pending' ? 'loading' : categoriesQueryStatus;
 
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -33,11 +33,7 @@ function TambahJasaForm() {
 
     const [errorModal, setErrorModal] = useState({ isOpen: false, message: '' });
 
-    useEffect(() => {
-        if (!categories?.data) {
-            dispatch(getCategoryService())
-        }
-    }, [dispatch, categories])
+
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0]
@@ -104,32 +100,30 @@ function TambahJasaForm() {
         formData.append('data', JSON.stringify(serviceData));
 
         setIsSubmitting(true)
-        dispatch(addService(formData));
+        addServiceMutation(formData, {
+            onSuccess: () => {
+                setModalAdd(true)
+                setFile(null)
+                setPreview(null)
+                setNama_Jasa('')
+                setBase_Price('')
+                setTop_Price('')
+                setDeskripsi('')
+                setKategori_Id('')
+                setIsSubmitting(false)
+            },
+            onError: (err) => {
+                setErrorModal({ isOpen: true, message: `Gagal menambahkan jasa: ${err.message}` })
+                setIsSubmitting(false)
+                resetAddStatus()
+            }
+        });
     };
 
-    useEffect(() => {
-        if (status === 'success') {
-            setModalAdd(true)
 
-            setFile(null)
-            setPreview(null)
-            setNama_Jasa('')
-            setBase_Price('')
-            setTop_Price('')
-            setDeskripsi('')
-            setKategori_Id('')
-            setIsSubmitting(false)
-        }
-
-        if (status === 'error') {
-            setErrorModal({ isOpen: true, message: `Gagal menambahkan jasa: ${message}` })
-            setIsSubmitting(false)
-            dispatch(resetAddStatus())
-        }
-    }, [status, message, dispatch])
 
     const handleSuccessNav = () => {
-        dispatch(resetAddStatus())
+        resetAddStatus()
         navigate('/dashboard')
     }
 

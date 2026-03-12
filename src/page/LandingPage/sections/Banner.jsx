@@ -4,9 +4,8 @@ import banner1 from "../../../assets/banner1.png";
 import banner2 from "../../../assets/banner2.png";
 import banner3 from "../../../assets/banner3.png";
 import { MdLocationOn } from "react-icons/md";
-import { selectSeeAddress } from "../../../features/userSlice";
-import { useSelector } from "react-redux";
-import { selectAccessToken } from "../../../features/authSlice";
+import useAuthStore from "../../../store/useAuthStore";
+import { useGetAddresses } from "../../../hooks/useUsers";
 
 const Banner = () => {
   // Sample banner data - you can replace these with your actual images
@@ -38,8 +37,11 @@ const Banner = () => {
   const [isDragging, setIsDragging] = useState(false);
   const sliderRef = useRef(null);
 
-  const address = useSelector(selectSeeAddress);
-  const token = useSelector(selectAccessToken);
+  // Zustand Store
+  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.accessToken);
+  // TanStack Query Hooks
+  const { data: addressResponse } = useGetAddresses(user?.id_buyer);
 
   // Auto slide function
   const nextSlide = useCallback(() => {
@@ -159,7 +161,7 @@ const Banner = () => {
           <div className="flex items-center gap-1">
             <MdLocationOn className="text-gray-500" />
             <p className="font-light sm:text-h5 text-h6">
-              {address?.data?.kecamatan}
+              {addressResponse?.kecamatan}
             </p>
           </div>
         </div>
@@ -244,11 +246,10 @@ const Banner = () => {
                 e.stopPropagation();
                 goToSlide(index);
               }}
-              className={`transition-all duration-300 rounded-full ${
-                index === currentIndex
-                  ? "bg-white w-8 h-2"
-                  : "bg-white/50 hover:bg-white/75 w-2 h-2"
-              }`}
+              className={`transition-all duration-300 rounded-full ${index === currentIndex
+                ? "bg-white w-8 h-2"
+                : "bg-white/50 hover:bg-white/75 w-2 h-2"
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}

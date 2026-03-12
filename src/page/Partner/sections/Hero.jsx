@@ -1,8 +1,7 @@
 import Button from "../../../components/common/Button";
 import bgPartner from "../../../assets/bgPartner.jpg";
 import { isiCard } from "../dummy/IsiCard";
-import { useSelector } from "react-redux";
-import { selectAccessToken } from "../../../features/authSlice";
+import useAuthStore from "../../../store/useAuthStore";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaCheckCircle, FaRocket } from "react-icons/fa";
 import { useState, useEffect, useRef } from "react";
@@ -11,7 +10,7 @@ import ModalAuth from "../../../components/modules/Modal/ModalAuth";
 import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
-    const token = useSelector(selectAccessToken);
+    const token = useAuthStore((state) => state.accessToken);
     const [isVisible, setIsVisible] = useState(false);
     const [scrollOpacity, setScrollOpacity] = useState(0.5);
     const [showAuthModal, setShowAuthModal] = useState(false);

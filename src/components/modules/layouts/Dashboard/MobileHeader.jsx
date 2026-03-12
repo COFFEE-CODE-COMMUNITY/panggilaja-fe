@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import { FaArrowLeft, FaRegComment, FaCog, FaTrashAlt } from "react-icons/fa";
-import { selectContactSeller } from '../../../../features/chatSlice';
 import ModalSwitchAccount from '../../Modal/ModalSwitchAccount';
 import ModalConfirmDeleteSeller from '../../Modal/ModalConfirmDeleteSeller';
-import { changeAccount, selectCurrentUser } from '../../../../features/authSlice';
-import { deleteSellerById, resetSellerStatusDelete, selectDeleteSellerStatus } from '../../../../features/sellerSlice';
+import useAuthStore from '../../../../store/useAuthStore';
+import { useChangeAccount } from '../../../../hooks/useAuth';
+import { useDeleteSellerById } from '../../../../hooks/useSellers';
+import { useGetContactForSeller } from '../../../../hooks/useChat';
 
 const MobileHeader = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const contactSeller = useSelector(selectContactSeller);
-    const user = useSelector(selectCurrentUser);
-    const deleteSellerStatus = useSelector(selectDeleteSellerStatus);
+
+    // Zustand Store
+    const user = useAuthStore((state) => state.user);
+
+    // TanStack Query Hooks
+    const { data: contactSeller } = useGetContactForSeller(user?.id_seller);
+    const { mutate: changeAccountMutate } = useChangeAccount();
+    const { mutate: deleteSellerMutate, status: deleteSellerStatus } = useDeleteSellerById();
 
     const [showSwitchModal, setShowSwitchModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     // Calculate unread count
-    const unreadCount = contactSeller?.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0) || 0;
+    const contacts = Array.isArray(contactSeller) ? contactSeller : (contactSeller?.data || []);
+    const unreadCount = contacts.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0) || 0;
 
     const getPageTitle = (pathname) => {
         if (pathname.includes('manage-order')) return 'Pesanan';
@@ -37,10 +42,9 @@ const MobileHeader = () => {
 
     useEffect(() => {
         if (deleteSellerStatus === "success") {
-            dispatch(resetSellerStatusDelete());
             navigate("/");
         }
-    }, [deleteSellerStatus, dispatch, navigate]);
+    }, [deleteSellerStatus, navigate]);
 
     const handleBack = () => {
         if (isMainDashboard) {
@@ -51,7 +55,7 @@ const MobileHeader = () => {
     };
 
     const handleDeleteAccount = () => {
-        dispatch(deleteSellerById(user?.id_seller));
+        deleteSellerMutate(user?.id_seller);
         setShowDeleteModal(false);
     };
 
@@ -116,7 +120,7 @@ const MobileHeader = () => {
             {showSwitchModal && (
                 <ModalSwitchAccount
                     onRedirect={() => {
-                        dispatch(changeAccount({ targetRole: "buyer" }));
+                        changeAccountMutate({ targetRole: "buyer" });
                         navigate('/');
                         setShowSwitchModal(false);
                     }}
@@ -129,7 +133,7 @@ const MobileHeader = () => {
                 <ModalConfirmDeleteSeller
                     onConfirm={handleDeleteAccount}
                     onCancel={() => setShowDeleteModal(false)}
-                    isDeleting={deleteSellerStatus === 'loading'}
+                    isDeleting={deleteSellerStatus === 'pending'}
                 />
             )}
         </>

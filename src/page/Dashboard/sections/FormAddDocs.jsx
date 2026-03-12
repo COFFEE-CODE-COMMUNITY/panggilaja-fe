@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectCurrentUser } from '../../../features/authSlice';
-import Button from '../../../components/common/Button';
-import { addDocs, getDocsById, selectAddSellerStatus } from '../../../features/sellerSlice';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../../components/common/Button';
+import { useAddDocs } from '../../../hooks/useSellers';
 import ModalDocsAdded from '../../../components/modules/Modal/ModalDocsAdded';
+import useAuthStore from '../../../store/useAuthStore';
 
 const FormAddDocs = () => {
-    const dispatch = useDispatch();
-    const user = useSelector(selectCurrentUser);
+    const user = useAuthStore((state) => state.user);
     const navigate = useNavigate();
+
+    const { mutateAsync: addDocsMutate, status: addMutationStatus } = useAddDocs();
+    const addDocsStatus = addMutationStatus === 'pending' ? 'loading' : addMutationStatus;
 
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
     const handleFileChange = (e) => {
@@ -28,17 +27,14 @@ const FormAddDocs = () => {
         e.preventDefault();
         if (!file) return;
 
-        setIsSubmitting(true);
         const formData = new FormData();
         formData.append('file', file);
 
         try {
-            await dispatch(addDocs(formData)).unwrap();
+            await addDocsMutate(formData);
             setShowModal(true);
         } catch (error) {
             alert(`Gagal menambahkan dokumentasi: ${error}`);
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -90,15 +86,15 @@ const FormAddDocs = () => {
                         type='submit'
                         variant='primary'
                         className='w-full text-white py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90'
-                        disabled={!file || isSubmitting}
+                        disabled={!file || addDocsStatus === 'loading'}
                     >
-                        {isSubmitting ? 'Mengupload...' : 'Upload Dokumentasi'}
+                        {addDocsStatus === 'loading' ? 'Mengupload...' : 'Upload Dokumentasi'}
                     </Button>
                 </div>
             </form>
             {showModal && (
                 <ModalDocsAdded
-                    onBack={() => navigate(`/dashboard/manage-profile/${user.id_seller}/photos`)}
+                    onBack={() => navigate(`/dashboard/manage-profile/${user?.id_seller}/photos`)}
                 />
             )}
         </>

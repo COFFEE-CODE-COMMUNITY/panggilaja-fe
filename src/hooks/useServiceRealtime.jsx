@@ -1,16 +1,15 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { getServices } from "../features/serviceSlice";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useServiceRealtime = (socket) => {
-    const dispatch = useDispatch();
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (!socket) return;
 
         const handleServiceUpdate = (data) => {
             console.log("🔄 Service update received:", data);
-            dispatch(getServices());
+            queryClient.invalidateQueries({ queryKey: ['services'] });
         };
 
         // Listen for multiple potential event names to be safe
@@ -25,5 +24,5 @@ export const useServiceRealtime = (socket) => {
             socket.off("service_deleted", handleServiceUpdate);
             socket.off("new_service", handleServiceUpdate);
         };
-    }, [socket, dispatch]);
+    }, [socket, queryClient]);
 };

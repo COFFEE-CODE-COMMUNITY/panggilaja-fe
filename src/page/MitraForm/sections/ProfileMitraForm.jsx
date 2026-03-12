@@ -2,23 +2,24 @@ import React, { useEffect, useState } from "react";
 import Button from "../../../components/common/Button";
 import InputForm from "../../../components/modules/form/InputForm";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { getCategoryService, selectCategoryService, selectCategoryServiceStatus } from "../../../features/serviceSlice";
-import { addSeller, selectAddSellerStatus } from "../../../features/sellerSlice";
-import { changeAccount, resetChangeAccountStatus, selectChangeAccountStatus } from "../../../features/authSlice";
-import { fetchDistricts, fetchProvinces, fetchRegencies, resetDistricts, resetRegencies, selectAlamatStatus, selectAllDistricts, selectAllProvinces, selectAllRegencies } from "../../../features/addressSlice";
+import { useGetCategoryService } from "../../../hooks/useServices";
+import { useAddSeller } from "../../../hooks/useSellers";
+import { useChangeAccount } from "../../../hooks/useAuth";
+import { useGetProvinces, useGetRegencies, useGetDistricts } from "../../../hooks/useAddress";
 import Input from "../../../components/common/Input";
 import ModalSelect from "../../../components/common/ModalSelect"; // Updated import
 import AddressPickerModal from "../../../components/modules/form/AddressPickerModal"; // New import
 import ModalSuccessBecomeSeller from "../../../components/modules/Modal/ModalSuccessBecomeSeller";
 
 function ProfileMitraForm() {
-    const categorys = useSelector(selectCategoryService)
-    const status = useSelector(selectCategoryServiceStatus)
-    const dispatch = useDispatch()
+    const { data: categorysResponse, status: categorysQueryStatus } = useGetCategoryService();
+    const categorys = categorysResponse || null;
+    const status = categorysQueryStatus === 'pending' ? 'loading' : categorysQueryStatus;
+
     const navigate = useNavigate()
 
-    const statusAdd = useSelector(selectAddSellerStatus)
+    const { mutateAsync: addSellerMutation, status: addSellerMutationStatus } = useAddSeller();
+    const statusAdd = addSellerMutationStatus === 'pending' ? 'loading' : addSellerMutationStatus;
 
     const [file, setFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState(null)
@@ -32,16 +33,23 @@ function ProfileMitraForm() {
     const [kecamatan, setKecamatan] = useState('')
     const [kode_pos, setKode_Pos] = useState('')
 
-    const provinces = useSelector(selectAllProvinces)
-    const regencies = useSelector(selectAllRegencies)
-    const districts = useSelector(selectAllDistricts)
-    const alamatStatus = useSelector(selectAlamatStatus)
-
-    useEffect(() => {
-        if (!categorys) {
-            dispatch(getCategoryService())
+    const { mutateAsync: changeAccountMutation, status: changeAccountMutationStatus, reset: resetChangeAccountStatus } = useChangeAccount({
+        onSuccess: () => {
+            setShowSuccessModal(true);
         }
-    }, [dispatch])
+    });
+    const statusChange = changeAccountMutationStatus === 'pending' ? 'loading' : changeAccountMutationStatus;
+
+    const { data: provincesResponse, status: provincesQueryStatus } = useGetProvinces();
+    const provinces = provincesResponse?.data || provincesResponse || [];
+
+    const { data: regenciesResponse, status: regenciesQueryStatus } = useGetRegencies(provinsi);
+    const regencies = regenciesResponse?.data || regenciesResponse || [];
+
+    const { data: districtsResponse, status: districtsQueryStatus } = useGetDistricts(kota);
+    const districts = districtsResponse?.data || districtsResponse || [];
+
+    const alamatStatus = (provincesQueryStatus === 'pending' || regenciesQueryStatus === 'pending' || districtsQueryStatus === 'pending') ? 'loading' : 'idle';
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -56,7 +64,6 @@ function ProfileMitraForm() {
         }
     };
 
-    const statusChange = useSelector(selectChangeAccountStatus)
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -97,20 +104,14 @@ function ProfileMitraForm() {
 
         formData.append('data', JSON.stringify(serviceData));
 
-        dispatch(addSeller(formData)).unwrap()
+        addSellerMutation(formData)
             .then(() => {
-                dispatch(changeAccount({ targetRole: 'seller' }))
+                changeAccountMutation({ targetRole: 'seller' })
             })
     };
 
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    useEffect(() => {
-        if (statusChange === 'success') {
-            dispatch(resetChangeAccountStatus());
-            setShowSuccessModal(true);
-        }
-    }, [statusChange]);
 
     const handleAddService = () => {
         navigate('add-service');
@@ -120,31 +121,15 @@ function ProfileMitraForm() {
         navigate('/dashboard/manage-services');
     };
 
-    useEffect(() => {
-        if (provinces.length === 0 && alamatStatus === 'idle') {
-            dispatch(fetchProvinces())
-        }
-    }, [dispatch, provinces.length, alamatStatus])
-
     const handleProvinceChange = (code) => {
         setProvinsi(code)
         setKota('')
         setKecamatan('')
-        dispatch(resetRegencies())
-
-        if (code) {
-            dispatch(fetchRegencies(code))
-        }
     }
 
     const handleRegencyChange = (code) => {
         setKota(code)
         setKecamatan('')
-        dispatch(resetDistricts())
-
-        if (code) {
-            dispatch(fetchDistricts(code))
-        }
     }
 
     const handleDistrictChange = (code) => {

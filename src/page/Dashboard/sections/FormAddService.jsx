@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectCurrentUser } from '../../../features/authSlice';
+import useAuthStore from '../../../store/useAuthStore';
+import { useGetCategoryService, useAddService } from '../../../hooks/useServices';
 import InputForm from '../../../components/modules/form/InputForm';
 import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
-import { addService, getCategoryService, resetAddStatus, selectAddServiceError, selectAddServiceStatus, selectCategoryService, selectCategoryServiceStatus } from '../../../features/serviceSlice';
+
 import { useNavigate } from 'react-router-dom';
 import AddServiceStatusModal from '../../../components/modules/Modal/ModalAddService';
 import ModalServiceAdded from '../../../components/modules/Modal/ModalAddService';
 
 const FormAddService = () => {
-    const dispatch = useDispatch();
-    const user = useSelector(selectCurrentUser);
-
-    const status = useSelector(selectAddServiceStatus);
-    const message = useSelector(selectAddServiceError);
+    const user = useAuthStore(state => state.user);
+    const { mutateAsync: addServiceMutation, status: addMutationStatus, error: addMutationError, reset: resetAddStatus } = useAddService(user?.id_seller);
+    const status = addMutationStatus === 'pending' ? 'loading' : addMutationStatus;
+    const message = addMutationError ? addMutationError.message : null;
 
     const navigate = useNavigate()
 
-    const categories = useSelector(selectCategoryService)
-    const categoriesStatus = useSelector(selectCategoryServiceStatus)
+    const { data: categoriesResponse, status: categoriesQueryStatus } = useGetCategoryService();
+    const categories = categoriesResponse || null;
+    const categoriesStatus = categoriesQueryStatus === 'pending' ? 'loading' : categoriesQueryStatus;
 
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -32,15 +32,7 @@ const FormAddService = () => {
     const [statusAdd, setStatusAdd] = useState(false)
     const [modalAdd, setModalAdd] = useState(false)
 
-    useEffect(() => {
 
-    }, [user])
-
-    useEffect(() => {
-        if (!categories?.data) {
-            dispatch(getCategoryService())
-        }
-    }, [dispatch, categories])
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0]
@@ -108,28 +100,25 @@ const FormAddService = () => {
         formData.append('data', JSON.stringify(serviceData));
 
         setIsSubmitting(true)
-        dispatch(addService(formData));
+        addServiceMutation(formData, {
+            onSuccess: () => {
+                setModalAdd(true)
+                setFile(null)
+                setPreview(null)
+                setNama_Jasa('')
+                setBase_Price('')
+                setTop_Price('')
+                setDeskripsi('')
+                setKategori_Id('')
+                setIsSubmitting(false)
+            },
+            onError: (err) => {
+                alert(`Gagal menambahkan jasa: ${err.message}`)
+                setIsSubmitting(false)
+                resetAddStatus()
+            }
+        });
     };
-
-    useEffect(() => {
-        if (status === 'success') {
-            setFile(null)
-            setPreview(null)
-            setNama_Jasa('')
-            setBase_Price('')
-            setTop_Price('')
-            setDeskripsi('')
-            setKategori_Id('')
-
-            dispatch(resetAddStatus())
-            setModalAdd(true)
-        }
-
-        if (status === 'error') {
-            alert(`Gagal menambahkan jasa: ${message}`)
-            setIsSubmitting(false)
-        }
-    }, [status, message, navigate, dispatch])
 
 
 

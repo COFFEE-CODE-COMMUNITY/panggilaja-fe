@@ -1,27 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { deleteSellerById, resetSellerStatusDelete, selectDeleteSellerMessage, selectDeleteSellerStatus } from '../../features/sellerSlice'
-import { selectAccessToken, selectCurrentUser } from '../../features/authSlice'
+import useAuthStore from '../../store/useAuthStore'
+import { useDeleteSellerById } from '../../hooks/useSellers'
 import { useNavigate } from 'react-router-dom'
 import ModalConfirmDeleteSeller from '../../components/modules/Modal/ModalConfirmDeleteSeller'
 import { FaTrash, FaExclamationTriangle } from 'react-icons/fa'
 
 const ManageProfile = () => {
-  const dispatch = useDispatch()
-  const statusDelete = useSelector(selectDeleteSellerStatus)
-  const user = useSelector(selectCurrentUser)
+  const user = useAuthStore(state => state.user)
   const navigate = useNavigate()
   const [showModal, setShowModal] = useState(false)
 
-  useEffect(() => {
-    if (statusDelete === 'success') {
-      dispatch(resetSellerStatusDelete())
-      navigate('/')
-    }
-  }, [statusDelete, dispatch, navigate])
+  const { mutate: deleteSeller, status: mutationStatus } = useDeleteSellerById();
+  const isDeleting = mutationStatus === 'pending';
 
   const handleDelete = () => {
-    dispatch(deleteSellerById(user.id_seller))
+    deleteSeller(user?.id_seller, {
+      onSuccess: () => {
+        navigate('/')
+      }
+    })
   }
 
   return (
@@ -61,7 +58,7 @@ const ManageProfile = () => {
         <ModalConfirmDeleteSeller
           onConfirm={handleDelete}
           onCancel={() => setShowModal(false)}
-          isDeleting={statusDelete === 'loading'}
+          isDeleting={isDeleting}
         />
       )}
     </div>

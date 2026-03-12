@@ -2,34 +2,18 @@ import { useEffect, useState } from "react";
 import { FaStar, FaRegHeart, FaHeart, FaCommentDots, FaHandshake, FaUser } from "react-icons/fa";
 import Button from "../../../components/common/Button";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import socket from "../../../config/socket";
 import {
-  addFavoriteService,
-  deleteFavoriteService,
-  getFavoriteService,
-  getReviewServicesById,
-  resetAddFavoritesStatus,
-  resetDeleteFavoritesStatus,
-  selectAddFavoriteServiceError,
-  selectAddFavoriteServiceStatus,
-  selectDeleteFavoriteServiceError,
-  selectDeleteFavoriteServiceStatus,
-  selectFavoriteService,
-  selectReviewService,
-  selectReviewServiceStatus,
-} from "../../../features/serviceSlice";
-import {
-  selectAccessToken,
-  selectCurrentUser,
-} from "../../../features/authSlice";
-import {
-  getSellerById,
-  selectSelectedSeller,
-} from "../../../features/sellerSlice";
+  useGetReviewServicesById,
+  useGetFavoriteServices,
+  useAddFavoriteService,
+  useDeleteFavoriteService,
+} from "../../../hooks/useServices";
+import useAuthStore from "../../../store/useAuthStore";
+import useFavoriteStore from "../../../store/useFavoriteStore";
+import { useGetSellerById } from "../../../hooks/useSellers";
 import Stars from "../../../components/common/Stars";
 import ReviewService from "./ReviewService";
-
 import ModalAuth from "../../../components/modules/Modal/ModalAuth";
 
 const InformationService = ({
@@ -45,59 +29,48 @@ const InformationService = ({
   foto_product,
   idSeller,
 }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector(selectCurrentUser);
-  const favorites = useSelector(selectFavoriteService);
-  const [isStartingChat, setIsStartingChat] = useState(false);
-  const reviews = useSelector(selectReviewService);
-  const status = useSelector(selectReviewServiceStatus);
-  const statusAdd = useSelector(selectAddFavoriteServiceStatus);
-  const errorAdd = useSelector(selectAddFavoriteServiceError);
-  const token = useSelector(selectAccessToken);
-  const sellerProfile = useSelector(selectSelectedSeller);
+  const token = useAuthStore((state) => state.accessToken);
+  const user = useAuthStore((state) => state.user);
 
+  const [isStartingChat, setIsStartingChat] = useState(false);
   const [showMoreDesc, setShowMoreDesc] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const myId = user?.id_buyer;
 
-  let averageStar = reviews?.data?.reduce((total, review) => total + review.rating, 0) / reviews?.data?.length || 0;
+  const myId = user?.id_buyer || user?.id;
 
+  // TanStack Query Hooks
+  const { data: reviewsResponse } = useGetReviewServicesById(idService);
+  const reviews = reviewsResponse?.data || [];
 
-  useEffect(() => {
-    if (idSeller) {
-      dispatch(getSellerById(idSeller));
-    }
-  }, [idSeller]);
-
-  const handleAddFavorite = () => {
-    dispatch(addFavoriteService(idService));
-  };
-
-  useEffect(() => {
-    if (statusAdd === "success") {
-      if (user?.id) {
-        dispatch(getFavoriteService(user.id));
-      }
-      dispatch(resetAddFavoritesStatus());
-    }
-  }, [statusAdd, errorAdd, dispatch, user?.id]);
-
-  let isServiceFavorite = favorites?.data?.find(
+  // useFavoriteStore for optimistic UI
+  const isServiceFavorite = useFavoriteStore((state) => state.favorites.find(
     (favorite) => favorite.service_id === idService
-  );
+  ));
 
-  const deleteFavoriteStatus = useSelector(selectDeleteFavoriteServiceStatus);
-  const deleteFavoriteMessage = useSelector(selectDeleteFavoriteServiceError);
+  const { data: favoritesResponse } = useGetFavoriteServices(user?.id);
 
-  useEffect(() => {
-    if (deleteFavoriteStatus === "success") {
-      if (user?.id) {
-        dispatch(getFavoriteService(user.id));
-      }
-      dispatch(resetDeleteFavoritesStatus());
+  const { data: sellerProfile } = useGetSellerById(idSeller);
+
+  const { mutate: addFavorite } = useAddFavoriteService();
+  const { mutate: deleteFavorite } = useDeleteFavoriteService(idService);
+
+  const averageStar = reviews.length > 0
+    ? reviews.reduce((total, review) => total + review.rating, 0) / reviews.length
+    : 0;
+
+  const handleToggleFavorite = () => {
+    if (!token) {
+      setShowAuthModal(true);
+      return;
     }
-  }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
+
+    if (isServiceFavorite) {
+      deleteFavorite(isServiceFavorite.id);
+    } else {
+      addFavorite(idService);
+    }
+  };
 
   const handleStartChat = () => {
     if (!token) {
@@ -147,7 +120,7 @@ const InformationService = ({
 
   useEffect(() => {
     const handleMessageReceived = (msg) => {
-
+      // Optional: Handle incoming message acknowledgment if needed
     };
 
     socket.on("receive_message", handleMessageReceived);
@@ -187,7 +160,7 @@ const InformationService = ({
 
             {token && (
               <button
-                onClick={isServiceFavorite ? () => dispatch(deleteFavoriteService(isServiceFavorite.id)) : handleAddFavorite}
+                onClick={handleToggleFavorite}
                 className="cursor-pointer p-2 rounded-full hover:bg-gray-50 transition-colors"
                 title={isServiceFavorite ? "Hapus dari favorit" : "Tambah ke favorit"}
               >

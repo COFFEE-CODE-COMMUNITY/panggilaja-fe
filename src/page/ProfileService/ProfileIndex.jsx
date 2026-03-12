@@ -1,15 +1,14 @@
-import React, { useState } from 'react'
-import ProfileLayout from '../../components/modules/layouts/ProfileLayout'
-import { useOutletContext } from 'react-router-dom'
-import { selectSelectedSeller } from '../../features/sellerSlice'
-import { useSelector } from 'react-redux'
+import React from 'react'
+import { useParams } from 'react-router-dom'
+import { useGetSellerById } from '../../hooks/useSellers'
 
 const ProfileIndex = () => {
-  const seller = useSelector(selectSelectedSeller)
+  const { id } = useParams();
+  const { data: seller } = useGetSellerById(id);
 
   return (
     <div className='min-h-screen'>
-      {seller.deskripsi_toko}
+      {seller?.deskripsi_toko}
     </div>
   )
 }

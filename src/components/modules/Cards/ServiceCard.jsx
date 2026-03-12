@@ -1,7 +1,5 @@
-import { useSelector } from "react-redux";
 import Card from "../../common/Card";
 import Stars from "../../common/Stars";
-import { selectCurrentUser } from "../../../features/authSlice";
 
 const ServiceCard = ({
   image,

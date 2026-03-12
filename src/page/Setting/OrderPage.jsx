@@ -1,19 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../components/common/Button";
-import { useDispatch, useSelector } from "react-redux";
-import { selectCurrentUser } from "../../features/authSlice";
-import {
-    getOrders,
-    selectOrders,
-    selectOrdersError,
-    selectOrdersStatus,
-} from "../../features/userSlice";
-import {
-    createNewReview,
-    selectCreateStatus,
-    clearCreateStatus
-} from "../../features/reviewSlice";
-import { selectAllService } from "../../features/serviceSlice";
+import { useGetUserOrders } from "../../hooks/useUsers";
+import { useCreateNewReview } from "../../hooks/useReviews";
+import useAuthStore from "../../store/useAuthStore";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import ModalReview from "../../components/modules/Modal/ModalReview";
@@ -25,20 +14,14 @@ const OrderPage = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
 
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const user = useAuthStore(state => state.user);
 
-    const user = useSelector(selectCurrentUser);
-    const order = useSelector(selectOrders);
-    const orderStatus = useSelector(selectOrdersStatus);
-    const createReviewStatus = useSelector(selectCreateStatus);
-    const orderMessage = useSelector(selectOrdersError);
-    const allService = useSelector(selectAllService);
+    const { data: ordersResponse, status: ordersQueryStatus, refetch: refetchOrders } = useGetUserOrders(user?.id_buyer);
+    const order = ordersResponse?.data || ordersResponse || [];
+    const orderStatus = ordersQueryStatus === "pending" ? "loading" : ordersQueryStatus;
 
-    useEffect(() => {
-        if (user && user.id_buyer) {
-            dispatch(getOrders(user.id_buyer));
-        }
-    }, [dispatch, user]);
+    const { mutate: createReview, status: createReviewMutationStatus } = useCreateNewReview();
+    const createReviewStatus = createReviewMutationStatus === "pending" ? "loading" : createReviewMutationStatus;
 
     // Listen for real-time order status updates
     useEffect(() => {
@@ -47,8 +30,8 @@ const OrderPage = () => {
         const handleOrderStatusUpdate = (data) => {
             console.log("🔔 Order status updated (Socket):", data);
             if (data?.status) {
-                // Dispatch getOrders to refresh list
-                dispatch(getOrders(user.id_buyer));
+                // Refresh list
+                refetchOrders();
             }
         };
 
@@ -57,7 +40,7 @@ const OrderPage = () => {
         return () => {
             socket.off("order_status_updated", handleOrderStatusUpdate);
         };
-    }, [user?.id_buyer, dispatch]);
+    }, [user?.id_buyer]);
 
     let orderService = [];
 
@@ -116,25 +99,23 @@ const OrderPage = () => {
     const handleCloseReview = () => {
         setIsReviewModalOpen(false);
         setSelectedOrder(null);
-        dispatch(clearCreateStatus());
     };
 
-    const handleSubmitReview = async (reviewData) => {
+    const handleSubmitReview = (reviewData) => {
         if (!selectedOrder) return;
 
-        const result = await dispatch(createNewReview({
+        createReview({
+            orderId: selectedOrder.order_id,
             reviewData: {
                 rating: reviewData.rating,
                 komentar: reviewData.comment,
-            },
-            orderId: selectedOrder.order_id
-        }));
-
-        if (createNewReview.fulfilled.match(result)) {
-            handleCloseReview();
-            // Refresh orders to update "is_reviewed" status
-            dispatch(getOrders(user.id_buyer));
-        }
+            }
+        }, {
+            onSuccess: () => {
+                handleCloseReview();
+                refetchOrders();
+            }
+        });
     };
 
     const OrderSkeleton = () => (

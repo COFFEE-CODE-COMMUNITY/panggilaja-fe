@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  clearCreateStatus,
-  createNewReview,
-  selectCreateError,
-  selectCreateStatus,
-} from "../../features/reviewSlice";
+import { useGetOrderById } from "../../hooks/useOrders";
+import { useCreateNewReview } from "../../hooks/useReviews";
 import { ServiceCard } from "./sections/ServiceCard";
-import {
-  getOrderById,
-  selectCurrentOrder,
-  selectOrderStatus,
-} from "../../features/orderSlice";
 import { ReviewHeader } from "./sections/ReviewHeader";
 import { ReviewSuccess } from "./sections/ReviewSuccess";
 import { RatingInput } from "./sections/RatingInput";
@@ -21,7 +11,6 @@ import { ReviewForm } from "./sections/ReviewForm";
 import { StatusMessage } from "./sections/StatusMessage";
 
 const ReviewPage = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { orderId } = useParams();
 
@@ -29,15 +18,13 @@ const ReviewPage = () => {
   const [reviewText, setReviewText] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const createStatus = useSelector(selectCreateStatus);
-  const createError = useSelector(selectCreateError);
+  const { data: orderResponse, status: orderQueryStatus } = useGetOrderById(orderId);
+  const orders = orderResponse?.data || orderResponse;
+  const orderStatus = orderQueryStatus === "pending" ? "loading" : orderQueryStatus;
 
-  const orders = useSelector(selectCurrentOrder);
-  const orderStatus = useSelector(selectOrderStatus);
-
-  useEffect(() => {
-    dispatch(getOrderById(orderId));
-  }, [dispatch, orderId]);
+  const { mutate: createReview, status: createReviewMutationStatus, error: createReviewMutationError, reset: resetCreateReview } = useCreateNewReview();
+  const createStatus = createReviewMutationStatus === "pending" ? "loading" : createReviewMutationStatus;
+  const createError = createReviewMutationError ? createReviewMutationError.message : null;
 
   const handleRatingChange = (rating) => {
     setSelectedRating(rating);
@@ -58,21 +45,18 @@ const ReviewPage = () => {
     };
 
     // Debug logging to see what we're sending
-
-
-    dispatch(createNewReview({ reviewData, orderId })).then((result) => {
-      if (result.meta.requestStatus === "fulfilled") {
+    createReview({ orderId, reviewData }, {
+      onSuccess: () => {
         setIsSubmitted(true);
-      } else if (result.meta.requestStatus === "rejected") {
-        console.error("Review submission failed:", result.payload);
-
-        // Check if it's an authentication error
-        if (result.payload?.error_code === "NO_USER_CONTEXT") {
-          // Redirect to login page
+        setTimeout(() => resetCreateReview(), 3000);
+      },
+      onError: (err) => {
+        console.error("Review submission failed:", err);
+        if (err?.error_code === "NO_USER_CONTEXT") {
           navigate("/login");
         }
+        setTimeout(() => resetCreateReview(), 3000);
       }
-      setTimeout(() => dispatch(clearCreateStatus()), 3000);
     });
   };
 

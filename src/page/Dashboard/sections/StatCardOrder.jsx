@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { selectOrderSeller, selectOrderSellerStatus } from '../../../features/sellerSlice'
-import { useSelector } from 'react-redux'
 import { FaShoppingBag, FaClock, FaCheckCircle } from 'react-icons/fa'
+import { useGetOrdersBySellerId } from '../../../hooks/useSellers'
+import useAuthStore from '../../../../store/useAuthStore'
 
 const StatCardOrder = () => {
-  const orders = useSelector(selectOrderSeller)
-  const status = useSelector(selectOrderSellerStatus)
+  const user = useAuthStore((state) => state.user);
+  const { data: ordersResponse, status } = useGetOrdersBySellerId(user?.id_seller);
+  const orders = ordersResponse?.data || ordersResponse || [];
 
   const [isArtificialLoading, setIsArtificialLoading] = useState(true);
 
@@ -16,26 +17,17 @@ const StatCardOrder = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  let lengthAllOrder = 0
-  orders?.data?.map(() => {
-    lengthAllOrder += 1
-  })
+  let lengthAllOrder = Array.isArray(orders) ? orders.length : 0;
 
-  let lengthProggressOrder = 0
-  orders?.data?.map((order) => {
-    if (order.status === 'in_progress' || order.status === 'proses') {
-      lengthProggressOrder += 1
-    }
-  })
+  let lengthProggressOrder = Array.isArray(orders) ? orders.filter(order =>
+    order.status === 'in_progress' || order.status === 'proses'
+  ).length : 0;
 
-  let lengthDoneOrder = 0
-  orders?.data?.map((order) => {
-    if (order.status === 'completed' || order.status === 'selesai') {
-      lengthDoneOrder += 1
-    }
-  })
+  let lengthDoneOrder = Array.isArray(orders) ? orders.filter(order =>
+    order.status === 'completed' || order.status === 'selesai'
+  ).length : 0;
 
-  if (status === 'loading' || isArtificialLoading) {
+  if (status === 'pending' || isArtificialLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         {[1, 2, 3].map((i) => (

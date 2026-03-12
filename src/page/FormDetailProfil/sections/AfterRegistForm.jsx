@@ -2,114 +2,68 @@ import { useEffect, useState } from 'react'
 import Button from '../../../components/common/Button'
 import AddressPickerModal from '../../../components/modules/form/AddressPickerModal'
 import Input from '../../../components/common/Input'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-    addAddress as addAddressAction,
-    selectSeeAddress,
-    selectSeeAddressStatus,
-    selectAddAddressStatus,
-    seeAddress,
-    selectAddAddress
-} from '../../../features/userSlice'
-import { selectAccessToken, selectCurrentUser } from '../../../features/authSlice'
+import { useGetAddresses, useAddAddress } from '../../../hooks/useUsers'
+import useAuthStore from '../../../store/useAuthStore'
+import { useGetProvinces, useGetRegencies, useGetDistricts } from '../../../hooks/useAddress'
 import { useNavigate } from 'react-router-dom'
 
-import {
-    fetchProvinces,
-    fetchRegencies,
-    fetchDistricts,
-    selectAllProvinces,
-    selectAllRegencies,
-    selectAllDistricts,
-    selectAlamatStatus,
-    resetRegencies,
-    resetDistricts,
-} from '../../../features/addressSlice'
-
-
 const AfterRegistForm = () => {
-    const user = useSelector(selectCurrentUser)
-    const token = useSelector(selectAccessToken)
-    const address = useSelector(selectSeeAddress)
-    const addressStatus = useSelector(selectSeeAddressStatus)
-    const addAddressStatus = useSelector(selectAddAddressStatus)
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-
-    const provinces = useSelector(selectAllProvinces)
-    const regencies = useSelector(selectAllRegencies)
-    const districts = useSelector(selectAllDistricts)
-    const alamatStatus = useSelector(selectAlamatStatus)
-
     const [provinsiCode, setProvinsiCode] = useState('')
     const [kotaCode, setKotaCode] = useState('')
     const [kecamatanCode, setKecamatanCode] = useState('')
-
     const [kode_pos, setKode_Pos] = useState('')
     const [alamat, setAlamat] = useState('')
-    const [isSubmitting, setIsSubmitting] = useState(false)
+
+    const user = useAuthStore(state => state.user)
+    const token = useAuthStore(state => state.accessToken)
+    const navigate = useNavigate()
+
+    const { data: addressResponse, status: addressStatus, refetch: refetchAddress } = useGetAddresses(user?.id_buyer);
+    const address = addressResponse || null;
+
+    const { mutate: addAddressAction, status: addMutationStatus } = useAddAddress({
+        onSuccess: () => {
+            refetchAddress();
+            setTimeout(() => {
+                navigate('/', { replace: true });
+            }, 1000);
+        },
+        onError: (error) => {
+            console.error('❌ Gagal menambahkan alamat', error);
+        }
+    });
+    const addAddressStatus = addMutationStatus === "pending" ? "loading" : addMutationStatus;
+
+    const { data: provincesResponse, isLoading: isLoadingProvinces } = useGetProvinces();
+    const provinces = provincesResponse?.data || provincesResponse || [];
+
+    const { data: regenciesResponse, isLoading: isLoadingRegencies } = useGetRegencies(provinsiCode);
+    const regencies = regenciesResponse?.data || regenciesResponse || [];
+
+    const { data: districtsResponse, isLoading: isLoadingDistricts } = useGetDistricts(kotaCode);
+    const districts = districtsResponse?.data || districtsResponse || [];
+
+    const alamatStatus = isLoadingProvinces || isLoadingRegencies || isLoadingDistricts ? "loading" : "idle";
 
     useEffect(() => {
-        if (provinces.length === 0 && alamatStatus === 'idle') {
-            dispatch(fetchProvinces())
-        }
-    }, [dispatch, provinces.length, alamatStatus])
-
-    useEffect(() => {
-        if (user?.id_buyer && token) {
-            dispatch(seeAddress(user?.id_buyer))
-        }
-    }, [dispatch, user?.id_buyer, token])
-
-    useEffect(() => {
-        if (addressStatus === 'loading') {
-            return
-        }
-        if (address?.data?.provinsi || address?.data?.alamat) {
+        // Redirection logic: if address data already exists, go to home
+        if (addressStatus === 'success' && address?.data && (address.data.provinsi || address.data.alamat)) {
             navigate('/', { replace: true })
         }
     }, [address, addressStatus, navigate])
 
-    useEffect(() => {
-        if (isSubmitting && addAddressStatus === 'success') {
-            dispatch(seeAddress(user?.id_buyer))
-
-            setTimeout(() => {
-                navigate('/', { replace: true })
-            }, 1000)
-        }
-
-        if (addAddressStatus === 'error') {
-            console.error('❌ Gagal menambahkan alamat')
-            setIsSubmitting(false)
-        }
-    }, [addAddressStatus, isSubmitting, navigate, dispatch, user?.id_buyer])
-
-    const handleProvinceChange = (e) => {
-        const code = e.target.value
+    const handleProvinceChange = (code) => {
         setProvinsiCode(code)
         setKotaCode('')
         setKecamatanCode('')
-        dispatch(resetRegencies())
-
-        if (code) {
-            dispatch(fetchRegencies(code))
-        }
     }
 
-    const handleRegencyChange = (e) => {
-        const code = e.target.value
+    const handleRegencyChange = (code) => {
         setKotaCode(code)
         setKecamatanCode('')
-        dispatch(resetDistricts())
-
-        if (code) {
-            dispatch(fetchDistricts(code))
-        }
     }
 
-    const handleDistrictChange = (e) => {
-        const code = e.target.value
+    const handleDistrictChange = (code) => {
         setKecamatanCode(code)
     }
 
@@ -134,9 +88,7 @@ const AfterRegistForm = () => {
             kode_pos
         }
 
-        setIsSubmitting(true)
-
-        dispatch(addAddressAction({ id: user?.id_buyer, data }))
+        addAddressAction({ id: user?.id_buyer, data })
     }
 
     return (
@@ -157,20 +109,9 @@ const AfterRegistForm = () => {
                                 provinces={provinces}
                                 regencies={regencies}
                                 districts={districts}
-                                onProvinceChange={(code) => {
-                                    setProvinsiCode(code);
-                                    setKotaCode('');
-                                    setKecamatanCode('');
-                                    dispatch(resetRegencies());
-                                    if (code) dispatch(fetchRegencies(code));
-                                }}
-                                onRegencyChange={(code) => {
-                                    setKotaCode(code);
-                                    setKecamatanCode('');
-                                    dispatch(resetDistricts());
-                                    if (code) dispatch(fetchDistricts(code));
-                                }}
-                                onDistrictChange={(code) => setKecamatanCode(code)}
+                                onProvinceChange={handleProvinceChange}
+                                onRegencyChange={handleRegencyChange}
+                                onDistrictChange={handleDistrictChange}
                                 currentProvince={provinsiCode}
                                 currentRegency={kotaCode}
                                 currentDistrict={kecamatanCode}

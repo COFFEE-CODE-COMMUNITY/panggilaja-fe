@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { googleLoginSuccess } from '../../features/authSlice';
+import useAuthStore from '../../store/useAuthStore';
 
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const setAuth = useAuthStore(state => state.setAuth);
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -29,13 +28,7 @@ const GoogleCallback = () => {
 
         let userData = JSON.parse(decodeURIComponent(userParam));
 
-        await dispatch(
-          googleLoginSuccess({
-            status: 'success',
-            message: 'Login dengan Google berhasil',
-            data: { user: userData, token },
-          })
-        ).unwrap();
+        setAuth(token, userData);
 
         navigate('/', { replace: true });
       } catch (err) {

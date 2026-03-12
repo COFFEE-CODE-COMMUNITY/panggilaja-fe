@@ -1,27 +1,11 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import socket from "../../../../config/socket";
-import { API_BASE_URL } from "../../../../api/api";
-import Input from "../../../common/Input";
-import Button from "../../../common/Button";
-import {
-  FaSearch,
-  FaArrowLeft,
-  FaPaperPlane,
-  FaEllipsisV,
-  FaUser,
-  FaCheckCircle,
-} from "react-icons/fa";
-import axiosInstance from "../../../utils/axios";
-import Modal from "../../../common/Modal";
-import {
-  getContactForBuyer,
-  getContactForSeller,
-  selectContactBuyerStatus,
-  selectContactSellerStatus,
-  markChatAsRead,
-} from "../../../../features/chatSlice";
+import { useGetContactForBuyer, useGetContactForSeller, useGetChatMessages } from "../../../../hooks/useChat";
+import { useQueryClient } from "@tanstack/react-query";
+import useAuthStore from "../../../../store/useAuthStore";
+import useChatStore from "../../../../store/useChatStore";
+import { useChatRealtime } from "../../../../hooks/useChatRealtime";
+import { useCreateOrder } from "../../../../hooks/useOrders";
 
 // SECTIONS
 import AcceptNegoCard from "./sections/AcceptNegoCard";
@@ -36,17 +20,21 @@ import {
   negoMessageRegex,
   acceptNegoRegex,
 } from "./utils/chatUtils";
+import { FaArrowLeft, FaCheckCircle, FaEllipsisV, FaPaperPlane, FaSearch, FaUser } from "react-icons/fa";
+import Input from "../../../common/Input";
+import Modal from "../../../common/Modal";
+import Button from "../../../common/Button";
 
 const ChatLayout = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { partnerId } = useParams();
   const location = useLocation();
 
   const shouldRefresh = location.state?.shouldRefreshList;
 
-  const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.accessToken);
+  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.accessToken);
   const isBuyer = user?.active_role?.toUpperCase() === "BUYER";
   const myId = isBuyer ? user?.id_buyer : user?.id_seller;
   const role = user?.active_role?.toLowerCase();
@@ -59,216 +47,72 @@ const ChatLayout = () => {
     return `${buyerId}_${sellerId}`;
   }, [buyerId, sellerId]);
 
-  const buyerStatus = useSelector(selectContactBuyerStatus);
-  const sellerStatus = useSelector(selectContactSellerStatus);
-  const conversationsData = useSelector((state) =>
-    isBuyer ? state.chat.contactBuyer : state.chat.contactSeller
-  );
-  const conversations = useMemo(
-    () => conversationsData || [],
-    [conversationsData]
-  );
+  const { data: buyerData, isLoading: buyerLoading, refetch: refetchBuyer } = useGetContactForBuyer(isBuyer ? myId : null);
+  const { data: sellerData, isLoading: sellerLoading, refetch: refetchSeller } = useGetContactForSeller(!isBuyer ? myId : null);
 
-  const [chatMobile, setChatMobile] = useState(false);
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [text, setText] = useState("");
-  const [messages, setMessages] = useState([]);
+  const onlineUsers = useChatStore((state) => state.onlineUsers);
+
+  const rawConversations = isBuyer ? buyerData : sellerData;
+  // Attach online status
+  const conversations = useMemo(() => {
+    if (!rawConversations) return [];
+    return rawConversations.map(contact => {
+      const userKey = isBuyer ? `seller_${contact.id}` : `buyer_${contact.id}`;
+      return {
+        ...contact,
+        name: isBuyer ? contact.nama_toko : contact.nama,
+        avatar: isBuyer ? contact.foto_toko : contact.foto_profile,
+        isOnline: !!onlineUsers[userKey]
+      };
+    });
+  }, [rawConversations, onlineUsers, isBuyer]);
+
+  const listLoading = isBuyer ? buyerLoading : sellerLoading;
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [messagesLoading, setMessagesLoading] = useState(false);
-  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [text, setText] = useState("");
+  const [chatMobile, setChatMobile] = useState(false);
   const [confirmedMessageIds, setConfirmedMessageIds] = useState([]);
-  const [isPartnerTyping, setIsPartnerTyping] = useState(false);
   const chatContainerRef = useRef(null);
   const inputRef = useRef(null);
-  const typingTimeoutRef = useRef(null);
 
-  const listLoading = buyerStatus === "loading" || sellerStatus === "loading";
+  const { data: messagesResponse, isLoading: messagesLoading } = useGetChatMessages(partnerId);
+  const { isPartnerTyping, sendMessage, emitTyping } = useChatRealtime(partnerId, myId, isBuyer);
+
+  // Derive formatted messages from TanStack Query cache
+  const messages = useMemo(() => {
+    if (!messagesResponse) return [];
+    return messagesResponse.map((msg) => ({
+      id: msg.id,
+      type: "text",
+      text: msg.text,
+      timestamp: formatTime(msg.created_at),
+      sender:
+        (isBuyer && msg.sender_role?.toUpperCase() === "BUYER") ||
+          (!isBuyer && msg.sender_role?.toUpperCase() === "SELLER")
+          ? "user"
+          : "seller",
+      isOptimistic: msg.isOptimistic
+    }));
+  }, [messagesResponse, isBuyer]);
+
+  // Derive selected chat
+  const selectedChat = useMemo(() => {
+    if (!partnerId || conversations.length === 0) return null;
+    return conversations.find((c) => String(c.id).trim() === String(partnerId).trim()) || null;
+  }, [partnerId, conversations]);
 
   // USEEFFECT: AUTO FOCUS INPUT ON CHAT SELECTION
   useEffect(() => {
     if (selectedChat && inputRef.current) {
-      // Checking window.innerWidth to avoid auto-focus on mobile which might trigger keyboard
       if (window.innerWidth > 768) {
         setTimeout(() => {
-          inputRef.current.focus();
+          inputRef.current?.focus();
         }, 100);
       }
     }
   }, [selectedChat]);
 
-  // USEEFFECT #1: LOAD CONTACTS
-  useEffect(() => {
-    if (!myId) return;
-
-    if (isBuyer && (buyerStatus === "idle" || shouldRefresh)) {
-      dispatch(getContactForBuyer(myId));
-    } else if (!isBuyer && (sellerStatus === "idle" || shouldRefresh)) {
-      dispatch(getContactForSeller(myId));
-    }
-
-    if (shouldRefresh) {
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [
-    dispatch,
-    myId,
-    isBuyer,
-    buyerStatus,
-    sellerStatus,
-    shouldRefresh,
-    navigate,
-    location.pathname,
-  ]);
-
-  // USEEFFECT #2: FETCH MESSAGES & MARK AS READ
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!partnerId || !token) return;
-      setMessagesLoading(true);
-      setMessages([]);
-
-      // Mark as read when entering chat
-      dispatch(markChatAsRead({ partnerId, isBuyer }));
-
-      try {
-        const messagesResponse = await axiosInstance.get(
-          `${API_BASE_URL}/chat/${partnerId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-
-
-        if (messagesResponse.data.success) {
-          const formattedMessages = messagesResponse.data.data.map((msg) => ({
-            id: msg.id,
-            type: "text",
-            text: msg.text,
-            timestamp: formatTime(msg.created_at),
-            sender:
-              (isBuyer && msg.sender_role?.toUpperCase() === "BUYER") ||
-                (!isBuyer && msg.sender_role?.toUpperCase() === "SELLER")
-                ? "user"
-                : "seller",
-          }));
-          setMessages(formattedMessages);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching messages:", error);
-      } finally {
-        setMessagesLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [partnerId, token, isBuyer, dispatch]);
-
-  // USEEFFECT #3: UPDATE SELECTED CHAT
-  useEffect(() => {
-    if (partnerId && conversations.length > 0) {
-      const selected = conversations.find(
-        (c) => c.id.trim() === partnerId.trim()
-      );
-      setSelectedChat(selected);
-    } else if (!partnerId) {
-      setSelectedChat(null);
-    }
-  }, [partnerId, conversations]);
-
-  // USEEFFECT #4: JOIN CHAT ROOM & RECONNECTION HANDLING
-  useEffect(() => {
-    if (!partnerId || !myId || !roomId) return;
-
-    const joinRoom = () => {
-      socket.emit("join_room", { buyerId, sellerId });
-
-    };
-
-    // Join immediately
-    joinRoom();
-
-    // Re-join on reconnection
-    const handleReconnect = () => {
-
-      joinRoom();
-    };
-
-    socket.on("reconnect", handleReconnect);
-
-    return () => {
-
-      socket.off("reconnect", handleReconnect);
-    };
-  }, [partnerId, myId, isBuyer]);
-
-  // USEEFFECT #5: LISTEN TO MESSAGES IN ACTIVE CHAT
-  useEffect(() => {
-    if (!partnerId || !myId) return;
-
-    const handleNewMessage = (newMessage) => {
-
-
-      const messagePartnerId = isBuyer
-        ? newMessage.id_seller
-        : newMessage.id_buyer;
-
-      if (messagePartnerId !== partnerId) {
-
-        return;
-      }
-
-      const isMyMessage =
-        (isBuyer && newMessage.sender_role?.toUpperCase() === "BUYER") ||
-        (!isBuyer && newMessage.sender_role?.toUpperCase() === "SELLER");
-
-      setMessages((prevMessages) => {
-        const exists = prevMessages.some((msg) => msg.id === newMessage.id);
-        if (exists) {
-
-          return prevMessages;
-        }
-
-        // Stop typing indicator when message received
-        setIsPartnerTyping(false);
-
-        return [
-          ...prevMessages,
-          {
-            id: newMessage.id,
-            type: "text",
-            text: newMessage.text,
-            timestamp: formatTime(newMessage.created_at),
-            sender: isMyMessage ? "user" : "seller",
-          },
-        ];
-      });
-
-      // Mark as read immediately to keep unread count at 0
-      dispatch(markChatAsRead({ partnerId, isBuyer }));
-    };
-
-    const handleUserTyping = ({ userId, isTyping }) => {
-
-      // Only show typing if it's from the current partner
-      if (String(userId) === String(partnerId)) {
-        setIsPartnerTyping(isTyping);
-      }
-    };
-
-    const handleErrorMessage = (data) => {
-      console.error("❌ Socket Error:", data);
-      alert(`Gagal mengirim pesan: ${data.error}`);
-    };
-
-    socket.on("receive_message", handleNewMessage);
-    socket.on("user_typing", handleUserTyping);
-    socket.on("error_message", handleErrorMessage);
-
-    return () => {
-      socket.off("receive_message", handleNewMessage);
-      socket.off("user_typing", handleUserTyping);
-      socket.off("error_message", handleErrorMessage);
-    };
-  }, [partnerId, myId, isBuyer]);
 
   // USEEFFECT #6: AUTO SCROLL
   useEffect(() => {
@@ -284,64 +128,27 @@ const ChatLayout = () => {
 
   const handleInputChange = (e) => {
     setText(e.target.value);
-
-    // Emit typing event
-    if (socket && roomId && myId) {
-      if (!typingTimeoutRef.current) {
-
-        socket.emit("typing", {
-          roomId: roomId,
-          userId: myId,
-          isTyping: true,
-        });
-      }
-
-      // Clear existing timeout
-      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-
-      // Set timeout to stop typing
-      typingTimeoutRef.current = setTimeout(() => {
-
-        socket.emit("typing", {
-          roomId: roomId,
-          userId: myId,
-          isTyping: false,
-        });
-        typingTimeoutRef.current = null;
-      }, 2000);
-    }
+    emitTyping();
   };
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!text.trim() || !partnerId || !myId) return;
+    if (!text.trim()) return;
 
-    // Stop typing immediately
-    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    if (roomId) {
-      socket.emit("typing", {
-        roomId: roomId,
-        userId: myId,
-        isTyping: false,
-      });
-    }
-    typingTimeoutRef.current = null;
-
-    const messageData = {
-      id_buyer: isBuyer ? myId : partnerId,
-      id_seller: isBuyer ? partnerId : myId,
-      text: text,
-      sender_role: isBuyer ? "BUYER" : "SELLER",
-    };
-
-
-    socket.emit("send_message", messageData);
+    sendMessage(text);
     setText("");
   };
 
   const handleSelectChat = (conversation) => {
     setChatMobile(true);
-    dispatch(markChatAsRead({ partnerId: conversation.id, isBuyer }));
+    const queryKey = isBuyer ? ['contactsBuyer', myId] : ['contactsSeller', myId];
+    queryClient.setQueryData(queryKey, (oldData) => {
+      if (!oldData?.data) return oldData;
+      const newData = oldData.data.map(c =>
+        String(c.id).trim() === String(conversation.id).trim() ? { ...c, unreadCount: 0 } : c
+      );
+      return { ...oldData, data: newData };
+    });
     user?.active_role === "buyer"
       ? navigate(`/chat/${conversation.id}`)
       : navigate(`/dashboard/chat/${conversation.id}`);
@@ -351,55 +158,38 @@ const ChatLayout = () => {
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderSuccessId, setOrderSuccessId] = useState(null);
+  const { mutate: createOrderMutate, isPending: isCreatingOrder } = useCreateOrder({
+    onSuccess: (response, variables) => {
+      // response from apiFetch is already response.data if using apiFetch pattern correctly
+      // but orderService.createOrder uses apiFetch which returns the data
+      if (response.status === "success") {
+        const orderId = response.data.id;
+        setOrderSuccessId(orderId);
+        sendMessage(`✅ Pesanan telah dibuat! Order ID: #${orderId}`);
+        setShowSuccessModal(true);
+      }
+    },
+    onError: (error, variables) => {
+      console.error("❌ Error creating order:", error);
+      alert(error.message || "Gagal membuat pesanan");
+      // Remove from confirmed on error
+      if (variables.messageId) {
+        setConfirmedMessageIds((prev) => prev.filter((id) => id !== variables.messageId));
+      }
+    }
+  });
 
-  const handleCreateOrder = async (orderData, messageId) => {
-    setIsCreatingOrder(true);
-
+  const handleCreateOrder = (orderData, messageId) => {
     // Mark as confirmed immediately for better UX
     setConfirmedMessageIds((prev) => [...prev, messageId]);
 
-    try {
+    const agreedPriceFormatted = orderData.agreedPrice.toLocaleString("id-ID");
 
-
-      const agreedPriceFormatted =
-        orderData.agreedPrice.toLocaleString("id-ID");
-
-      const response = await axiosInstance.post(
-        `${API_BASE_URL}/orders`,
-        {
-          id_service: orderData.serviceId,
-          pesan_tambahan: `Negosiasi melalui chat. Harga disepakati: Rp ${agreedPriceFormatted}`,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-
-
-      if (response.data.status === "success") {
-        const orderId = response.data.data.id;
-        setOrderSuccessId(orderId);
-
-        // Send confirmation to chat
-        const confirmMessage = `✅ Pesanan telah dibuat! Order ID: #${orderId}`;
-        socket.emit("send_message", {
-          id_buyer: isBuyer ? myId : partnerId,
-          id_seller: isBuyer ? partnerId : myId,
-          text: confirmMessage,
-          sender_role: "BUYER",
-        });
-
-        setShowSuccessModal(true);
-      }
-    } catch (error) {
-      console.error("❌ Error creating order:", error);
-      alert(error.response?.data?.message || "Gagal membuat pesanan");
-      // Remove from confirmed on error
-      setConfirmedMessageIds((prev) => prev.filter((id) => id !== messageId));
-    } finally {
-      setIsCreatingOrder(false);
-    }
+    createOrderMutate({
+      id_service: orderData.serviceId,
+      pesan_tambahan: `Negosiasi melalui chat. Harga disepakati: Rp ${agreedPriceFormatted}`,
+      messageId // passing this for onError cleanup
+    });
   };
 
   return (
@@ -885,20 +675,39 @@ const ChatLayout = () => {
                         }`}
                     >
                       <div
-                        className={`max-w-xs lg:max-w-md xl:max-w-lg ${msg.sender === "user"
-                          ? "bg-primary text-white"
-                          : "bg-white text-gray-800"
-                          } rounded-2xl px-4 py-3 shadow-sm`}
+                        className={`max-w-[70%] rounded-2xl p-4 shadow-sm relative ${msg.sender === "user"
+                          ? "bg-primary text-white rounded-tr-sm"
+                          : "bg-white text-gray-800 rounded-tl-sm border border-gray-100"
+                          } ${msg.isOptimistic ? "opacity-70" : ""}`}
                       >
-                        <p className="text-sm md:text-base">{msg.text}</p>
-                        <p
-                          className={`text-xs mt-1 ${msg.sender === "user"
-                            ? "text-white/70"
-                            : "text-gray-500"
+                        <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
+                          {msg.text}
+                        </p>
+                        <div
+                          className={`flex items-center gap-1 mt-1 ${msg.sender === "user" ? "justify-end" : "justify-start"
                             }`}
                         >
-                          {msg.timestamp}
-                        </p>
+                          <p
+                            className={`text-[10px] ${msg.sender === "user"
+                              ? "text-white/70"
+                              : "text-gray-400"
+                              }`}
+                          >
+                            {msg.timestamp}
+                          </p>
+                          {msg.sender === "user" && (
+                            <div className="flex items-center">
+                              {msg.isOptimistic ? (
+                                <div className="w-2 h-2 border border-white/50 border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <FaCheckCircle
+                                  size={10}
+                                  className="text-white/70"
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );

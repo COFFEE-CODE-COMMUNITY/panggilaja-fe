@@ -3,70 +3,36 @@ import NavLink from "../../navigation/NavLink";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    changeAccount,
-    logoutUser,
-    resetChangeAccountStatus,
-    selectAccessToken,
-    selectChangeAccountStatus,
-    selectCurrentUser,
-} from "../../../../features/authSlice";
-import {
-    FaBars,
-    FaHeart,
-    FaRegComment,
-    FaRegHeart,
-    FaSearch,
-    FaShoppingBag,
-    FaTimes,
-    FaUser,
-    FaArrowLeft,
-} from "react-icons/fa";
-import { MdSearch } from "react-icons/md";
-import {
-    deleteFavoriteService,
-    getFavoriteService,
-    getServices,
-    resetDeleteFavoritesStatus,
-    selectAllService,
-    selectDeleteFavoriteServiceError,
-    selectDeleteFavoriteServiceStatus,
-    selectFavoriteService,
-    selectFavoriteServiceStatus,
-} from "../../../../features/serviceSlice";
-import {
-    seeProfile,
-    selectSeeProfile,
-    selectSeeProfileStatus,
-    resetUserProfile,
-} from "../../../../features/userSlice";
-import {
-    selectSearchText,
-    setSearchText,
-} from "../../../../features/searchSlice";
+import { authService } from "../../../../services/authService";
+import useAuthStore from "../../../../store/useAuthStore";
+import useSearchStore from "../../../../store/useSearchStore";
+import { useGetProfile } from "../../../../hooks/useUsers";
+import { useGetServices, useGetFavoriteServices } from "../../../../hooks/useServices";
 
 import ModalSwitchAccount from "../../Modal/ModalSwitchAccount";
 import ModalAuth from "../../Modal/ModalAuth";
+import { FaBars, FaRegComment, FaRegHeart, FaSearch, FaShoppingBag, FaUser } from "react-icons/fa";
+import { MdSearch } from "react-icons/md";
 
 const Header = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const urlSearchText = searchParams.get("q") || "";
 
-    const user = useSelector(selectCurrentUser);
-    const token = useSelector(selectAccessToken);
-    const profile = useSelector(selectSeeProfile);
-    const statusProfile = useSelector(selectSeeProfileStatus);
-    const searchText = useSelector(selectSearchText);
-    const favorites = useSelector(selectFavoriteService);
-    const favoritesStatus = useSelector(selectFavoriteServiceStatus);
-    const services = useSelector(selectAllService);
-    const statusChange = useSelector(selectChangeAccountStatus);
-    const deleteFavoriteStatus = useSelector(selectDeleteFavoriteServiceStatus);
-    const deleteFavoriteMessage = useSelector(selectDeleteFavoriteServiceError);
+    const user = useAuthStore(state => state.user);
+    const token = useAuthStore(state => state.accessToken);
+    const logout = useAuthStore(state => state.logout);
+    const setAuth = useAuthStore(state => state.setAuth);
+
+    const searchText = useSearchStore(state => state.searchText);
+    const setSearchText = useSearchStore(state => state.setSearchText);
+
+    const { data: profile } = useGetProfile(user?.id_buyer);
+    const { data: servicesResponse } = useGetServices();
+    const services = servicesResponse || [];
+    const { data: favoritesResponse, isSuccess: favoritesStatus } = useGetFavoriteServices(user?.id);
+    const favorites = favoritesResponse || { data: [] };
 
     const [sidebarProfile, setSidebarProfile] = useState(false);
     const [sidebarMobile, setSidebarMobile] = useState(false);
@@ -81,17 +47,9 @@ const Header = () => {
     const [showPartnerAuthModal, setShowPartnerAuthModal] = useState(false);
 
     useEffect(() => {
-        if (statusChange === "success") {
-            dispatch(resetChangeAccountStatus());
-            dispatch(resetUserProfile());
-            // navigate('/dashboard') // Removed because we navigate immediately
-        }
-    }, [statusChange, dispatch]); // Removed navigate dependency
-
-    useEffect(() => {
         setSearch(urlSearchText);
-        dispatch(setSearchText(urlSearchText));
-    }, [location.search, dispatch]);
+        setSearchText(urlSearchText);
+    }, [location.search, setSearchText]);
 
     useEffect(() => {
         if (sidebarProfile) {
@@ -100,27 +58,10 @@ const Header = () => {
     }, [location.pathname]);
 
     useEffect(() => {
-        if (user?.id_buyer) {
-            const isProfileMismatch = profile && profile.id !== user.id_buyer;
-
-            if ((statusProfile === "idle" && !profile) || isProfileMismatch) {
-                if (isProfileMismatch) {
-                    dispatch(resetUserProfile());
-                }
-                dispatch(seeProfile(user.id_buyer));
-            }
-        }
-    }, [statusProfile, dispatch, user?.id_buyer, profile]);
-
-    useEffect(() => {
         if (!token) {
             setSidebarProfile(false);
         }
-        if (token && user?.id) {
-            dispatch(getFavoriteService(user.id));
-        }
-        dispatch(getServices());
-    }, [token, user?.id, dispatch]);
+    }, [token]);
 
     useEffect(() => {
         if (sidebarMobile) {
@@ -128,16 +69,18 @@ const Header = () => {
         }
     }, [location.pathname]);
 
-    useEffect(() => {
-        if (deleteFavoriteStatus === "success") {
-            if (user?.id) {
-                dispatch(getFavoriteService(user.id));
+    // Async handler for account switch
+    const handleSwitchAccount = async () => {
+        try {
+            const res = await authService.changeAccount({ targetRole: "seller" });
+            if (res?.data) {
+                setAuth(res.data.accessToken, res.data.user);
             }
-            dispatch(resetDeleteFavoritesStatus());
+            navigate('/dashboard');
+        } catch (err) {
+            console.error(err);
         }
-    }, [deleteFavoriteStatus, deleteFavoriteMessage, dispatch, user?.id]);
-
-    // Removed the blocking loader for statusChange === "loading"
+    };
 
     const handleChange = (e) => {
         setSearch(e.target.value);
@@ -146,7 +89,7 @@ const Header = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         setHeader(true);
-        dispatch(setSearchText(search));
+        setSearchText(search);
         const targetPath = search
             ? `/search-result?q=${encodeURIComponent(search)}`
             : "/search-result";
@@ -156,7 +99,7 @@ const Header = () => {
 
     let favoritesService = [];
 
-    if (favoritesStatus === "success" && favorites.data && services.length > 0) {
+    if (favoritesStatus && favorites.data && services.length > 0) {
         const favoritedServiceIds = favorites.data.map((fav) => fav.service_id);
 
         favoritesService = services.filter((service) =>
@@ -335,7 +278,7 @@ const Header = () => {
                                         type="button"
                                         onClick={() => {
                                             setSearch("");
-                                            dispatch(setSearchText(""));
+                                            setSearchText("");
                                         }}
                                         className="absolute right-3 p-1 text-gray-400 hover:text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
                                     >
@@ -484,7 +427,7 @@ const Header = () => {
                                 className="flex justify-center w-full py-3 rounded-xl text-white font-medium hover:shadow-lg transition-all"
                                 variant="primary"
                                 onClick={() => {
-                                    dispatch(logoutUser());
+                                    authService.logout().then(() => logout());
                                     setSidebarMobile(false);
                                 }}
                             >
@@ -577,7 +520,7 @@ const Header = () => {
                             className="flex justify-center w-full py-4 rounded-xl text-white font-medium hover:shadow-lg transition-all"
                             variant="primary"
                             onClick={() => {
-                                dispatch(logoutUser());
+                                authService.logout().then(() => logout());
                                 setSidebarMobile(false);
                             }}
                         >
@@ -588,13 +531,7 @@ const Header = () => {
             )}
             {statusChanges && (
                 <ModalSwitchAccount
-                    onRedirect={() => {
-                        dispatch(changeAccount({ targetRole: "seller" }))
-                        navigate('/dashboard')
-                        // We DO NOT close the modal here (setStatusChanges(false)).
-                        // We let the navigation unmount the Header component, keeping the modal visible until the page physically changes.
-                        // This prevents the "flash" of the Landing Page before the Dashboard Skeleton appears.
-                    }}
+                    onRedirect={handleSwitchAccount}
                     destinationName={'seller dashboard'}
                     textSwitch={'Your account has been successfully switched to a seller account. You can now start managing your services.'}
                 />

@@ -1,25 +1,16 @@
 import React, { useEffect } from 'react'
 import ReviewCard from '../../components/modules/Cards/ReviewCard'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import {
-  getReviewsBySellerId,
-  selectSellerReviews,
-  selectSellerReviewsStatus
-} from '../../features/reviewSlice'
+import { useGetReviewsBySellerId } from '../../hooks/useReviews'
 import { MessageSquare } from 'lucide-react'
+import { useParams } from 'react-router-dom'
 
 const ProfileReviews = () => {
   const { id } = useParams()
-  const dispatch = useDispatch()
-  const reviews = useSelector(selectSellerReviews)
-  const status = useSelector(selectSellerReviewsStatus)
 
-  useEffect(() => {
-    if (id) {
-      dispatch(getReviewsBySellerId(id))
-    }
-  }, [dispatch, id])
+  const { data: reviewsResponse, status: reviewsQueryStatus } = useGetReviewsBySellerId(id);
+  const reviews = reviewsResponse?.data || reviewsResponse || [];
+  const status = reviewsQueryStatus === 'pending' ? 'loading' : reviewsQueryStatus;
+
 
   if (status === 'loading') {
     return (

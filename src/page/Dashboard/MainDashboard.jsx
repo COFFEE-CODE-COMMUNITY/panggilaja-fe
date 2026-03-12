@@ -1,18 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectChangeAccountStatus, selectCurrentUser } from '../../features/authSlice';
-import {
-  getAllServicesByIdSeller,
-  getOrderBySellerId,
-  getSellerById,
-  selectOrderSeller,
-  selectSelectedSeller,
-  selectSellerServices,
-  selectOrderSellerStatus,
-  selectServiceSellerStatus,
-} from '../../features/sellerSlice';
-import { selectContactSeller, getContactForSeller, selectContactSellerStatus } from '../../features/chatSlice';
+import useAuthStore from '../../store/useAuthStore';
+import { useGetOrdersBySellerId, useGetSellerById, useGetSellerServices } from '../../hooks/useSellers';
+import { useGetContactForSeller } from '../../hooks/useChat';
 import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
 
 const DashboardSkeleton = () => {
   return (
@@ -104,71 +94,52 @@ const DashboardSkeleton = () => {
 }
 
 const DashboardUtama = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector(selectCurrentUser);
-  const changeAccountStatus = useSelector(selectChangeAccountStatus);
-  const orders = useSelector(selectOrderSeller);
-  const services = useSelector(selectSellerServices);
-  const sellerProfile = useSelector(selectSelectedSeller);
-  const contactSeller = useSelector(selectContactSeller);
+  const user = useAuthStore(state => state.user);
 
-  const ordersStatus = useSelector(selectOrderSellerStatus);
-  const servicesStatus = useSelector(selectServiceSellerStatus);
-  const contactStatus = useSelector(selectContactSellerStatus);
+  const { data: sellerProfileResponse } = useGetSellerById(user?.id_seller);
+  const sellerProfile = sellerProfileResponse || {};
+
+  const { data: ordersResponse, status: ordersQueryStatus } = useGetOrdersBySellerId(user?.id_seller);
+  const orders = ordersResponse || { data: [] };
+  const ordersStatus = ordersQueryStatus === "pending" ? "loading" : ordersQueryStatus;
+
+  const { data: servicesResponse, status: servicesQueryStatus } = useGetSellerServices(user?.id_seller);
+  const services = servicesResponse || { data: [] };
+  const servicesStatus = servicesQueryStatus === "pending" ? "loading" : servicesQueryStatus;
+
+  const { data: contactResponse, status: contactQueryStatus } = useGetContactForSeller(user?.id_seller);
+  const contactSeller = contactResponse || [];
+  const contactStatus = contactQueryStatus === "pending" ? "loading" : contactQueryStatus;
 
   const unreadCount = contactSeller?.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0) || 0;
 
-  const [stats, setStats] = useState({
-    totalOrders: 0,
-    inProgressOrders: 0,
-    completedOrders: 0,
-    totalServices: 0,
-  });
+  const stats = useMemo(() => {
+    const data = {
+      totalOrders: orders?.data?.length || 0,
+      inProgressOrders: 0,
+      completedOrders: 0,
+      totalServices: services?.data?.length || 0,
+    };
 
-  // Loading based on account switch TO SELLER or initial data fetch
-  // If we are switching TO BUYER (active_role === 'seller' && status === 'loading'), we do NOT want to show dashboard skeleton.
+    if (orders?.data) {
+      data.inProgressOrders = orders.data.filter(
+        (order) => order.status === "in_progress"
+      ).length;
+      data.completedOrders = orders.data.filter(
+        (order) => order.status === "completed"
+      ).length;
+    }
 
-  const isSwitchingToSeller = changeAccountStatus === 'loading' && user?.active_role === 'buyer';
+    return data;
+  }, [orders?.data, services?.data]);
+
   const isDataLoading =
-    changeAccountStatus !== 'loading' &&
     user?.active_role === 'seller' &&
     (ordersStatus === 'loading' || servicesStatus === 'loading' || contactStatus === 'loading');
 
-  const isLoading = isSwitchingToSeller || isDataLoading || !user?.id_seller;
+  const isLoading = isDataLoading || !user?.id_seller;
 
-  let lengthService = 0
-  services?.data?.map(() => {
-    lengthService += 1
-  })
-
-  useEffect(() => {
-    if (user?.id_seller) {
-      // Small artificial delay to show skeleton if desired, or just load
-      dispatch(getSellerById(user?.id_seller));
-      dispatch(getOrderBySellerId(user?.id_seller));
-      dispatch(getAllServicesByIdSeller(user?.id_seller));
-      dispatch(getContactForSeller(user?.id_seller));
-    }
-  }, [dispatch, user?.id_seller]);
-
-  useEffect(() => {
-    if (orders?.data && services?.data) {
-      const inProgress = orders.data.filter(
-        (order) => order.status === 'in_progress'
-      ).length;
-      const completed = orders.data.filter(
-        (order) => order.status === 'completed'
-      ).length;
-
-      setStats({
-        totalOrders: orders.data.length,
-        inProgressOrders: inProgress,
-        completedOrders: completed,
-        totalServices: services.data.length,
-      });
-    }
-  }, [orders?.data, services?.data]);
 
   const latestOrders = orders?.data?.slice(0, 3) || [];
 
@@ -261,7 +232,7 @@ const DashboardUtama = () => {
               </div>
               <div className="flex flex-col items-center flex-1">
                 <p className="text-[10px] text-gray-500 mb-0.5">Layanan</p>
-                <p className="text-lg font-bold text-gray-800">{lengthService}</p>
+                <p className="text-lg font-bold text-gray-800">{stats.totalServices}</p>
               </div>
             </div>
           </div>
@@ -373,7 +344,7 @@ const DashboardUtama = () => {
               Layanan
             </h3>
             <p className="text-2xl sm:text-3xl font-bold text-gray-800">
-              {lengthService}
+              {stats.totalServices}
             </p>
           </div>
         </div>

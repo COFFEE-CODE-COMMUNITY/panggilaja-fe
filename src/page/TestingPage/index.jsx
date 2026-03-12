@@ -1,20 +1,12 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getBuyerOrders } from "../../features/orderSlice";
+import { useGetBuyerOrders } from "../../hooks/useOrders";
 
 const TestingPage = () => {
-  const dispatch = useDispatch();
+  const { data: ordersResponse, status, error } = useGetBuyerOrders();
+  const buyerOrders = ordersResponse?.data || ordersResponse || [];
 
-  const { buyerOrders, status, error } = useSelector((state) => state.order);
-
-  useEffect(() => {
-    dispatch(getBuyerOrders());
-  }, [dispatch]);
-
-
-
-  if (status === "loading") return <p>Loading order...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (status === "pending") return <p>Loading order...</p>;
+  if (status === "error") return <p>Error: {error?.message || "Something went wrong"}</p>;
 
   return (
     <main>

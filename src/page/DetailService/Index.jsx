@@ -1,54 +1,22 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import ImageService from "./sections/ImageService";
-import {
-  getReviewServicesById,
-  getServicesById,
-  selectReviewService,
-  selectReviewServiceStatus,
-  selectSelectedService,
-  selectSelectedServiceStatus,
-} from "../../features/serviceSlice";
+import { useGetServiceById, useGetReviewServicesById } from "../../hooks/useServices";
 import InformationService from "./sections/InformationService";
 import ReviewService from "./sections/ReviewService";
+import { useGetSellerById } from "../../hooks/useSellers";
 
 const DetailService = () => {
   const { id } = useParams();
-  const dispatch = useDispatch();
 
-  const service = useSelector(selectSelectedService);
-  const status = useSelector(selectSelectedServiceStatus);
-
-  const reviews = useSelector(selectReviewService);
-  const reviewStatus = useSelector(selectReviewServiceStatus);
-
-  useEffect(() => {
-    if (id) {
-      dispatch(getServicesById(id));
-    }
-  }, [dispatch, id]);
-
-  useEffect(() => {
-
-    if (service?.id) {
-
-      dispatch(getReviewServicesById(service.id));
-    } else {
-
-    }
-  }, [dispatch, service?.id]);
-
-
+  const { data: serviceData, status: serviceQueryStatus, isFetching } = useGetServiceById(id);
+  const service = serviceData?.data || serviceData || {};
+  const status = serviceQueryStatus === "pending" ? "loading" : serviceQueryStatus;
+  const { data: sellerData } = useGetSellerById(serviceData?.seller_id)
+  const { data: reviewsData, status: reviewStatus } = useGetReviewServicesById(service?.id || id);
+  const reviews = reviewsData || { data: [] };
 
   const [isArtificialLoading, setIsArtificialLoading] = React.useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsArtificialLoading(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, []);
 
   const DetailServiceSkeleton = () => (
     <div className="bg-gray-50/60 min-h-screen w-full pt-28 pb-12 animate-pulse">
@@ -87,7 +55,7 @@ const DetailService = () => {
     </div>
   );
 
-  if (status === "loading" || isArtificialLoading) {
+  if (isFetching) {
     return <DetailServiceSkeleton />;
   }
 
